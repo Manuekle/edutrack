@@ -1,6 +1,7 @@
 import { authOptions } from '@/lib/auth';
-import { generateAttendanceReportPDF } from '@/lib/generar-reporte-docente';
+import { generateAttendanceReportPDF } from '@/lib/generar-bitacora-docente';
 import { db } from '@/lib/prisma';
+import { put } from '@vercel/blob';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -42,6 +43,7 @@ export async function GET() {
 
     return NextResponse.json(reports);
   } catch (error) {
+    console.error('Error en GET /api/docente/reportes:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { subjectId, format } = createReportSchema.parse(body);
 
+    // Verificar que la asignatura existe y pertenece al docente
     const subject = await db.subject.findFirst({
       where: {
         id: subjectId,
@@ -91,58 +94,106 @@ export async function POST(request: Request) {
     const currentPeriod = currentMonth <= 6 ? 1 : 2;
     const currentYear = currentDate.getFullYear();
 
+    // Verificar si ya existe un reporte para este período
     const existingReport = await db.report.findFirst({
       where: {
         subjectId,
         period: currentPeriod,
         year: currentYear,
+        requestedById: session.user.id,
       },
     });
 
-    if (existingReport) {
+    if (existingReport && existingReport.status !== 'FALLIDO') {
       return NextResponse.json(
         { error: 'Ya se ha generado un reporte para este período' },
         { status: 400 }
       );
     }
 
-    const newReport = await db.report.create({
-      data: {
+    // Crear el reporte en estado PENDIENTE
+    let newReport;
+    try {
+      newReport = await db.report.create({
+        data: {
+          subjectId,
+          requestedById: session.user.id,
+          status: 'PENDIENTE',
+          format,
+          period: currentPeriod,
+          year: currentYear,
+        },
+      });
+    } catch (dbError) {
+      console.error('Error creando reporte en DB:', dbError);
+      return NextResponse.json({ error: 'Error creando el reporte' }, { status: 500 });
+    }
+
+    try {
+      // Actualizar estado a EN_PROCESO
+      await db.report.update({
+        where: { id: newReport.id },
+        data: { status: 'EN_PROCESO' },
+      });
+
+      const { buffer: pdfBuffer, fileName } = await generateAttendanceReportPDF(
         subjectId,
-        requestedById: session.user.id,
-        status: 'PENDIENTE',
-        format,
-        period: currentPeriod,
-        year: currentYear,
-      },
-      include: {
-        subject: {
-          select: {
-            name: true,
-            code: true,
+        session.user.id,
+        currentPeriod,
+        currentYear
+      );
+
+      const blob = await put(`reports/${fileName}`, pdfBuffer, {
+        access: 'public',
+        contentType: 'application/pdf',
+      });
+
+      // Actualizar el reporte con la información del archivo generado
+      const completedReport = await db.report.update({
+        where: { id: newReport.id },
+        data: {
+          status: 'COMPLETADO',
+          fileUrl: blob.url,
+          fileName: fileName,
+        },
+        include: {
+          subject: {
+            select: {
+              name: true,
+              code: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    generateAttendanceReportPDF(subjectId, newReport.id)
-      .then(() => {})
-      .catch(error => {});
+      return NextResponse.json(completedReport, { status: 201 });
+    } catch (pdfError) {
+      console.error('Error generando PDF:', pdfError);
 
-    const updatedReport = await db.report.findUnique({
-      where: { id: newReport.id },
-      include: {
-        subject: {
-          select: {
-            name: true,
-            code: true,
+      // Actualizar estado del reporte a FALLIDO
+      try {
+        await db.report.update({
+          where: { id: newReport.id },
+          data: {
+            status: 'FALLIDO',
+            error: pdfError instanceof Error ? pdfError.message : 'Error desconocido',
           },
-        },
-      },
-    });
+        });
+      } catch (updateError) {
+        console.error('Error actualizando estado de reporte fallido:', updateError);
+      }
 
-    return NextResponse.json(updatedReport, { status: 201 });
+      return NextResponse.json(
+        {
+          error: 'Error generando el PDF',
+          details: pdfError instanceof Error ? pdfError.message : 'Error desconocido',
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
+    console.error('Error en POST /api/docente/reportes:', error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Datos inválidos', details: error.errors },
@@ -150,6 +201,12 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Error interno del servidor',
+        details: error instanceof Error ? error.message : 'Error desconocido',
+      },
+      { status: 500 }
+    );
   }
 }

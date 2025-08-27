@@ -682,20 +682,23 @@ export default function SubjectDetailPage() {
           <CardTitle className="text-2xl font-semibold tracking-heading">Mis Clases</CardTitle>
           <CardDescription className="text-xs">Gestiona tus clases y eventos.</CardDescription>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setIsReportModalOpen(true)}
-          disabled={hasScheduledClasses || reportExistsForCurrentPeriod}
-          title={
-            hasScheduledClasses
-              ? 'No se puede generar el reporte porque hay clases programadas pendientes'
-              : reportExistsForCurrentPeriod
-                ? 'Ya se ha generado un reporte para este período'
-                : 'Generar reporte de asistencia'
-          }
-        >
-          {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsReportModalOpen(true)}
+            disabled={hasScheduledClasses || reportExistsForCurrentPeriod}
+            title={
+              hasScheduledClasses
+                ? 'No se puede generar el reporte porque hay clases programadas pendientes'
+                : reportExistsForCurrentPeriod
+                  ? 'Ya se ha generado un reporte para este período'
+                  : 'Generar reporte de asistencia'
+            }
+          >
+            {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
+          </Button>
+          <Button>Vista Previa</Button>
+        </div>
       </div>
 
       {/* SECCIÓN DE GESTIÓN DE ESTUDIANTES */}
