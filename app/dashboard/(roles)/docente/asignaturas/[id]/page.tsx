@@ -697,7 +697,6 @@ export default function SubjectDetailPage() {
           >
             {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
           </Button>
-          <Button>Vista Previa</Button>
         </div>
       </div>
 

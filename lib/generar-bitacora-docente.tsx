@@ -1,6 +1,9 @@
+import ReportReadyEmail from '@/app/emails/ReportReadyEmail';
 import { db } from '@/lib/prisma';
+import { ReportStatus } from '@prisma/client';
 import { Document, Image, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
 import React, { ReactElement } from 'react';
+import { sendEmail } from './email';
 
 declare module '@react-pdf/renderer' {
   interface PDFOptions {
@@ -283,8 +286,8 @@ const styles = StyleSheet.create({
     borderRightColor: '#ECEEDF',
     borderRightStyle: 'solid',
     padding: 6,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cellHoras: {
     width: '7%',
@@ -310,6 +313,10 @@ const styles = StyleSheet.create({
   cellTextLeft: {
     fontSize: 8,
     textAlign: 'left',
+  },
+  cellTextCenter: {
+    fontSize: 8,
+    textAlign: 'center',
   },
 
   // 🔧 DATA CELLS CORREGIDOS - MISMO ANCHO QUE HEADERS
@@ -574,7 +581,7 @@ export const AttendanceReportPDF: React.FC<{ data: TeacherReportData }> = ({ dat
                   </View>
                 </View>
                 <View style={styles.cellTema}>
-                  <Text style={styles.cellTextLeft}>
+                  <Text style={styles.cellTextCenter}>
                     {classItem.topic || `Sesión ${index + 1}`}
                   </Text>
                 </View>
@@ -593,7 +600,7 @@ export const AttendanceReportPDF: React.FC<{ data: TeacherReportData }> = ({ dat
           })}
 
           {/* Filas vacías */}
-          {Array.from({ length: Math.max(0, 15 - realizedClasses.length) }).map((_, index) => {
+          {/* {Array.from({ length: Math.max(0, 15 - realizedClasses.length) }).map((_, index) => {
             const isEven = (realizedClasses.length + index) % 2 === 1;
             return (
               <View
@@ -630,7 +637,7 @@ export const AttendanceReportPDF: React.FC<{ data: TeacherReportData }> = ({ dat
                 </View>
               </View>
             );
-          })}
+          })} */}
         </View>
 
         {/* Sección de clases canceladas corregida */}
@@ -832,42 +839,42 @@ export async function generateAttendanceReportPDF(
     const fileName = `registro-clases-${subject.code}-${period}-${year}-${Date.now()}.pdf`;
 
     // Enviar notificación por correo si se proporcionó el ID del reporte y el solicitante
-    // if (reportId && requestedBy?.correoPersonal) {
-    //   try {
-    //     await sendEmail({
-    //       to: requestedBy.correoPersonal,
-    //       subject: `Reporte de asistencia generado - ${subject.name}`,
-    //       react: ReportReadyEmail({
-    //         subjectName: subject.name,
-    //         reportName: fileName,
-    //         downloadUrl: '', // La URL de descarga debería ser proporcionada por el sistema de almacenamiento
-    //         userName: requestedBy.name || 'Docente',
-    //         supportEmail: 'soporte@institucion.edu.co',
-    //       }),
-    //     });
-    //     console.log(`Notificación enviada a: ${requestedBy.correoPersonal}`);
+    if (reportId && requestedBy?.correoPersonal) {
+      try {
+        await sendEmail({
+          to: requestedBy.correoPersonal,
+          subject: `Reporte de asistencia generado - ${subject.name}`,
+          react: ReportReadyEmail({
+            subjectName: subject.name,
+            reportName: fileName,
+            downloadUrl: '', // La URL de descarga debería ser proporcionada por el sistema de almacenamiento
+            userName: requestedBy.name || 'Docente',
+            supportEmail: 'soporte@institucion.edu.co',
+          }),
+        });
+        console.log(`Notificación enviada a: ${requestedBy.correoPersonal}`);
 
-    //     // Actualizar el estado del reporte si se proporcionó un ID
-    //     if (reportId) {
-    //       await db.report.update({
-    //         where: { id: reportId },
-    //         data: { status: ReportStatus.COMPLETADO },
-    //       });
-    //     }
-    //   } catch (emailError) {
-    //     console.error('Error al enviar el correo de notificación:', emailError);
-    //     if (reportId) {
-    //       await db.report.update({
-    //         where: { id: reportId },
-    //         data: {
-    //           status: ReportStatus.FALLIDO,
-    //           error:
-    //             'El reporte se generó correctamente, pero hubo un error al enviar la notificación por correo.',
-    //         },
-    //       });
-    //     }
-    //   }
-    // }
+        //Actualizar el estado del reporte si se proporcionó un ID
+        if (reportId) {
+          await db.report.update({
+            where: { id: reportId },
+            data: { status: ReportStatus.COMPLETADO },
+          });
+        }
+      } catch (emailError) {
+        console.error('Error al enviar el correo de notificación:', emailError);
+        if (reportId) {
+          await db.report.update({
+            where: { id: reportId },
+            data: {
+              status: ReportStatus.FALLIDO,
+              error:
+                'El reporte se generó correctamente, pero hubo un error al enviar la notificación por correo.',
+            },
+          });
+        }
+      }
+    }
 
     return { buffer, fileName };
   } catch (error) {
