@@ -63,13 +63,14 @@ const styles = StyleSheet.create({
   },
   metaTable: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#005a9c',
     borderStyle: 'solid',
+    borderBottomWidth: 0,
   },
   metaRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#005a9c',
     borderBottomStyle: 'solid',
     padding: 4,
   },
