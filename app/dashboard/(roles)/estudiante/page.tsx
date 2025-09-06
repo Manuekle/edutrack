@@ -210,32 +210,51 @@ export default function EstudianteDashboard() {
     }
   }, []);
 
+  // Combine data fetching into a single effect with proper cleanup
   useEffect(() => {
-    const interval = setInterval(
-      () => {
-        fetchDashboardData();
-      },
-      5 * 60 * 1000
-    ); // Refresh every 5 minutes
+    let isMounted = true;
+    let dashboardInterval: NodeJS.Timeout;
+    let liveClassInterval: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
-  }, [fetchDashboardData]);
-
-  useEffect(() => {
     const fetchAllData = async () => {
-      await Promise.all([fetchDashboardData(), fetchLiveClass()]);
-      setIsInitialLoad(false);
+      if (!isMounted) return;
+
+      try {
+        await Promise.all([fetchDashboardData(), fetchLiveClass()]);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        if (isMounted) {
+          setIsInitialLoad(false);
+        }
+      }
     };
 
+    // Initial fetch
     fetchAllData();
-  }, [fetchDashboardData, fetchLiveClass]);
 
-  useEffect(() => {
-    if (!isInitialLoad) {
-      const interval = setInterval(fetchLiveClass, 30000); // Poll every 30 seconds
-      return () => clearInterval(interval);
+    // Only set up polling if component is still mounted
+    if (isMounted) {
+      // Dashboard data refreshes every 10 minutes
+      dashboardInterval = setInterval(fetchDashboardData, 10 * 60 * 1000);
+
+      // Live class only polls when there's an active class
+      const checkLiveClass = () => {
+        if (liveClass?.id) {
+          fetchLiveClass();
+        }
+      };
+
+      // Initial check with shorter interval
+      liveClassInterval = setInterval(checkLiveClass, 30000);
     }
-  }, [fetchLiveClass, isInitialLoad]);
+
+    return () => {
+      isMounted = false;
+      clearInterval(dashboardInterval);
+      clearInterval(liveClassInterval);
+    };
+  }, [fetchDashboardData, fetchLiveClass, liveClass?.id]);
 
   if (isInitialLoad && (isLoadingUpcomingClasses || isLoadingLiveClass)) {
     return <LoadingPage />;

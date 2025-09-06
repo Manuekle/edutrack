@@ -133,6 +133,13 @@ function LoginForm() {
           </Link>
         </div>
       </form>
+      <div className="mx-6 mt-4 p-3 bg-muted rounded-lg text-xs text-muted-foreground">
+        <p className="font-medium mb-1">Cuentas de prueba:</p>
+        <p>Admin: meerazo7@hotmail.com / admin123</p>
+        <p>Docente: elustondo129@gmail.com / docente123</p>
+        <p>Estudiante 1: manuel.erazo@estudiante.fup.edu.co / estudiante123</p>
+        <p>Estudiante 2: andres.pena@estudiante.fup.edu.co / estudiante123</p>
+      </div>
     </Card>
   );
 }

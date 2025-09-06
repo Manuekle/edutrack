@@ -3,174 +3,114 @@ import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Rutas públicas que no requieren autenticación
-const publicPaths = ['/login', '/_next', '/favicon.ico', '/api/auth', '/icons'];
+// Public paths that don't require authentication
+const publicPaths = ['/', '/login', '/_next', '/favicon.ico', '/api/auth', '/icons'];
+
+// Role-based dashboard paths
+const roleDashboards = {
+  [Role.ADMIN]: '/dashboard/admin',
+  [Role.DOCENTE]: '/dashboard/docente',
+  [Role.ESTUDIANTE]: '/dashboard/estudiante',
+  [Role.COORDINADOR]: '/dashboard/coordinador',
+} as const;
 
 export default withAuth(
   async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // Verificar si es una ruta pública
+    // Check if it's a public path
     const isPublicPath = publicPaths.some(
       path => pathname === path || pathname.startsWith(`${path}/`)
     );
 
-    // Manejar acceso a la página de login
-    if (pathname === '/login') {
-      const token = await getToken({ req });
-
-      // Si el usuario ya está autenticado, redirigir según su rol
-      if (token) {
-        let targetPath = '/';
-        const userRole = token.role as Role;
-
-        // Redirigir según el rol del usuario
-        switch (userRole) {
-          case Role.ADMIN:
-            targetPath = '/dashboard/admin';
-            break;
-          case Role.DOCENTE:
-            targetPath = '/dashboard/docente';
-            break;
-          case Role.ESTUDIANTE:
-            targetPath = '/dashboard/estudiante';
-            break;
-        }
-
-        return NextResponse.redirect(new URL(targetPath, req.url));
-      }
-
-      // Si no está autenticado, permitir el acceso al login
-      return NextResponse.next();
-    }
-
-    // Si es una ruta pública, permitir el acceso
-    if (isPublicPath) {
-      // Si el usuario está autenticado y está intentando acceder a una ruta pública que no sea el login
-      const token = await getToken({ req });
-      if (token && pathname !== '/login') {
-        // Redirigir al dashboard correspondiente según el rol
-        let targetPath = '/dashboard';
-        const userRole = token.role as Role;
-
-        switch (userRole) {
-          case Role.ADMIN:
-            targetPath = '/dashboard/admin';
-            break;
-          case Role.DOCENTE:
-            targetPath = '/dashboard/docente';
-            break;
-          case Role.ESTUDIANTE:
-            targetPath = '/dashboard/estudiante';
-            break;
-        }
-
-        return NextResponse.redirect(new URL(targetPath, req.url));
-      }
-
-      return NextResponse.next();
-    }
-
-    // Obtener el token solo si es necesario (para rutas protegidas)
+    // Get token once to avoid multiple calls
     const token = await getToken({ req });
-    const userRole = token?.role as Role;
 
-    // Si no hay token, redirigir a login
+    // Handle login page access
+    if (pathname === '/login') {
+      if (token) {
+        // Redirect authenticated users to their dashboard
+        const targetPath = roleDashboards[token.role as Role] || '/';
+        return NextResponse.redirect(new URL(targetPath, req.url));
+      }
+      return NextResponse.next();
+    }
+
+    // Allow access to public paths
+    if (isPublicPath) {
+      return NextResponse.next();
+    }
+
+    // If no token, redirect to login
     if (!token) {
-      // Redirigir siempre al login sin parámetros adicionales
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
-    // Crear response con headers de seguridad
-    const response = NextResponse.next();
+    const userRole = token.role as Role;
 
-    // Headers de seguridad
-    response.headers.set('X-Content-Type-Options', 'nosniff');
-    response.headers.set('X-Frame-Options', 'DENY');
-    response.headers.set('X-XSS-Protection', '1; mode=block');
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-    // --- Redirection from root dashboard ---
-    if (pathname === '/dashboard') {
-      let targetPath: string;
-      switch (userRole) {
-        case Role.ADMIN:
-          targetPath = '/dashboard/admin';
-          break;
-        case Role.DOCENTE:
-          targetPath = '/dashboard/docente';
-          break;
-        case Role.ESTUDIANTE:
-          targetPath = '/dashboard/estudiante';
-          break;
-        default:
-          targetPath = '/';
-          break;
-      }
+    // Redirect root path to role-specific dashboard
+    if (pathname === '/') {
+      const targetPath = roleDashboards[userRole] || '/';
       return NextResponse.redirect(new URL(targetPath, req.url));
     }
 
-    // --- API Route Protection ---
+    // Redirect generic dashboard to role-specific dashboard
+    if (pathname === '/dashboard') {
+      const targetPath = roleDashboards[userRole] || '/';
+      return NextResponse.redirect(new URL(targetPath, req.url));
+    }
+
+    // API Route Protection
     if (pathname.startsWith('/api/')) {
-      // Headers adicionales para APIs
-      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      const response = NextResponse.next();
 
-      const unauthorizedResponse = NextResponse.json(
-        { message: 'Acceso denegado.' }, // Mensaje genérico
-        { status: 403 }
-      );
+      // Add security headers
+      response.headers.set('X-Content-Type-Options', 'nosniff');
+      response.headers.set('X-Frame-Options', 'DENY');
+      response.headers.set('X-XSS-Protection', '1; mode=block');
+      response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-      // Validaciones más específicas
+      // Admin-only API routes
       if (pathname.startsWith('/api/admin') && userRole !== Role.ADMIN) {
-        return unauthorizedResponse;
+        return new NextResponse(JSON.stringify({ message: 'Unauthorized' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
 
-      if (
-        pathname.startsWith('/api/docente') &&
-        userRole !== Role.DOCENTE &&
-        userRole !== Role.ADMIN
-      ) {
-        return unauthorizedResponse;
-      }
-
-      if (pathname.startsWith('/api/users')) {
-        const allowedRoles = [Role.ADMIN, Role.DOCENTE, Role.ESTUDIANTE, Role.COORDINADOR];
-        if (!allowedRoles.includes(userRole)) {
-          return unauthorizedResponse;
-        }
-      }
+      return response;
     }
 
-    // --- Page Route Protection ---
+    // Dashboard route protection
     if (pathname.startsWith('/dashboard/')) {
-      const homeUrl = new URL('/', req.url);
-
+      // Admin routes
       if (pathname.startsWith('/dashboard/admin') && userRole !== Role.ADMIN) {
-        return NextResponse.redirect(homeUrl);
+        return NextResponse.redirect(new URL('/unauthorized', req.url));
       }
+
+      // Teacher routes
       if (pathname.startsWith('/dashboard/docente') && userRole !== Role.DOCENTE) {
-        return NextResponse.redirect(homeUrl);
+        return NextResponse.redirect(new URL('/unauthorized', req.url));
       }
+
+      // Student routes
       if (pathname.startsWith('/dashboard/estudiante') && userRole !== Role.ESTUDIANTE) {
-        return NextResponse.redirect(homeUrl);
+        return NextResponse.redirect(new URL('/unauthorized', req.url));
       }
     }
 
-    return response;
+    return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => {
+        // This is handled in the main middleware function
+        return true;
+      },
     },
   }
 );
 
 export const config = {
-  matcher: [
-    // Solo proteger rutas bajo /dashboard y /api
-    '/dashboard/:path*',
-    '/api/:path*',
-    // Excluir explícitamente rutas públicas
-    '/((?!_next/static|_next/image|favicon.ico|login|api/auth|icons).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|icons).*)'],
 };

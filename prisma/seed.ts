@@ -8,14 +8,14 @@ const prisma = new PrismaClient();
 const generateClassDates = (startDate: Date, numberOfClasses: number): Date[] => {
   const dates: Date[] = [];
 
-  // Create date in local timezone for today (August 14, 2025) - ALWAYS start from today
-  const today = new Date(2025, 7, 14); // Month is 0-indexed, so 7 = August
+  // Usar la fecha actual como punto de partida
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Inicio del día actual
   let currentDate = new Date(today);
-  currentDate.setHours(12, 0, 0, 0); // Set to 12:00 PM local time
+  currentDate.setHours(12, 0, 0, 0); // Establecer a las 12:00 PM hora local
 
-  const now = new Date();
-  console.log(`Current local time: ${now.toLocaleString()}`);
-  console.log(`Starting classes TODAY: ${currentDate.toLocaleString()}`);
+  console.log(`Current local time: ${new Date().toLocaleString()}`);
+  console.log(`Starting classes from: ${currentDate.toLocaleString()}`);
 
   // Generate one class per day starting from today
   for (let i = 0; i < numberOfClasses; i++) {

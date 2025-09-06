@@ -1,11 +1,10 @@
 'use client';
 
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Home, Info, Menu, Moon, Sun, User, X, Zap } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
-
-import { useEffect, useMemo, useState } from 'react';
 
 interface NavigationItem {
   name: string;
@@ -30,49 +29,70 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = navigation.map((item: NavigationItem) => item.sectionId);
-      let currentSection = '';
-
-      sections.forEach((section: string) => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            currentSection = section;
-          }
-        }
-      });
-
-      setActiveSection(currentSection);
-      setScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [navigation]);
-
-  useEffect(() => {
-    // Establecer la sección activa inicialmente
+    // Set initial active section based on path
     const path = window.location.pathname;
     setActiveSection(path === '/' ? 'home' : '');
-  }, []);
 
-  useEffect(() => {
-    setMounted(true);
-
+    // Throttled scroll handler
     const handleScroll = () => {
+      // Update scroll position immediately
       const isScrolled = window.scrollY > 10;
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
       }
+
+      // Throttle the section detection
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+
+      scrollTimeout.current = setTimeout(() => {
+        const sections = navigation.map((item: NavigationItem) => item.sectionId);
+        let currentSection = '';
+        const scrollPosition = window.scrollY + 100; // 100px offset for better UX
+
+        for (const section of sections) {
+          const element = document.getElementById(section);
+          if (element) {
+            const { top, bottom } = element.getBoundingClientRect();
+            const elementTop = top + window.scrollY;
+            const elementBottom = bottom + window.scrollY;
+
+            if (scrollPosition >= elementTop && scrollPosition <= elementBottom) {
+              currentSection = section;
+              break;
+            }
+          }
+        }
+
+        if (currentSection !== activeSection) {
+          setActiveSection(currentSection);
+        }
+      }, 100); // 100ms throttle
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [scrolled]);
+    // Add event listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Initial check
+    handleScroll();
+
+    // Cleanup
+    return () => {
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [navigation, scrolled, activeSection]);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   if (!mounted) return null;
 

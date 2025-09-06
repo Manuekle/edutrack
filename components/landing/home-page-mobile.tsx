@@ -181,7 +181,8 @@ export default function HomePageMobile() {
             >
               <Button
                 size="lg"
-                onClick={() => setShowLogin(true)}
+                // onClick={() => setShowLogin(true)}
+                onClick={() => router.push('/login')}
                 variant="default"
                 className="w-full"
               >
