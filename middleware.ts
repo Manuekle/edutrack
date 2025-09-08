@@ -4,7 +4,7 @@ import { withAuth } from 'next-auth/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public paths that don't require authentication
-const publicPaths = ['/', '/login', '/_next', '/favicon.ico', '/api/auth', '/icons'];
+const publicPaths = ['/', '/login', '/_next', '/favicon.ico', '/api/auth', '/icons', '/logout'];
 
 // Role-based dashboard paths
 const roleDashboards = {
@@ -24,7 +24,7 @@ export default withAuth(
     );
 
     // Get token once to avoid multiple calls
-    const token = await getToken({ req });
+    const token = (await getToken({ req })) as { role: Role } | null;
 
     // Handle login page access
     if (pathname === '/login') {
@@ -34,6 +34,19 @@ export default withAuth(
         return NextResponse.redirect(new URL(targetPath, req.url));
       }
       return NextResponse.next();
+    }
+
+    // Handle logout
+    if (pathname === '/logout') {
+      // Clear the session cookie
+      const response = NextResponse.redirect(new URL('/login', req.url));
+      response.cookies.set({
+        name: 'next-auth.session-token',
+        value: '',
+        path: '/',
+        expires: new Date(0),
+      });
+      return response;
     }
 
     // Allow access to public paths
@@ -103,8 +116,8 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => {
-        // This is handled in the main middleware function
+      authorized: () => {
+        // Authorization is handled in the main middleware function
         return true;
       },
     },
