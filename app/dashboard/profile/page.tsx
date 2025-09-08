@@ -183,20 +183,95 @@ export default function ProfilePage() {
   };
 
   const saveCanvas = () => {
-    if (sigCanvas.current?.isEmpty()) {
+    if (!sigCanvas.current) {
+      toast.error('Error: Canvas no disponible');
+      return;
+    }
+
+    if (sigCanvas.current.isEmpty()) {
       toast.error('Por favor, dibuja tu firma antes de guardar.');
       return;
     }
 
-    const dataUrl = sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png') || '';
-    setSignaturePreview(dataUrl);
-    const filename = `${crypto.randomUUID().replace(/-/g, '')}.png`;
-    const newFile = dataURLtoFile(dataUrl, filename);
-    setSignatureFile(newFile);
-    toast.success('Firma capturada. Ahora puedes guardarla.');
+    try {
+      const canvas = sigCanvas.current.getCanvas();
+      if (!canvas) {
+        toast.error('Error: No se pudo acceder al canvas');
+        return;
+      }
 
-    // Limpiar cualquier event listener que pueda estar interfiriendo
-    document.removeEventListener('touchmove', preventScroll);
+      // Verificar que el contexto del canvas esté disponible
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        toast.error('Error: Contexto del canvas no disponible');
+        return;
+      }
+
+      let dataUrl: string;
+
+      // Método 1: Usar getTrimmedCanvas si está disponible
+      try {
+        const trimmedCanvas = sigCanvas.current.getTrimmedCanvas
+          ? sigCanvas.current.getTrimmedCanvas()
+          : null;
+
+        if (trimmedCanvas) {
+          dataUrl = trimmedCanvas.toDataURL('image/png');
+        } else {
+          throw new Error('getTrimmedCanvas no disponible');
+        }
+      } catch (trimError) {
+        console.warn('Método 1 falló, intentando método 2:', trimError);
+
+        // Método 2: Usar un canvas temporal con fondo blanco
+        try {
+          // Crear un canvas temporal para limpiar el fondo
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = canvas.width;
+          tempCanvas.height = canvas.height;
+          const tempCtx = tempCanvas.getContext('2d');
+
+          if (!tempCtx) {
+            throw new Error('No se pudo crear el contexto temporal');
+          }
+
+          // Rellenar con fondo blanco
+          tempCtx.fillStyle = 'white';
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+          // Dibujar la firma
+          tempCtx.drawImage(canvas, 0, 0);
+
+          // Obtener la URL de datos del canvas temporal
+          dataUrl = tempCanvas.toDataURL('image/png');
+        } catch (canvasError) {
+          console.error('Método 2 falló, intentando método 3:', canvasError);
+
+          // Método 3: Usar el canvas original sin procesar
+          try {
+            dataUrl = canvas.toDataURL('image/png');
+          } catch (finalError) {
+            console.error('Método 3 falló:', finalError);
+            toast.error('Error: No se pudo capturar la firma');
+            return;
+          }
+        }
+      }
+
+      if (!dataUrl || dataUrl === 'data:,' || dataUrl.length < 100) {
+        toast.error('Error: La imagen capturada está vacía');
+        return;
+      }
+
+      setSignaturePreview(dataUrl);
+      const filename = `signature_${Date.now()}.png`;
+      const newFile = dataURLtoFile(dataUrl, filename);
+      setSignatureFile(newFile);
+      toast.success('Firma capturada exitosamente');
+    } catch (error) {
+      console.error('Error general al capturar la firma:', error);
+      toast.error('Error inesperado al capturar la firma');
+    }
   };
 
   // Update profile
