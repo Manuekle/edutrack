@@ -55,11 +55,13 @@ export default function AsignarEstudiantePage() {
 
   const handleSearch = async () => {
     if (!codigoAsignatura || !documentoEstudiante) {
-      toast('Por favor ingrese el código de la asignatura y el documento del estudiante');
+      toast.error('Por favor ingrese el código de la asignatura y el documento del estudiante');
       return;
     }
 
     setIsLoading(true);
+    setSearchResults(null);
+
     try {
       // First, get the student and subject info
       const [subjectRes, studentRes] = await Promise.all([
@@ -67,14 +69,24 @@ export default function AsignarEstudiantePage() {
         fetch(`/api/students?document=${documentoEstudiante}`),
       ]);
 
-      if (!subjectRes.ok || !studentRes.ok) {
-        throw new Error('Error al buscar la información');
+      // Handle subject response
+      const subjectData = await subjectRes.json();
+      if (!subjectRes.ok) {
+        const errorMsg = subjectData.error || 'Error al buscar la asignatura';
+        throw new Error(`Asignatura: ${errorMsg}`);
       }
 
-      const [subjectData, studentData] = await Promise.all([subjectRes.json(), studentRes.json()]);
+      // Handle student response
+      const studentData = await studentRes.json();
+      if (!studentRes.ok) {
+        const errorMsg = studentData.error || 'Error al buscar el estudiante';
+        throw new Error(`Estudiante: ${errorMsg}`);
+      }
 
       if (!subjectData.success || !studentData.success) {
-        throw new Error('No se encontró la asignatura o el estudiante');
+        throw new Error(
+          'No se pudo obtener la información completa. Verifique los datos e intente nuevamente.'
+        );
       }
 
       const subject = subjectData.subject;
@@ -96,8 +108,16 @@ export default function AsignarEstudiantePage() {
         isEnrolled,
       });
     } catch (error) {
-      console.error('Error:', error);
-      toast('Error de conexión con el servidor');
+      console.error('Error en la búsqueda:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      toast.error(`Error: ${errorMessage}`);
+
+      // Show more detailed error in the UI if needed
+      setShowErrorDialog({
+        show: true,
+        title: 'Error en la búsqueda',
+        message: errorMessage,
+      });
       setSearchResults(null);
     } finally {
       setIsLoading(false);

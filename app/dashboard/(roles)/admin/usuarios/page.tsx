@@ -384,14 +384,12 @@ export default function GestionUsuariosPage() {
           </div>
 
           <div className="px-4 py-3 border-t">
-            <div className="border-t p-4">
-              <TablePagination
-                currentPage={currentPage}
-                totalItems={filteredUsers.length}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-              />
-            </div>
+            <TablePagination
+              currentPage={currentPage}
+              totalItems={filteredUsers.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+            />
           </div>
         </CardContent>
       </Card>

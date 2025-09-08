@@ -4,15 +4,22 @@ import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request, { params }: { params: { code: string } }) {
-  const session = await getServerSession(authOptions);
-
-  // Validate session
-  if (!session) {
-    return NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 });
-  }
-
   try {
+    const session = await getServerSession(authOptions);
+
+    // Validate session
+    if (!session) {
+      return NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 });
+    }
+
     const { code } = params;
+
+    if (!code) {
+      return NextResponse.json(
+        { success: false, error: 'Código de asignatura no proporcionado' },
+        { status: 400 }
+      );
+    }
 
     // Find the subject with the given code
     const subject = await db.subject.findUnique({
@@ -27,7 +34,11 @@ export async function GET(request: Request, { params }: { params: { code: string
 
     if (!subject) {
       return NextResponse.json(
-        { success: false, error: 'Asignatura no encontrada' },
+        {
+          success: false,
+          error: 'Asignatura no encontrada',
+          code: code,
+        },
         { status: 404 }
       );
     }
