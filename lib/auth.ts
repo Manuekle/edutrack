@@ -3,6 +3,7 @@ import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { clearUserCache } from './cache';
 import { CACHE_TTL, redis } from './redis';
 
 // 🔧 Configuración según entorno
@@ -22,7 +23,6 @@ export const authOptions: NextAuthOptions = {
   debug: !isProduction,
 
   providers: [
-    // In lib/auth.ts
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -101,6 +101,15 @@ export const authOptions: NextAuthOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET,
+
+  events: {
+    async signOut({ token }) {
+      // Limpiar caché cuando se cierre sesión
+      if (token?.id) {
+        await clearUserCache(token.id as string);
+      }
+    },
+  },
 
   callbacks: {
     async jwt({ token, user, trigger }) {

@@ -4,7 +4,7 @@ import { withAuth } from 'next-auth/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public paths that don't require authentication
-const publicPaths = ['/', '/login', '/_next', '/favicon.ico', '/api/auth', '/icons', '/logout'];
+const publicPaths = ['/', '/login', '/logout', '/_next', '/favicon.ico', '/api/auth', '/icons'];
 
 // Role-based dashboard paths
 const roleDashboards = {
@@ -36,16 +36,37 @@ export default withAuth(
       return NextResponse.next();
     }
 
-    // Handle logout
+    // Handle logout - MEJORADO
     if (pathname === '/logout') {
-      // Clear the session cookie
       const response = NextResponse.redirect(new URL('/login', req.url));
-      response.cookies.set({
-        name: 'next-auth.session-token',
-        value: '',
-        path: '/',
-        expires: new Date(0),
+
+      // Limpiar todas las posibles cookies de NextAuth
+      const cookieNames = [
+        'next-auth.session-token',
+        '__Secure-next-auth.session-token',
+        'next-auth.csrf-token',
+        '__Host-next-auth.csrf-token',
+        'next-auth.callback-url',
+        '__Secure-next-auth.callback-url',
+      ];
+
+      cookieNames.forEach(cookieName => {
+        response.cookies.set({
+          name: cookieName,
+          value: '',
+          path: '/',
+          expires: new Date(0),
+          secure: true,
+          httpOnly: true,
+          sameSite: 'lax',
+        });
       });
+
+      // Agregar headers para evitar caché
+      response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+
       return response;
     }
 
@@ -117,7 +138,6 @@ export default withAuth(
   {
     callbacks: {
       authorized: () => {
-        // Authorization is handled in the main middleware function
         return true;
       },
     },

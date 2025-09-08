@@ -52,12 +52,31 @@ function AppSidebar({ homePath }: { homePath: string }) {
 
   const handleSignOut = async () => {
     try {
-      // Primero redirigir a la raíz para evitar el callbackUrl
-      window.location.href = '/';
-      // Luego cerrar sesión
-      await signOut({ redirect: false });
+      // Llamar a API para limpiar caché
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).catch(console.error); // No bloqueamos si falla
+
+      // Cerrar sesión en NextAuth
+      await signOut({
+        redirect: false,
+        callbackUrl: '/login',
+      });
+
+      // Limpiar estado local
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+
+      // Forzar redirección
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
+      window.location.href = '/login';
     }
   };
 
