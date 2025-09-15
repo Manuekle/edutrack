@@ -1,3 +1,5 @@
+import { DownloadPdfButton } from '@/components/preview/download-pdf-button';
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -44,7 +46,7 @@ function shouldShowSignature(status: string) {
   return status === 'REALIZADA' || status === 'CANCELADA';
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function PreviewPage({ params }: PageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== 'DOCENTE') {
@@ -93,8 +95,22 @@ export default async function Page({ params }: PageProps) {
   const currentPeriod = currentMonth <= 6 ? 1 : 2;
 
   return (
-    <div className="p-6">
-      <div className="mx-auto px-8 pb-6 bg-white rounded-md shadow-sm ring-1 ring-gray-200">
+    <div className="space-y-6">
+      <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
+        <div>
+          <CardTitle className="text-2xl font-semibold tracking-heading">
+            Bitacora Docente
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Visualiza el reporte de asistencia para la asignatura {subject.name}
+          </CardDescription>
+        </div>
+        <DownloadPdfButton targetId="pdf-section" />
+      </div>
+      <div
+        id="pdf-section"
+        className="mx-auto px-8 pb-6 bg-white rounded-md shadow-sm ring-1 ring-gray-200"
+      >
         {/* Header estilo “PDF” */}
         <div className="border-b border-[#005a9c] p-4 flex items-center justify-between">
           {/* Logo */}
