@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loading, LoadingPage } from '@/components/ui/loading';
 import { format } from 'date-fns';
 import { AlertTriangle, BarChart3, BookOpen, Calendar, Clock, MapPin } from 'lucide-react';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 type EventType = 'EXAMEN' | 'TRABAJO' | 'LIMITE' | 'ANUNCIO' | 'INFO';
@@ -280,7 +279,7 @@ export default function EstudianteDashboard() {
                   {liveClass.subjectName} • {liveClass.topic}
                 </p>
               </div>
-              <div className="flex items-center md:space-x-2 bg-foreground/5 px-2 md:px-3 py-1 rounded-full">
+              <div className="flex items-center md:space-x-2 md:bg-foreground/5 px-2 md:px-3 py-1 rounded-full">
                 <div className="w-2 h-2 rounded-full bg-foreground animate-pulse"></div>
                 <span className="text-xs font-medium hidden md:block">En curso</span>
               </div>
@@ -313,16 +312,15 @@ export default function EstudianteDashboard() {
                       ¡Estás presente en esta clase!
                     </span>
                   </div>
-                ) : (
-                  <Link
-                    href={`/dashboard/estudiante/escanear/${liveClass.qrToken}`}
-                    className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2"
-                    tabIndex={!liveClass.qrToken ? -1 : 0}
-                    aria-disabled={!liveClass.qrToken}
-                  >
-                    Unirse a la clase
-                  </Link>
-                )}
+                ) : // <Link
+                //   href={`/dashboard/estudiante/escanear/${liveClass.qrToken}`}
+                //   className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2"
+                //   tabIndex={!liveClass.qrToken ? -1 : 0}
+                //   aria-disabled={!liveClass.qrToken}
+                // >
+                //   Unirse a la clase
+                // </Link>
+                null}
               </div>
             </div>
           </CardContent>

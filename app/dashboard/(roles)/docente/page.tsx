@@ -134,7 +134,7 @@ export default function DocenteDashboard() {
                   {liveClass.subjectName} • {liveClass.topic}
                 </p>
               </div>
-              <div className="flex items-center md:space-x-2 bg-foreground/5 px-2 md:px-3 py-1 rounded-full">
+              <div className="flex items-center md:space-x-2 md:bg-foreground/5 px-2 md:px-3 py-1 rounded-full">
                 <div className="w-2 h-2 rounded-full bg-foreground animate-pulse"></div>
                 <span className="text-xs font-medium hidden md:block">En curso</span>
               </div>
