@@ -40,7 +40,15 @@ export default withAuth(
     // Handle login page access
     if (pathname === '/login') {
       if (token) {
-        // Redirect authenticated users to their dashboard
+        // If there is a callbackUrl, honor it for authenticated users
+        const cb = req.nextUrl.searchParams.get('callbackUrl');
+        if (cb) {
+          // Support absolute and relative callback URLs
+          const targetUrl = new URL(cb, req.url);
+          return NextResponse.redirect(targetUrl);
+        }
+
+        // Otherwise, redirect authenticated users to their dashboard
         const targetPath = roleDashboards[token.role as Role] || '/';
         return NextResponse.redirect(new URL(targetPath, req.url));
       }
@@ -86,9 +94,11 @@ export default withAuth(
       return NextResponse.next();
     }
 
-    // If no token, redirect to login
+    // If no token, redirect to login with callbackUrl back to the original URL
     if (!token) {
-      return NextResponse.redirect(new URL('/login', req.url));
+      const loginUrl = new URL('/login', req.url);
+      loginUrl.searchParams.set('callbackUrl', req.nextUrl.href);
+      return NextResponse.redirect(loginUrl);
     }
 
     const userRole = token.role as Role;
