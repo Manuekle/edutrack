@@ -93,7 +93,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div className="p-6">
-      <div className="mx-auto p-8 bg-white rounded-md shadow-sm ring-1 ring-gray-200">
+      <div className="mx-auto px-8 pb-6 bg-white rounded-md shadow-sm ring-1 ring-gray-200">
         {/* Header estilo “PDF” */}
         <div className="border-b border-[#005a9c] p-4 flex items-center justify-between">
           {/* Logo */}
