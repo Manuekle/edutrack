@@ -146,7 +146,7 @@ export default function HomePageMobile() {
                 edu<span className="text-amber-500">Track</span>
               </h1>
               <p className="text-muted-foreground text-xs max-w-xs mx-auto">
-                Gestión de asistencia inteligente para instituciones educativas
+                Gestión de asistencia inteligente para la Fundación Universitaria de la Popayán
               </p>
             </motion.div>
 

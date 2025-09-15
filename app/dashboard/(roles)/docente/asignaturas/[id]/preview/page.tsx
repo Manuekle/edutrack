@@ -1,6 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 type PageProps = {
@@ -98,7 +99,17 @@ export default async function Page({ params }: PageProps) {
         <div className="border-b border-[#005a9c] p-4 flex items-center justify-between">
           {/* Logo */}
           <div className="w-1/4">
-            <img src="/images/logo-fup.png" alt="Logo" className="h-32 w-32 object-contain" />
+            <div className="relative h-32 w-32">
+              <Image
+                src="/logo-fup.png"
+                alt="Logo FUP"
+                width={128}
+                height={128}
+                className="h-full w-full object-contain"
+                priority
+                unoptimized
+              />
+            </div>
           </div>
 
           {/* Títulos */}
@@ -248,9 +259,11 @@ export default async function Page({ params }: PageProps) {
                     {/* Firma Docente */}
                     <div className="flex items-center justify-center p-1">
                       {showSignature && signatureUrl ? (
-                        <img
+                        <Image
                           src={signatureUrl}
                           alt="Firma docente"
+                          width={150}
+                          height={48}
                           className="h-12 max-w-full object-contain my-1"
                         />
                       ) : (
