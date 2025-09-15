@@ -273,12 +273,6 @@ export default async function Page({ params }: PageProps) {
               })}
             </div>
           </div>
-
-          {/* Leyenda opcional */}
-          <div className="mt-3 text-[11px] text-gray-500">
-            La firma se muestra solo cuando la clase está REALIZADA o CANCELADA. En clases
-            PROGRAMADAS, incluso si “finalizaron” por hora, no se muestra firma.
-          </div>
         </div>
       </div>
     </div>
