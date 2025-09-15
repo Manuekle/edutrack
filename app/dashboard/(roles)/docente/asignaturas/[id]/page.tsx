@@ -697,6 +697,12 @@ export default function SubjectDetailPage() {
           >
             {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
           </Button>
+          <Button
+            variant="default"
+            onClick={() => router.push(`/dashboard/docente/asignaturas/${subject?.id}/preview`)}
+          >
+            Vista Previa
+          </Button>
         </div>
       </div>
 

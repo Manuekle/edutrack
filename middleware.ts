@@ -4,7 +4,18 @@ import { withAuth } from 'next-auth/middleware';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public paths that don't require authentication
-const publicPaths = ['/', '/login', '/logout', '/_next', '/favicon.ico', '/api/auth', '/icons'];
+const publicPaths = [
+  '/',
+  '/login',
+  '/logout',
+  '/forgot-password',
+  '/reset-password',
+  '/justificar-ausencia',
+  '/_next',
+  '/favicon.ico',
+  '/api/auth',
+  '/icons',
+];
 
 // Role-based dashboard paths
 const roleDashboards = {

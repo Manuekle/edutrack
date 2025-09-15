@@ -35,7 +35,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { Ban, CheckCircle, Clock, Edit, MoreHorizontal, UserCheck } from 'lucide-react';
+import { Ban, Clock, Edit, MoreHorizontal, Signature, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import React, { useEffect, useMemo, useState } from 'react';
 import { TablePagination } from '../shared/table-pagination';
@@ -371,8 +371,8 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                                     : 'cursor-pointer'
                                 }
                               >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                <span>Marcar como Realizada</span>
+                                <Signature className="mr-2 h-4 w-4" />
+                                <span>Firmar Clase</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
