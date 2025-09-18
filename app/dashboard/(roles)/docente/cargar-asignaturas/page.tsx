@@ -235,6 +235,10 @@ export default function UploadSubjectsPage() {
     setIsLoading(true);
     const formData = new FormData();
     formData.append('file', file);
+    // Incluir los cambios editados en la previsualización para que el backend los procese
+    if (isPreview && previewData.length > 0) {
+      formData.append('editedPreview', JSON.stringify(previewData));
+    }
 
     try {
       const response = await fetch('/api/docente/cargar-asignaturas', {
@@ -357,8 +361,11 @@ export default function UploadSubjectsPage() {
     if (editingClass) {
       let finalValue = value;
       if (field === 'fechaClase' && value instanceof Date) {
-        // Formatear la fecha a YYYY-MM-DD para mantener la consistencia del estado
-        finalValue = value.toISOString().split('T')[0];
+        // Formatear la fecha a YYYY-MM-DD en horario local para evitar desfaces por zona horaria
+        const y = value.getFullYear();
+        const m = String(value.getMonth() + 1).padStart(2, '0');
+        const d = String(value.getDate()).padStart(2, '0');
+        finalValue = `${y}-${m}-${d}`;
       }
       setEditingClass({ ...editingClass, [field]: finalValue });
     }
@@ -566,14 +573,28 @@ export default function UploadSubjectsPage() {
                                                     Fecha
                                                   </p>
                                                   <p className="text-xs ">
-                                                    {new Date(cls.fechaClase).toLocaleDateString(
-                                                      'es-ES',
-                                                      {
+                                                    {(() => {
+                                                      // Parsear YYYY-MM-DD como fecha local, con fallback a Date nativo si no coincide el formato
+                                                      const parts =
+                                                        typeof cls.fechaClase === 'string'
+                                                          ? cls.fechaClase.split('-')
+                                                          : [];
+                                                      const y = Number(parts[0]);
+                                                      const m = Number(parts[1]);
+                                                      const d = Number(parts[2]);
+                                                      const date =
+                                                        parts.length === 3 &&
+                                                        !isNaN(y) &&
+                                                        !isNaN(m) &&
+                                                        !isNaN(d)
+                                                          ? new Date(y, (m || 1) - 1, d || 1)
+                                                          : new Date(cls.fechaClase);
+                                                      return date.toLocaleDateString('es-ES', {
                                                         day: '2-digit',
                                                         month: 'short',
                                                         year: 'numeric',
-                                                      }
-                                                    )}
+                                                      });
+                                                    })()}
                                                   </p>
                                                 </div>
                                                 <div className="space-y-1">
@@ -676,7 +697,15 @@ export default function UploadSubjectsPage() {
               <div className="space-y-2">
                 <Label className="text-xs font-normal">Fecha</Label>
                 <DatePicker
-                  value={editingClass.fechaClase ? new Date(editingClass.fechaClase) : undefined}
+                  value={
+                    editingClass.fechaClase
+                      ? (() => {
+                          // Parsear YYYY-MM-DD como fecha local (evitar new Date('YYYY-MM-DD'))
+                          const [yy, mm, dd] = editingClass.fechaClase.split('-').map(Number);
+                          return new Date(yy, (mm || 1) - 1, dd || 1);
+                        })()
+                      : undefined
+                  }
                   onChange={date => handleEditingClassChange('fechaClase', date)}
                 />
               </div>
@@ -710,7 +739,14 @@ export default function UploadSubjectsPage() {
                         align="start"
                         onOpenAutoFocus={(e: Event) => e.preventDefault()}
                       >
-                        <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2">
+                        <div
+                          className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2"
+                          onWheel={e => {
+                            // Habilitar scroll con la rueda del mouse dentro del popover
+                            e.preventDefault();
+                            e.currentTarget.scrollTop += e.deltaY;
+                          }}
+                        >
                           {Array.from({ length: 16 }, (_, i) => {
                             const hour = i + 7; // 7AM a 10PM
                             const time24 = `${hour.toString().padStart(2, '0')}:00`;
@@ -784,7 +820,14 @@ export default function UploadSubjectsPage() {
                         align="start"
                         onOpenAutoFocus={(e: Event) => e.preventDefault()}
                       >
-                        <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2">
+                        <div
+                          className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2"
+                          onWheel={e => {
+                            // Habilitar scroll con la rueda del mouse dentro del popover
+                            e.preventDefault();
+                            e.currentTarget.scrollTop += e.deltaY;
+                          }}
+                        >
                           {startTime &&
                             Array.from({ length: 16 }, (_, i) => {
                               const hour = i + 7; // 7AM a 10PM

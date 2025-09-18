@@ -335,10 +335,8 @@ export default function DocenteDashboard() {
               </div>
             ) : (
               <div className="flex flex-col text-center py-16 items-center justify-center h-[calc(50vh-200px)]">
-                <p className="text-xs text-muted-foreground font-medium">
-                  No hay clases programadas
-                </p>
-                <p className="text-xs text-muted-foreground/70 mt-1">
+                <p className="text-xs">No hay clases programadas</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   Las próximas clases aparecerán aquí
                 </p>
               </div>
@@ -403,11 +401,9 @@ export default function DocenteDashboard() {
                 })}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <p className="text-xs text-muted-foreground font-medium">
-                  No tienes asignaturas asignadas
-                </p>
-                <p className="text-xs text-muted-foreground/70 mt-1">
+              <div className="flex flex-col text-center py-16 items-center justify-center h-[calc(50vh-200px)]">
+                <p className="text-xs">No tienes asignaturas asignadas</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   Registra una asignatura para comenzar
                 </p>
               </div>

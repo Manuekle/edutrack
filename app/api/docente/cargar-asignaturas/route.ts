@@ -29,15 +29,58 @@ export async function POST(request: Request) {
     const data = await request.formData();
     const file = data.get('file') as File;
     const isPreview = data.get('preview') === 'true';
+    const editedPreviewRaw = data.get('editedPreview') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No se encontró el archivo' }, { status: 400 });
     }
 
-    const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet) as RowData[];
+    // Utilidad para parsear fechas YYYY-MM-DD en horario local
+    const parseLocalYMD = (ymd: string) => {
+      const [yy, mm, dd] = ymd.split('-').map(Number);
+      return new Date(yy, (mm || 1) - 1, dd || 1);
+    };
+
+    // Reconstruir filas desde el Excel, a menos que recibamos editedPreview
+    let rows: RowData[] = [];
+    if (editedPreviewRaw) {
+      // editedPreview es un arreglo de sujetos con sus clases editadas
+      // Debemos aplanar a filas RowData para reutilizar el flujo actual
+      const editedPreview = JSON.parse(editedPreviewRaw) as Array<{
+        codigoAsignatura: string;
+        nombreAsignatura: string;
+        creditosClase: number;
+        programa: string;
+        semestreAsignatura: number;
+        classes: Array<{
+          fechaClase: string; // YYYY-MM-DD
+          horaInicio: string; // HH:MM
+          horaFin: string; // HH:MM
+          temaClase?: string;
+          descripcionClase?: string;
+        }>;
+      }>;
+
+      rows = editedPreview.flatMap(s =>
+        s.classes.map(c => ({
+          codigoAsignatura: s.codigoAsignatura,
+          nombreAsignatura: s.nombreAsignatura,
+          'fechaClase (YYYY-MM-DD)': c.fechaClase,
+          'horaInicio (HH:MM)': c.horaInicio,
+          'horaFin (HH:MM)': c.horaFin,
+          temaClase: c.temaClase,
+          descripcionClase: c.descripcionClase,
+          creditosClase: s.creditosClase,
+          programa: s.programa,
+          semestreAsignatura: String(s.semestreAsignatura),
+        }))
+      );
+    } else {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(sheet) as RowData[];
+    }
 
     if (rows.length === 0) {
       return NextResponse.json(
@@ -78,12 +121,14 @@ export async function POST(request: Request) {
     });
     const existingSubjectCodes = new Set(existingSubjects.map(s => s.code));
 
-    if (isPreview) {
+    if (isPreview && !editedPreviewRaw) {
       const previewData = rows.map(row => {
         try {
           const codigoAsignatura = row['codigoAsignatura']?.toString().trim();
           const nombreAsignatura = row['nombreAsignatura']?.toString().trim();
-          const fechaClase = new Date(row['fechaClase (YYYY-MM-DD)']);
+          const fechaStr = row['fechaClase (YYYY-MM-DD)'];
+          const fechaClase =
+            typeof fechaStr === 'string' ? parseLocalYMD(fechaStr) : new Date(fechaStr);
           const horaInicio = row['horaInicio (HH:MM)'];
           const horaFin = row['horaFin (HH:MM)'];
 
@@ -149,7 +194,9 @@ export async function POST(request: Request) {
             try {
               const codigoAsignatura = row['codigoAsignatura']?.toString().trim();
               const nombreAsignatura = row['nombreAsignatura']?.toString().trim();
-              const fechaClase = new Date(row['fechaClase (YYYY-MM-DD)']);
+              const fechaStr = row['fechaClase (YYYY-MM-DD)'];
+              const fechaClase =
+                typeof fechaStr === 'string' ? parseLocalYMD(fechaStr) : new Date(fechaStr);
               const horaInicio = row['horaInicio (HH:MM)'];
               const horaFin = row['horaFin (HH:MM)'];
 

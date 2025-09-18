@@ -16,7 +16,7 @@ export default function NotFound() {
         Lo sentimos, no pudimos encontrar la página que estás buscando.
       </p>
       <Button asChild className="text-xs">
-        <Link href="/" className="px-6 py-2">
+        <Link href="/dashboard/" className="px-6 py-2">
           Volver al inicio
         </Link>
       </Button>

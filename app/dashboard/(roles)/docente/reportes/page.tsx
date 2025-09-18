@@ -192,10 +192,10 @@ export default function ReportsPage() {
           <TableBody>
             {reports.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-56 text-center">
                   <div className="flex flex-col items-center justify-center py-6">
-                    <p className="text-xs  text-muted-foreground">No hay reportes generados</p>
-                    <p className="text-xs text-muted-foreground/70">
+                    <p className="text-xs">No hay reportes generados</p>
+                    <p className="text-xs text-muted-foreground">
                       Los reportes que generes aparecerán aquí
                     </p>
                   </div>
