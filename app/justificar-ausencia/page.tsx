@@ -156,7 +156,7 @@ function JustificarAusenciaContent() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Serás redirigido a la página principal en {redirectIn} segundos...
             </p>
             <Button variant="outline" className="w-full" onClick={() => router.push('/')}>

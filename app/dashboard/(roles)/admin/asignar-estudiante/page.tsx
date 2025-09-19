@@ -279,7 +279,7 @@ export default function AsignarEstudiantePage() {
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground">Asignatura</h4>
+                    <h4 className="text-xs font-medium text-muted-foreground">Asignatura</h4>
                     <p className="text-xs ">
                       {searchResults.subject
                         ? `${searchResults.subject.code} - ${searchResults.subject.name}`
@@ -287,7 +287,7 @@ export default function AsignarEstudiantePage() {
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground">Estudiante</h4>
+                    <h4 className="text-xs font-medium text-muted-foreground">Estudiante</h4>
                     <p className="text-xs">
                       {searchResults.student
                         ? `${searchResults.student.name} (${searchResults.student.document})`
@@ -360,7 +360,7 @@ export default function AsignarEstudiantePage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="tracking-tight text-xl">{showErrorDialog.title}</DialogTitle>
-            <DialogDescription className="text-sm">{showErrorDialog.message}</DialogDescription>
+            <DialogDescription className="text-xs">{showErrorDialog.message}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button

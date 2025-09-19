@@ -306,7 +306,7 @@ export default function GestionUsuariosPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-xs px-4 py-3">
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           {user.role === 'ESTUDIANTE' ? user.codigoEstudiantil || 'N/A' : 'N/A'}
                         </div>
                       </TableCell>

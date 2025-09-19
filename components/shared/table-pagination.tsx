@@ -71,7 +71,7 @@ export function TablePagination({
     <div
       className={`w-full flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 ${className}`}
     >
-      <div className="text-sm text-muted-foreground w-full">
+      <div className="text-xs text-muted-foreground w-full">
         Mostrando{' '}
         <span className="font-medium">
           {startItem}-{endItem}

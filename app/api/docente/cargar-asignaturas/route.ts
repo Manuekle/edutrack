@@ -1,3 +1,4 @@
+// app/api/docente/cargar-asignaturas/route.ts
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
@@ -18,6 +19,24 @@ interface RowData {
   semestreAsignatura?: string;
 }
 
+// Interface for generator data format
+interface GeneratorSubjectData {
+  id: string;
+  codigoAsignatura: string;
+  nombreAsignatura: string;
+  creditosClase: number;
+  programa: string;
+  semestreAsignatura: number;
+  classes: Array<{
+    id: string;
+    fechaClase: string; // YYYY-MM-DD
+    horaInicio: string; // HH:MM
+    horaFin: string; // HH:MM
+    temaClase?: string;
+    descripcionClase?: string;
+  }>;
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -31,8 +50,14 @@ export async function POST(request: Request) {
     const isPreview = data.get('preview') === 'true';
     const editedPreviewRaw = data.get('editedPreview') as string | null;
 
-    if (!file) {
-      return NextResponse.json({ error: 'No se encontró el archivo' }, { status: 400 });
+    // Check if this is a direct generator submission (JSON format)
+    const isGeneratorSubmission = !file && editedPreviewRaw;
+
+    if (!file && !isGeneratorSubmission) {
+      return NextResponse.json(
+        { error: 'No se encontró el archivo o datos del generador' },
+        { status: 400 }
+      );
     }
 
     // Utilidad para parsear fechas YYYY-MM-DD en horario local
@@ -41,41 +66,35 @@ export async function POST(request: Request) {
       return new Date(yy, (mm || 1) - 1, dd || 1);
     };
 
-    // Reconstruir filas desde el Excel, a menos que recibamos editedPreview
+    // Reconstruir filas desde el Excel o desde el generador
     let rows: RowData[] = [];
-    if (editedPreviewRaw) {
-      // editedPreview es un arreglo de sujetos con sus clases editadas
-      // Debemos aplanar a filas RowData para reutilizar el flujo actual
-      const editedPreview = JSON.parse(editedPreviewRaw) as Array<{
-        codigoAsignatura: string;
-        nombreAsignatura: string;
-        creditosClase: number;
-        programa: string;
-        semestreAsignatura: number;
-        classes: Array<{
-          fechaClase: string; // YYYY-MM-DD
-          horaInicio: string; // HH:MM
-          horaFin: string; // HH:MM
-          temaClase?: string;
-          descripcionClase?: string;
-        }>;
-      }>;
 
-      rows = editedPreview.flatMap(s =>
-        s.classes.map(c => ({
-          codigoAsignatura: s.codigoAsignatura,
-          nombreAsignatura: s.nombreAsignatura,
-          'fechaClase (YYYY-MM-DD)': c.fechaClase,
-          'horaInicio (HH:MM)': c.horaInicio,
-          'horaFin (HH:MM)': c.horaFin,
-          temaClase: c.temaClase,
-          descripcionClase: c.descripcionClase,
-          creditosClase: s.creditosClase,
-          programa: s.programa,
-          semestreAsignatura: String(s.semestreAsignatura),
-        }))
-      );
-    } else {
+    if (editedPreviewRaw) {
+      try {
+        const editedPreview = JSON.parse(editedPreviewRaw) as GeneratorSubjectData[];
+
+        // Convert generator format to RowData format
+        rows = editedPreview.flatMap(s =>
+          s.classes.map(c => ({
+            codigoAsignatura: s.codigoAsignatura,
+            nombreAsignatura: s.nombreAsignatura,
+            'fechaClase (YYYY-MM-DD)': c.fechaClase,
+            'horaInicio (HH:MM)': c.horaInicio,
+            'horaFin (HH:MM)': c.horaFin,
+            temaClase: c.temaClase,
+            descripcionClase: c.descripcionClase,
+            creditosClase: s.creditosClase,
+            programa: s.programa,
+            semestreAsignatura: String(s.semestreAsignatura),
+          }))
+        );
+      } catch (error) {
+        return NextResponse.json(
+          { error: 'Error al procesar los datos del generador' },
+          { status: 400 }
+        );
+      }
+    } else if (file) {
       const buffer = await file.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: 'buffer' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -83,32 +102,30 @@ export async function POST(request: Request) {
     }
 
     if (rows.length === 0) {
-      return NextResponse.json(
-        { error: 'El archivo Excel está vacío' },
-        {
-          status: 400,
-        }
-      );
+      return NextResponse.json({ error: 'No hay datos para procesar' }, { status: 400 });
     }
 
-    const requiredHeaders = [
-      'codigoAsignatura',
-      'nombreAsignatura',
-      'fechaClase (YYYY-MM-DD)',
-      'horaInicio (HH:MM)',
-      'horaFin (HH:MM)',
-      'creditosClase',
-      'programa',
-      'semestreAsignatura',
-    ];
-    const headers = Object.keys(rows[0] || {});
-    const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+    // For generator submissions, skip header validation as data is already structured
+    if (!isGeneratorSubmission) {
+      const requiredHeaders = [
+        'codigoAsignatura',
+        'nombreAsignatura',
+        'fechaClase (YYYY-MM-DD)',
+        'horaInicio (HH:MM)',
+        'horaFin (HH:MM)',
+        'creditosClase',
+        'programa',
+        'semestreAsignatura',
+      ];
+      const headers = Object.keys(rows[0] || {});
+      const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
 
-    if (missingHeaders.length > 0) {
-      return NextResponse.json(
-        { error: `Faltan los siguientes encabezados requeridos: ${missingHeaders.join(', ')}` },
-        { status: 400 }
-      );
+      if (missingHeaders.length > 0) {
+        return NextResponse.json(
+          { error: `Faltan los siguientes encabezados requeridos: ${missingHeaders.join(', ')}` },
+          { status: 400 }
+        );
+      }
     }
 
     const existingSubjects = await db.subject.findMany({
@@ -180,9 +197,9 @@ export async function POST(request: Request) {
     }
 
     // Procesar la carga real
-
     let processed = 0;
     const errors: string[] = [];
+    const createdSubjects: string[] = []; // Track created subjects
 
     // Process in batches of 20 rows to avoid transaction timeouts
     const BATCH_SIZE = 20;
@@ -229,6 +246,7 @@ export async function POST(request: Request) {
                   },
                 });
                 isNewSubject = true;
+                createdSubjects.push(codigoAsignatura);
               }
 
               // Combine date with time strings for proper DateTime
@@ -240,7 +258,7 @@ export async function POST(request: Request) {
               const [endH, endM] = horaFin.split(':');
               endDateTime.setHours(parseInt(endH), parseInt(endM));
 
-              // Always create the class record, but only count as processed if it's a new subject
+              // Always create the class record
               await tx.class.create({
                 data: {
                   subjectId: subject.id,
@@ -252,7 +270,13 @@ export async function POST(request: Request) {
                 },
               });
 
-              if (isNewSubject) {
+              // Count processed only once per subject for generator submissions
+              if (isGeneratorSubmission) {
+                if (isNewSubject) {
+                  processed++;
+                }
+              } else {
+                // For Excel uploads, count each row
                 processed++;
               }
             } catch (error) {
@@ -273,8 +297,9 @@ export async function POST(request: Request) {
     // Return success response with processing summary
     return NextResponse.json({
       success: true,
-      processed,
+      processed: isGeneratorSubmission ? createdSubjects.length : processed,
       total: rows.length,
+      createdSubjects: isGeneratorSubmission ? createdSubjects : undefined,
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {

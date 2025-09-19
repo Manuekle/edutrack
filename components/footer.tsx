@@ -24,7 +24,7 @@ export default function Footer() {
           <div className="flex items-center">
             <a
               href="mailto:contacto@edutrack.com"
-              className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <Mail className="h-4 w-4 mr-2" />
               contacto@edutrack.com

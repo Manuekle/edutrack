@@ -158,7 +158,7 @@ export default async function PreviewPage({ params }: PageProps) {
         </div>
 
         {/* Info Docente/Asignatura */}
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm border border-gray-200 dark:border-gray-700 my-4 rounded-md text-gray-900 dark:text-gray-100">
+        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs border border-gray-200 dark:border-gray-700 my-4 rounded-md text-gray-900 dark:text-gray-100">
           <div className="flex gap-2">
             <span className="font-semibold">NOMBRE DEL DOCENTE:</span>
             <span>{teacherName}</span>

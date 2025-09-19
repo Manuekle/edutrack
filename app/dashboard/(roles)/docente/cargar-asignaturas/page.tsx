@@ -1,9 +1,11 @@
+// app/dashboard/(roles)/docente/cargar-asignaturas/page.tsx
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import {
   Dialog,
   DialogClose,
@@ -15,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Table,
   TableBody,
@@ -23,13 +26,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-// Icons from lucide-react
-import { DatePicker } from '@/components/ui/date-picker';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarX, CheckCircle, ChevronDown, Clock, Download, Loader2 } from 'lucide-react';
+import {
+  CalendarX,
+  CheckCircle,
+  ChevronDown,
+  Clock,
+  Download,
+  FileSpreadsheet,
+  Loader2,
+  Plus,
+} from 'lucide-react';
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
+// ... [resto de interfaces y funciones helper permanecen igual] ...
 // Helper function to format time with AM/PM
 function formatTimeWithAmPm(timeString: string): string {
   try {
@@ -379,29 +390,65 @@ export default function UploadSubjectsPage() {
           Cargar Asignaturas y Clases
         </CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .xlsx para cargar masivamente las asignaturas y sus respectivas clases.
+          Sube un archivo .xlsx para cargar masivamente las asignaturas y sus respectivas clases, o
+          utiliza nuestro generador integrado.
         </CardDescription>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
-          {/* Download Template */}
+          {/* Download Template and Generator */}
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold tracking-heading">
-                Plantilla de Carga
+                Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Descarga la plantilla para asegurar que tu archivo tiene el formato correcto.
+                Elige cómo quieres gestionar tus asignaturas y clases.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <a href="/formatos/plantilla_docente_asignaturas_clases.xlsx" download>
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Descargar Plantilla
-                </Button>
-              </a>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 gap-2">
+                <Link href="/dashboard/docente/cargar-asignaturas/generador">
+                  <Button variant="default" className="w-full justify-start">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Crear Asignaturas
+                  </Button>
+                </Link>
+
+                <a href="/formatos/plantilla_docente_asignaturas_clases.xlsx" download>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="mr-2 h-4 w-4" />
+                    Descargar Plantilla
+                  </Button>
+                </a>
+              </div>
+
+              <div className="pt-2 border-t">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <FileSpreadsheet className="h-4 w-4" />
+                    <span className="font-medium">Generador Integrado:</span>
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>Crea asignaturas directamente en la plataforma</li>
+                    <li>Autoguardado automático</li>
+                    <li>Importa y edita datos desde Excel</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2 mt-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Download className="h-4 w-4" />
+                    <span className="font-medium">Plantilla Excel:</span>
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>Formato tradicional de carga masiva</li>
+                    <li>Para usuarios con datos existentes</li>
+                    <li>Compatible con sistemas externos</li>
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -409,8 +456,11 @@ export default function UploadSubjectsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold tracking-heading">
-                Subir Archivo
+                Subir Archivo Excel
               </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                Si ya tienes un archivo Excel con tus datos, súbelo aquí.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
@@ -668,7 +718,10 @@ export default function UploadSubjectsPage() {
               ) : (
                 <div className="min-h-[400px] sm:h-[calc(75vh-11.5rem)]">
                   <div className="text-center text-xs flex h-full font-normal items-center justify-center text-muted-foreground py-24">
-                    <p>Sube un archivo para ver la previsualización aquí.</p>
+                    <p>
+                      Sube un archivo para ver la previsualización aquí, o utiliza el generador
+                      integrado.
+                    </p>
                   </div>
                 </div>
               )}
