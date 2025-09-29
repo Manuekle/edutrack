@@ -160,7 +160,7 @@
     "autoprefixer": "^10.4.21",
     "dotenv": "^17.2.1",
     "eslint": "^9.29.0",
-    "eslint-config-next": "^15.4.4",
+    "eslint-config-next": "^15.5.4",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.3",
     "eslint-plugin-unused-imports": "^4.1.4",
