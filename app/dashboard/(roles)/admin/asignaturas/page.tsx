@@ -304,7 +304,7 @@ export default function GestionAsignaturasPage() {
             </Table>
           </div>
 
-          <div className="px-4 py-3 border-t">
+          <div className="border-t">
             <TablePagination
               currentPage={currentPage}
               totalItems={filteredSubjects.length}
