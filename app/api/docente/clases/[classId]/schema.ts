@@ -26,8 +26,11 @@ export const DocenteClaseDetailSchema = z.object({
 });
 
 export const DocenteClaseUpdateSchema = z.object({
-  date: z.coerce.date().optional(),
+  date: z.string().optional(), // Accept date as string in YYYY-MM-DD format
+  startTime: z.string().optional(), // Accept time as string in HH:MM format
+  endTime: z.string().optional(), // Accept time as string in HH:MM format
   topic: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
   status: ClassStatusEnum.optional(),
   reason: z.string().optional(),
 });

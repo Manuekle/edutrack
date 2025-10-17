@@ -57,7 +57,7 @@ export async function GET(request: Request, { params }: { params: { classId: str
       );
     }
     return NextResponse.json({ data: validated.data });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -87,7 +87,55 @@ export async function PUT(request: Request, { params }: { params: { classId: str
       return NextResponse.json({ error: result.error.format() }, { status: 400 });
     }
 
-    const { date, topic, status, reason } = result.data;
+    const { date, startTime, endTime, topic, description, status, reason } = result.data;
+
+    // Parse date string to local Date object (YYYY-MM-DD format)
+    const parseLocalDate = (dateStr: string): Date => {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    };
+
+    // Parse time string and combine with date (HH:MM format)
+    const combineDateTime = (date: Date, timeStr: string): Date => {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      const combined = new Date(date);
+      combined.setHours(hours, minutes, 0, 0);
+      return combined;
+    };
+
+    // Prepare date and time updates
+    let parsedDate: Date | undefined;
+    let parsedStartTime: Date | undefined;
+    let parsedEndTime: Date | undefined;
+
+    if (date) {
+      parsedDate = parseLocalDate(date);
+
+      // If we have a new date, we need to update start/end times with the new date
+      if (startTime) {
+        parsedStartTime = combineDateTime(parsedDate, startTime);
+      }
+      if (endTime) {
+        parsedEndTime = combineDateTime(parsedDate, endTime);
+      }
+    } else {
+      // If no date change, but time changes, use existing date
+      if (startTime || endTime) {
+        const existingClass = await db.class.findUnique({
+          where: { id: classId },
+          select: { date: true },
+        });
+
+        if (existingClass) {
+          if (startTime) {
+            parsedStartTime = combineDateTime(existingClass.date, startTime);
+          }
+          if (endTime) {
+            parsedEndTime = combineDateTime(existingClass.date, endTime);
+          }
+        }
+      }
+    }
 
     // Handle class cancellation notification
     if (status === 'CANCELADA' && reason) {
@@ -143,7 +191,7 @@ export async function PUT(request: Request, { params }: { params: { classId: str
             if (failedEmails.length > 0) {
             } else {
             }
-          } catch (emailError) {}
+          } catch {}
         }
       }
     }
@@ -152,8 +200,11 @@ export async function PUT(request: Request, { params }: { params: { classId: str
     const updatedClass = await db.class.update({
       where: { id: classId },
       data: {
-        ...(date && { date }),
-        ...(topic && { topic }),
+        ...(parsedDate && { date: parsedDate }),
+        ...(parsedStartTime && { startTime: parsedStartTime }),
+        ...(parsedEndTime && { endTime: parsedEndTime }),
+        ...(topic !== undefined && { topic }),
+        ...(description !== undefined && { description }),
         ...(status && { status }),
         ...(status === 'CANCELADA' && reason && { cancellationReason: reason }),
       },
@@ -175,7 +226,7 @@ export async function PUT(request: Request, { params }: { params: { classId: str
     }
 
     return NextResponse.json({ data: validated.data });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Ocurrió un error interno del servidor' }, { status: 500 });
   }
 }
@@ -214,7 +265,7 @@ export async function DELETE(request: Request, { params }: { params: { classId: 
       { data: validated.data, message: 'Clase eliminada con éxito' },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }

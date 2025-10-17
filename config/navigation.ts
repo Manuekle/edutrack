@@ -133,6 +133,13 @@ export const navLinkGroups: NavLinkGroup[] = [
         ],
       },
       {
+        href: '/dashboard/admin/asignaturas',
+        icon: BookMarked,
+        label: 'Gestión de Asignaturas',
+        roles: ['ADMIN'],
+        description: 'Administrar asignaturas',
+      },
+      {
         href: '/dashboard/admin/asignar-estudiante',
         icon: UserPlus,
         label: 'Asignar Estudiante',

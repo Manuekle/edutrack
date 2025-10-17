@@ -10,8 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { StudentCombobox } from '@/components/ui/student-combobox';
+import { SubjectCombobox } from '@/components/ui/subject-combobox';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -238,24 +239,20 @@ export default function AsignarEstudiantePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="codigoAsignatura">Código de Asignatura</Label>
-                <Input
-                  id="codigoAsignatura"
-                  placeholder="Ej: MAT101"
+                <SubjectCombobox
                   value={codigoAsignatura}
-                  onChange={e => setCodigoAsignatura(e.target.value.toUpperCase())}
+                  onValueChange={setCodigoAsignatura}
                   disabled={isLoading}
-                  className="text-xs"
+                  placeholder="Buscar por código, nombre o docente..."
                 />
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="documentoEstudiante">Documento del Estudiante</Label>
-                <Input
-                  id="documentoEstudiante"
-                  placeholder="Número de documento"
+                <StudentCombobox
                   value={documentoEstudiante}
-                  onChange={e => setDocumentoEstudiante(e.target.value)}
+                  onValueChange={setDocumentoEstudiante}
                   disabled={isLoading}
-                  className="text-xs"
+                  placeholder="Buscar por documento, nombre o correo..."
                 />
               </div>
             </div>
@@ -274,7 +271,7 @@ export default function AsignarEstudiantePage() {
 
           {searchResults && (
             <div className="mt-8 border-t pt-6">
-              <h3 className="text-lg mb-4 font-semibold tracking-card">Resultado de la búsqueda</h3>
+              <h3 className="text-xl mb-4 font-semibold tracking-card">Resultado de la búsqueda</h3>
 
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -312,7 +309,7 @@ export default function AsignarEstudiantePage() {
                       className="text-xs"
                       disabled={isLoading || !searchResults.student || !searchResults.subject}
                     >
-                      {isLoading ? 'Asignando...' : 'Asignar a la asignatura'}
+                      {isLoading ? 'Asignando...' : 'Asignar estudiante'}
                     </Button>
                   )}
                 </div>

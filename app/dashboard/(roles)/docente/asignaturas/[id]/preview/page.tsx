@@ -1,4 +1,3 @@
-import { DownloadPdfButton } from '@/components/preview/download-pdf-button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
@@ -107,7 +106,7 @@ export default async function PreviewPage({ params }: PageProps) {
             Visualiza el reporte de asistencia para la asignatura {subject.name}
           </CardDescription>
         </div>
-        <DownloadPdfButton targetId="pdf-section" />
+        {/* <DownloadPdfButton targetId="pdf-section" /> */}
       </div>
       <div
         id="pdf-section"

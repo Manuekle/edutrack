@@ -26,17 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  CalendarX,
-  CheckCircle,
-  ChevronDown,
-  Clock,
-  Download,
-  FileSpreadsheet,
-  Loader2,
-  Plus,
-} from 'lucide-react';
-import Link from 'next/link';
+import { CalendarX, CheckCircle, ChevronDown, Clock, Download, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -409,13 +399,6 @@ export default function UploadSubjectsPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-1 gap-2">
-                <Link href="/dashboard/docente/cargar-asignaturas/generador">
-                  <Button variant="default" className="w-full justify-start">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Crear Asignaturas
-                  </Button>
-                </Link>
-
                 <a href="/formatos/plantilla_docente_asignaturas_clases.xlsx" download>
                   <Button variant="outline" className="w-full justify-start">
                     <Download className="mr-2 h-4 w-4" />
@@ -424,19 +407,7 @@ export default function UploadSubjectsPage() {
                 </a>
               </div>
 
-              <div className="pt-2 border-t">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <FileSpreadsheet className="h-4 w-4" />
-                    <span className="font-medium">Generador Integrado:</span>
-                  </div>
-                  <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                    <li>Crea asignaturas directamente en la plataforma</li>
-                    <li>Autoguardado automático</li>
-                    <li>Importa y edita datos desde Excel</li>
-                  </ul>
-                </div>
-
+              <div>
                 <div className="space-y-2 mt-4">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Download className="h-4 w-4" />
