@@ -106,7 +106,11 @@ function LoginForm() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 disabled={isLoading}
-                className="pr-10 text-xs" // Add right padding for the eye icon
+                className="pr-10 text-xs"
+                autoComplete="current-password"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
               />
               <button
                 type="button"

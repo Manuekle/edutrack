@@ -222,8 +222,16 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   <span>Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="cursor-pointer py-1 my-1  px-4 text-xs flex items-center"
+                  onClick={e => {
+                    e.preventDefault();
+                    const newTheme = theme === 'dark' ? 'light' : 'dark';
+                    setTheme(newTheme);
+                    // Forzar la actualización del localStorage
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('theme', newTheme);
+                    }
+                  }}
+                  className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
                 >
                   {theme === 'dark' ? (
                     <Sun className="mr-3 h-4 w-4 flex-shrink-0" />

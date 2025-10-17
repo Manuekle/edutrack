@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import type { Role, User } from '@/types';
 import { ROLES } from '@/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface EditUserRoleModalProps {
@@ -31,6 +31,15 @@ interface EditUserRoleModalProps {
 export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditUserRoleModalProps) {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Resetear el estado cuando el modal se abre o cambia el usuario
+  useEffect(() => {
+    if (isOpen && user?.role) {
+      setSelectedRole(user.role as Role);
+    } else {
+      setSelectedRole(null);
+    }
+  }, [isOpen, user?.role]);
 
   const handleSave = async () => {
     if (!user || !selectedRole) return;
@@ -59,11 +68,11 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
     }
   };
 
-  if (!user) return null;
+  if (!isOpen || !user) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg font-sans" onInteractOutside={e => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
             Editar Rol de {user.name}
@@ -75,16 +84,17 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
         </DialogHeader>
         <div className="py-4">
           <Select
+            value={selectedRole || ''}
             onValueChange={value => setSelectedRole(value as Role)}
-            defaultValue={user.role as Role}
+            disabled={isSaving}
           >
-            <SelectTrigger className="lowercase">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecciona un rol" />
             </SelectTrigger>
             <SelectContent>
               {ROLES.map(role => (
-                <SelectItem className="lowercase" key={role} value={role}>
-                  {role}
+                <SelectItem key={role} value={role}>
+                  {role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}
                 </SelectItem>
               ))}
             </SelectContent>
