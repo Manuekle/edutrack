@@ -3,13 +3,12 @@
 import QRScanner from '@/components/qr-scanner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function ScannerPage() {
-  const [error, setError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
   const [attendanceData, setAttendanceData] = useState<{
@@ -21,7 +20,6 @@ export default function ScannerPage() {
 
   const handleScan = async (qrToken: string) => {
     setIsProcessing(true);
-    setError('');
     setSuccess(false);
 
     const loadingToast = toast.loading('Procesando código QR...');
@@ -51,13 +49,11 @@ export default function ScannerPage() {
         });
         toast.success('¡Asistencia registrada exitosamente!', { id: loadingToast });
       } else {
-        setError(data.message || 'Código QR inválido');
         toast.error(data.message || 'Código QR inválido', { id: loadingToast });
       }
     } catch (err) {
       console.error('Error procesando QR:', err);
       const errorMsg = 'Error al procesar el código QR. Intenta nuevamente.';
-      setError(errorMsg);
       toast.error(errorMsg, { id: loadingToast });
     } finally {
       setIsProcessing(false);
@@ -65,13 +61,12 @@ export default function ScannerPage() {
   };
 
   const handleError = (errorMessage: string) => {
-    setError(errorMessage);
+    toast.error(errorMessage);
   };
 
   const handleReset = () => {
     setSuccess(false);
     setAttendanceData(null);
-    setError('');
   };
 
   const handleGoBack = () => {
@@ -128,23 +123,6 @@ export default function ScannerPage() {
           </Card>
         ) : (
           <>
-            {/* Error Message */}
-            {error && (
-              <Card className="border-red-200 dark:border-red-800">
-                <CardHeader className="text-center pb-3">
-                  <div className="flex justify-center mb-2">
-                    <XCircle className="h-12 w-12 text-red-500" />
-                  </div>
-                  <CardTitle className="text-red-700 dark:text-red-400 text-lg">
-                    Error al registrar asistencia
-                  </CardTitle>
-                  <CardDescription className="text-red-600 dark:text-red-400">
-                    {error}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            )}
-
             {/* Scanner */}
             <QRScanner onScan={handleScan} onError={handleError} isLoading={isProcessing} />
 
@@ -159,10 +137,6 @@ export default function ScannerPage() {
                     <li>Apunta tu cámara hacia el código QR</li>
                     <li>Espera a que se procese automáticamente</li>
                   </ul>
-                  <p className="text-xs pt-2">
-                    Si no puedes escanear el código, puedes ingresar manualmente el código que te
-                    proporcione el docente.
-                  </p>
                 </div>
               </CardContent>
             </Card>
