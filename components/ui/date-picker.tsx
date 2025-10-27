@@ -58,6 +58,8 @@ export function DatePicker({
             setOpen(false);
           }}
           initialFocus
+          locale={es}
+          disabled={disabled}
         />
       </PopoverContent>
     </Popover>
