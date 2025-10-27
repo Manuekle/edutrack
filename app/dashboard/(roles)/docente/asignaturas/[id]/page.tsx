@@ -121,40 +121,36 @@ type LocalClassWithStatus = Omit<
 };
 
 // Utility function to convert LocalClassWithStatus to TableClassWithStatus
-const toTableClass = (cls: LocalClassWithStatus): TableClassWithStatus => {
-  return {
-    ...cls,
-    date: typeof cls.date === 'string' ? cls.date : dateUtils.formatForAPI(cls.date),
-    startTime: cls.startTime
-      ? typeof cls.startTime === 'string'
-        ? cls.startTime
-        : dateUtils.formatDisplayTime(cls.startTime)
-      : undefined,
-    endTime: cls.endTime
-      ? typeof cls.endTime === 'string'
-        ? cls.endTime
-        : dateUtils.formatDisplayTime(cls.endTime)
-      : undefined,
-    topic: cls.topic || undefined,
-    description: cls.description || undefined,
-    status: cls.status as string, // Safe cast since we know it's a valid status
-    cancellationReason: cls.cancellationReason || undefined,
-  };
-};
+const toTableClass = (cls: LocalClassWithStatus): TableClassWithStatus => ({
+  ...cls,
+  date: typeof cls.date === 'string' ? cls.date : dateUtils.formatForAPI(cls.date),
+  startTime: cls.startTime
+    ? typeof cls.startTime === 'string'
+      ? cls.startTime
+      : dateUtils.formatDisplayTime(cls.startTime)
+    : undefined,
+  endTime: cls.endTime
+    ? typeof cls.endTime === 'string'
+      ? cls.endTime
+      : dateUtils.formatDisplayTime(cls.endTime)
+    : undefined,
+  topic: cls.topic || undefined,
+  description: cls.description || undefined,
+  status: cls.status as string,
+  cancellationReason: cls.cancellationReason || undefined,
+});
 
 // Utility function to convert TableClassWithStatus to LocalClassWithStatus
-const toLocalClass = (cls: TableClassWithStatus): LocalClassWithStatus => {
-  return {
-    ...cls,
-    date: cls.date,
-    startTime: cls.startTime || null,
-    endTime: cls.endTime || null,
-    topic: cls.topic || null,
-    description: cls.description || null,
-    status: cls.status as ClassStatus, // Safe cast since we know it's a valid status
-    cancellationReason: cls.cancellationReason || null,
-  };
-};
+const toLocalClass = (cls: TableClassWithStatus): LocalClassWithStatus => ({
+  ...cls,
+  date: cls.date,
+  startTime: cls.startTime || null,
+  endTime: cls.endTime || null,
+  topic: cls.topic || null,
+  description: cls.description || null,
+  status: cls.status as ClassStatus,
+  cancellationReason: cls.cancellationReason || null,
+});
 
 const classStatusMap = {
   PROGRAMADA: {
@@ -264,9 +260,6 @@ export default function SubjectDetailPage() {
   const [classTopic, setClassTopic] = useState('');
   const [classDescription, setClassDescription] = useState('');
 
-  const [isStartTimePickerOpen, setIsStartTimePickerOpen] = useState(false);
-  const [isEndTimePickerOpen, setIsEndTimePickerOpen] = useState(false);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   // Classes state
   const [classes, setClasses] = useState<LocalClassWithStatus[]>([]);
@@ -328,9 +321,8 @@ export default function SubjectDetailPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
-
       const response = await fetch(`/api/docente/reportes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -407,6 +399,12 @@ export default function SubjectDetailPage() {
   };
 
   // --- DATA FETCHING ---
+  // Function to determine the current period (1 or 2) based on current date
+  const getCurrentPeriod = useCallback(() => {
+    const currentMonth = new Date().getMonth() + 1; // 1-12
+    return currentMonth <= 6 ? 1 : 2; // Jan-Jun: Period 1, Jul-Dec: Period 2
+  }, []);
+
   // Function to check if a report exists for the current period
   const checkReportExistsForPeriod = useCallback(
     async (period: number) => {
@@ -416,9 +414,8 @@ export default function SubjectDetailPage() {
         const response = await fetch(
           `/api/docente/reportes?subjectId=${subjectId}&period=${period}`
         );
-        if (!response.ok) {
-          throw new Error('Error al verificar reportes existentes');
-        }
+        if (!response.ok) return false;
+        
         const { exists } = await response.json();
         return exists;
       } catch (error) {
@@ -428,12 +425,6 @@ export default function SubjectDetailPage() {
     },
     [subjectId]
   );
-
-  // Function to determine the current period (1 or 2) based on current date
-  const getCurrentPeriod = useCallback(() => {
-    const currentMonth = new Date().getMonth() + 1; // 1-12
-    return currentMonth <= 6 ? 1 : 2; // Jan-Jun: Period 1, Jul-Dec: Period 2
-  }, []);
 
   // Fetch all classes without pagination
   const fetchClasses = useCallback(async () => {
@@ -474,13 +465,9 @@ export default function SubjectDetailPage() {
       setClasses(result.data);
 
       // Check if a report already exists for the current period
-      try {
-        const currentPeriod = getCurrentPeriod();
-        const reportExists = await checkReportExistsForPeriod(currentPeriod);
-        setReportExistsForCurrentPeriod(reportExists);
-      } catch (error) {
-        console.error('Error checking report existence:', error);
-      }
+      const currentPeriod = getCurrentPeriod();
+      const reportExists = await checkReportExistsForPeriod(currentPeriod);
+      setReportExistsForCurrentPeriod(reportExists);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al cargar las clases';
       setError(errorMessage);
@@ -610,14 +597,8 @@ export default function SubjectDetailPage() {
     try {
       const response = await fetch('/api/docente/solicitudes/desmatricula', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subjectId,
-          studentId,
-          reason,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjectId, studentId, reason }),
       });
 
       if (!response.ok) {
@@ -625,7 +606,6 @@ export default function SubjectDetailPage() {
         throw new Error(errorData.message || 'Error al enviar la solicitud de desmatriculación');
       }
 
-      // Refresh the students list
       fetchEnrolledStudents();
       toast.success('Solicitud de desmatriculación enviada correctamente');
       setUnenrollReason('');
@@ -755,31 +735,19 @@ export default function SubjectDetailPage() {
         classDescription={classDescription}
         setClassDescription={setClassDescription}
         isSubmitting={isSubmitting}
-        // Date picker states
-        isDatePickerOpen={isDatePickerOpen}
-        setIsDatePickerOpen={setIsDatePickerOpen}
-        isStartTimePickerOpen={isStartTimePickerOpen}
-        setIsStartTimePickerOpen={setIsStartTimePickerOpen}
-        isEndTimePickerOpen={isEndTimePickerOpen}
-        setIsEndTimePickerOpen={setIsEndTimePickerOpen}
         // Form submission
         onSubmitEdit={async () => {
           if (!currentClass) return;
 
+          setIsSubmitting(true);
           try {
-            setIsSubmitting(true);
-            // Format the date and time for the API
-            const formattedDate = classDate ? dateUtils.formatForAPI(classDate) : '';
-            const formattedStartTime = startTime || '';
-            const formattedEndTime = endTime || '';
-
             const response = await fetch(`/api/docente/clases/${currentClass.id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                date: formattedDate,
-                startTime: formattedStartTime,
-                endTime: formattedEndTime,
+                date: classDate ? dateUtils.formatForAPI(classDate) : '',
+                startTime: startTime || '',
+                endTime: endTime || '',
                 topic: classTopic,
                 description: classDescription,
               }),
@@ -791,10 +759,7 @@ export default function SubjectDetailPage() {
             }
 
             const updatedClass = await response.json();
-
-            // Update the classes list
             setClasses(prev => prev.map(c => (c.id === updatedClass.id ? updatedClass : c)));
-
             toast.success('La clase ha sido actualizada correctamente.');
             setIsEditClassDialogOpen(false);
           } catch (error) {
@@ -810,11 +775,11 @@ export default function SubjectDetailPage() {
           setClassTopic('');
           setClassDescription('');
         }}
-        formatClassDate={cls => {
-          const date =
-            typeof cls.date === 'string' ? dateUtils.createLocalDate(cls.date) : cls.date;
-          return dateUtils.formatDisplayDate(date);
-        }}
+        formatClassDate={cls =>
+          dateUtils.formatDisplayDate(
+            typeof cls.date === 'string' ? dateUtils.createLocalDate(cls.date) : cls.date
+          )
+        }
       />
 
       <EventsTable subjectId={subjectId} />

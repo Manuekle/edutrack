@@ -9,9 +9,9 @@ import * as XLSX from 'xlsx';
 interface RowData {
   codigoAsignatura: string;
   nombreAsignatura: string;
-  'fechaClase (YYYY-MM-DD)': string;
-  'horaInicio (HH:MM)': string;
-  'horaFin (HH:MM)'?: string;
+  'fechaClase (MM/DD/YYYY)': string | number | Date;
+  'horaInicio (HH:MM)': string | number;
+  'horaFin (HH:MM)'?: string | number;
   temaClase?: string;
   descripcionClase?: string;
   creditosClase?: number;
@@ -36,6 +36,121 @@ interface GeneratorSubjectData {
     descripcionClase?: string;
   }>;
 }
+
+// Función para dividir cadenas de hora de manera segura
+const safeSplitTime = (timeInput: string | number): [string, string] => {
+  if (typeof timeInput === 'number') {
+    // Excel guarda las horas como fracción del día (0.5 = 12:00 PM)
+    const totalMinutes = Math.round(timeInput * 24 * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return [String(hours).padStart(2, '0'), String(minutes).padStart(2, '0')];
+  }
+
+  // Si es string, limpiar y parsear
+  const timeStr = String(timeInput).trim();
+  const [h, m] = timeStr.split(':');
+  return [(h || '00').padStart(2, '0'), (m || '00').padStart(2, '0')];
+};
+
+// Utilidad para parsear fechas en diferentes formatos
+const parseExcelDate = (dateInput: string | number | Date): Date => {
+  if (dateInput instanceof Date) {
+    return dateInput;
+  }
+
+  // Si es un número, es un serial de Excel
+  if (typeof dateInput === 'number') {
+    // Excel cuenta los días desde 1900-01-01, pero tiene un bug: considera 1900 como año bisiesto
+    // Días desde 1900-01-01 hasta 1970-01-01: 25569
+    const excelEpoch = 25569;
+    const millisecondsPerDay = 86400000;
+    const dateMs = (dateInput - excelEpoch) * millisecondsPerDay;
+    const date = new Date(dateMs);
+
+    // Ajustar por zona horaria para obtener la fecha local correcta
+    const offsetMs = date.getTimezoneOffset() * 60000;
+    return new Date(dateMs + offsetMs);
+  }
+
+  // Si es string, intentar parsear diferentes formatos
+  const dateStr = String(dateInput).trim();
+
+  // Formato YYYY-MM-DD (viene del generador)
+  const isoFormat = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (isoFormat) {
+    const [, year, month, day] = isoFormat;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  // Formato MM/DD/YYYY
+  const usFormat = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (usFormat) {
+    const [, month, day, year] = usFormat;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  // Formato DD/MM/YYYY
+  const euFormat = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (euFormat) {
+    const [, day, month, year] = euFormat;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  // Último recurso: parseo nativo
+  return new Date(dateStr);
+};
+
+// Utilidad para formatear fecha a YYYY-MM-DD
+const formatYMD = (date: Date): string => {
+  if (isNaN(date.getTime())) return '';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+// Utilidad para parsear tiempo (HH:MM o fracción de día)
+const parseExcelTime = (timeInput: string | number | undefined | null): string => {
+  // Si es undefined o null, devolver string vacío
+  if (timeInput === undefined || timeInput === null) {
+    return '';
+  }
+
+  // Si es un número, es fracción de día (0.5 = 12:00 PM)
+  if (typeof timeInput === 'number') {
+    const totalMinutes = Math.round(timeInput * 24 * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+
+  // Si es string, limpiar y validar formato HH:MM
+  const timeStr = String(timeInput).trim();
+
+  // Si el string está vacío, devolver string vacío
+  if (!timeStr) {
+    return '';
+  }
+
+  // Intentar parsear formato HH:MM
+  const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+
+  if (timeMatch) {
+    const hours = parseInt(timeMatch[1], 10);
+    const minutes = parseInt(timeMatch[2], 10);
+
+    // Validar rangos
+    if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+  }
+
+  // Si no coincide con ningún formato válido, devolver string vacío
+  return '';
+};
 
 export async function POST(request: Request) {
   try {
@@ -68,6 +183,30 @@ export async function POST(request: Request) {
 
     // Reconstruir filas desde el Excel o desde el generador
     let rows: RowData[] = [];
+    // Mapa de encabezados detectados en el Excel -> claves normalizadas requeridas
+    let headerKeys: {
+      codigoAsignatura?: string;
+      nombreAsignatura?: string;
+      fechaClase?: string;
+      horaInicio?: string;
+      horaFin?: string;
+      creditosClase?: string;
+      programa?: string;
+      semestreAsignatura?: string;
+      temaClase?: string;
+      descripcionClase?: string;
+    } = {};
+
+    // Helper para leer una celda con clave dinámica de forma segura
+    const cell = <K extends keyof RowData>(
+      row: RowData,
+      dynamicKey: string | undefined,
+      fallback: K
+    ): unknown => {
+      const r = row as unknown as Record<string, unknown>;
+      if (dynamicKey && dynamicKey in r) return r[dynamicKey];
+      return r[String(fallback)];
+    };
 
     if (editedPreviewRaw) {
       try {
@@ -78,7 +217,7 @@ export async function POST(request: Request) {
           s.classes.map(c => ({
             codigoAsignatura: s.codigoAsignatura,
             nombreAsignatura: s.nombreAsignatura,
-            'fechaClase (YYYY-MM-DD)': c.fechaClase,
+            'fechaClase (MM/DD/YYYY)': c.fechaClase,
             'horaInicio (HH:MM)': c.horaInicio,
             'horaFin (HH:MM)': c.horaFin,
             temaClase: c.temaClase,
@@ -88,11 +227,9 @@ export async function POST(request: Request) {
             semestreAsignatura: String(s.semestreAsignatura),
           }))
         );
-      } catch (error) {
-        return NextResponse.json(
-          { error: 'Error al procesar los datos del generador' },
-          { status: 400 }
-        );
+      } catch (err) {
+        console.error('Error al procesar la solicitud:', err);
+        return NextResponse.json({ error: 'Error al procesar la solicitud' }, { status: 500 });
       }
     } else if (file) {
       const buffer = await file.arrayBuffer();
@@ -107,25 +244,66 @@ export async function POST(request: Request) {
 
     // For generator submissions, skip header validation as data is already structured
     if (!isGeneratorSubmission) {
-      const requiredHeaders = [
-        'codigoAsignatura',
-        'nombreAsignatura',
-        'fechaClase (YYYY-MM-DD)',
-        'horaInicio (HH:MM)',
-        'horaFin (HH:MM)',
-        'creditosClase',
-        'programa',
-        'semestreAsignatura',
-      ];
       const headers = Object.keys(rows[0] || {});
-      const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+      const normalize = (s: string) => s.toString().trim().toLowerCase().replace(/\s+/g, ' ');
 
-      if (missingHeaders.length > 0) {
+      // Log para depuración: encabezados y primeras filas
+      try {
+        console.log('Upload debug - headers:', headers);
+        console.log('Upload debug - normalized headers:', headers.map(normalize));
+        console.log('Upload debug - sample row 1:', rows[0]);
+        console.log('Upload debug - sample rows (first 3):', rows.slice(0, 3));
+      } catch {}
+
+      const normalizedHeaders = headers.map(normalize);
+      const hasBase = (base: string) =>
+        normalizedHeaders.some(
+          h => h === base || h.startsWith(base + ' ') || h.startsWith(base + '(')
+        );
+      const findKeyForBase = (base: string): string | undefined => {
+        const idx = normalizedHeaders.findIndex(
+          h => h === base || h.startsWith(base + ' ') || h.startsWith(base + '(')
+        );
+        return idx >= 0 ? headers[idx] : undefined;
+      };
+
+      const requiredBases = [
+        'codigoasignatura',
+        'nombreasignatura',
+        'fechaclase',
+        'horainicio',
+        'horafin',
+        'creditosclase',
+        'programa',
+        'semestreasignatura',
+      ];
+
+      const missingBases = requiredBases.filter(b => !hasBase(b));
+
+      if (missingBases.length > 0) {
         return NextResponse.json(
-          { error: `Faltan los siguientes encabezados requeridos: ${missingHeaders.join(', ')}` },
+          {
+            error: `Faltan los siguientes encabezados requeridos: ` + missingBases.join(', '),
+          },
           { status: 400 }
         );
       }
+
+      // Construir mapa de claves reales detectadas
+      headerKeys = {
+        codigoAsignatura: findKeyForBase('codigoasignatura'),
+        nombreAsignatura: findKeyForBase('nombreasignatura'),
+        fechaClase: findKeyForBase('fechaclase'),
+        horaInicio: findKeyForBase('horainicio'),
+        horaFin: findKeyForBase('horafin'),
+        creditosClase: findKeyForBase('creditosclase'),
+        programa: findKeyForBase('programa'),
+        semestreAsignatura: findKeyForBase('semestreasignatura'),
+        // Opcionales
+        temaClase: headers[normalizedHeaders.findIndex(h => h === 'temaclase')] || 'temaClase',
+        descripcionClase:
+          headers[normalizedHeaders.findIndex(h => h === 'descripcionclase')] || 'descripcionClase',
+      };
     }
 
     const existingSubjects = await db.subject.findMany({
@@ -141,25 +319,38 @@ export async function POST(request: Request) {
     if (isPreview && !editedPreviewRaw) {
       const previewData = rows.map(row => {
         try {
-          const codigoAsignatura = row['codigoAsignatura']?.toString().trim();
-          const nombreAsignatura = row['nombreAsignatura']?.toString().trim();
-          const fechaStr = row['fechaClase (YYYY-MM-DD)'];
-          const fechaClase =
-            typeof fechaStr === 'string' ? parseLocalYMD(fechaStr) : new Date(fechaStr);
-          const horaInicio = row['horaInicio (HH:MM)'];
-          const horaFin = row['horaFin (HH:MM)'];
+          const codigoAsignatura = String(
+            cell(row, headerKeys.codigoAsignatura, 'codigoAsignatura') ?? ''
+          ).trim();
+          const nombreAsignatura = String(
+            cell(row, headerKeys.nombreAsignatura, 'nombreAsignatura') ?? ''
+          ).trim();
 
+          // Procesar fecha y horas con manejo de valores undefined
+          const fechaClase = parseExcelDate(
+            cell(row, headerKeys.fechaClase, 'fechaClase (MM/DD/YYYY)') as string | number | Date
+          );
+          const horaInicio = parseExcelTime(
+            cell(row, headerKeys.horaInicio, 'horaInicio (HH:MM)') as string | number | undefined
+          );
+          const horaFin = parseExcelTime(
+            cell(row, headerKeys.horaFin, 'horaFin (HH:MM)') as string | number | undefined
+          );
+          const fechaFormateada = formatYMD(fechaClase);
+
+          // Validar campos requeridos
           if (
             !codigoAsignatura ||
             !nombreAsignatura ||
             isNaN(fechaClase.getTime()) ||
             !horaInicio ||
-            !horaFin
+            !horaFin ||
+            (horaInicio === '00:00' && horaFin === '00:00') // Rechazar si no se pudo parsear la hora
           ) {
             return {
               ...row,
               status: 'error',
-              error: 'Faltan datos requeridos (código, nombre, fecha u hora de inicio).',
+              error: 'Faltan datos requeridos o formato incorrecto (código, nombre, fecha u hora).',
             };
           }
 
@@ -174,14 +365,29 @@ export async function POST(request: Request) {
           return {
             codigoAsignatura,
             nombreAsignatura,
-            fechaClase: fechaClase.toISOString(),
+            fechaClase: fechaFormateada,
             horaInicio,
             horaFin,
-            creditosClase: row['creditosClase'] ? Number(row['creditosClase']) : null,
-            programa: row['programa']?.toString(),
-            semestreAsignatura: row['semestreAsignatura']?.toString(),
-            temaClase: row['temaClase']?.toString(),
-            descripcionClase: row['descripcionClase']?.toString(),
+            creditosClase: (() => {
+              const v = cell(row, headerKeys.creditosClase, 'creditosClase');
+              return v !== undefined && v !== null && String(v).trim() !== '' ? Number(v) : null;
+            })(),
+            programa: (() => {
+              const v = cell(row, headerKeys.programa, 'programa');
+              return v !== undefined && v !== null ? String(v) : undefined;
+            })(),
+            semestreAsignatura: (() => {
+              const v = cell(row, headerKeys.semestreAsignatura, 'semestreAsignatura');
+              return v !== undefined && v !== null ? String(v) : undefined;
+            })(),
+            temaClase: (() => {
+              const v = cell(row, headerKeys.temaClase, 'temaClase');
+              return v !== undefined && v !== null ? String(v) : undefined;
+            })(),
+            descripcionClase: (() => {
+              const v = cell(row, headerKeys.descripcionClase, 'descripcionClase');
+              return v !== undefined && v !== null ? String(v) : undefined;
+            })(),
             status: 'success' as const,
           };
         } catch (error) {
@@ -209,13 +415,30 @@ export async function POST(request: Request) {
         await db.$transaction(async tx => {
           for (const row of batch) {
             try {
-              const codigoAsignatura = row['codigoAsignatura']?.toString().trim();
-              const nombreAsignatura = row['nombreAsignatura']?.toString().trim();
-              const fechaStr = row['fechaClase (YYYY-MM-DD)'];
-              const fechaClase =
-                typeof fechaStr === 'string' ? parseLocalYMD(fechaStr) : new Date(fechaStr);
-              const horaInicio = row['horaInicio (HH:MM)'];
-              const horaFin = row['horaFin (HH:MM)'];
+              const codigoAsignatura = String(
+                cell(row as RowData, headerKeys.codigoAsignatura, 'codigoAsignatura') ?? ''
+              ).trim();
+              const nombreAsignatura = String(
+                cell(row as RowData, headerKeys.nombreAsignatura, 'nombreAsignatura') ?? ''
+              ).trim();
+              const fechaClase = parseExcelDate(
+                cell(row as RowData, headerKeys.fechaClase, 'fechaClase (MM/DD/YYYY)') as
+                  | string
+                  | number
+                  | Date
+              );
+              const horaInicio = parseExcelTime(
+                cell(row as RowData, headerKeys.horaInicio, 'horaInicio (HH:MM)') as
+                  | string
+                  | number
+                  | undefined
+              );
+              const horaFin = parseExcelTime(
+                cell(row as RowData, headerKeys.horaFin, 'horaFin (HH:MM)') as
+                  | string
+                  | number
+                  | undefined
+              );
 
               if (
                 !codigoAsignatura ||
@@ -249,14 +472,26 @@ export async function POST(request: Request) {
                 createdSubjects.push(codigoAsignatura);
               }
 
-              // Combine date with time strings for proper DateTime
-              const startDateTime = new Date(fechaClase);
-              const [startH, startM] = horaInicio.split(':');
-              startDateTime.setHours(parseInt(startH), parseInt(startM));
+              // Crear fechas con hora usando la fecha base y las horas parseadas
+              const [startH, startM] = safeSplitTime(horaInicio);
+              const startDateTime = new Date(
+                fechaClase.getFullYear(),
+                fechaClase.getMonth(),
+                fechaClase.getDate(),
+                parseInt(startH, 10),
+                parseInt(startM, 10),
+                0
+              );
 
-              const endDateTime = new Date(fechaClase);
-              const [endH, endM] = horaFin.split(':');
-              endDateTime.setHours(parseInt(endH), parseInt(endM));
+              const [endH, endM] = safeSplitTime(horaFin);
+              const endDateTime = new Date(
+                fechaClase.getFullYear(),
+                fechaClase.getMonth(),
+                fechaClase.getDate(),
+                parseInt(endH, 10),
+                parseInt(endM, 10),
+                0
+              );
 
               // Always create the class record
               await tx.class.create({

@@ -1,3 +1,5 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,7 +25,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loading } from '@/components/ui/loading';
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Table,
   TableBody,
@@ -33,11 +34,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { TimePicker } from '@/components/ui/time-picker';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { Ban, Clock, Edit, MoreHorizontal, Signature, UserCheck } from 'lucide-react';
+import { Ban, Clock, Edit, MoreHorizontal, Ligature as Signature, UserCheck } from 'lucide-react';
 import Link from 'next/link';
-import React, { useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { TablePagination } from '../shared/table-pagination';
 
 export interface ClassWithStatus {
@@ -89,12 +92,6 @@ interface ClassesTableDialogProps {
   isSubmitting: boolean;
   onEditDialogOpenChange: (open: boolean) => void;
   onSubmitEdit: (e: React.FormEvent) => void;
-  isDatePickerOpen: boolean;
-  setIsDatePickerOpen: (open: boolean) => void;
-  isStartTimePickerOpen: boolean;
-  setIsStartTimePickerOpen: (open: boolean) => void;
-  isEndTimePickerOpen: boolean;
-  setIsEndTimePickerOpen: (open: boolean) => void;
   resetEditForm: () => void;
   formatClassDate: (cls: ClassWithStatus) => string;
 }
@@ -128,11 +125,6 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
   isSubmitting,
   onEditDialogOpenChange,
   onSubmitEdit,
-  setIsDatePickerOpen,
-  isStartTimePickerOpen,
-  setIsStartTimePickerOpen,
-  isEndTimePickerOpen,
-  setIsEndTimePickerOpen,
   resetEditForm,
   formatClassDate,
 }) => {
@@ -141,15 +133,45 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
 
   // Calculate pagination
   const totalItems = allClasses.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return allClasses.slice(startIndex, startIndex + itemsPerPage);
-  }, [allClasses, currentPage, itemsPerPage]);
+  }, [allClasses, currentPage]);
 
-  // Reset to first page when classes change
   useEffect(() => {
-    setCurrentPage(1);
-  }, [allClasses]);
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    } else if (totalPages === 0) {
+      setCurrentPage(1);
+    }
+  }, [allClasses, currentPage, totalPages]);
+
+
+  const calculateDuration = (start: string, end: string): number => {
+    const [sh, sm] = (start || '').trim().split(':');
+    const [eh, em] = (end || '').trim().split(':');
+    const startHour = Number(sh);
+    const startMin = Number(sm ?? 0);
+    const endHour = Number(eh);
+    const endMin = Number(em ?? 0);
+    const sH = Number.isNaN(startHour) ? 0 : startHour;
+    const sM = Number.isNaN(startMin) ? 0 : startMin;
+    const eH = Number.isNaN(endHour) ? 0 : endHour;
+    const eM = Number.isNaN(endMin) ? 0 : endMin;
+    const startMinutes = sH * 60 + sM;
+    const endMinutes = eH * 60 + eM;
+    const diff = Math.max(0, endMinutes - startMinutes);
+    return diff / 60;
+  };
+
+  const isFormValid = useMemo(() => {
+    if (!classDate || !startTime || !endTime) return false;
+
+    const duration = calculateDuration(startTime, endTime);
+    return duration >= 2; // Minimum 2 hours
+  }, [classDate, startTime, endTime]);
 
   return (
     <>
@@ -166,7 +188,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-8" role="status" aria-label="Cargando clases">
               <Loading className="h-8 w-8" />
             </div>
           ) : allClasses.length > 0 ? (
@@ -241,13 +263,13 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                             <span>{dateUtils.formatDisplayDate(classDate)}</span>
                             {cls.startTime && (
                               <span className="text-xs text-muted-foreground">
-                                {new Date(cls.startTime).toLocaleTimeString('en-US', {
+                                {new Date(cls.startTime).toLocaleTimeString('es-ES', {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                   hour12: true,
                                 })}
                                 {cls.endTime
-                                  ? ` - ${new Date(cls.endTime).toLocaleTimeString('en-US', {
+                                  ? ` - ${new Date(cls.endTime).toLocaleTimeString('es-ES', {
                                       hour: '2-digit',
                                       minute: '2-digit',
                                       hour12: true,
@@ -255,11 +277,6 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                                   : ''}
                               </span>
                             )}
-                            {/* {cls.status === 'CANCELADA' && cls.cancellationReason && (
-                              <span className="text-xs text-amber-600 mt-1 dark:text-amber-400">
-                                Motivo: {cls.cancellationReason}
-                              </span>
-                            )} */}
                           </div>
                         </TableCell>
                         <TableCell className="text-xs px-4 py-2">
@@ -269,12 +286,13 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                                 {canTakeAttendance ? (
                                   <Link
                                     href={`/dashboard/docente/asignaturas/${cls.id}/clase/${cls.id}/asistencia`}
-                                    className="hover:underline"
+                                    className="hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
+                                    aria-label={`Registrar asistencia para ${cls.topic || 'Sin tema'}`}
                                   >
                                     {cls.topic || 'Sin tema'}
                                   </Link>
                                 ) : (
-                                  <span className="cursor-default">{cls.topic || 'N/A'}</span>
+                                  <span>{cls.topic || 'N/A'}</span>
                                 )}
                               </TooltipTrigger>
                               <TooltipContent>
@@ -306,7 +324,11 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                         <TableCell className="text-xs text-right px-4 py-2 font-sans">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                aria-label={`Acciones para clase ${cls.topic || 'sin tema'}`}
+                              >
                                 <span className="sr-only">Abrir menú</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
@@ -328,50 +350,54 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                                   href={`/dashboard/docente/asignaturas/${cls.id}/clase/${cls.id}/asistencia`}
                                   className="flex items-center w-full"
                                   onClick={e => !canTakeAttendance && e.preventDefault()}
+                                  aria-disabled={!canTakeAttendance}
                                 >
-                                  <UserCheck className="mr-2 h-4 w-4" />
+                                  <UserCheck className="mr-2 h-4 w-4" aria-hidden="true" />
                                   <span>Asistencia</span>
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onSelect={e => {
-                                  e.preventDefault();
-                                  if (canEdit) handleEdit(cls);
+                                disabled={!canEdit}
+                                onSelect={() => {
+                                  if (canEdit) setTimeout(() => handleEdit(cls), 0);
                                 }}
                                 className={
                                   !canEdit ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                                 }
+                                aria-disabled={!canEdit}
                               >
-                                <Edit className="mr-2 h-4 w-4" />
+                                <Edit className="mr-2 h-4 w-4" aria-hidden="true" />
                                 <span>Editar</span>
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onSelect={e => {
-                                  e.preventDefault();
-                                  if (canCancel) handleCancel(cls);
+                                disabled={!canCancel}
+                                onSelect={() => {
+                                  if (canCancel) setTimeout(() => handleCancel(cls), 0);
                                 }}
                                 className={
                                   !canCancel
                                     ? 'opacity-50 cursor-not-allowed'
                                     : 'text-destructive cursor-pointer'
                                 }
+                                aria-disabled={!canCancel}
                               >
-                                <Ban className="mr-2 h-4 w-4" />
+                                <Ban className="mr-2 h-4 w-4" aria-hidden="true" />
                                 <span>Cancelar Clase</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onSelect={e => {
-                                  e.preventDefault();
-                                  if (canMarkAsDone) handleMarkAsDone(cls.id);
+                                disabled={!canMarkAsDone}
+                                onSelect={() => {
+                                  if (canMarkAsDone) setTimeout(() => handleMarkAsDone(cls.id), 0);
                                 }}
                                 className={
                                   !canMarkAsDone
                                     ? 'opacity-50 cursor-not-allowed'
                                     : 'cursor-pointer'
                                 }
+                                aria-disabled={!canMarkAsDone}
                               >
-                                <Signature className="mr-2 h-4 w-4" />
+                                <Signature className="mr-2 h-4 w-4" aria-hidden="true" />
                                 <span>Firmar Clase</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -399,7 +425,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
       </Card>
 
       <Dialog open={isCancelDialogOpen} onOpenChange={onCancelDialogOpenChange}>
-        <DialogContent>
+        <DialogContent onCloseAutoFocus={e => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
               Cancelar Clase
@@ -424,7 +450,12 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               value={cancelReason}
               className="resize-none h-24"
               onChange={e => setCancelReason(e.target.value)}
+              aria-required={true}
+              aria-describedby="cancel-reason-description"
             />
+            <span id="cancel-reason-description" className="sr-only">
+              Ingrese el motivo de la cancelación que se enviará a los estudiantes
+            </span>
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -436,6 +467,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               disabled={!cancelReason.trim() || isSubmitting}
               onClick={onConfirmCancel}
               className="bg-rose-600 text-white hover:bg-rose-700 font-sans"
+              aria-label="Confirmar cancelación de clase"
             >
               {isSubmitting ? 'Cancelando...' : 'Confirmar Cancelación'}
             </Button>
@@ -450,13 +482,13 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
           onEditDialogOpenChange(open);
           if (!open) {
             resetEditForm();
-            setIsDatePickerOpen(false);
-            setIsStartTimePickerOpen(false);
-            setIsEndTimePickerOpen(false);
           }
         }}
       >
-        <DialogContent className="sm:max-w-[500px] font-sans">
+        <DialogContent
+          className="sm:max-w-[500px] font-sans"
+          onCloseAutoFocus={e => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle className="text-foreground font-semibold text-xl tracking-tight">
               Editar Clase
@@ -469,8 +501,15 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
             <div className="space-y-6 py-4">
               {/* Selector de Fecha */}
               <div className="space-y-2">
-                <Label className="text-xs font-normal">Fecha</Label>
-                <DatePicker value={classDate} onChange={setClassDate} />
+                <Label htmlFor="class-date" className="text-xs font-normal">
+                  Fecha
+                </Label>
+                <DatePicker
+                  value={classDate}
+                  onChange={setClassDate}
+                  aria-required={true}
+                  aria-label="Seleccionar fecha de la clase"
+                />
               </div>
 
               {/* Selector de Horario */}
@@ -478,151 +517,110 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                 <div className="grid grid-cols-2 gap-4">
                   {/* Hora de Inicio */}
                   <div className="space-y-2">
-                    <Label className="text-xs text-normal">Hora de inicio</Label>
-                    <Popover open={isStartTimePickerOpen} onOpenChange={setIsStartTimePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal text-xs"
-                          type="button"
-                        >
-                          <Clock className="mr-2 h-4 w-4 opacity-50" />
-                          {startTime
-                            ? (() => {
-                                const hour = Number.parseInt(startTime.split(':')[0]);
-                                const period = hour >= 12 ? 'PM' : 'AM';
-                                const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                                return `${displayHour}:00 ${period}`;
-                              })()
-                            : 'Seleccionar'}
-                          {!startTime && <span className="text-muted-foreground">Requerido</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-48 p-0"
-                        align="start"
-                        onOpenAutoFocus={e => e.preventDefault()}
-                      >
-                        <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2">
-                          {Array.from({ length: 16 }, (_, i) => {
-                            const hour = i + 7; // 7AM a 10PM
-                            const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                            const period = hour >= 12 ? 'PM' : 'AM';
-                            const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                            const timeDisplay = `${displayHour}:00 ${period}`;
-
-                            return (
-                              <Button
-                                key={time24}
-                                variant="ghost"
-                                className="font-sans w-full justify-center text-center h-9 px-3 text-xs hover:bg-accent rounded-sm"
-                                onClick={() => {
-                                  setStartTime(time24);
-                                  setIsStartTimePickerOpen(false); // Cerrar popover
-                                  // Auto-ajustar hora de fin si es necesaria
-                                  const startHour = Number.parseInt(time24.split(':')[0]);
-                                  const endHour = Math.min(startHour + 2, 22); // Mínimo 2 horas, máximo 10PM
-                                  const newEndTime = `${endHour.toString().padStart(2, '0')}:00`;
-                                  if (
-                                    !endTime ||
-                                    endTime <= time24 ||
-                                    Number.parseInt(endTime.split(':')[0]) - startHour < 2
-                                  ) {
-                                    setEndTime(newEndTime);
-                                  }
-                                }}
-                                type="button"
-                              >
-                                {timeDisplay}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <Label htmlFor="start-time" className="text-xs text-normal">
+                      Hora de inicio
+                    </Label>
+                    <TimePicker
+                      id="start-time"
+                      value={startTime || '07:00'}
+                      onChange={newValue => {
+                        setStartTime(newValue);
+                        const [hStr, mStr = '00'] = newValue.split(':');
+                        const startHour = Number.parseInt(hStr, 10);
+                        const endHourMin = Math.min(startHour + 2, 22);
+                        const requiredMinEnd = `${endHourMin.toString().padStart(2, '0')}:${mStr}`;
+                        if (!endTime) {
+                          setEndTime(requiredMinEnd);
+                        } else {
+                          const [eh, em = '00'] = endTime.split(':');
+                          const endHour = Number.parseInt(eh, 10);
+                          const endMin = Number.parseInt(em, 10);
+                          const startMin = Number.parseInt(mStr, 10);
+                          const startTotalMin = startHour * 60 + startMin;
+                          const endTotalMin = endHour * 60 + endMin;
+                          if (endTotalMin - startTotalMin < 120) {
+                            setEndTime(requiredMinEnd);
+                          }
+                        }
+                      }}
+                      className="w-full"
+                      aria-required={true}
+                      aria-label="Seleccionar hora de inicio"
+                    />
+                    {!startTime && (
+                      <p className="text-muted-foreground text-xs" role="alert" aria-live="polite">
+                        Requerido
+                      </p>
+                    )}
                   </div>
 
                   {/* Hora de Fin */}
                   <div className="space-y-2">
-                    <Label className="text-xs text-normal">Hora de fin</Label>
-                    <Popover open={isEndTimePickerOpen} onOpenChange={setIsEndTimePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal text-xs"
-                          type="button"
-                          disabled={!startTime}
-                        >
-                          <Clock className="mr-2 h-4 w-4 opacity-50" />
-                          {endTime
-                            ? (() => {
-                                const hour = Number.parseInt(endTime.split(':')[0]);
-                                const period = hour >= 12 ? 'PM' : 'AM';
-                                const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                                return `${displayHour}:00 ${period}`;
-                              })()
-                            : 'Seleccionar'}
-                          {!endTime && startTime && (
-                            <span className="text-muted-foreground ml-2">Requerido</span>
-                          )}
-                          {!startTime && (
-                            <span className="text-muted-foreground ml-2">
-                              Seleccione hora de inicio primero
-                            </span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-48 p-0"
-                        align="start"
-                        onOpenAutoFocus={e => e.preventDefault()}
-                      >
-                        <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2">
-                          {startTime &&
-                            Array.from({ length: 16 }, (_, i) => {
-                              const hour = i + 7; // 7AM a 10PM
-                              const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                              const period = hour >= 12 ? 'PM' : 'AM';
-                              const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                              const timeDisplay = `${displayHour}:00 ${period}`;
-                              const startHour = Number.parseInt(startTime.split(':')[0]);
-                              const currentHour = Number.parseInt(time24.split(':')[0]);
+                    <Label htmlFor="end-time" className="text-xs text-normal">
+                      Hora de fin
+                    </Label>
+                    <TimePicker
+                      id="end-time"
+                      value={endTime || ''}
+                      onChange={newValue => {
+                        if (startTime) {
+                          const [sh, sm = '00'] = startTime.split(':');
+                          const [eh, em = '00'] = newValue.split(':');
+                          const startHour = Number.parseInt(sh, 10);
+                          const startMin = Number.parseInt(sm, 10);
+                          const endHour = Number.parseInt(eh, 10);
+                          const endMin = Number.parseInt(em, 10);
 
-                              // Solo mostrar horas que sean al menos 2 horas después del inicio
-                              if (currentHour < startHour + 2) return null;
+                          const startTotalMin = startHour * 60 + startMin;
+                          const endTotalMin = endHour * 60 + endMin;
 
-                              return (
-                                <Button
-                                  key={time24}
-                                  variant="ghost"
-                                  className="font-sans w-full justify-center text-center h-9 px-3 text-xs hover:bg-accent rounded-sm"
-                                  onClick={() => {
-                                    setEndTime(time24);
-                                    setIsEndTimePickerOpen(false);
-                                  }}
-                                  type="button"
-                                >
-                                  {timeDisplay}
-                                </Button>
-                              );
-                            }).filter(Boolean)}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                          if (endTotalMin - startTotalMin < 120) {
+                            const adjustedTotalMin = Math.min(startTotalMin + 120, 22 * 60);
+                            const adjustedHour = Math.floor(adjustedTotalMin / 60);
+                            const adjustedMin = adjustedTotalMin % 60;
+                            const adjustedTime = `${adjustedHour.toString().padStart(2, '0')}:${adjustedMin.toString().padStart(2, '0')}`;
+                            setEndTime(adjustedTime);
+                            return;
+                          }
+                        }
+                        setEndTime(newValue);
+                      }}
+                      className="w-full"
+                      disabled={!startTime}
+                      aria-required={true}
+                      aria-label="Seleccionar hora de fin"
+                      aria-disabled={!startTime}
+                    />
+                    {!endTime && startTime && (
+                      <p className="text-muted-foreground text-xs" role="alert" aria-live="polite">
+                        Requerido
+                      </p>
+                    )}
+                    {!startTime && (
+                      <p className="text-muted-foreground text-xs">
+                        Seleccione hora de inicio primero
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* Indicador de Duración */}
                 {startTime && endTime && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
-                    <Clock className="h-4 w-4" />
+                  <div
+                    className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-3"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <Clock className="h-4 w-4" aria-hidden="true" />
                     <span>
                       Duración:{' '}
                       {(() => {
-                        const start = Number.parseInt(startTime.split(':')[0]);
-                        const end = Number.parseInt(endTime.split(':')[0]);
-                        const duration = end - start;
-                        return `${duration} ${duration === 1 ? 'hora' : 'horas'}`;
+                        const duration = calculateDuration(startTime, endTime);
+                        const hours = Math.floor(duration);
+                        const minutes = Math.round((duration - hours) * 60);
+                        return minutes > 0
+                          ? `${hours} ${hours === 1 ? 'hora' : 'horas'} y ${minutes} minutos`
+                          : `${hours} ${hours === 1 ? 'hora' : 'horas'}`;
                       })()}
                     </span>
                   </div>
@@ -640,6 +638,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                   onChange={e => setClassTopic(e.target.value)}
                   className="text-xs"
                   placeholder="Ej: Introducción a las Derivadas"
+                  aria-label="Tema de la clase"
                 />
               </div>
 
@@ -653,6 +652,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                   onChange={e => setClassDescription(e.target.value)}
                   className="text-xs"
                   placeholder="Ej: Descripción detallada de la clase"
+                  aria-label="Descripción de la clase"
                 />
               </div>
             </div>
@@ -665,15 +665,17 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               </DialogClose>
               <Button
                 type="submit"
-                disabled={
-                  isSubmitting || !classDate || !startTime || !endTime || startTime >= endTime
-                }
+                disabled={isSubmitting || !isFormValid}
                 className="min-w-[120px]"
+                aria-label="Guardar cambios de la clase"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                    Actualizando...
+                    <div
+                      className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"
+                      aria-hidden="true"
+                    />
+                    <span>Actualizando...</span>
                   </>
                 ) : (
                   'Guardar Cambios'

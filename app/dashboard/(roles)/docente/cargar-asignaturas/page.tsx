@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { TimePicker } from '@/components/ui/time-picker';
 import {
   Table,
   TableBody,
@@ -78,9 +78,9 @@ interface RawApiPreviewItem {
   codigoAsignatura: string;
   nombreAsignatura: string;
   creditosClase: number;
-  fechaClase: string;
-  horaInicio: string;
-  horaFin: string;
+  fechaClase: string | number;
+  horaInicio: string | number;
+  horaFin: string | number;
   temaClase?: string; // Optional
   descripcionClase?: string; // Optional
   semestreAsignatura: number;
@@ -136,8 +136,6 @@ export default function UploadSubjectsPage() {
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<EditableClass | null>(null);
-  const [isStartTimePickerOpen, setIsStartTimePickerOpen] = useState(false);
-  const [isEndTimePickerOpen, setIsEndTimePickerOpen] = useState(false);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
@@ -201,11 +199,16 @@ export default function UploadSubjectsPage() {
 
         // Add class only if the row itself doesn't have an error about the class fields
         if (!item.error) {
+          // Helper function to ensure value is string
+          const ensureString = (value: string | number): string => {
+            return typeof value === 'number' ? value.toString() : value;
+          };
+
           groupedBySubject[subjectCode].classes.push({
             id: groupedBySubject[subjectCode].classes.length,
-            fechaClase: item.fechaClase ? item.fechaClase.split('T')[0] : '', // Format to YYYY-MM-DD
-            horaInicio: item.horaInicio ?? '',
-            horaFin: item.horaFin ?? '',
+            fechaClase: ensureString(item.fechaClase),
+            horaInicio: ensureString(item.horaInicio),
+            horaFin: ensureString(item.horaFin),
             temaClase: item.temaClase ?? '',
             descripcionClase: item.descripcionClase ?? '',
           });
@@ -739,150 +742,59 @@ export default function UploadSubjectsPage() {
                   {/* Hora de Inicio */}
                   <div className="space-y-2">
                     <Label className="text-xs text-normal">Hora de inicio</Label>
-                    <Popover open={isStartTimePickerOpen} onOpenChange={setIsStartTimePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal text-xs"
-                          type="button"
-                        >
-                          <Clock className="mr-2 h-4 w-4 opacity-50" />
-                          {startTime
-                            ? (() => {
-                                const hour = Number.parseInt(startTime.split(':')[0]);
-                                const period = hour >= 12 ? 'PM' : 'AM';
-                                const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                                return `${displayHour}:00 ${period}`;
-                              })()
-                            : 'Seleccionar'}
-                          {!startTime && <span className="text-muted-foreground">Requerido</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-48 p-0"
-                        align="start"
-                        onOpenAutoFocus={(e: Event) => e.preventDefault()}
-                      >
-                        <div
-                          className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2"
-                          onWheel={e => {
-                            // Habilitar scroll con la rueda del mouse dentro del popover
-                            e.preventDefault();
-                            e.currentTarget.scrollTop += e.deltaY;
-                          }}
-                        >
-                          {Array.from({ length: 16 }, (_, i) => {
-                            const hour = i + 7; // 7AM a 10PM
-                            const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                            const period = hour >= 12 ? 'PM' : 'AM';
-                            const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                            const timeDisplay = `${displayHour}:00 ${period}`;
-
-                            return (
-                              <Button
-                                key={time24}
-                                variant="ghost"
-                                className="font-sans w-full justify-center text-center h-9 px-3 text-xs hover:bg-accent rounded-sm"
-                                onClick={() => {
-                                  setStartTime(time24);
-                                  setIsStartTimePickerOpen(false);
-                                  // Auto-ajustar hora de fin si es necesaria
-                                  const startHour = Number.parseInt(time24.split(':')[0]);
-                                  const endHour = Math.min(startHour + 2, 22); // Mínimo 2 horas, máximo 10PM
-                                  const newEndTime = `${endHour.toString().padStart(2, '0')}:00`;
-                                  if (
-                                    !endTime ||
-                                    endTime <= time24 ||
-                                    Number.parseInt(endTime.split(':')[0]) - startHour < 2
-                                  ) {
-                                    setEndTime(newEndTime);
-                                  }
-                                }}
-                                type="button"
-                              >
-                                {timeDisplay}
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <TimePicker
+                      value={startTime || '07:00'}
+                      onChange={newValue => {
+                        setStartTime(newValue);
+                        const [hStr, mStr = '00'] = newValue.split(':');
+                        const startHour = Number.parseInt(hStr, 10);
+                        const endHourMin = Math.min(startHour + 2, 22);
+                        const requiredMinEnd = `${endHourMin.toString().padStart(2, '0')}:${mStr}`;
+                        if (!endTime) {
+                          setEndTime(requiredMinEnd);
+                        } else {
+                          const [eh] = endTime.split(':');
+                          if (Number.parseInt(eh, 10) < endHourMin) {
+                            setEndTime(requiredMinEnd);
+                          }
+                        }
+                      }}
+                      className="w-full"
+                    />
+                    {!startTime && (
+                      <span className="text-muted-foreground text-xs">Requerido</span>
+                    )}
                   </div>
 
                   {/* Hora de Fin */}
                   <div className="space-y-2">
                     <Label className="text-xs text-normal">Hora de fin</Label>
-                    <Popover open={isEndTimePickerOpen} onOpenChange={setIsEndTimePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal text-xs"
-                          type="button"
-                          disabled={!startTime}
-                        >
-                          <Clock className="mr-2 h-4 w-4 opacity-50" />
-                          {endTime
-                            ? (() => {
-                                const hour = Number.parseInt(endTime.split(':')[0]);
-                                const period = hour >= 12 ? 'PM' : 'AM';
-                                const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                                return `${displayHour}:00 ${period}`;
-                              })()
-                            : 'Seleccionar'}
-                          {!endTime && startTime && (
-                            <span className="text-muted-foreground ml-2">Requerido</span>
-                          )}
-                          {!startTime && (
-                            <span className="text-muted-foreground ml-2">
-                              Seleccione hora de inicio primero
-                            </span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-48 p-0"
-                        align="start"
-                        onOpenAutoFocus={(e: Event) => e.preventDefault()}
-                      >
-                        <div
-                          className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 p-2"
-                          onWheel={e => {
-                            // Habilitar scroll con la rueda del mouse dentro del popover
-                            e.preventDefault();
-                            e.currentTarget.scrollTop += e.deltaY;
-                          }}
-                        >
-                          {startTime &&
-                            Array.from({ length: 16 }, (_, i) => {
-                              const hour = i + 7; // 7AM a 10PM
-                              const time24 = `${hour.toString().padStart(2, '0')}:00`;
-                              const period = hour >= 12 ? 'PM' : 'AM';
-                              const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-                              const timeDisplay = `${displayHour}:00 ${period}`;
-                              const startHour = Number.parseInt(startTime.split(':')[0]);
-                              const currentHour = Number.parseInt(time24.split(':')[0]);
-
-                              // Solo mostrar horas que sean al menos 2 horas después del inicio
-                              if (currentHour < startHour + 2) return null;
-
-                              return (
-                                <Button
-                                  key={time24}
-                                  variant="ghost"
-                                  className="font-sans w-full justify-center text-center h-9 px-3 text-xs hover:bg-accent rounded-sm"
-                                  onClick={() => {
-                                    setEndTime(time24);
-                                    setIsEndTimePickerOpen(false);
-                                  }}
-                                  type="button"
-                                >
-                                  {timeDisplay}
-                                </Button>
-                              );
-                            }).filter(Boolean)}
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <TimePicker
+                      value={endTime || ''}
+                      onChange={newValue => {
+                        if (startTime) {
+                          const [sh] = startTime.split(':');
+                          const endHour = Number.parseInt(newValue.split(':')[0], 10);
+                          const startHour = Number.parseInt(sh, 10);
+                          if (endHour < startHour + 2) {
+                            const adjustedHour = Math.min(startHour + 2, 22);
+                            const minutes = newValue.split(':')[1] || '00';
+                            setEndTime(`${adjustedHour.toString().padStart(2, '0')}:${minutes}`);
+                            return;
+                          }
+                        }
+                        setEndTime(newValue);
+                      }}
+                      className="w-full"
+                    />
+                    {!endTime && startTime && (
+                      <span className="text-muted-foreground text-xs">Requerido</span>
+                    )}
+                    {!startTime && (
+                      <span className="text-muted-foreground text-xs">
+                        Seleccione hora de inicio primero
+                      </span>
+                    )}
                   </div>
                 </div>
 
