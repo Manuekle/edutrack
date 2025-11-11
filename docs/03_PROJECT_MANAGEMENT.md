@@ -144,7 +144,7 @@
 
 | Riesgo                        | Probabilidad | Impacto | Mitigación                                          |
 | ----------------------------- | ------------ | ------- | --------------------------------------------------- |
-| **Fraude en QR**              | Media        | Alto    | Tokens únicos, validación temporal, geolocalización |
+| **Fraude en QR**              | Media        | Alto    | Tokens únicos, validación temporal, prevención de reutilización |
 | **Baja adopción docente**     | Alta         | Alto    | Capacitación, interfaz intuitiva, soporte técnico   |
 | **Problemas de conectividad** | Alta         | Medio   | Modo offline, sincronización posterior              |
 | **Escalabilidad**             | Baja         | Alto    | Arquitectura cloud-native, load balancing           |

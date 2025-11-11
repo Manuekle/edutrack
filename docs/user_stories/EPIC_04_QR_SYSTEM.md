@@ -37,7 +37,6 @@ Sistema avanzado de generación y validación de códigos QR para el registro de
 - [x] Validación de token QR y tiempo de expiración
 - [x] Verificación de estudiante matriculado
 - [x] Prevención de reutilización de códigos
-- [ ] Validación por geolocalización (pendiente)
 
 **Prioridad:** Alta  
 **Story Points:** 13  
