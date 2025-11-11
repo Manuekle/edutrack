@@ -1,18 +1,22 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Prisma, Role } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { Role } from '@/lib/roles';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 // PATCH: Actualizar un usuario existente
-export async function PATCH(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== Role.ADMIN) {
       return NextResponse.json({ message: 'Acceso denegado' }, { status: 403 });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
     const body = await request.json();
     const {
       name,
@@ -78,14 +82,17 @@ export async function PATCH(request: NextRequest, { params }: { params: { userId
 }
 
 // DELETE: Eliminar un usuario
-export async function DELETE(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== Role.ADMIN) {
       return NextResponse.json({ message: 'Acceso denegado' }, { status: 403 });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     if (session.user.id === userId) {
       return NextResponse.json({ message: 'No puedes eliminar tu propia cuenta' }, { status: 400 });

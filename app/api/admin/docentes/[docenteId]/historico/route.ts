@@ -1,6 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { AttendanceStatus, Role } from '@prisma/client';
+import { AttendanceStatus } from '@prisma/client';
+import { Role } from '@/lib/roles';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 

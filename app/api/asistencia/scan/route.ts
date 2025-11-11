@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       const parsed = ScanAttendanceRequestSchema.safeParse(body);
       if (!parsed.success) {
         return createErrorResponse('INVALID_REQUEST', {
-          errors: parsed.error.errors,
+          errors: parsed.error.issues,
         });
       }
       qrToken = parsed.data.qrToken.trim();
@@ -168,6 +168,11 @@ export async function POST(request: Request) {
         recordedAt: new Date(),
       },
     });
+
+    // CACHE: Invalidate cache for this subject (affects student and teacher)
+    const { clearSubjectCache } = await import('@/lib/cache');
+    await clearSubjectCache(subject.id);
+
     // Validar respuesta con Zod
     const attendanceResponse = {
       id: newAttendance.id,
@@ -181,7 +186,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message: 'Asistencia registrada pero error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 201 }
       );

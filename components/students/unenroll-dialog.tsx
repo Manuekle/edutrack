@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -9,18 +9,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface UnenrollDialogProps {
-  isOpen: boolean
-  studentName: string | null
-  reason: string
-  isSubmitting: boolean
-  onReasonChange: (reason: string) => void
-  onClose: () => void
-  onConfirm: () => void
+  isOpen: boolean;
+  studentName: string | null;
+  reason: string;
+  isSubmitting: boolean;
+  onReasonChange: (reason: string) => void;
+  onClose: () => void;
+  onConfirm: () => void;
 }
 
 export function UnenrollDialog({
@@ -36,9 +36,14 @@ export function UnenrollDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-tight">Solicitar desmatrícula</DialogTitle>
+          <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
+            Solicitar desmatrícula
+          </DialogTitle>
           <DialogDescription className="space-y-4 font-sans">
-            <p>Se enviará una solicitud al administrador para desmatricular a {studentName} de la asignatura.</p>
+            <p>
+              Se enviará una solicitud al administrador para desmatricular a {studentName} de la
+              asignatura.
+            </p>
             <div className="space-y-2">
               <Label className="text-xs font-normal text-black dark:text-white" htmlFor="reason">
                 Motivo de la solicitud
@@ -48,25 +53,32 @@ export function UnenrollDialog({
                 placeholder="Ingrese el motivo de la solicitud"
                 value={reason}
                 className="text-xs"
-                onChange={(e) => onReasonChange(e.target.value)}
+                onChange={e => onReasonChange(e.target.value)}
                 required
               />
             </div>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose className="font-sans" onClick={onClose}>
-            Cancelar
-          </DialogClose>
           <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="font-sans"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="button"
             onClick={onConfirm}
             className="bg-amber-600 text-white hover:bg-amber-700 font-sans"
             disabled={!reason.trim() || isSubmitting}
           >
-            {isSubmitting ? "Enviando..." : "Enviar solicitud"}
+            {isSubmitting ? 'Enviando...' : 'Enviar solicitud'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

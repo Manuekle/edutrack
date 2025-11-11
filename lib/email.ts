@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-interface SendEmailOptions {
+export interface SendEmailOptions {
   to: string | string[];
   subject: string;
   react: React.ReactElement;
@@ -49,14 +49,12 @@ export async function sendEmail({
 
     const info: SentMessageInfo = await transporter.sendMail(mailOptions);
 
-    console.log('Correo enviado: %s', info.messageId);
     return {
       success: true,
       messageId: info.messageId,
       response: info.response,
     };
   } catch (error) {
-    console.error('Error al enviar el correo:', error);
     throw new Error(
       `Error al enviar el correo: ${error instanceof Error ? error.message : String(error)}`
     );

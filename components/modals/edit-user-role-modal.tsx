@@ -1,5 +1,9 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,6 +13,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -28,28 +41,40 @@ interface EditUserRoleModalProps {
   onUserUpdate: (updatedUser: User) => void;
 }
 
+const editUserRoleSchema = z.object({
+  role: z.enum(['ADMIN', 'DOCENTE', 'ESTUDIANTE', 'COORDINADOR'] as const),
+});
+
+type EditUserRoleFormValues = z.infer<typeof editUserRoleSchema>;
+
 export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditUserRoleModalProps) {
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Resetear el estado cuando el modal se abre o cambia el usuario
+  const form = useForm<EditUserRoleFormValues>({
+    resolver: zodResolver(editUserRoleSchema),
+    defaultValues: {
+      role: (user?.role as Role) || 'ESTUDIANTE',
+    },
+  });
+
+  // Resetear el formulario cuando el modal se abre o cambia el usuario
   useEffect(() => {
     if (isOpen && user?.role) {
-      setSelectedRole(user.role as Role);
-    } else {
-      setSelectedRole(null);
+      form.reset({
+        role: user.role as Role,
+      });
     }
-  }, [isOpen, user?.role]);
+  }, [isOpen, user?.role, form]);
 
-  const handleSave = async () => {
-    if (!user || !selectedRole) return;
+  const onSubmit = async (data: EditUserRoleFormValues) => {
+    if (!user) return;
 
     setIsSaving(true);
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: selectedRole }),
+        body: JSON.stringify({ role: data.role }),
       });
 
       if (!response.ok) {
@@ -61,7 +86,6 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
       toast.success(`El rol de ${updatedUser.name} ha sido actualizado a ${updatedUser.role}.`);
       onClose();
     } catch (error) {
-      console.error(error);
       toast.error('Error al actualizar el rol del usuario.');
     } finally {
       setIsSaving(false);
@@ -82,32 +106,42 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
             sistema.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <Select
-            value={selectedRole || ''}
-            onValueChange={value => setSelectedRole(value as Role)}
-            disabled={isSaving}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona un rol" />
-            </SelectTrigger>
-            <SelectContent>
-              {ROLES.map(role => (
-                <SelectItem key={role} value={role}>
-                  {role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSaving}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSave} disabled={isSaving || !selectedRole}>
-            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
-          </Button>
-        </DialogFooter>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="py-4">
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rol</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={isSaving}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecciona un rol" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {ROLES.map(role => (
+                        <SelectItem key={role} value={role}>
+                          {role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

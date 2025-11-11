@@ -1,18 +1,18 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Role } from '@prisma/client';
+import { Role } from '@/lib/roles';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 // PATCH: Actualizar una asignatura
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== Role.ADMIN) {
       return NextResponse.json({ message: 'Acceso denegado' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { name, code, program, semester, credits, teacherId } = body;
 
@@ -95,14 +95,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE: Eliminar una asignatura
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== Role.ADMIN) {
       return NextResponse.json({ message: 'Acceso denegado' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Verificar que la asignatura existe
     const existingSubject = await db.subject.findUnique({

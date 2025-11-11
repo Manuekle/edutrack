@@ -6,10 +6,7 @@ export const EventTypeEnum = z.enum(['EXAMEN', 'TRABAJO', 'LIMITE', 'ANUNCIO', '
 // Schema for querying events
 export const DocenteEventosQuerySchema = z.object({
   subjectId: z
-    .string({
-      required_error: 'El ID de la asignatura es requerido.',
-      invalid_type_error: 'El ID de la asignatura debe ser un texto.',
-    })
+    .string({ message: 'El ID de la asignatura debe ser un texto.' })
     .min(1, 'El ID de la asignatura no puede estar vacío.'),
   page: z.coerce.number().positive().default(1),
   limit: z.coerce.number().positive().default(10),
@@ -21,7 +18,7 @@ export const DocenteEventosQuerySchema = z.object({
 export const DocenteEventoUpdateSchema = z.object({
   title: z.string().min(1, 'El título no puede estar vacío.').optional(),
   description: z.string().optional().nullable(),
-  date: z.coerce.date({ invalid_type_error: 'La fecha no es válida.' }).optional(),
+  date: z.coerce.date({ message: 'La fecha no es válida.' }).optional(),
   type: EventTypeEnum.optional(),
 });
 

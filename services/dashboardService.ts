@@ -53,7 +53,6 @@ export async function getTeacherDashboardData(): Promise<
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error('Error en getTeacherDashboardData:', error);
     return { error: 'Error de conexión' };
   }
 }
@@ -110,7 +109,6 @@ export async function getLiveClassData(): Promise<
     const data = await response.json();
     return { data };
   } catch (error) {
-    console.error('Error en getLiveClassData:', error);
     return { error: 'Error de conexión' };
   }
 }

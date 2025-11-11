@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
@@ -6,9 +7,9 @@ import { NextResponse } from 'next/server';
 import { DocenteEventoDetailSchema, DocenteEventoUpdateSchema } from './schema';
 
 // GET /api/docente/eventos/[id] - Obtener un evento específico
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  const eventId = params.id;
+  const { id: eventId } = await params;
   if (!session || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
   }
@@ -30,7 +31,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 500 }
       );
@@ -42,9 +43,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // PUT /api/docente/eventos/[id] - Actualizar un evento
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  const eventId = params.id;
+  const { id: eventId } = await params;
   if (!session || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
   }
@@ -53,7 +54,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const parsed = DocenteEventoUpdateSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: parsed.error.errors },
+        { message: 'Datos de entrada inválidos', errors: parsed.error.issues },
         { status: 400 }
       );
     }
@@ -72,20 +73,33 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         { status: 404 }
       );
     }
+
+    // Normalizar la fecha a medianoche si se proporciona
+    const updateData = { ...parsed.data };
+    if (updateData.date) {
+      const eventDate = new Date(updateData.date);
+      eventDate.setHours(0, 0, 0, 0);
+      updateData.date = eventDate;
+    }
+
     const updatedEvent = await db.subjectEvent.update({
       where: { id: eventId },
-      data: parsed.data,
+      data: updateData,
     });
     const validated = DocenteEventoDetailSchema.safeParse(updatedEvent);
     if (!validated.success) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 500 }
       );
     }
+
+    // CACHE: Invalidate cache for this subject (affects students and teacher)
+    await clearSubjectCache(existingEvent.subjectId);
+
     return NextResponse.json({
       data: validated.data,
       message: 'Evento actualizado correctamente',
@@ -96,9 +110,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // DELETE /api/docente/eventos/[id] - Eliminar un evento
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  const eventId = params.id;
+  const { id: eventId } = await params;
   if (!session || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
   }
@@ -122,11 +136,15 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
       return NextResponse.json(
         {
           message: 'Evento eliminado, pero error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 200 }
       );
     }
+
+    // CACHE: Invalidate cache for this subject (affects students and teacher)
+    await clearSubjectCache(existingEvent.subjectId);
+
     return NextResponse.json(
       { data: validated.data, message: 'Evento eliminado correctamente' },
       { status: 200 }

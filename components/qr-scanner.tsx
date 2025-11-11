@@ -37,13 +37,10 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
           videoRef.current,
           result => {
             try {
-              console.log('QR Token escaneado:', result.data);
               onScan(result.data);
               setError('');
               stopScanning();
             } catch (err) {
-              console.error('Error procesando código QR:', err);
-              console.log('Datos QR que causaron error:', result?.data);
               setError('Error procesando el código QR');
               onError?.('Error procesando el código QR');
             }
@@ -59,7 +56,6 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
 
         qrScannerRef.current = qrScanner;
       } catch (err) {
-        console.error('Error initializing QR scanner:', err);
         const errorMsg = err instanceof Error ? err.message : 'Error al inicializar el escáner';
         setError(errorMsg);
         onError?.(errorMsg);
@@ -82,7 +78,6 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
       setIsScanning(true);
       setError('');
     } catch (err) {
-      console.error('Error starting scanner:', err);
       const errorMsg = 'Error al iniciar el escáner. Verifica los permisos de cámara.';
       setError(errorMsg);
       onError?.(errorMsg);

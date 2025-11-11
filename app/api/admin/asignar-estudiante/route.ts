@@ -88,7 +88,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result, { status: result.status || 200 });
   } catch (error) {
-    console.error('Error en la asignación de estudiante:', error);
     return NextResponse.json(
       {
         success: false,
@@ -182,7 +181,6 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json(result, { status: result.status || 200 });
   } catch (error) {
-    console.error('Error al retirar estudiante:', error);
     return NextResponse.json(
       {
         success: false,

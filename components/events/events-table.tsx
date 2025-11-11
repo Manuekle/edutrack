@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
 import {
   AlertDialog,
@@ -12,9 +12,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -22,165 +22,166 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Loading } from "@/components/ui/loading"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { type EventType, type SubjectEvent, getErrorMessage } from "@/types"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
-import { Edit, Trash2 } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
-import { toast } from "sonner"
-import { EventForm } from "./event-form"
-import { EventTypeBadge } from "./event-type-badge"
+} from '@/components/ui/dialog';
+import { Loading } from '@/components/ui/loading';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { type EventType, type SubjectEvent, getErrorMessage } from '@/types';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Edit, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { EventForm } from './event-form';
+import { EventTypeBadge } from './event-type-badge';
 
 interface EventsTableProps {
-  subjectId: string
+  subjectId: string;
 }
 
 export function EventsTable({ subjectId }: EventsTableProps) {
-  const [events, setEvents] = useState<SubjectEvent[]>([])
-  const [isLoadingEvents, setIsLoadingEvents] = useState(true)
-  const [isCreateEventDialogOpen, setIsCreateEventDialogOpen] = useState(false)
-  const [currentEvent, setCurrentEvent] = useState<SubjectEvent | null>(null)
-  const [isEditEventDialogOpen, setIsEditEventDialogOpen] = useState(false)
-  const [eventToDelete, setEventToDelete] = useState<SubjectEvent | null>(null)
-
-  // Form state
-  const [eventTitle, setEventTitle] = useState("")
-  const [eventDescription, setEventDescription] = useState("")
-  const [eventDate, setEventDate] = useState<Date | undefined>(new Date())
-  const [eventType, setEventType] = useState<EventType | "">("")
+  const [events, setEvents] = useState<SubjectEvent[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  const [isCreateEventDialogOpen, setIsCreateEventDialogOpen] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<SubjectEvent | null>(null);
+  const [isEditEventDialogOpen, setIsEditEventDialogOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<SubjectEvent | null>(null);
 
   const fetchEvents = useCallback(async () => {
-    setIsLoadingEvents(true)
+    setIsLoadingEvents(true);
     try {
-      const response = await fetch(`/api/docente/eventos?subjectId=${subjectId}`)
+      const response = await fetch(`/api/docente/eventos?subjectId=${subjectId}`);
       if (!response.ok) {
-        throw new Error("Error al cargar los eventos")
+        throw new Error('Error al cargar los eventos');
       }
-      const data = await response.json()
-      setEvents(data.data)
+      const data = await response.json();
+      setEvents(data.data);
     } catch (error) {
-      toast.error(getErrorMessage(error))
+      toast.error(getErrorMessage(error));
     } finally {
-      setIsLoadingEvents(false)
+      setIsLoadingEvents(false);
     }
-  }, [subjectId])
+  }, [subjectId]);
 
   useEffect(() => {
     if (subjectId) {
-      fetchEvents()
+      fetchEvents();
     }
-  }, [subjectId, fetchEvents])
+  }, [subjectId, fetchEvents]);
 
-  const resetEventForm = () => {
-    setEventTitle("")
-    setEventDescription("")
-    setEventDate(new Date())
-    setEventType("")
-  }
-
-  const handleCreateEvent = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!eventTitle || !eventDate || !eventType) {
-      toast.error("Título, fecha y tipo son requeridos.")
-      return
-    }
-    const toastId = toast.loading("Creando evento...")
+  const handleCreateEvent = async (data: {
+    title: string;
+    description?: string;
+    date: Date;
+    type: EventType;
+  }) => {
+    const toastId = toast.loading('Creando evento...');
     try {
-      const response = await fetch("/api/docente/eventos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/docente/eventos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: eventTitle,
-          description: eventDescription,
-          date: eventDate.toISOString(),
-          type: eventType,
+          title: data.title,
+          description: data.description || '',
+          date: data.date.toISOString(),
+          type: data.type,
           subjectId: subjectId,
         }),
-      })
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Error al crear el evento")
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error || 'Error al crear el evento');
       }
-      const createdEventResp = await response.json()
-      setEvents((prevEvents) => [...prevEvents, createdEventResp.data])
-      toast.success("Evento creado con éxito", { id: toastId })
-      setIsCreateEventDialogOpen(false)
-      resetEventForm()
+      const createdEventResp = await response.json();
+      const createdEvent = createdEventResp.data || createdEventResp;
+
+      if (!createdEvent) {
+        throw new Error('La respuesta del servidor no contiene datos válidos');
+      }
+
+      setEvents(prevEvents => [...prevEvents, createdEvent]);
+      toast.success('Evento creado con éxito', { id: toastId });
+      setIsCreateEventDialogOpen(false);
     } catch (error) {
-      console.error(error)
-      toast.error(getErrorMessage(error), { id: toastId })
+      toast.error(getErrorMessage(error), { id: toastId });
     }
-  }
+  };
 
   const openEditEventDialog = (event: SubjectEvent) => {
-    setCurrentEvent(event)
-    setEventTitle(event.title)
-    setEventDescription(event.description || "")
-    setEventDate(new Date(event.date))
-    setEventType(event.type)
-    setIsEditEventDialogOpen(true)
-  }
+    setCurrentEvent(event);
+    setIsEditEventDialogOpen(true);
+  };
 
-  const handleUpdateEvent = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!currentEvent) return
-
-    if (!eventTitle || !eventDate || !eventType) {
-      toast.error("Título, fecha y tipo son requeridos.")
-      return
+  const handleUpdateEvent = async (data: {
+    title: string;
+    description?: string;
+    date: Date;
+    type: EventType;
+  }) => {
+    if (!currentEvent) {
+      toast.error('No hay evento seleccionado para editar');
+      return;
     }
-    const toastId = toast.loading("Actualizando evento...")
+
+    const toastId = toast.loading('Actualizando evento...');
     try {
       const response = await fetch(`/api/docente/eventos/${currentEvent.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: eventTitle,
-          description: eventDescription,
-          date: eventDate.toISOString(),
-          type: eventType,
+          title: data.title,
+          description: data.description || '',
+          date: data.date.toISOString(),
+          type: data.type,
         }),
-      })
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Error al actualizar el evento")
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error || 'Error al actualizar el evento');
       }
-      const updatedEventResp = await response.json()
-      setEvents((prevEvents) =>
-        prevEvents.map((event) => (event.id === currentEvent.id ? updatedEventResp.data : event)),
-      )
-      toast.success("Evento actualizado con éxito", { id: toastId })
-      setIsEditEventDialogOpen(false)
-      resetEventForm()
+      const updatedEventResp = await response.json();
+      const updatedEvent = updatedEventResp.data || updatedEventResp;
+
+      if (!updatedEvent) {
+        throw new Error('La respuesta del servidor no contiene datos válidos');
+      }
+
+      setEvents(prevEvents =>
+        prevEvents.map(event => (event.id === currentEvent.id ? updatedEvent : event))
+      );
+      toast.success('Evento actualizado con éxito', { id: toastId });
+      setIsEditEventDialogOpen(false);
+      setCurrentEvent(null);
     } catch (error) {
-      console.error(error)
-      toast.error(getErrorMessage(error), { id: toastId })
+      toast.error(getErrorMessage(error), { id: toastId });
     }
-  }
+  };
 
   const handleDeleteEvent = async (eventId: string) => {
-    if (!eventId) return
-    const toastId = toast.loading("Eliminando evento...")
+    if (!eventId) return;
+    const toastId = toast.loading('Eliminando evento...');
     try {
       const response = await fetch(`/api/docente/eventos/${eventId}`, {
-        method: "DELETE",
-      })
+        method: 'DELETE',
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Error al eliminar el evento")
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al eliminar el evento');
       }
-      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId))
-      toast.success("Evento eliminado con éxito", { id: toastId })
-      setEventToDelete(null)
+      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+      toast.success('Evento eliminado con éxito', { id: toastId });
+      setEventToDelete(null);
     } catch (error) {
-      console.error(error)
-      toast.error(getErrorMessage(error), { id: toastId })
-      setEventToDelete(null)
+      toast.error(getErrorMessage(error), { id: toastId });
+      setEventToDelete(null);
     }
-  }
+  };
 
   return (
     <>
@@ -197,7 +198,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
             </div>
             <Dialog open={isCreateEventDialogOpen} onOpenChange={setIsCreateEventDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" onClick={resetEventForm}>
+                <Button variant="outline" onClick={() => setIsCreateEventDialogOpen(true)}>
                   Crear Evento
                 </Button>
               </DialogTrigger>
@@ -211,15 +212,8 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                   </DialogDescription>
                 </DialogHeader>
                 <EventForm
-                  title={eventTitle}
-                  description={eventDescription}
-                  date={eventDate}
-                  type={eventType}
-                  onTitleChange={setEventTitle}
-                  onDescriptionChange={setEventDescription}
-                  onDateChange={setEventDate}
-                  onTypeChange={setEventType}
                   onSubmit={handleCreateEvent}
+                  onCancel={() => setIsCreateEventDialogOpen(false)}
                   submitLabel="Crear Evento"
                 />
               </DialogContent>
@@ -237,14 +231,18 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                     <TableHead className="text-xs font-normal px-4 py-2">Título</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2">Fecha</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2">Tipo</TableHead>
-                    <TableHead className="text-xs font-normal text-right px-4 py-2">Acciones</TableHead>
+                    <TableHead className="text-xs font-normal text-right px-4 py-2">
+                      Acciones
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {events.map((event) => (
+                  {events.map(event => (
                     <TableRow key={event.id}>
                       <TableCell className="font-normal px-4 py-2">{event.title}</TableCell>
-                      <TableCell className="px-4 py-2">{format(new Date(event.date), "PPP", { locale: es })}</TableCell>
+                      <TableCell className="px-4 py-2">
+                        {format(new Date(event.date), 'PPP', { locale: es })}
+                      </TableCell>
                       <TableCell className="px-4 py-2">
                         <EventTypeBadge type={event.type} />
                       </TableCell>
@@ -259,7 +257,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                         </Button>
                         <AlertDialog
                           open={eventToDelete?.id === event.id}
-                          onOpenChange={(isOpen) => !isOpen && setEventToDelete(null)}
+                          onOpenChange={isOpen => !isOpen && setEventToDelete(null)}
                         >
                           <AlertDialogTrigger asChild>
                             <Button
@@ -277,11 +275,15 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                                 ¿Estás seguro?
                               </AlertDialogTitle>
                               <AlertDialogDescription className="font-sans text-xs text-muted-foreground">
-                                Esta acción no se puede deshacer. Se eliminará el evento permanentemente.
+                                Esta acción no se puede deshacer. Se eliminará el evento
+                                permanentemente.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel className="font-sans" onClick={() => setEventToDelete(null)}>
+                              <AlertDialogCancel
+                                className="font-sans"
+                                onClick={() => setEventToDelete(null)}
+                              >
                                 Cancelar
                               </AlertDialogCancel>
                               <AlertDialogAction
@@ -308,33 +310,33 @@ export function EventsTable({ subjectId }: EventsTableProps) {
       </Card>
 
       {/* Edit Event Dialog */}
-      <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-sans text-xl font-semibold tracking-tight">Editar Evento</DialogTitle>
-            <DialogDescription className="font-sans text-xs text-muted-foreground">
-              Modifica los detalles del evento.
-            </DialogDescription>
-          </DialogHeader>
-          <EventForm
-            title={eventTitle}
-            description={eventDescription}
-            date={eventDate}
-            type={eventType}
-            onTitleChange={setEventTitle}
-            onDescriptionChange={setEventDescription}
-            onDateChange={setEventDate}
-            onTypeChange={setEventType}
-            onSubmit={handleUpdateEvent}
-            onCancel={() => {
-              setIsEditEventDialogOpen(false)
-              resetEventForm()
-            }}
-            submitLabel="Guardar Cambios"
-            isEdit
-          />
-        </DialogContent>
-      </Dialog>
+      {currentEvent && (
+        <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
+                Editar Evento
+              </DialogTitle>
+              <DialogDescription className="font-sans text-xs text-muted-foreground">
+                Modifica los detalles del evento.
+              </DialogDescription>
+            </DialogHeader>
+            <EventForm
+              title={currentEvent.title}
+              description={currentEvent.description || ''}
+              date={new Date(currentEvent.date)}
+              type={currentEvent.type}
+              onSubmit={handleUpdateEvent}
+              onCancel={() => {
+                setIsEditEventDialogOpen(false);
+                setCurrentEvent(null);
+              }}
+              submitLabel="Guardar Cambios"
+              isEdit
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </>
-  )
+  );
 }

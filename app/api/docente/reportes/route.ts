@@ -43,7 +43,6 @@ export async function GET() {
 
     return NextResponse.json(reports);
   } catch (error) {
-    console.error('Error en GET /api/docente/reportes:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -125,7 +124,6 @@ export async function POST(request: Request) {
         },
       });
     } catch (dbError) {
-      console.error('Error creando reporte en DB:', dbError);
       return NextResponse.json({ error: 'Error creando el reporte' }, { status: 500 });
     }
 
@@ -168,8 +166,6 @@ export async function POST(request: Request) {
 
       return NextResponse.json(completedReport, { status: 201 });
     } catch (pdfError) {
-      console.error('Error generando PDF:', pdfError);
-
       // Actualizar estado del reporte a FALLIDO
       try {
         await db.report.update({
@@ -180,7 +176,7 @@ export async function POST(request: Request) {
           },
         });
       } catch (updateError) {
-        console.error('Error actualizando estado de reporte fallido:', updateError);
+        // Error updating report status
       }
 
       return NextResponse.json(
@@ -192,11 +188,9 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    console.error('Error en POST /api/docente/reportes:', error);
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Datos inválidos', details: error.errors },
+        { error: 'Datos inválidos', details: error.issues },
         { status: 400 }
       );
     }

@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
 import { getServerSession } from 'next-auth';
@@ -107,6 +108,9 @@ export async function POST(request: Request) {
 
     await db.$transaction(updatePromises);
 
+    // CACHE: Invalidate cache for this subject (affects all students and teacher)
+    await clearSubjectCache(classWithSubject.subjectId);
+
     return NextResponse.json({ message: 'Asistencia guardada con éxito' }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
@@ -152,6 +156,9 @@ export async function PUT(request: Request) {
       update: { status },
       create: { studentId, classId, status },
     });
+
+    // CACHE: Invalidate cache for this subject (affects all students and teacher)
+    await clearSubjectCache(classWithSubject.subjectId);
 
     return NextResponse.json(updatedAttendance, { status: 200 });
   } catch (error) {

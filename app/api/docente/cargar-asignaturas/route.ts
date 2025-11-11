@@ -5,13 +5,15 @@ import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 
-// Interface for the raw data from the API/Excel file
+// Interface for the raw data from the API/Excel/CSV file
 interface RowData {
   codigoAsignatura: string;
   nombreAsignatura: string;
   'fechaClase (MM/DD/YYYY)': string | number | Date;
   'horaInicio (HH:MM)': string | number;
+  'horaInicio (HH:MM:SS AM o PM)'?: string | number; // Formato alternativo para CSV
   'horaFin (HH:MM)'?: string | number;
+  'horaFin (HH:MM:SS AM o PM)'?: string | number; // Formato alternativo para CSV
   temaClase?: string;
   descripcionClase?: string;
   creditosClase?: number;
@@ -80,25 +82,70 @@ const parseExcelDate = (dateInput: string | number | Date): Date => {
   const isoFormat = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
   if (isoFormat) {
     const [, year, month, day] = isoFormat;
-    return new Date(Number(year), Number(month) - 1, Number(day));
+    // Crear fecha en hora local para evitar problemas de zona horaria
+    return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
   }
 
-  // Formato MM/DD/YYYY
+  // Formato MM/DD/YYYY (priorizar este formato ya que el header del CSV lo indica)
   const usFormat = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (usFormat) {
     const [, month, day, year] = usFormat;
-    return new Date(Number(year), Number(month) - 1, Number(day));
+    // Crear fecha en hora local para evitar problemas de zona horaria
+    return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
   }
 
   // Formato DD/MM/YYYY
   const euFormat = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (euFormat) {
     const [, day, month, year] = euFormat;
-    return new Date(Number(year), Number(month) - 1, Number(day));
+    // Crear fecha en hora local para evitar problemas de zona horaria
+    return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
   }
 
-  // Último recurso: parseo nativo
-  return new Date(dateStr);
+  // Intentar otros formatos comunes antes del parseo nativo
+  // Formato YYYY/MM/DD
+  const isoSlashFormat = dateStr.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+  if (isoSlashFormat) {
+    const [, year, month, day] = isoSlashFormat;
+    return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
+  }
+
+  // Último recurso: intentar parseo usando diferentes estrategias
+  // Primero intentar como si fuera una fecha ISO
+  const isoDateMatch = dateStr.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (isoDateMatch) {
+    const [, year, month, day] = isoDateMatch;
+    return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
+  }
+
+  // Intentar parseo nativo, pero extraer componentes inmediatamente para evitar problemas de zona horaria
+  const parsedDate = new Date(dateStr);
+  if (!isNaN(parsedDate.getTime())) {
+    // Extraer componentes de la fecha parseada y crear una nueva en hora local
+    // Usar getUTCFullYear/getUTCMonth/getUTCDate si la fecha fue parseada como UTC
+    // o getFullYear/getMonth/getDate si fue parseada como local
+    // Para ser seguro, intentar ambos y usar el que tenga más sentido
+    const year = parsedDate.getFullYear();
+    const month = parsedDate.getMonth();
+    const day = parsedDate.getDate();
+
+    // Si la fecha parece haber sido convertida incorrectamente (año < 1970 o año > 2100),
+    // puede ser un problema de zona horaria, usar UTC
+    if (year < 1970 || year > 2100) {
+      const utcYear = parsedDate.getUTCFullYear();
+      const utcMonth = parsedDate.getUTCMonth();
+      const utcDay = parsedDate.getUTCDate();
+      if (utcYear >= 1970 && utcYear <= 2100) {
+        return new Date(utcYear, utcMonth, utcDay, 0, 0, 0, 0);
+      }
+    }
+
+    // Crear fecha en hora local usando los componentes extraídos
+    return new Date(year, month, day, 0, 0, 0, 0);
+  }
+
+  // Si todo falla, lanzar error
+  throw new Error(`Formato de fecha no reconocido: ${dateStr}`);
 };
 
 // Utilidad para formatear fecha a YYYY-MM-DD
@@ -112,7 +159,7 @@ const formatYMD = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Utilidad para parsear tiempo (HH:MM o fracción de día)
+// Utilidad para parsear tiempo (HH:MM, HH:MM:SS, o formato AM/PM, o fracción de día)
 const parseExcelTime = (timeInput: string | number | undefined | null): string => {
   // Si es undefined o null, devolver string vacío
   if (timeInput === undefined || timeInput === null) {
@@ -127,15 +174,39 @@ const parseExcelTime = (timeInput: string | number | undefined | null): string =
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   }
 
-  // Si es string, limpiar y validar formato HH:MM
-  const timeStr = String(timeInput).trim();
+  // Si es string, limpiar y validar formato
+  const timeStr = String(timeInput).trim().toUpperCase();
 
   // Si el string está vacío, devolver string vacío
   if (!timeStr) {
     return '';
   }
 
-  // Intentar parsear formato HH:MM
+  // Intentar parsear formato AM/PM (ej: "8:00:00 AM", "5:00:00 PM", "8:00 AM")
+  const amPmMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  if (amPmMatch) {
+    let hours = parseInt(amPmMatch[1], 10);
+    const minutes = parseInt(amPmMatch[2], 10);
+    const period = amPmMatch[4].toUpperCase();
+
+    // Convertir a formato 24 horas
+    if (period === 'AM') {
+      if (hours === 12) {
+        hours = 0; // 12:00 AM = 00:00
+      }
+    } else if (period === 'PM') {
+      if (hours !== 12) {
+        hours += 12; // 1:00 PM = 13:00, etc.
+      }
+    }
+
+    // Validar rangos
+    if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+  }
+
+  // Intentar parsear formato HH:MM o HH:MM:SS (24 horas)
   const timeMatch = timeStr.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
 
   if (timeMatch) {
@@ -175,13 +246,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Utilidad para parsear fechas YYYY-MM-DD en horario local
-    const parseLocalYMD = (ymd: string) => {
-      const [yy, mm, dd] = ymd.split('-').map(Number);
-      return new Date(yy, (mm || 1) - 1, dd || 1);
-    };
-
-    // Reconstruir filas desde el Excel o desde el generador
+    // Reconstruir filas desde el Excel/CSV o desde el generador
     let rows: RowData[] = [];
     // Mapa de encabezados detectados en el Excel -> claves normalizadas requeridas
     let headerKeys: {
@@ -228,14 +293,100 @@ export async function POST(request: Request) {
           }))
         );
       } catch (err) {
-        console.error('Error al procesar la solicitud:', err);
         return NextResponse.json({ error: 'Error al procesar la solicitud' }, { status: 500 });
       }
     } else if (file) {
       const buffer = await file.arrayBuffer();
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(sheet) as RowData[];
+      const fileName = file.name.toLowerCase();
+      const isCSV = fileName.endsWith('.csv');
+
+      let workbook;
+      if (isCSV) {
+        // Para CSV, leer manualmente como texto para evitar conversión de fechas a números seriales
+        const text = new TextDecoder('utf-8').decode(buffer);
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+        if (lines.length === 0) {
+          return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
+        }
+
+        // Función para parsear una línea CSV manejando comas dentro de comillas
+        const parseCSVLine = (line: string): string[] => {
+          const values: string[] = [];
+          let current = '';
+          let inQuotes = false;
+
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = line[i + 1];
+
+            if (char === '"') {
+              if (inQuotes && nextChar === '"') {
+                // Comilla escapada ("" dentro de comillas)
+                current += '"';
+                i++; // Saltar la siguiente comilla
+              } else {
+                // Toggle estado de comillas
+                inQuotes = !inQuotes;
+              }
+            } else if (char === ',' && !inQuotes) {
+              // Separador de campo (solo fuera de comillas)
+              values.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          // Agregar el último valor
+          values.push(current.trim());
+
+          // Limpiar comillas de los valores
+          return values.map(val => {
+            // Remover comillas externas si existen
+            if (
+              (val.startsWith('"') && val.endsWith('"')) ||
+              (val.startsWith("'") && val.endsWith("'"))
+            ) {
+              return val.slice(1, -1).replace(/""/g, '"'); // Reemplazar comillas escapadas
+            }
+            return val;
+          });
+        };
+
+        // Parsear headers
+        const headers = parseCSVLine(lines[0]).map(h => h.trim());
+
+        // Parsear filas
+        rows = lines
+          .slice(1)
+          .map(line => {
+            const values = parseCSVLine(line);
+
+            // Crear objeto con headers
+            const row: Record<string, string> = {};
+            headers.forEach((header, index) => {
+              row[header] = values[index] || '';
+            });
+            return row as unknown as RowData;
+          })
+          .filter(row => {
+            // Filtrar filas vacías
+            return Object.values(row).some(val => val && String(val).trim());
+          });
+      } else {
+        // Para Excel, usar buffer directamente
+        workbook = XLSX.read(buffer, {
+          type: 'buffer',
+          cellDates: false, // NO convertir fechas automáticamente
+        });
+
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(sheet, {
+          defval: '', // Valor por defecto para celdas vacías
+          raw: true, // Mantener valores raw (no procesar) para que las fechas vengan como strings
+          dateNF: 'mm/dd/yyyy', // Formato de fecha esperado
+        }) as RowData[];
+      }
     }
 
     if (rows.length === 0) {
@@ -246,14 +397,6 @@ export async function POST(request: Request) {
     if (!isGeneratorSubmission) {
       const headers = Object.keys(rows[0] || {});
       const normalize = (s: string) => s.toString().trim().toLowerCase().replace(/\s+/g, ' ');
-
-      // Log para depuración: encabezados y primeras filas
-      try {
-        console.log('Upload debug - headers:', headers);
-        console.log('Upload debug - normalized headers:', headers.map(normalize));
-        console.log('Upload debug - sample row 1:', rows[0]);
-        console.log('Upload debug - sample rows (first 3):', rows.slice(0, 3));
-      } catch {}
 
       const normalizedHeaders = headers.map(normalize);
       const hasBase = (base: string) =>
@@ -472,24 +615,35 @@ export async function POST(request: Request) {
                 createdSubjects.push(codigoAsignatura);
               }
 
-              // Crear fechas con hora usando la fecha base y las horas parseadas
+              // Asegurarse de que la fecha esté en hora local (sin problemas de zona horaria)
+              // Extraer los componentes de la fecha parseada
+              const year = fechaClase.getFullYear();
+              const month = fechaClase.getMonth();
+              const day = fechaClase.getDate();
+
+              // Crear una nueva fecha en hora local para asegurar que no haya problemas de zona horaria
+              const localDate = new Date(year, month, day, 0, 0, 0, 0);
+
+              // Crear fechas con hora usando la fecha local y las horas parseadas
               const [startH, startM] = safeSplitTime(horaInicio);
               const startDateTime = new Date(
-                fechaClase.getFullYear(),
-                fechaClase.getMonth(),
-                fechaClase.getDate(),
+                year,
+                month,
+                day,
                 parseInt(startH, 10),
                 parseInt(startM, 10),
+                0,
                 0
               );
 
               const [endH, endM] = safeSplitTime(horaFin);
               const endDateTime = new Date(
-                fechaClase.getFullYear(),
-                fechaClase.getMonth(),
-                fechaClase.getDate(),
+                year,
+                month,
+                day,
                 parseInt(endH, 10),
                 parseInt(endM, 10),
+                0,
                 0
               );
 
@@ -497,7 +651,7 @@ export async function POST(request: Request) {
               await tx.class.create({
                 data: {
                   subjectId: subject.id,
-                  date: fechaClase,
+                  date: localDate, // Usar la fecha local creada explícitamente
                   startTime: startDateTime,
                   endTime: endDateTime,
                   topic: row['temaClase']?.toString(),
@@ -522,10 +676,8 @@ export async function POST(request: Request) {
           }
         });
       } catch (error) {
-        console.error(`Error en el lote ${Math.floor(i / BATCH_SIZE) + 1}:`, error);
         const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
         errors.push(`Error en el lote ${Math.floor(i / BATCH_SIZE) + 1}: ${errorMessage}`);
-        // Continue with next batch even if one fails
       }
     }
 

@@ -1,6 +1,8 @@
 'use client';
 
-'use client';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,8 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -31,57 +41,83 @@ interface CreateUserModalProps {
   onUserCreated: (user: User) => void;
 }
 
-const initialUserState = {
-  name: '',
-  correoPersonal: '',
-  correoInstitucional: '',
-  password: '',
-  role: 'ESTUDIANTE' as Role,
-  document: '',
-  telefono: '',
-  codigoEstudiantil: '',
-  codigoDocente: '',
-};
+const createUserSchema = z
+  .object({
+    name: z.string().min(1, 'El nombre es requerido'),
+    correoPersonal: z.string().email('Correo personal inválido').optional().or(z.literal('')),
+    correoInstitucional: z
+      .string()
+      .email('Correo institucional inválido')
+      .optional()
+      .or(z.literal('')),
+    password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    role: z.nativeEnum(Role),
+    document: z.string().optional(),
+    telefono: z.string().optional(),
+    codigoEstudiantil: z.string().optional(),
+    codigoDocente: z.string().optional(),
+  })
+  .refine(data => data.correoPersonal || data.correoInstitucional, {
+    message: 'Debes proporcionar al menos un correo (personal o institucional)',
+    path: ['correoPersonal'],
+  });
+
+type CreateUserFormValues = z.infer<typeof createUserSchema>;
 
 export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserModalProps) {
-  const [newUser, setNewUser] = useState(initialUserState);
   const [isCreating, setIsCreating] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewUser(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleRoleChange = (value: Role) => {
-    setNewUser(prev => ({
-      ...prev,
-      role: value,
-      codigoDocente: '',
+  const form = useForm<CreateUserFormValues>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      name: '',
+      correoPersonal: '',
+      correoInstitucional: '',
+      password: '',
+      role: Role.ESTUDIANTE,
+      document: '',
+      telefono: '',
       codigoEstudiantil: '',
-    }));
-  };
+      codigoDocente: '',
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const role = form.watch('role');
+
+  const onSubmit = async (data: CreateUserFormValues) => {
     setIsCreating(true);
 
     try {
       const response = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify({
+          ...data,
+          correoPersonal: data.correoPersonal || undefined,
+          correoInstitucional: data.correoInstitucional || undefined,
+          document: data.document || undefined,
+          telefono: data.telefono || undefined,
+          codigoEstudiantil: data.codigoEstudiantil || undefined,
+          codigoDocente: data.codigoDocente || undefined,
+        }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'No se pudo crear el usuario.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error || 'No se pudo crear el usuario.');
       }
 
-      const createdUser: User = await response.json();
+      const responseData = await response.json();
+      const createdUser: User = responseData.data || responseData;
+
+      if (!createdUser) {
+        throw new Error('La respuesta del servidor no contiene datos válidos');
+      }
+
       toast.success('Usuario creado con éxito.');
       onUserCreated(createdUser);
       onClose();
-      setNewUser(initialUserState);
+      form.reset();
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message);
@@ -102,119 +138,170 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
             Completa los datos para crear un nuevo usuario. Al menos un correo es requerido.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre Completo</Label>
-            <Input id="name" name="name" value={newUser.name} onChange={handleChange} required />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="correoPersonal">Correo Personal</Label>
-              <Input
-                id="correoPersonal"
-                name="correoPersonal"
-                type="email"
-                className="text-xs"
-                value={newUser.correoPersonal}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="correoInstitucional">Correo Institucional</Label>
-              <Input
-                id="correoInstitucional"
-                name="correoInstitucional"
-                type="email"
-                className="text-xs"
-                value={newUser.correoInstitucional}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              className="text-xs"
-              value={newUser.password}
-              onChange={handleChange}
-              required
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre Completo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nombre completo" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="document">Documento</Label>
-              <Input
-                id="document"
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="correoPersonal"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Correo Personal</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="correo@personal.com"
+                        className="text-xs"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="correoInstitucional"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Correo Institucional</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="correo@institucional.com"
+                        className="text-xs"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contraseña</FormLabel>
+                  <FormControl>
+                    <Input type="password" className="text-xs" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
                 name="document"
-                className="text-xs"
-                value={newUser.document}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Documento</FormLabel>
+                    <FormControl>
+                      <Input className="text-xs" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="telefono">Teléfono</Label>
-              <Input
-                id="telefono"
+              <FormField
+                control={form.control}
                 name="telefono"
-                className="text-xs"
-                value={newUser.telefono}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Teléfono</FormLabel>
+                    <FormControl>
+                      <Input className="text-xs" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="role">Rol</Label>
-            <Select onValueChange={handleRoleChange} defaultValue={newUser.role}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un rol" />
-              </SelectTrigger>
-              <SelectContent className="font-sans">
-                <SelectItem value="ADMIN">Administrador</SelectItem>
-                <SelectItem value="DOCENTE">Docente</SelectItem>
-                <SelectItem value="ESTUDIANTE">Estudiante</SelectItem>
-                <SelectItem value="COORDINADOR">Coordinador</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
-          {newUser.role === 'ESTUDIANTE' && (
-            <div className="space-y-2">
-              <Label htmlFor="codigoEstudiantil">Código de Estudiante</Label>
-              <Input
-                id="codigoEstudiantil"
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rol</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un rol" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="font-sans">
+                      <SelectItem value="ADMIN">Administrador</SelectItem>
+                      <SelectItem value="DOCENTE">Docente</SelectItem>
+                      <SelectItem value="ESTUDIANTE">Estudiante</SelectItem>
+                      <SelectItem value="COORDINADOR">Coordinador</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {role === 'ESTUDIANTE' && (
+              <FormField
+                control={form.control}
                 name="codigoEstudiantil"
-                className="text-xs"
-                value={newUser.codigoEstudiantil}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Código de Estudiante</FormLabel>
+                    <FormControl>
+                      <Input className="text-xs" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          )}
+            )}
 
-          {newUser.role === 'DOCENTE' && (
-            <div className="space-y-2">
-              <Label htmlFor="codigoDocente">Código de Docente</Label>
-              <Input
-                id="codigoDocente"
+            {role === 'DOCENTE' && (
+              <FormField
+                control={form.control}
                 name="codigoDocente"
-                className="text-xs"
-                value={newUser.codigoDocente}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Código de Docente</FormLabel>
+                    <FormControl>
+                      <Input className="text-xs" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          )}
+            )}
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isCreating}>
-              {isCreating ? 'Creando...' : 'Crear Usuario'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={onClose} disabled={isCreating}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isCreating}>
+                {isCreating ? 'Creando...' : 'Crear Usuario'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

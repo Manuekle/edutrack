@@ -60,7 +60,7 @@ export async function GET(request: Request) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validados.error.errors,
+          errors: validados.error.issues,
         },
         { status: 500 }
       );
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de consulta inválidos', errors: error.errors },
+        { message: 'Datos de consulta inválidos', errors: error.issues },
         { status: 400 }
       );
     }
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validado.error.errors,
+          errors: validado.error.issues,
         },
         { status: 500 }
       );
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: error.errors },
+        { message: 'Datos de entrada inválidos', errors: error.issues },
         { status: 400 }
       );
     }
@@ -176,7 +176,7 @@ export async function PUT(request: Request) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validado.error.errors,
+          errors: validado.error.issues,
         },
         { status: 500 }
       );
@@ -188,7 +188,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: error.errors },
+        { message: 'Datos de entrada inválidos', errors: error.issues },
         { status: 400 }
       );
     }
@@ -220,7 +220,7 @@ export async function DELETE(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: error.errors },
+        { message: 'Datos de entrada inválidos', errors: error.issues },
         { status: 400 }
       );
     }

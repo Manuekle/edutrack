@@ -118,9 +118,7 @@ export default function UploadStudentsToSubjectsPage() {
         body: formData,
       });
 
-      console.log('Response status:', res.status);
       const result = await res.json();
-      console.log('Response data:', result);
 
       if (res.ok && result.success) {
         // Adaptar la respuesta al formato esperado por el frontend
@@ -151,7 +149,6 @@ export default function UploadStudentsToSubjectsPage() {
         toast.error(result.message || 'Error en la carga');
       }
     } catch (error) {
-      console.error('Error en handleConfirmUpload:', error);
       toast.error('Error de conexión o en el servidor.');
       setUploadResult({
         success: false,

@@ -4,11 +4,8 @@ import { sendEmail } from '@/lib/email';
 import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import fs from 'fs/promises';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
-import { tmpdir } from 'os';
-import path from 'path';
 import * as XLSX from 'xlsx';
 
 // Interfaces para la carga de usuarios
@@ -66,9 +63,8 @@ const sendWelcomeEmailAsync = async (
         supportEmail: 'soporte@example.com',
       }),
     });
-    console.log(`Correo enviado exitosamente a: ${email}`);
   } catch (emailError) {
-    console.error(`Error enviando correo a ${email}:`, emailError);
+    // Error sending email
   }
 };
 
@@ -85,9 +81,8 @@ export async function POST(request: Request) {
   const url = new URL(request.url, `https://${request.headers.get('host')}`);
   const isPreview = url.searchParams.get('preview') === 'true';
 
-  // --- MODO PREVISUALIZACIÓN: Leer y validar archivo Excel ---
+  // --- MODO PREVISUALIZACIÓN: Leer y validar archivo Excel/CSV ---
   if (isPreview) {
-    let filePath = '';
     try {
       const data = await request.formData();
       const file = data.get('file') as File;
@@ -95,34 +90,109 @@ export async function POST(request: Request) {
       if (!file) {
         return NextResponse.json({ error: 'No se subió ningún archivo.' }, { status: 400 });
       }
-      if (!file.name.endsWith('.xlsx')) {
+
+      const fileName = file.name.toLowerCase();
+      const isCSV = fileName.endsWith('.csv');
+      const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
+      if (!isCSV && !isExcel) {
         return NextResponse.json(
-          { error: 'Tipo de archivo no válido. Se requiere un archivo Excel (.xlsx).' },
+          {
+            error:
+              'Tipo de archivo no válido. Se requiere un archivo Excel (.xlsx, .xls) o CSV (.csv).',
+          },
           { status: 400 }
         );
       }
 
-      const buffer = Buffer.from(await file.arrayBuffer());
+      const buffer = await file.arrayBuffer();
+      let rows: ExcelRow[] = [];
 
-      // Guardar en directorio temporal del sistema
-      const filename = `${session.user.id}_${Date.now()}.xlsx`;
-      const tempDir = tmpdir();
-      const uploadsDir = path.join(tempDir, 'gestion-asistencias-uploads');
+      if (isCSV) {
+        // Para CSV, leer manualmente como texto
+        const text = new TextDecoder('utf-8').decode(buffer);
+        const lines = text.split(/\r?\n/).filter(line => line.trim());
 
-      // Asegurarse de que el directorio exista
-      try {
-        await fs.mkdir(uploadsDir, { recursive: true });
-      } catch (error) {
-        console.error('Error al crear directorio temporal:', error);
-        throw new Error('No se pudo crear el directorio temporal para el archivo');
+        if (lines.length === 0) {
+          return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
+        }
+
+        // Función para parsear una línea CSV manejando comas dentro de comillas
+        const parseCSVLine = (line: string): string[] => {
+          const values: string[] = [];
+          let current = '';
+          let inQuotes = false;
+
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = line[i + 1];
+
+            if (char === '"') {
+              if (inQuotes && nextChar === '"') {
+                // Comilla escapada ("" dentro de comillas)
+                current += '"';
+                i++; // Saltar la siguiente comilla
+              } else {
+                // Toggle estado de comillas
+                inQuotes = !inQuotes;
+              }
+            } else if (char === ',' && !inQuotes) {
+              // Separador de campo (solo fuera de comillas)
+              values.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          // Agregar el último valor
+          values.push(current.trim());
+
+          // Limpiar comillas de los valores
+          return values.map(val => {
+            // Remover comillas externas si existen
+            if (
+              (val.startsWith('"') && val.endsWith('"')) ||
+              (val.startsWith("'") && val.endsWith("'"))
+            ) {
+              return val.slice(1, -1).replace(/""/g, '"'); // Reemplazar comillas escapadas
+            }
+            return val;
+          });
+        };
+
+        // Parsear headers
+        const headers = parseCSVLine(lines[0]).map(h => h.trim());
+
+        // Parsear filas
+        rows = lines
+          .slice(1)
+          .map(line => {
+            const values = parseCSVLine(line);
+
+            // Crear objeto con headers
+            const row: Record<string, string> = {};
+            headers.forEach((header, index) => {
+              row[header] = values[index] || '';
+            });
+            return row as ExcelRow;
+          })
+          .filter(row => {
+            // Filtrar filas vacías
+            return Object.values(row).some(val => val && String(val).trim());
+          });
+      } else {
+        // Para Excel, usar XLSX
+        const workbook = XLSX.read(buffer, {
+          type: 'buffer',
+          cellDates: false,
+        });
+
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(sheet, {
+          defval: '',
+          raw: true,
+        }) as ExcelRow[];
       }
-
-      filePath = path.join(uploadsDir, filename);
-      console.log(`Guardando archivo temporal en: ${filePath}`);
-
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: ExcelRow[] = XLSX.utils.sheet_to_json(sheet);
 
       const previewResults: PreviewResult[] = [];
 
@@ -136,19 +206,138 @@ export async function POST(request: Request) {
       const processedDocuments = new Set<string>();
       const processedEmails = new Set<string>();
 
+      // Normalizar headers para búsqueda flexible (case-insensitive, espacios)
+      const normalizeHeader = (header: string): string => {
+        return header
+          .toString()
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, ' ')
+          .replace(/[^\w\s]/g, '');
+      };
+
+      // Obtener headers del primer row si es CSV, o usar las claves disponibles
+      const availableHeaders = rows.length > 0 ? Object.keys(rows[0] || {}) : [];
+      const normalizedHeaders = availableHeaders.reduce(
+        (acc, header) => {
+          acc[normalizeHeader(header)] = header;
+          return acc;
+        },
+        {} as Record<string, string>
+      );
+
+      // Función para encontrar el header correcto
+      const findHeader = (variants: string[]): string | undefined => {
+        for (const variant of variants) {
+          const normalized = normalizeHeader(variant);
+          if (normalizedHeaders[normalized]) {
+            return normalizedHeaders[normalized];
+          }
+        }
+        return undefined;
+      };
+
+      // Mapear headers a variantes comunes
+      const nameHeader =
+        findHeader(['name', 'nombre', 'nombre completo', 'nombrecompleto']) ||
+        availableHeaders.find(
+          h => normalizeHeader(h).includes('nombre') || normalizeHeader(h).includes('name')
+        );
+
+      const documentHeader =
+        findHeader([
+          'document',
+          'documento',
+          'cedula',
+          'cédula',
+          'dni',
+          'identificacion',
+          'identificación',
+        ]) ||
+        availableHeaders.find(
+          h =>
+            normalizeHeader(h).includes('document') ||
+            normalizeHeader(h).includes('cedula') ||
+            normalizeHeader(h).includes('dni')
+        );
+
+      const correoPersonalHeader =
+        findHeader([
+          'correo personal',
+          'correopersonal',
+          'correo',
+          'email',
+          'email personal',
+          'emailpersonal',
+        ]) ||
+        availableHeaders.find(
+          h => normalizeHeader(h).includes('correo') || normalizeHeader(h).includes('email')
+        );
+
+      const correoInstitucionalHeader =
+        findHeader([
+          'correo institucional',
+          'correoinstitucional',
+          'correo institucion',
+          'email institucional',
+          'emailinstitucional',
+        ]) ||
+        availableHeaders.find(
+          h =>
+            normalizeHeader(h).includes('institucional') ||
+            normalizeHeader(h).includes('institucion')
+        );
+
+      const passwordHeader =
+        findHeader(['password', 'contraseña', 'contrasena', 'pass', 'clave']) ||
+        availableHeaders.find(
+          h => normalizeHeader(h).includes('password') || normalizeHeader(h).includes('contraseña')
+        );
+
+      const roleHeader =
+        findHeader(['role', 'rol', 'tipo', 'tipo usuario', 'tipousuario']) ||
+        availableHeaders.find(
+          h => normalizeHeader(h).includes('rol') || normalizeHeader(h).includes('role')
+        );
+
       for (const row of rows) {
-        // Mapeo flexible de cabeceras
+        // Mapeo flexible de cabeceras usando los headers encontrados o fallback
         const mappedRow = {
-          name: row.name || row.Name || row.nombre || row.Nombre,
-          document: row.document || row.Document || row.documento || row.Documento,
-          correoPersonal: row.correoPersonal || row['Correo Personal'] || row.correo || row.Correo,
+          name:
+            (nameHeader ? row[nameHeader] : undefined) ||
+            row.name ||
+            row.Name ||
+            row.nombre ||
+            row.Nombre,
+          document:
+            (documentHeader ? row[documentHeader] : undefined) ||
+            row.document ||
+            row.Document ||
+            row.documento ||
+            row.Documento,
+          correoPersonal:
+            (correoPersonalHeader ? row[correoPersonalHeader] : undefined) ||
+            row.correoPersonal ||
+            row['Correo Personal'] ||
+            row.correo ||
+            row.Correo,
           correoInstitucional:
+            (correoInstitucionalHeader ? row[correoInstitucionalHeader] : undefined) ||
             row.correoInstitucional ||
             row['Correo Institucional'] ||
-            row['CorreoInstitucional'] ||
-            row.correoInstitucional,
-          password: row.password || row.Password || row.contraseña || row.Contraseña,
-          role: row.role || row.Role || row.rol || row.Rol,
+            row['CorreoInstitucional'],
+          password:
+            (passwordHeader ? row[passwordHeader] : undefined) ||
+            row.password ||
+            row.Password ||
+            row.contraseña ||
+            row.Contraseña,
+          role:
+            (roleHeader ? row[roleHeader] : undefined) ||
+            row.role ||
+            row.Role ||
+            row.rol ||
+            row.Rol,
         };
 
         const userData: UserData = {
@@ -218,7 +407,6 @@ export async function POST(request: Request) {
 
       return NextResponse.json(previewResults);
     } catch (err) {
-      console.error('Error procesando el archivo:', err);
       return NextResponse.json(
         {
           error: 'Error procesando el archivo',
@@ -226,37 +414,14 @@ export async function POST(request: Request) {
         },
         { status: 500 }
       );
-    } finally {
-      if (filePath) {
-        try {
-          // Check if file exists before trying to delete it
-          try {
-            await fs.access(filePath);
-            await fs.unlink(filePath);
-            console.log(`Archivo temporal eliminado: ${filePath}`);
-          } catch (error) {
-            if (error instanceof Error && 'code' in error && error.code !== 'ENOENT') {
-              // Only log if it's not a "file not found" error
-              console.error('Error al limpiar archivo temporal:', error);
-            }
-            // If file doesn't exist, no need to do anything
-          }
-        } catch (error) {
-          console.error('Error inesperado al limpiar archivo temporal:', error);
-        }
-      }
     }
   }
 
   // --- MODO CREACIÓN: Recibir datos validados y crear usuarios ---
   try {
     const { previewData } = await request.json();
-    console.log('Datos recibidos para creación de usuarios:', {
-      previewDataLength: previewData?.length,
-    });
 
     if (!Array.isArray(previewData)) {
-      console.error('Formato inválido: previewData no es un array', { previewData });
       return NextResponse.json(
         {
           error: 'Formato inválido',
@@ -268,10 +433,6 @@ export async function POST(request: Request) {
 
     // Filtrar solo los elementos con status 'success' para evitar duplicados
     const validUsers = previewData.filter(item => item.status === 'success');
-
-    console.log(
-      `Procesando ${validUsers.length} usuarios válidos de ${previewData.length} totales`
-    );
 
     const finalResults: FinalResult[] = [];
     const validRoles = Object.values(Role);
@@ -346,8 +507,6 @@ export async function POST(request: Request) {
           },
         });
 
-        console.log(`Usuario creado: ${user.id} - ${user.document}`);
-
         // Agregar email a la cola para envío posterior
         const emailToSend = correoInstitucional || correoPersonal;
         emailQueue.push({
@@ -363,8 +522,6 @@ export async function POST(request: Request) {
           message: 'Usuario creado exitosamente.',
         });
       } catch (error) {
-        console.error(`Error procesando usuario ${document || 'desconocido'}:`, error);
-
         finalResults.push({
           document: document || 'N/A',
           name: name || 'Usuario desconocido',
@@ -375,8 +532,6 @@ export async function POST(request: Request) {
     }
 
     // Enviar correos de bienvenida de forma asíncrona (después de crear todos los usuarios)
-    console.log(`Enviando ${emailQueue.length} correos de bienvenida...`);
-
     // Enviar correos en lotes pequeños para no sobrecargar el servidor de email
     const EMAIL_BATCH_SIZE = 3;
     for (let i = 0; i < emailQueue.length; i += EMAIL_BATCH_SIZE) {
@@ -385,8 +540,8 @@ export async function POST(request: Request) {
       // Enviar lote actual sin esperar (fire and forget)
       Promise.all(
         emailBatch.map(({ email, name, password }) => sendWelcomeEmailAsync(email, name, password))
-      ).catch(error => {
-        console.error('Error en lote de correos:', error);
+      ).catch(() => {
+        // Error sending email batch
       });
 
       // Pequeña pausa entre lotes para evitar rate limiting
@@ -403,15 +558,12 @@ export async function POST(request: Request) {
       errors: finalResults.filter(r => r.status === 'error').length,
     };
 
-    console.log('Resumen de la operación:', summary);
-
     return NextResponse.json({
       success: summary.errors === 0,
       results: finalResults,
       summary,
     });
   } catch (error) {
-    console.error('Error en el endpoint de creación de usuarios:', error);
     return NextResponse.json(
       {
         success: false,

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 function formatDD(date: Date) {
@@ -52,8 +52,10 @@ export default async function PreviewPage({ params }: PageProps) {
     redirect('/login');
   }
 
+  const { id } = await params;
+
   const subject = await db.subject.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       teacher: {
         select: {
@@ -134,7 +136,7 @@ export default async function PreviewPage({ params }: PageProps) {
             <div className="text-[#003366] dark:text-blue-200 font-bold text-lg">
               REGISTRO DE CLASES Y ASISTENCIA
             </div>
-            <div className="text-[#003366] dark:text-blue-200 text-base">DOCENCIA</div>
+            <div className="text-[#003366] dark:text-blue-200 text-xs">DOCENCIA</div>
           </div>
 
           {/* Meta info */}

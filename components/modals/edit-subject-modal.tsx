@@ -1,5 +1,9 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,8 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -48,27 +60,54 @@ interface EditSubjectModalProps {
   onSubjectUpdate: (subject: Subject) => void;
 }
 
+const editSubjectSchema = z.object({
+  name: z.string().min(1, 'El nombre de la asignatura es requerido'),
+  code: z.string().min(1, 'El código es requerido'),
+  program: z.string().optional(),
+  semester: z
+    .string()
+    .optional()
+    .refine(
+      val => !val || (Number(val) >= 1 && Number(val) <= 10),
+      'El semestre debe ser un número entre 1 y 10'
+    ),
+  credits: z
+    .string()
+    .optional()
+    .refine(
+      val => !val || (Number(val) >= 1 && Number(val) <= 10),
+      'Los créditos deben ser un número entre 1 y 10'
+    ),
+  teacherId: z.string().min(1, 'El docente es requerido'),
+});
+
+type EditSubjectFormValues = z.infer<typeof editSubjectSchema>;
+
 export function EditSubjectModal({
   subject,
   isOpen,
   onClose,
   onSubjectUpdate,
 }: EditSubjectModalProps) {
-  const [editedSubject, setEditedSubject] = useState({
-    name: '',
-    code: '',
-    program: '',
-    semester: '',
-    credits: '',
-    teacherId: '',
-  });
   const [isUpdating, setIsUpdating] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loadingTeachers, setLoadingTeachers] = useState(false);
 
+  const form = useForm<EditSubjectFormValues>({
+    resolver: zodResolver(editSubjectSchema),
+    defaultValues: {
+      name: '',
+      code: '',
+      program: '',
+      semester: '',
+      credits: '',
+      teacherId: '',
+    },
+  });
+
   useEffect(() => {
     if (subject && isOpen) {
-      setEditedSubject({
+      form.reset({
         name: subject.name,
         code: subject.code,
         program: subject.program || '',
@@ -78,7 +117,7 @@ export function EditSubjectModal({
       });
       fetchTeachers();
     }
-  }, [subject, isOpen]);
+  }, [subject, isOpen, form]);
 
   const fetchTeachers = async () => {
     setLoadingTeachers(true);
@@ -86,7 +125,7 @@ export function EditSubjectModal({
       const response = await fetch('/api/admin/users?role=DOCENTE');
       if (response.ok) {
         const data = await response.json();
-        setTeachers(data);
+        setTeachers(data.data || data);
       }
     } catch (error) {
       toast.error('Error al cargar los docentes');
@@ -95,18 +134,11 @@ export function EditSubjectModal({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditedSubject(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleTeacherChange = (value: string) => {
-    setEditedSubject(prev => ({ ...prev, teacherId: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!subject) return;
+  const onSubmit = async (data: EditSubjectFormValues) => {
+    if (!subject) {
+      toast.error('No hay asignatura seleccionada para editar');
+      return;
+    }
 
     setIsUpdating(true);
 
@@ -114,18 +146,31 @@ export function EditSubjectModal({
       const response = await fetch(`/api/admin/subjects/${subject.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editedSubject),
+        body: JSON.stringify({
+          ...data,
+          semester: data.semester ? parseInt(data.semester, 10) : null,
+          credits: data.credits ? parseInt(data.credits, 10) : null,
+          program: data.program || undefined,
+        }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'No se pudo actualizar la asignatura.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || errorData.error || 'No se pudo actualizar la asignatura.'
+        );
       }
 
-      const updatedSubject: Subject = await response.json();
+      const responseData = await response.json();
+      const updatedSubject: Subject = responseData.data || responseData;
+
+      if (!updatedSubject) {
+        throw new Error('La respuesta del servidor no contiene datos válidos');
+      }
+
       toast.success('Asignatura actualizada con éxito.');
       onSubjectUpdate(updatedSubject);
-      handleClose();
+      onClose();
     } catch (err) {
       if (err instanceof Error) {
         toast.error(err.message);
@@ -137,22 +182,10 @@ export function EditSubjectModal({
     }
   };
 
-  const handleClose = () => {
-    setEditedSubject({
-      name: '',
-      code: '',
-      program: '',
-      semester: '',
-      credits: '',
-      teacherId: '',
-    });
-    onClose();
-  };
-
   if (!subject) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
           <DialogTitle className="tracking-tight text-xl">Editar Asignatura</DialogTitle>
@@ -160,96 +193,119 @@ export function EditSubjectModal({
             Modifica los datos de la asignatura {subject.name}.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre de la Asignatura</Label>
-            <Input
-              id="name"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
               name="name"
-              value={editedSubject.name}
-              onChange={handleChange}
-              required
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre de la Asignatura</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="code">Código</Label>
-              <Input
-                id="code"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
                 name="code"
-                value={editedSubject.code}
-                onChange={handleChange}
-                required
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Código</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="program">Programa</Label>
-              <Input
-                id="program"
+              <FormField
+                control={form.control}
                 name="program"
-                value={editedSubject.program}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Programa</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="semester">Semestre</Label>
-              <Input
-                id="semester"
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
                 name="semester"
-                type="number"
-                min="1"
-                max="10"
-                value={editedSubject.semester}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Semestre</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="1" max="10" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="credits">Créditos</Label>
-              <Input
-                id="credits"
+              <FormField
+                control={form.control}
                 name="credits"
-                type="number"
-                min="1"
-                max="10"
-                value={editedSubject.credits}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Créditos</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="1" max="10" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="teacherId">Docente</Label>
-            <Select
-              onValueChange={handleTeacherChange}
-              value={editedSubject.teacherId}
-              disabled={loadingTeachers}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona un docente" />
-              </SelectTrigger>
-              <SelectContent className="font-sans">
-                {teachers.map(teacher => (
-                  <SelectItem key={teacher.id} value={teacher.id}>
-                    {teacher.name} {teacher.codigoDocente ? `(${teacher.codigoDocente})` : ''}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <FormField
+              control={form.control}
+              name="teacherId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Docente</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={loadingTeachers}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un docente" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="font-sans">
+                      {teachers.map(teacher => (
+                        <SelectItem key={teacher.id} value={teacher.id}>
+                          {teacher.name} {teacher.codigoDocente ? `(${teacher.codigoDocente})` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isUpdating}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isUpdating}>
-              {isUpdating ? 'Actualizando...' : 'Actualizar Asignatura'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={onClose} disabled={isUpdating}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isUpdating}>
+                {isUpdating ? 'Actualizando...' : 'Actualizar Asignatura'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

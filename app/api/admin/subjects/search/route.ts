@@ -16,8 +16,6 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
 
-    console.log('[Subject Search] Query:', query);
-
     // Search subjects by code, name, or teacher name
     const whereClause: Prisma.SubjectWhereInput = query
       ? {
@@ -67,7 +65,6 @@ export async function GET(request: Request) {
       })),
     });
   } catch (error) {
-    console.error('Error al buscar asignaturas:', error);
     return NextResponse.json(
       {
         success: false,

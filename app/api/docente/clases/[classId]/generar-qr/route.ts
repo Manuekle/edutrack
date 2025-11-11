@@ -7,8 +7,8 @@ import { NextResponse } from 'next/server';
 import { GenerarQRResponseSchema } from './schema';
 
 // Endpoint para generar un token QR para una clase específica
-export async function POST(request: Request, { params }: { params: { classId: string } }) {
-  const { classId } = params;
+export async function POST(request: Request, { params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || session.user?.role !== 'DOCENTE') {
@@ -130,12 +130,10 @@ export async function POST(request: Request, { params }: { params: { classId: st
         // Ejecutar todos los envíos en paralelo
         await Promise.all(sendEmailPromises);
       } catch (emailError) {
-        console.error('Error al enviar notificaciones por correo:', emailError);
         // No fallar la operación si hay error en el envío de correos
       }
     }
   } catch (error) {
-    console.error('Error al actualizar la clase:', error);
     return NextResponse.json(
       { message: 'Error al guardar el token QR en la base de datos' },
       { status: 500 }
@@ -177,7 +175,7 @@ export async function POST(request: Request, { params }: { params: { classId: st
       {
         message: 'Error en el formato de la respuesta',
         error: 'VALIDATION_ERROR',
-        details: validation.error.errors,
+        details: validation.error.issues,
       },
       { status: 500 }
     );

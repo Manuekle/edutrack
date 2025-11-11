@@ -1,9 +1,9 @@
-import { Badge } from "@/components/ui/badge"
-import { getEventTypeLabel } from "@/lib/event-utils"
-import type { EventType } from "@/types"
+import { Badge } from '@/components/ui/badge';
+import { getEventTypeLabel } from '@/lib/event-utils';
+import type { EventType } from '@/types';
 
 interface EventTypeBadgeProps {
-  type: EventType
+  type: EventType;
 }
 
 export function EventTypeBadge({ type }: EventTypeBadgeProps) {
@@ -11,5 +11,5 @@ export function EventTypeBadge({ type }: EventTypeBadgeProps) {
     <Badge variant="outline" className="text-xs font-normal font-sans">
       {getEventTypeLabel(type)}
     </Badge>
-  )
+  );
 }

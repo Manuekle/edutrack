@@ -45,6 +45,8 @@ model Attendance {
   updatedAt     DateTime         @updatedAt
 
   @@unique([studentId, classId])
+  @@index([studentId, status])
+  @@index([classId, status])
 }
 
 model User {
@@ -99,6 +101,8 @@ model Subject {
   unenrollRequests UnenrollRequest[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+
+  @@index([teacherId])
 }
 
 model Class {
@@ -126,6 +130,11 @@ model Class {
   absentCount    Int @default(0)
   lateCount      Int @default(0)
   justifiedCount Int @default(0)
+
+  @@index([subjectId, status, date])
+  @@index([subjectId, date])
+  @@index([status, date])
+  @@index([qrToken])
 }
 
 enum ClassStatus {

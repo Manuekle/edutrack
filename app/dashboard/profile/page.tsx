@@ -1,6 +1,10 @@
 // app/dashboard/profile/page.tsx
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { SignatureFileUpload } from '@/components/profile/signature-file-upload';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -12,8 +16,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { LoadingPage } from '@/components/ui/loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { uploadSignature } from '@/lib/actions/user.actions';
@@ -40,27 +52,35 @@ function dataURLtoFile(dataurl: string, filename: string): File {
   return new File([u8arr], filename, { type: mime });
 }
 
+const profileFormSchema = z.object({
+  name: z.string().min(1, 'El nombre completo es requerido'),
+  correoInstitucional: z.string().email('Correo institucional inválido'),
+  correoPersonal: z.string().email('Correo personal inválido').optional().or(z.literal('')),
+  telefono: z.string().optional(),
+  codigoEstudiantil: z.string().optional(),
+  codigoDocente: z.string().optional(),
+});
+
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'La contraseña actual es requerida'),
+    newPassword: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    confirmPassword: z.string().min(1, 'Por favor confirma la nueva contraseña'),
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden',
+    path: ['confirmPassword'],
+  });
+
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type PasswordFormValues = z.infer<typeof passwordFormSchema>;
+
 export default function ProfilePage() {
   const { data: session, status, update } = useSession();
   const [activeTab, setActiveTab] = useState('profile');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isSignatureLoading, setIsSignatureLoading] = useState(false);
-
-  // Profile form
-  const [name, setName] = useState('');
-  const [correoInstitucional, setCorreoInstitucional] = useState('');
-  const [correoPersonal, setCorreoPersonal] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [codigoEstudiantil, setCodigoEstudiantil] = useState('');
-  const [codigoDocente, setCodigoDocente] = useState('');
-
-  // Password form
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-
-  // Password form
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Signature
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
@@ -68,6 +88,45 @@ export default function ProfilePage() {
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
+
+  const profileForm = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      name: '',
+      correoInstitucional: '',
+      correoPersonal: '',
+      telefono: '',
+      codigoEstudiantil: '',
+      codigoDocente: '',
+    },
+  });
+
+  const passwordForm = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  // Initialize form with session data
+  useEffect(() => {
+    if (session?.user) {
+      profileForm.reset({
+        name: session.user.name || '',
+        correoInstitucional: session.user?.correoInstitucional || '',
+        correoPersonal: session.user?.correoPersonal || '',
+        telefono: session.user?.telefono || '',
+        codigoEstudiantil: session.user?.codigoEstudiantil || '',
+        codigoDocente: session.user?.codigoDocente || '',
+      });
+      // Set initial preview from session
+      if (!signatureFile) {
+        setSignaturePreview(session.user?.signatureUrl || null);
+      }
+    }
+  }, [session, signatureFile, profileForm]);
 
   // This effect handles the resizing of the signature canvas to prevent pixelation.
   useEffect(() => {
@@ -113,22 +172,6 @@ export default function ProfilePage() {
       document.removeEventListener('touchmove', preventScroll);
     };
   }, []);
-
-  // Initialize form with session data
-  useEffect(() => {
-    if (session?.user) {
-      setName(session.user.name || '');
-      setCorreoInstitucional(session.user?.correoInstitucional || '');
-      setCorreoPersonal(session.user?.correoPersonal || '');
-      setTelefono(session.user?.telefono || '');
-      setCodigoEstudiantil(session.user?.codigoEstudiantil || '');
-      setCodigoDocente(session.user?.codigoDocente || '');
-      // Set initial preview from session
-      if (!signatureFile) {
-        setSignaturePreview(session.user?.signatureUrl || null);
-      }
-    }
-  }, [session, signatureFile]);
 
   // Handle file selection for signature
   const handleFileSelect = (file: File | null) => {
@@ -221,8 +264,6 @@ export default function ProfilePage() {
           throw new Error('getTrimmedCanvas no disponible');
         }
       } catch (trimError) {
-        console.warn('Método 1 falló, intentando método 2:', trimError);
-
         // Método 2: Usar un canvas temporal con fondo blanco
         try {
           // Crear un canvas temporal para limpiar el fondo
@@ -245,13 +286,10 @@ export default function ProfilePage() {
           // Obtener la URL de datos del canvas temporal
           dataUrl = tempCanvas.toDataURL('image/png');
         } catch (canvasError) {
-          console.error('Método 2 falló, intentando método 3:', canvasError);
-
           // Método 3: Usar el canvas original sin procesar
           try {
             dataUrl = canvas.toDataURL('image/png');
           } catch (finalError) {
-            console.error('Método 3 falló:', finalError);
             toast.error('Error: No se pudo capturar la firma');
             return;
           }
@@ -269,40 +307,15 @@ export default function ProfilePage() {
       setSignatureFile(newFile);
       toast.success('Firma capturada exitosamente');
     } catch (error) {
-      console.error('Error general al capturar la firma:', error);
       toast.error('Error inesperado al capturar la firma');
     }
   };
 
   // Update profile
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onProfileSubmit = async (data: ProfileFormValues) => {
+    if (!session?.user?.id) return;
 
-    // Validate required fields
-    if (!name.trim()) {
-      toast.error('El nombre completo es requerido');
-      return;
-    }
-
-    if (!correoInstitucional.trim()) {
-      toast.error('El correo institucional es requerido');
-      return;
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(correoInstitucional)) {
-      toast.error('Por favor ingresa un correo institucional válido');
-      return;
-    }
-
-    // Validate personal email if provided
-    if (correoPersonal && !emailRegex.test(correoPersonal)) {
-      toast.error('Por favor ingresa un correo personal válido');
-      return;
-    }
-
-    setIsLoading(true);
+    setIsProfileLoading(true);
     try {
       const updateData: {
         name: string;
@@ -312,17 +325,17 @@ export default function ProfilePage() {
         codigoEstudiantil?: string | null;
         codigoDocente?: string | null;
       } = {
-        name,
-        correoPersonal: correoPersonal || null,
-        correoInstitucional,
-        telefono: telefono || null,
+        name: data.name,
+        correoPersonal: data.correoPersonal || null,
+        correoInstitucional: data.correoInstitucional,
+        telefono: data.telefono || null,
       };
 
       // Only include the appropriate code based on user role
       if (session?.user?.role === 'ESTUDIANTE') {
-        updateData.codigoEstudiantil = codigoEstudiantil || null;
+        updateData.codigoEstudiantil = data.codigoEstudiantil || null;
       } else {
-        updateData.codigoDocente = codigoDocente || null;
+        updateData.codigoDocente = data.codigoDocente || null;
       }
 
       const response = await fetch(`/api/users?id=${session?.user?.id}`, {
@@ -337,13 +350,13 @@ export default function ProfilePage() {
       }
 
       // Get the updated user data from the response
-      const result = await response.json(); // Log the full response
+      const result = await response.json();
 
       if (!result.data) {
         throw new Error('No se recibieron datos actualizados del servidor');
       }
 
-      const updatedUser = result.data; // Log the data being used to update the session
+      const updatedUser = result.data;
 
       // Update the session with all the updated fields
       await update({
@@ -362,48 +375,21 @@ export default function ProfilePage() {
       const errorMessage = error instanceof Error ? error.message : 'Error al actualizar el perfil';
       toast.error(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsProfileLoading(false);
     }
   };
 
   // Update password
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validate current password
-    if (!currentPassword.trim()) {
-      toast.error('La contraseña actual es requerida');
-      return;
-    }
-
-    // Validate new password
-    if (!newPassword.trim()) {
-      toast.error('La nueva contraseña es requerida');
-      return;
-    }
-
-    // Validate password confirmation
-    if (!confirmPassword.trim()) {
-      toast.error('Por favor confirma la nueva contraseña');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error('Las contraseñas no coinciden');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
+  const onPasswordSubmit = async (data: PasswordFormValues) => {
     setIsPasswordLoading(true);
     try {
       const response = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        }),
       });
 
       if (!response.ok) {
@@ -411,9 +397,7 @@ export default function ProfilePage() {
         throw new Error(error.message || 'Error al cambiar la contraseña');
       }
 
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      passwordForm.reset();
       toast.success('Contraseña actualizada correctamente');
     } catch (error: unknown) {
       const errorMessage =
@@ -501,103 +485,146 @@ export default function ProfilePage() {
                 Actualiza tu información personal y cómo se muestra en la plataforma.
               </CardDescription>
             </CardHeader>
-            <form onSubmit={handleUpdateProfile}>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col sm:flex-row items-center gap-6">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24 bg-primary/10 border border-zinc-200 dark:border-zinc-700">
-                      <AvatarFallback className="text-2xl">
-                        {session?.user?.name?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="flex-1 w-full space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nombre completo</Label>
-                      <Input
-                        id="name"
-                        disabled
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        placeholder="Tu nombre completo"
-                        className="text-xs"
-                      />
+            <Form {...profileForm}>
+              <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+                <CardContent className="space-y-6">
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div className="relative">
+                      <Avatar className="h-24 w-24 bg-primary/10 border border-zinc-200 dark:border-zinc-700">
+                        <AvatarFallback className="text-2xl">
+                          {session?.user?.name?.charAt(0) || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="correoInstitucional">Correo Institucional</Label>
-                      <Input
-                        id="correoInstitucional"
-                        type="email"
-                        value={correoInstitucional}
-                        onChange={e => setCorreoInstitucional(e.target.value)}
-                        placeholder="correo@institucion.edu"
-                        required
-                        className="text-xs"
+                    <div className="flex-1 w-full space-y-4">
+                      <FormField
+                        control={profileForm.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nombre completo</FormLabel>
+                            <FormControl>
+                              <Input
+                                disabled
+                                placeholder="Tu nombre completo"
+                                className="text-xs"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="correoPersonal">Correo Personal (Opcional)</Label>
-                      <Input
-                        id="correoPersonal"
-                        type="email"
-                        value={correoPersonal}
-                        onChange={e => setCorreoPersonal(e.target.value)}
-                        placeholder="correo@personal.com"
-                        className="text-xs"
+                      <FormField
+                        control={profileForm.control}
+                        name="correoInstitucional"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Correo Institucional</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="correo@institucion.edu"
+                                className="text-xs"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="telefono">Teléfono</Label>
-                      <Input
-                        id="telefono"
-                        type="tel"
-                        value={telefono}
-                        onChange={e => setTelefono(e.target.value)}
-                        placeholder="+57 312 312 312"
-                        className="text-xs"
+                      <FormField
+                        control={profileForm.control}
+                        name="correoPersonal"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Correo Personal (Opcional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="correo@personal.com"
+                                className="text-xs"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    {session?.user?.role === 'ESTUDIANTE' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="codigoEstudiantil">Código Estudiantil</Label>
-                        <Input
-                          id="codigoEstudiantil"
-                          value={codigoEstudiantil}
-                          onChange={e => setCodigoEstudiantil(e.target.value)}
-                          placeholder="Ingrese su código estudiantil"
-                          className="text-xs"
+                      <FormField
+                        control={profileForm.control}
+                        name="telefono"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Teléfono</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="tel"
+                                placeholder="+57 312 312 312"
+                                className="text-xs"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {session?.user?.role === 'ESTUDIANTE' && (
+                        <FormField
+                          control={profileForm.control}
+                          name="codigoEstudiantil"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Código Estudiantil</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Ingrese su código estudiantil"
+                                  className="text-xs"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </div>
-                    )}
-                    {session?.user?.role === 'DOCENTE' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="codigoDocente">Código Docente</Label>
-                        <Input
-                          id="codigoDocente"
-                          value={codigoDocente}
-                          disabled
-                          onChange={e => setCodigoDocente(e.target.value)}
-                          placeholder="Ingrese su código docente"
-                          className="text-xs"
+                      )}
+                      {session?.user?.role === 'DOCENTE' && (
+                        <FormField
+                          control={profileForm.control}
+                          name="codigoDocente"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Código Docente</FormLabel>
+                              <FormControl>
+                                <Input
+                                  disabled
+                                  placeholder="Ingrese su código docente"
+                                  className="text-xs"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-              <CardFooter className="mt-6 border-t px-6">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Guardando...
-                    </>
-                  ) : (
-                    'Guardar cambios'
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
+                </CardContent>
+                <CardFooter className="mt-6 border-t px-6">
+                  <Button type="submit" disabled={isProfileLoading}>
+                    {isProfileLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      'Guardar cambios'
+                    )}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
           </Card>
         </TabsContent>
 
@@ -611,64 +638,84 @@ export default function ProfilePage() {
                 Actualiza tu contraseña para mantener tu cuenta segura.
               </CardDescription>
             </CardHeader>
-            <form onSubmit={handleUpdatePassword}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Contraseña actual</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={currentPassword}
-                    onChange={e => setCurrentPassword(e.target.value)}
-                    placeholder="Ingresa tu contraseña actual"
-                    required
-                    className="text-xs"
+            <Form {...passwordForm}>
+              <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
+                <CardContent className="space-y-4">
+                  <FormField
+                    control={passwordForm.control}
+                    name="currentPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contraseña actual</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Ingresa tu contraseña actual"
+                            className="text-xs"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">Nueva contraseña</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={e => setNewPassword(e.target.value)}
-                    placeholder="Ingresa tu nueva contraseña"
-                    required
-                    className="text-xs"
+                  <FormField
+                    control={passwordForm.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nueva contraseña</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Ingresa tu nueva contraseña"
+                            className="text-xs"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar nueva contraseña</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                    placeholder="Confirma tu nueva contraseña"
-                    required
-                    className="text-xs"
+                  <FormField
+                    control={passwordForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirmar nueva contraseña</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirma tu nueva contraseña"
+                            className="text-xs"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div className="mb-4 rounded-lg border border-gray-200 p-4 text-xs text-gray-700 dark:border-gray-800/30 dark:text-gray-300">
-                  <div className="flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-2" />
-                    <span>La contraseña debe tener al menos 6 caracteres.</span>
+                  <div className="mb-4 rounded-lg border border-gray-200 p-4 text-xs text-gray-700 dark:border-gray-800/30 dark:text-gray-300">
+                    <div className="flex items-center">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      <span>La contraseña debe tener al menos 6 caracteres.</span>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-              <CardFooter className="border-t px-6">
-                <Button type="submit" disabled={isPasswordLoading}>
-                  {isPasswordLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Actualizando...
-                    </>
-                  ) : (
-                    'Cambiar contraseña'
-                  )}
-                </Button>
-              </CardFooter>
-            </form>
+                </CardContent>
+                <CardFooter className="border-t px-6">
+                  <Button type="submit" disabled={isPasswordLoading}>
+                    {isPasswordLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Actualizando...
+                      </>
+                    ) : (
+                      'Cambiar contraseña'
+                    )}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
           </Card>
         </TabsContent>
 
@@ -687,7 +734,7 @@ export default function ProfilePage() {
                   {/* Subir Archivo */}
                   <div className="space-y-3 h-full flex flex-col">
                     <div>
-                      <Label className="text-xs font-medium">Subir Firma</Label>
+                      <FormLabel className="text-xs font-medium">Subir Firma</FormLabel>
                     </div>
                     <div className="flex-1 min-h-[180px]">
                       <SignatureFileUpload onFileSelect={handleFileSelect} file={signatureFile} />
@@ -696,7 +743,7 @@ export default function ProfilePage() {
 
                   {/* Dibujar Firma */}
                   <div className="space-y-3 h-full flex flex-col">
-                    <Label className="text-xs font-medium">Dibujar Firma</Label>
+                    <FormLabel className="text-xs font-medium">Dibujar Firma</FormLabel>
                     <div className="flex-1 flex flex-col">
                       <div
                         ref={canvasWrapperRef}
@@ -754,7 +801,7 @@ export default function ProfilePage() {
 
                 {/* Vista Previa */}
                 <div className="space-y-3">
-                  <Label className="text-xs font-medium">Vista Previa</Label>
+                  <FormLabel className="text-xs font-medium">Vista Previa</FormLabel>
                   <div className="border border-muted-foreground/20 rounded-md p-4 flex items-center justify-center h-48 sm:h-56 bg-card">
                     {signaturePreview ? (
                       <div className="relative w-full h-full">

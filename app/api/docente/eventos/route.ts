@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
 
     if (!query.success) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: query.error.errors },
+        { message: 'Datos de entrada inválidos', errors: query.error.issues },
         { status: 400 }
       );
     }
@@ -104,16 +105,23 @@ export async function POST(request: Request) {
       );
     }
 
+    // Normalizar la fecha a medianoche (00:00:00) para que el evento se muestre todo el día
+    const eventDate = new Date(date);
+    eventDate.setHours(0, 0, 0, 0);
+
     const newEvent = await db.subjectEvent.create({
       data: {
         title,
         description,
-        date: new Date(date),
+        date: eventDate,
         type,
         subject: { connect: { id: subjectId } },
         createdBy: { connect: { id: session.user.id } },
       },
     });
+
+    // CACHE: Invalidate cache for this subject (affects students and teacher)
+    await clearSubjectCache(subjectId);
 
     return NextResponse.json(
       { data: newEvent, message: 'Evento creado correctamente' },

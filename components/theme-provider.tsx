@@ -1,38 +1,20 @@
 'use client';
 
-import {
-  ThemeProvider as NextThemesProvider,
-  useTheme as useNextTheme,
-  type ThemeProviderProps,
-} from 'next-themes';
+import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from 'next-themes';
 import { useEffect, useState } from 'react';
 
-// Componente wrapper para manejar la sincronización del tema
-function ThemeWrapper({ children }: { children: React.ReactNode }) {
-  const { theme, setTheme } = useNextTheme();
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const [mounted, setMounted] = useState(false);
 
-  // Sincronizar el tema con localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Leer el tema guardado
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme && savedTheme !== theme) {
-        setTheme(savedTheme);
-      }
-    }
     setMounted(true);
-  }, [setTheme, theme]);
+  }, []);
 
-  // Evitar parpadeo en la carga inicial
+  // Prevenir parpadeo durante la hidratación
   if (!mounted) {
-    return <div style={{ visibility: 'hidden' }}>{children}</div>;
+    return <>{children}</>;
   }
 
-  return <>{children}</>;
-}
-
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
@@ -40,9 +22,11 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       enableSystem
       disableTransitionOnChange
       storageKey="theme"
+      // El tema se guarda en localStorage con la clave 'theme'
+      // y persiste entre sesiones
       {...props}
     >
-      <ThemeWrapper>{children}</ThemeWrapper>
+      {children}
     </NextThemesProvider>
   );
 }

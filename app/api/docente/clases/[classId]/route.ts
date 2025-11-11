@@ -1,5 +1,6 @@
 import ClassCancellationEmail from '@/app/emails/ClassCancellationEmail';
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { sendEmail } from '@/lib/email';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -20,8 +21,8 @@ async function verifyTeacherOwnership(classId: string, teacherId: string) {
 }
 
 // GET: Obtener los detalles de una clase específica
-export async function GET(request: Request, { params }: { params: { classId: string } }) {
-  const { classId } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 403 });
@@ -51,7 +52,7 @@ export async function GET(request: Request, { params }: { params: { classId: str
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 500 }
       );
@@ -63,8 +64,8 @@ export async function GET(request: Request, { params }: { params: { classId: str
 }
 
 // HU-009: Actualizar una clase
-export async function PUT(request: Request, { params }: { params: { classId: string } }) {
-  const { classId } = params;
+export async function PUT(request: Request, { params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id || session.user.role !== 'DOCENTE') {
@@ -219,11 +220,14 @@ export async function PUT(request: Request, { params }: { params: { classId: str
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 500 }
       );
     }
+
+    // CACHE: Invalidate cache for this subject
+    await clearSubjectCache(updatedClass.subject.id);
 
     return NextResponse.json({ data: validated.data });
   } catch {
@@ -232,8 +236,11 @@ export async function PUT(request: Request, { params }: { params: { classId: str
 }
 
 // HU-009: Eliminar una clase
-export async function DELETE(request: Request, { params }: { params: { classId: string } }) {
-  const { classId } = params;
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ classId: string }> }
+) {
+  const { classId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
@@ -247,6 +254,12 @@ export async function DELETE(request: Request, { params }: { params: { classId: 
   }
 
   try {
+    // Get subject ID before deleting
+    const classToDelete = await db.class.findUnique({
+      where: { id: classId },
+      select: { subjectId: true },
+    });
+
     const deleted = await db.class.delete({
       where: { id: classId },
       include: { subject: true },
@@ -256,11 +269,17 @@ export async function DELETE(request: Request, { params }: { params: { classId: 
       return NextResponse.json(
         {
           message: 'Clase eliminada, pero error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 200 }
       );
     }
+
+    // CACHE: Invalidate cache for this subject
+    if (classToDelete) {
+      await clearSubjectCache(classToDelete.subjectId);
+    }
+
     return NextResponse.json(
       { data: validated.data, message: 'Clase eliminada con éxito' },
       { status: 200 }

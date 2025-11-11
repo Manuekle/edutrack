@@ -48,7 +48,6 @@ export async function GET(request: Request) {
       student,
     });
   } catch (error) {
-    console.error('Error al buscar el estudiante:', error);
     return NextResponse.json(
       {
         success: false,

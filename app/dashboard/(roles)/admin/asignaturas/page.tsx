@@ -59,18 +59,50 @@ export default function GestionAsignaturasPage() {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   const handleSubjectCreated = (newSubject: Subject) => {
-    setSubjects(currentSubjects => [newSubject, ...currentSubjects]);
+    // Refrescar la lista desde el servidor para mantener la paginación consistente
+    setCurrentPage(1);
+    // El useEffect se encargará de recargar los datos
   };
+
+  const [pagination, setPagination] = useState<{
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }>({
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
 
   useEffect(() => {
     const fetchSubjects = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('/api/admin/subjects');
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+        });
+
+        if (searchTerm) {
+          params.append('search', searchTerm);
+        }
+
+        const response = await fetch(`/api/admin/subjects?${params.toString()}`);
         if (!response.ok) {
           throw new Error('Error al obtener las asignaturas');
         }
-        const data = await response.json();
-        setSubjects(data);
+        const result = await response.json();
+        setSubjects(result.data || []);
+        setPagination(
+          result.pagination || {
+            total: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          }
+        );
       } catch {
         toast.error('Error al cargar las asignaturas');
       } finally {
@@ -79,27 +111,12 @@ export default function GestionAsignaturasPage() {
     };
 
     fetchSubjects();
-  }, []);
-
-  const filteredSubjects = useMemo(() => {
-    return subjects.filter(
-      subject =>
-        subject.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        subject.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        subject.program?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        subject.teacher?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [subjects, searchTerm]);
-
-  // Calcular datos de paginación
-  const totalPages = Math.ceil(filteredSubjects.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedSubjects = filteredSubjects.slice(startIndex, startIndex + itemsPerPage);
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   // Resetear a la primera página cuando cambia el término de búsqueda
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, itemsPerPage]);
+  }, [searchTerm]);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -132,9 +149,9 @@ export default function GestionAsignaturasPage() {
                 Lista de Asignaturas
               </CardTitle>
               <CardDescription className="text-xs">
-                {filteredSubjects.length} asignatura
-                {filteredSubjects.length !== 1 ? 's' : ''} encontrada
-                {filteredSubjects.length !== 1 ? 's' : ''}
+                {pagination.total} asignatura
+                {pagination.total !== 1 ? 's' : ''} encontrada
+                {pagination.total !== 1 ? 's' : ''}
               </CardDescription>
             </div>
             <div className="relative w-full md:w-auto">
@@ -179,7 +196,7 @@ export default function GestionAsignaturasPage() {
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-md hidden sm:block">
               Página <span className="font-normal">{currentPage}</span> de{' '}
-              <span className="font-normal">{totalPages || 1}</span>
+              <span className="font-normal">{pagination.totalPages || 1}</span>
             </div>
           </div>
 
@@ -232,7 +249,7 @@ export default function GestionAsignaturasPage() {
                       </TableCell>
                     </TableRow>
                   ))
-                ) : filteredSubjects.length === 0 ? (
+                ) : subjects.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="h-24 text-center">
                       {searchTerm ? (
@@ -252,7 +269,7 @@ export default function GestionAsignaturasPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedSubjects.map(subject => (
+                  subjects.map(subject => (
                     <TableRow key={subject.id} className="hover:bg-muted/50 group">
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center space-x-3">
@@ -307,7 +324,7 @@ export default function GestionAsignaturasPage() {
           <div className="border-t">
             <TablePagination
               currentPage={currentPage}
-              totalItems={filteredSubjects.length}
+              totalItems={pagination.total}
               itemsPerPage={itemsPerPage}
               onPageChange={handlePageChange}
             />

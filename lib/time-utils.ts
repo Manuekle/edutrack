@@ -9,24 +9,24 @@
  * @returns Duration in hours
  */
 export function calculateDuration(start: string, end: string): number {
-  const [sh, sm] = (start || "").trim().split(":")
-  const [eh, em] = (end || "").trim().split(":")
+  const [sh, sm] = (start || '').trim().split(':');
+  const [eh, em] = (end || '').trim().split(':');
 
-  const startHour = Number(sh)
-  const startMin = Number(sm ?? 0)
-  const endHour = Number(eh)
-  const endMin = Number(em ?? 0)
+  const startHour = Number(sh);
+  const startMin = Number(sm ?? 0);
+  const endHour = Number(eh);
+  const endMin = Number(em ?? 0);
 
-  const sH = Number.isNaN(startHour) ? 0 : startHour
-  const sM = Number.isNaN(startMin) ? 0 : startMin
-  const eH = Number.isNaN(endHour) ? 0 : endHour
-  const eM = Number.isNaN(endMin) ? 0 : endMin
+  const sH = Number.isNaN(startHour) ? 0 : startHour;
+  const sM = Number.isNaN(startMin) ? 0 : startMin;
+  const eH = Number.isNaN(endHour) ? 0 : endHour;
+  const eM = Number.isNaN(endMin) ? 0 : endMin;
 
-  const startMinutes = sH * 60 + sM
-  const endMinutes = eH * 60 + eM
-  const diff = Math.max(0, endMinutes - startMinutes)
+  const startMinutes = sH * 60 + sM;
+  const endMinutes = eH * 60 + eM;
+  const diff = Math.max(0, endMinutes - startMinutes);
 
-  return diff / 60
+  return diff / 60;
 }
 
 /**
@@ -35,13 +35,13 @@ export function calculateDuration(start: string, end: string): number {
  * @returns Formatted string like "2 horas" or "2 horas y 30 minutos"
  */
 export function formatDuration(duration: number): string {
-  const hours = Math.floor(duration)
-  const minutes = Math.round((duration - hours) * 60)
+  const hours = Math.floor(duration);
+  const minutes = Math.round((duration - hours) * 60);
 
   if (minutes > 0) {
-    return `${hours} ${hours === 1 ? "hora" : "horas"} y ${minutes} minutos`
+    return `${hours} ${hours === 1 ? 'hora' : 'horas'} y ${minutes} minutos`;
   }
-  return `${hours} ${hours === 1 ? "hora" : "horas"}`
+  return `${hours} ${hours === 1 ? 'hora' : 'horas'}`;
 }
 
 /**
@@ -52,25 +52,25 @@ export function formatDuration(duration: number): string {
  * @returns Adjusted end time string
  */
 export function adjustEndTime(startTime: string, endTime: string, minDurationHours = 2): string {
-  const [sh, sm = "00"] = startTime.split(":")
-  const [eh, em = "00"] = endTime.split(":")
+  const [sh, sm = '00'] = startTime.split(':');
+  const [eh, em = '00'] = endTime.split(':');
 
-  const startHour = Number.parseInt(sh, 10)
-  const startMin = Number.parseInt(sm, 10)
-  const endHour = Number.parseInt(eh, 10)
-  const endMin = Number.parseInt(em, 10)
+  const startHour = Number.parseInt(sh, 10);
+  const startMin = Number.parseInt(sm, 10);
+  const endHour = Number.parseInt(eh, 10);
+  const endMin = Number.parseInt(em, 10);
 
-  const startTotalMin = startHour * 60 + startMin
-  const endTotalMin = endHour * 60 + endMin
+  const startTotalMin = startHour * 60 + startMin;
+  const endTotalMin = endHour * 60 + endMin;
 
   if (endTotalMin - startTotalMin < minDurationHours * 60) {
-    const adjustedTotalMin = Math.min(startTotalMin + minDurationHours * 60, 22 * 60)
-    const adjustedHour = Math.floor(adjustedTotalMin / 60)
-    const adjustedMin = adjustedTotalMin % 60
-    return `${adjustedHour.toString().padStart(2, "0")}:${adjustedMin.toString().padStart(2, "0")}`
+    const adjustedTotalMin = Math.min(startTotalMin + minDurationHours * 60, 22 * 60);
+    const adjustedHour = Math.floor(adjustedTotalMin / 60);
+    const adjustedMin = adjustedTotalMin % 60;
+    return `${adjustedHour.toString().padStart(2, '0')}:${adjustedMin.toString().padStart(2, '0')}`;
   }
 
-  return endTime
+  return endTime;
 }
 
 /**
@@ -78,9 +78,9 @@ export function adjustEndTime(startTime: string, endTime: string, minDurationHou
  * @returns Date object representing today at midnight
  */
 export function getTodayWithoutTime(): Date {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return today;
 }
 
 /**
@@ -89,8 +89,8 @@ export function getTodayWithoutTime(): Date {
  * @returns Date object in local timezone
  */
 export function createLocalDate(dateString: string): Date {
-  const [year, month, day] = dateString.split("-").map(Number)
-  return new Date(year, month - 1, day)
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
 }
 
 /**
@@ -104,19 +104,33 @@ export function isSameDay(date1: Date, date2: Date): boolean {
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate()
-  )
+  );
 }
 
 /**
  * Formats a date for display
  * @param date - Date to format
- * @returns Formatted date string (DD/MM/YYYY)
+ * @returns Formatted date string (e.g., "27 octubre del 2025")
  */
 export function formatDisplayDate(date: Date): string {
-  const day = date.getDate().toString().padStart(2, "0")
-  const month = (date.getMonth() + 1).toString().padStart(2, "0")
-  const year = date.getFullYear()
-  return `${day}/${month}/${year}`
+  const day = date.getDate();
+  const monthNames = [
+    'enero',
+    'febrero',
+    'marzo',
+    'abril',
+    'mayo',
+    'junio',
+    'julio',
+    'agosto',
+    'septiembre',
+    'octubre',
+    'noviembre',
+    'diciembre',
+  ];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} del ${year}`;
 }
 
 /**
@@ -125,10 +139,10 @@ export function formatDisplayDate(date: Date): string {
  * @returns Formatted date string (YYYY-MM-DD)
  */
 export function formatForAPI(date: Date): string {
-  const year = date.getFullYear()
-  const month = (date.getMonth() + 1).toString().padStart(2, "0")
-  const day = date.getDate().toString().padStart(2, "0")
-  return `${year}-${month}-${day}`
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -137,7 +151,7 @@ export function formatForAPI(date: Date): string {
  * @returns Time string in HH:MM format
  */
 export function formatDisplayTime(time: Date): string {
-  const hours = time.getHours().toString().padStart(2, "0")
-  const minutes = time.getMinutes().toString().padStart(2, "0")
-  return `${hours}:${minutes}`
+  const hours = time.getHours().toString().padStart(2, '0');
+  const minutes = time.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 }

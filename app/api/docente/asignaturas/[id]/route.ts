@@ -1,12 +1,12 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Role } from '@prisma/client';
+import { Role } from '@/lib/roles';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { DocenteSubjectSchema } from '../schema';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== Role.DOCENTE) {
@@ -31,7 +31,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validado.error.errors,
+          errors: validado.error.issues,
         },
         { status: 500 }
       );

@@ -1,14 +1,32 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { LoadingPage } from '@/components/ui/loading';
 import { Textarea } from '@/components/ui/textarea';
 import { Link, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
+const justifyAbsenceSchema = z.object({
+  reason: z.string().min(1, 'Por favor ingresa una justificación'),
+});
+
+type JustifyAbsenceFormValues = z.infer<typeof justifyAbsenceSchema>;
 
 // Main page component with Suspense boundary
 function JustificarAusenciaContent() {
@@ -17,11 +35,17 @@ function JustificarAusenciaContent() {
   const [isJustificationSubmitted, setIsJustificationSubmitted] = useState(false);
   const [redirectIn, setRedirectIn] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [reason, setReason] = useState('');
   const router = useRouter();
 
   const classId = searchParams.get('classId');
   const studentId = searchParams.get('studentId');
+
+  const form = useForm<JustifyAbsenceFormValues>({
+    resolver: zodResolver(justifyAbsenceSchema),
+    defaultValues: {
+      reason: '',
+    },
+  });
 
   // Check for existing justification on component mount
   useEffect(() => {
@@ -60,7 +84,7 @@ function JustificarAusenciaContent() {
           return cleanup; // Return cleanup function
         }
       } catch (error) {
-        console.error('Error checking existing justification:', error);
+        // Error checking existing justification
       } finally {
         setIsLoading(false);
       }
@@ -95,14 +119,7 @@ function JustificarAusenciaContent() {
     return () => clearInterval(timer);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!reason.trim()) {
-      toast('Por favor ingresa una justificación');
-      return;
-    }
-
+  const onSubmit = async (data: JustifyAbsenceFormValues) => {
     try {
       setIsSubmitting(true);
 
@@ -114,25 +131,27 @@ function JustificarAusenciaContent() {
         body: JSON.stringify({
           classId,
           studentId,
-          reason,
+          reason: data.reason,
         }),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
-        if (response.status === 400 && data.message?.includes('ya tiene una justificación')) {
+        if (
+          response.status === 400 &&
+          responseData.message?.includes('ya tiene una justificación')
+        ) {
           throw new Error('Ya has enviado una justificación para esta clase.');
         }
-        throw new Error(data.message || 'Error al procesar la justificación');
+        throw new Error(responseData.message || 'Error al procesar la justificación');
       }
 
       toast.success('Tu justificación ha sido enviada correctamente.');
-      setReason('');
+      form.reset();
       setIsJustificationSubmitted(true);
       handleSuccessfulSubmission();
     } catch (error) {
-      console.error('Error al enviar la justificación:', error);
       toast(error instanceof Error ? error.message : 'Ocurrió un error al enviar la justificación');
     } finally {
       setIsSubmitting(false);
@@ -203,34 +222,40 @@ function JustificarAusenciaContent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="reason" className="text-xs">
-                Motivo de la ausencia
-              </Label>
-              <Textarea
-                id="reason"
-                placeholder="Describe el motivo de tu ausencia..."
-                className="min-h-[120px] text-xs resize-none"
-                value={reason}
-                onChange={e => setReason(e.target.value)}
-                disabled={isSubmitting}
-                rows={4}
-                required
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">Motivo de la ausencia</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe el motivo de tu ausencia..."
+                        className="min-h-[120px] text-xs resize-none"
+                        disabled={isSubmitting}
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <Button type="submit" className="w-full text-xs" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                'Enviar justificación'
-              )}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full text-xs" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  'Enviar justificación'
+                )}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

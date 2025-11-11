@@ -1,10 +1,10 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Role } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET: Obtener lista de asignaturas
+// GET: Obtener lista de asignaturas con paginación
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -12,26 +12,56 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
     }
 
-    const subjects = await db.subject.findMany({
-      include: {
-        teacher: {
-          select: {
-            id: true,
-            name: true,
-            correoInstitucional: true,
-            codigoDocente: true,
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+
+    // Validar parámetros de paginación
+    const pageNumber = Math.max(1, page);
+    const pageSize = Math.min(Math.max(1, limit), 100); // Máximo 100 items por página
+    const skip = (pageNumber - 1) * pageSize;
+
+    const whereClause: Prisma.SubjectWhereInput = {};
+
+    // Agregar búsqueda si existe
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+        { code: { contains: search, mode: Prisma.QueryMode.insensitive } },
+        { program: { contains: search, mode: Prisma.QueryMode.insensitive } },
+      ];
+    }
+
+    // Obtener asignaturas con paginación
+    const [subjects, total] = await Promise.all([
+      db.subject.findMany({
+        where: Object.keys(whereClause).length > 0 ? whereClause : {},
+        include: {
+          teacher: {
+            select: {
+              id: true,
+              name: true,
+              correoInstitucional: true,
+              codigoDocente: true,
+            },
+          },
+          _count: {
+            select: {
+              classes: true,
+            },
           },
         },
-        _count: {
-          select: {
-            classes: true,
-          },
+        orderBy: {
+          createdAt: 'desc',
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        skip,
+        take: pageSize,
+      }),
+      db.subject.count({
+        where: whereClause,
+      }),
+    ]);
 
     // Transform the data to include student count
     const subjectsWithCounts = subjects.map(subject => ({
@@ -40,7 +70,19 @@ export async function GET(req: NextRequest) {
       classCount: subject._count.classes,
     }));
 
-    return NextResponse.json(subjectsWithCounts);
+    const totalPages = Math.ceil(total / pageSize);
+
+    return NextResponse.json({
+      data: subjectsWithCounts,
+      pagination: {
+        page: pageNumber,
+        limit: pageSize,
+        total,
+        totalPages,
+        hasNextPage: pageNumber < totalPages,
+        hasPreviousPage: pageNumber > 1,
+      },
+    });
   } catch (error) {
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }

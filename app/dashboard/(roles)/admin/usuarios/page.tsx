@@ -84,42 +84,59 @@ export default function GestionUsuariosPage() {
     }
   };
 
+  const [pagination, setPagination] = useState<{
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }>({
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('/api/admin/users');
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: itemsPerPage.toString(),
+        });
+
+        if (searchTerm) {
+          params.append('search', searchTerm);
+        }
+
+        const response = await fetch(`/api/admin/users?${params.toString()}`);
         if (!response.ok) {
           throw new Error('Error al obtener los usuarios');
         }
-        const data = await response.json();
-        setUsers(data);
+        const result = await response.json();
+        setUsers(result.data || []);
+        setPagination(
+          result.pagination || {
+            total: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPreviousPage: false,
+          }
+        );
       } catch (error) {
+        toast.error('Error al cargar los usuarios');
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, []);
-
-  const filteredUsers = useMemo(() => {
-    return users.filter(
-      user =>
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.correoInstitucional?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.correoPersonal?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [users, searchTerm]);
-
-  // Calcular datos de paginación
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   // Resetear a la primera página cuando cambia el término de búsqueda
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, itemsPerPage]);
+  }, [searchTerm]);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -157,9 +174,9 @@ export default function GestionUsuariosPage() {
                 Lista de Usuarios
               </CardTitle>
               <CardDescription className="text-xs">
-                {filteredUsers.length} usuario
-                {filteredUsers.length !== 1 ? 's' : ''} encontrado
-                {filteredUsers.length !== 1 ? 's' : ''}
+                {pagination.total} usuario
+                {pagination.total !== 1 ? 's' : ''} encontrado
+                {pagination.total !== 1 ? 's' : ''}
               </CardDescription>
             </div>
             <div className="relative w-full md:w-auto">
@@ -204,7 +221,7 @@ export default function GestionUsuariosPage() {
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-md hidden sm:block">
               Página <span className="font-normal">{currentPage}</span> de{' '}
-              <span className="font-normal">{totalPages || 1}</span>
+              <span className="font-normal">{pagination.totalPages || 1}</span>
             </div>
           </div>
 
@@ -253,7 +270,7 @@ export default function GestionUsuariosPage() {
                       </TableCell>
                     </TableRow>
                   ))
-                ) : filteredUsers.length === 0 ? (
+                ) : users.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                       {searchTerm ? (
@@ -273,7 +290,7 @@ export default function GestionUsuariosPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedUsers.map(user => (
+                  users.map(user => (
                     <TableRow key={user.id} className="hover:bg-muted/50 group">
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center space-x-3">
@@ -386,7 +403,7 @@ export default function GestionUsuariosPage() {
           <div className="px-4 py-3 border-t">
             <TablePagination
               currentPage={currentPage}
-              totalItems={filteredUsers.length}
+              totalItems={pagination.total}
               itemsPerPage={itemsPerPage}
               onPageChange={handlePageChange}
             />

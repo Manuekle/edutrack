@@ -323,7 +323,6 @@ export async function POST(request: Request) {
       });
     }
   } catch (error) {
-    console.error('Error in API route:', error);
     return NextResponse.json(
       {
         success: false,

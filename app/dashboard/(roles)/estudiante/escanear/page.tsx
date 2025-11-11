@@ -24,8 +24,6 @@ export default function ScannerPage() {
 
     const loadingToast = toast.loading('Procesando código QR...');
 
-    console.log('Procesando token QR:', qrToken);
-
     try {
       const response = await fetch('/api/asistencia/scan', {
         method: 'POST',
@@ -52,7 +50,6 @@ export default function ScannerPage() {
         toast.error(data.message || 'Código QR inválido', { id: loadingToast });
       }
     } catch (err) {
-      console.error('Error procesando QR:', err);
       const errorMsg = 'Error al procesar el código QR. Intenta nuevamente.';
       toast.error(errorMsg, { id: loadingToast });
     } finally {
@@ -79,7 +76,7 @@ export default function ScannerPage() {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-heading">Registrar Asistencia</h1>
-          <p className="text-muted-foreground text-sm mt-2">
+          <p className="text-muted-foreground text-xs mt-2">
             Escanea el código QR mostrado por tu docente para registrar tu asistencia
           </p>
         </div>
@@ -98,15 +95,15 @@ export default function ScannerPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="bg-muted rounded-lg p-4 space-y-2">
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Asignatura:</span>
                   <span className="font-medium">{attendanceData.subject}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Clase:</span>
                   <span className="font-medium">{attendanceData.class}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Hora de registro:</span>
                   <span className="font-medium">{attendanceData.recordedAt}</span>
                 </div>
@@ -129,7 +126,7 @@ export default function ScannerPage() {
             {/* Help Text */}
             <Card>
               <CardContent className="pt-6">
-                <div className="space-y-3 text-sm text-muted-foreground">
+                <div className="space-y-3 text-xs text-muted-foreground">
                   <p className="font-medium text-foreground">Instrucciones:</p>
                   <ul className="space-y-2 list-disc list-inside">
                     <li>Asegúrate de estar en la clase correspondiente</li>

@@ -30,7 +30,6 @@ export async function GET(request: Request) {
       justification: existingJustification,
     });
   } catch (error) {
-    console.error('Error al verificar justificación:', error);
     return NextResponse.json({ message: 'Error al verificar justificación' }, { status: 500 });
   }
 }

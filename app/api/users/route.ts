@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           message: 'Datos de entrada inválidos',
-          errors: query.error.errors,
+          errors: query.error.issues,
           data: [],
         },
         { status: 400 }
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: usuariosValidados.error.errors,
+          errors: usuariosValidados.error.issues,
           data: [],
         },
         { status: 500 }
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           message: 'Datos de entrada inválidos',
-          errors: error.errors,
+          errors: error.issues,
           data: [],
         },
         { status: 400 }
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: usuarioValidado.error.errors,
+          errors: usuarioValidado.error.issues,
         },
         { status: 500 }
       );
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: error.errors },
+        { message: 'Datos de entrada inválidos', errors: error.issues },
         { status: 400 }
       );
     }
@@ -236,7 +236,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: usuarioValidado.error.errors,
+          errors: usuarioValidado.error.issues,
         },
         { status: 500 }
       );
@@ -245,7 +245,7 @@ export async function PUT(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: error.errors },
+        { message: 'Datos de entrada inválidos', errors: error.issues },
         { status: 400 }
       );
     }

@@ -52,13 +52,22 @@ function AppSidebar({ homePath }: { homePath: string }) {
 
   const handleSignOut = async () => {
     try {
+      // Guardar el tema actual antes de limpiar (tanto del estado como del localStorage)
+      let themeToPreserve: string | null = null;
+      if (typeof window !== 'undefined') {
+        // Priorizar el tema del estado actual, si no existe, usar el del localStorage
+        themeToPreserve = theme || localStorage.getItem('theme') || 'system';
+        // Guardar explícitamente en localStorage para asegurar que persista
+        localStorage.setItem('theme', themeToPreserve);
+      }
+
       // Llamar a API para limpiar caché
       await fetch('/api/auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-      }).catch(console.error); // No bloqueamos si falla
+      }).catch(() => {}); // No bloqueamos si falla
 
       // Cerrar sesión en NextAuth
       await signOut({
@@ -66,16 +75,34 @@ function AppSidebar({ homePath }: { homePath: string }) {
         callbackUrl: '/login',
       });
 
-      // Limpiar estado local
+      // Limpiar estado local pero preservar el tema
       if (typeof window !== 'undefined') {
-        localStorage.clear();
+        // Obtener todas las claves del localStorage
+        const allKeys = Object.keys(localStorage);
+
+        // Eliminar todas las claves excepto 'theme'
+        allKeys.forEach(key => {
+          if (key !== 'theme') {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // Restaurar el tema después de limpiar (por si acaso se perdió)
+        if (themeToPreserve) {
+          localStorage.setItem('theme', themeToPreserve);
+        }
+
+        // Limpiar sessionStorage completamente (no contiene tema)
         sessionStorage.clear();
       }
 
       // Forzar redirección
       window.location.href = '/login';
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      // En caso de error, también preservar el tema
+      if (typeof window !== 'undefined' && theme) {
+        localStorage.setItem('theme', theme);
+      }
       window.location.href = '/login';
     }
   };
@@ -224,22 +251,39 @@ function AppSidebar({ homePath }: { homePath: string }) {
                 <DropdownMenuItem
                   onClick={e => {
                     e.preventDefault();
-                    const newTheme = theme === 'dark' ? 'light' : 'dark';
+                    // Determinar el tema actual efectivo (si es 'system', detectar el modo del sistema)
+                    let currentEffectiveTheme = theme;
+                    if (theme === 'system' && typeof window !== 'undefined') {
+                      currentEffectiveTheme = window.matchMedia('(prefers-color-scheme: dark)')
+                        .matches
+                        ? 'dark'
+                        : 'light';
+                    }
+                    // Cambiar entre dark y light (nunca volver a system desde aquí)
+                    const newTheme = currentEffectiveTheme === 'dark' ? 'light' : 'dark';
                     setTheme(newTheme);
-                    // Forzar la actualización del localStorage
+                    // next-themes ya guarda automáticamente, pero aseguramos persistencia
                     if (typeof window !== 'undefined') {
                       localStorage.setItem('theme', newTheme);
                     }
                   }}
                   className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
                 >
-                  {theme === 'dark' ? (
+                  {theme === 'dark' ||
+                  (theme === 'system' &&
+                    typeof window !== 'undefined' &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
                     <Sun className="mr-3 h-4 w-4 flex-shrink-0" />
                   ) : (
                     <Moon className="mr-3 h-4 w-4 flex-shrink-0" />
                   )}
                   <span className="font-sans">
-                    {theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+                    {theme === 'dark' ||
+                    (theme === 'system' &&
+                      typeof window !== 'undefined' &&
+                      window.matchMedia('(prefers-color-scheme: dark)').matches)
+                      ? 'Modo Claro'
+                      : 'Modo Oscuro'}
                   </span>
                 </DropdownMenuItem>
                 <Separator />

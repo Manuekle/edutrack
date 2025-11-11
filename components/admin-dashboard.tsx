@@ -31,6 +31,7 @@ interface ChartData {
   name: string;
   value: number;
   label: string;
+  [key: string]: unknown;
 }
 
 interface DashboardData {
@@ -85,7 +86,6 @@ const AdminDashboardComponent = () => {
       const result: DashboardData = await response.json();
       setData(result);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
       setError(
         error instanceof Error
           ? error.message

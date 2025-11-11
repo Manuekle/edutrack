@@ -109,7 +109,6 @@ export default function AsignarEstudiantePage() {
         isEnrolled,
       });
     } catch (error) {
-      console.error('Error en la búsqueda:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast.error(`Error: ${errorMessage}`);
 
@@ -155,7 +154,6 @@ export default function AsignarEstudiantePage() {
         });
       }
     } catch (error) {
-      console.error('Error:', error);
       setShowErrorDialog({
         show: true,
         title: 'Error de conexión',
@@ -202,7 +200,6 @@ export default function AsignarEstudiantePage() {
         });
       }
     } catch (error) {
-      console.error('Error:', error);
       setShowErrorDialog({
         show: true,
         title: 'Error de conexión',

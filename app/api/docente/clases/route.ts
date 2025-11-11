@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
         return NextResponse.json(
           {
             message: 'Error de validación en la respuesta',
-            errors: validados.error.errors,
+            errors: validados.error.issues,
           },
           { status: 500 }
         );
@@ -84,57 +85,62 @@ export async function GET(request: Request) {
       },
     });
     const now = new Date();
-    const formatted = await Promise.all(
-      classes.map(async cls => {
-        // Determine if the class is in the past
-        const classEndTime = cls.endTime || cls.startTime || cls.date;
-        const isPast = new Date(classEndTime) < now;
 
-        // If class is in the past and doesn't have a status, update it to REALIZADA
-        let status = cls.status;
-        if (isPast && !status) {
-          try {
-            // Update the status in the database
-            await db.class.update({
-              where: { id: cls.id },
-              data: { status: 'REALIZADA' },
-            });
-            status = 'REALIZADA';
-          } catch (error) {
-            // If update fails, use PROGRAMADA as fallback
-            status = 'PROGRAMADA';
-          }
-        }
+    // OPTIMIZATION: Identify classes that need status update in a single pass
+    const classesToUpdate: string[] = [];
+    const formatted = classes.map(cls => {
+      // Determine if the class is in the past
+      const classEndTime = cls.endTime || cls.startTime || cls.date;
+      const isPast = new Date(classEndTime) < now;
 
-        return {
-          id: cls.id,
-          subjectId: cls.subjectId,
-          date: cls.date,
-          startTime: cls.startTime,
-          endTime: cls.endTime,
-          topic: cls.topic,
-          description: cls.description,
-          classroom: cls.classroom,
-          status: status || 'PROGRAMADA', // Default to PROGRAMADA if status is still not set
-          cancellationReason: cls.cancellationReason,
-          totalStudents: cls.totalStudents,
-          presentCount: cls.presentCount,
-          absentCount: cls.absentCount,
-          lateCount: cls.lateCount,
-          justifiedCount: cls.justifiedCount,
-          createdAt: cls.createdAt,
-          updatedAt: cls.updatedAt,
-          subjectName: cls.subject?.name,
-          subjectCode: cls.subject?.code,
-        };
-      })
-    );
+      // If class is in the past and doesn't have a status, mark for update
+      if (isPast && !cls.status) {
+        classesToUpdate.push(cls.id);
+      }
+
+      return {
+        id: cls.id,
+        subjectId: cls.subjectId,
+        date: cls.date,
+        startTime: cls.startTime,
+        endTime: cls.endTime,
+        topic: cls.topic,
+        description: cls.description,
+        classroom: cls.classroom,
+        status: (isPast && !cls.status ? 'REALIZADA' : cls.status) || 'PROGRAMADA',
+        cancellationReason: cls.cancellationReason,
+        totalStudents: cls.totalStudents,
+        presentCount: cls.presentCount,
+        absentCount: cls.absentCount,
+        lateCount: cls.lateCount,
+        justifiedCount: cls.justifiedCount,
+        createdAt: cls.createdAt,
+        updatedAt: cls.updatedAt,
+        subjectName: cls.subject?.name,
+        subjectCode: cls.subject?.code,
+      };
+    });
+
+    // OPTIMIZATION: Update all classes that need status update in a single bulk operation
+    if (classesToUpdate.length > 0) {
+      // Use updateMany for better performance
+      await db.class.updateMany({
+        where: {
+          id: {
+            in: classesToUpdate,
+          },
+        },
+        data: {
+          status: 'REALIZADA',
+        },
+      });
+    }
     const validados = z.array(DocenteClaseSchema).safeParse(formatted);
     if (!validados.success) {
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validados.error.errors,
+          errors: validados.error.issues,
         },
         { status: 500 }
       );
@@ -145,7 +151,7 @@ export async function GET(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de consulta inválidos', errors: error.errors },
+        { message: 'Datos de consulta inválidos', errors: error.issues },
         { status: 400 }
       );
     }
@@ -189,11 +195,15 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             message: 'Error de validación en la respuesta',
-            errors: validado.error.errors,
+            errors: validado.error.issues,
           },
           { status: 500 }
         );
       }
+
+      // CACHE: Invalidate cache for this subject
+      await clearSubjectCache(data.subjectId);
+
       return NextResponse.json(
         { data: validado.data, message: 'Evento creado correctamente' },
         { status: 201 }
@@ -234,11 +244,15 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             message: 'Error de validación en la respuesta',
-            errors: validado.error.errors,
+            errors: validado.error.issues,
           },
           { status: 500 }
         );
       }
+
+      // CACHE: Invalidate cache for this subject
+      await clearSubjectCache(data.subjectId);
+
       return NextResponse.json(
         { data: validado.data, message: 'Clase creada correctamente' },
         { status: 201 }
@@ -247,7 +261,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { message: 'Datos de entrada inválidos', errors: error.errors },
+        { message: 'Datos de entrada inválidos', errors: error.issues },
         { status: 400 }
       );
     }

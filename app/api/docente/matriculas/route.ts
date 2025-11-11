@@ -57,7 +57,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         message: 'Error de validación en la respuesta',
-        errors: validated.error.errors,
+        errors: validated.error.issues,
         data: [],
       },
       { status: 500 }

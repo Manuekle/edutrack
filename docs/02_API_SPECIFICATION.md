@@ -592,3 +592,46 @@ Si no hay clase vigente:
 - **Respuestas de Error:** `401 Unauthorized`, `403 Forbidden`, `500 Internal Server Error`.
 
 ---
+
+## Optimizaciones de Rendimiento
+
+### Caché Redis
+
+Los siguientes endpoints utilizan caché Redis para mejorar el rendimiento:
+
+- `GET /api/estudiante/dashboard` - TTL: 5 minutos
+- `GET /api/docente/dashboard` - TTL: 5 minutos
+
+**Invalidación de Caché**: El caché se invalida automáticamente cuando se actualizan datos relevantes:
+- Crear/actualizar/eliminar eventos (`POST/PUT/DELETE /api/docente/eventos`)
+- Crear/actualizar/eliminar clases (`POST/PUT/DELETE /api/docente/clases`)
+- Actualizar asistencias (`POST /api/docente/clases/[classId]/asistencia`)
+- Escanear QR para asistencia (`POST /api/asistencia/scan`)
+- Justificar ausencias (`POST /api/justificar-ausencia`)
+
+**Nota**: Si Redis no está configurado, los endpoints funcionarán normalmente pero sin caché, resultando en tiempos de respuesta más lentos.
+
+### Índices de Base de Datos
+
+Se han agregado índices en las siguientes tablas para optimizar las queries:
+
+- **Class**: `[subjectId, status, date]`, `[subjectId, date]`, `[status, date]`, `[qrToken]`
+- **Attendance**: `[studentId, status]`, `[classId, status]`
+- **Subject**: `[teacherId]`
+
+**Impacto**: Queries hasta 10x más rápidas en colecciones grandes.
+
+Ver [Documentación de Optimizaciones](./05_OPTIMIZATIONS.md) para más detalles.
+
+---
+
+## Notas Adicionales
+
+- Todos los endpoints requieren autenticación excepto los de autenticación y recuperación de contraseña.
+- Las respuestas de error incluyen un campo `message` con una descripción del error.
+- Los tokens JWT expiran después de 30 días.
+- Las fechas se manejan en formato ISO 8601.
+- Los endpoints de dashboard utilizan caché Redis para mejorar el rendimiento (opcional).
+- Los índices de base de datos mejoran significativamente el rendimiento de las queries más frecuentes.
+
+---

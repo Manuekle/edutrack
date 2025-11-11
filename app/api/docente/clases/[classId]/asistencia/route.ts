@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
@@ -14,8 +15,8 @@ async function verifyTeacherOwnership(classId: string, teacherId: string) {
 }
 
 // GET: Obtener la lista de estudiantes de una clase con su estado de asistencia
-export async function GET(request: Request, { params }: { params: { classId: string } }) {
-  const { classId } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
   const session = await getServerSession(authOptions);
   if (!session || !session.user || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 403 });
@@ -63,7 +64,7 @@ export async function GET(request: Request, { params }: { params: { classId: str
       return NextResponse.json(
         {
           message: 'Error de validación en la respuesta',
-          errors: validated.error.errors,
+          errors: validated.error.issues,
         },
         { status: 500 }
       );
@@ -75,8 +76,8 @@ export async function GET(request: Request, { params }: { params: { classId: str
 }
 
 // POST: Guardar/Actualizar la asistencia de los estudiantes para una clase
-export async function POST(request: Request, { params }: { params: { classId: string } }) {
-  const { classId } = params;
+export async function POST(request: Request, { params }: { params: Promise<{ classId: string }> }) {
+  const { classId } = await params;
   const session = await getServerSession(authOptions);
   if (!session || !session.user || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 403 });
@@ -95,12 +96,19 @@ export async function POST(request: Request, { params }: { params: { classId: st
       return NextResponse.json(
         {
           message: 'Datos de asistencia inválidos',
-          errors: parsed.error.errors,
+          errors: parsed.error.issues,
         },
         { status: 400 }
       );
     }
     const { attendances } = parsed.data;
+
+    // Get subject ID before updating attendance
+    const classInfo = await db.class.findUnique({
+      where: { id: classId },
+      select: { subjectId: true },
+    });
+
     const upsertOperations = attendances.map(({ studentId, status }) =>
       db.attendance.upsert({
         where: { studentId_classId: { studentId, classId } },
@@ -109,6 +117,12 @@ export async function POST(request: Request, { params }: { params: { classId: st
       })
     );
     await db.$transaction(upsertOperations);
+
+    // CACHE: Invalidate cache for this subject (affects all students and teacher)
+    if (classInfo) {
+      await clearSubjectCache(classInfo.subjectId);
+    }
+
     return NextResponse.json({ message: 'Asistencia guardada con éxito' }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });

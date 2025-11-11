@@ -32,7 +32,6 @@ export function useSubjectData(subjectId: string) {
         const { exists } = await response.json();
         return exists;
       } catch (error) {
-        console.error('Error checking report existence:', error);
         return false;
       }
     },
@@ -174,7 +173,6 @@ export function useSubjectData(subjectId: string) {
         await Promise.all([fetchSubject(), fetchClasses(), fetchEnrolledStudents()]);
         toast.dismiss(loadingToast);
       } catch (error) {
-        console.error('Error loading data:', error);
         toast.dismiss(loadingToast);
       }
     };

@@ -162,7 +162,6 @@ export function AsignaturasImportDialog({
       setImportData(Object.values(importedSubjects));
     } catch (error) {
       toast.error('Error al procesar el archivo Excel');
-      console.error('Import error:', error);
     } finally {
       setIsProcessing(false);
       setProcessingProgress(0);

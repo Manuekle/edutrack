@@ -17,8 +17,6 @@ if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
 const useSecureCookies = baseUrl.startsWith('https://') || isProduction;
 const cookiePrefix = useSecureCookies ? '__Secure-' : '';
 
-console.log('⚙️ Configurando NextAuth con URL base:', baseUrl);
-
 export const authOptions: NextAuthOptions = {
   debug: !isProduction,
 
@@ -42,7 +40,6 @@ export const authOptions: NextAuthOptions = {
             const isValid = await bcrypt.compare(credentials.password, hash);
             return isValid ? user : null;
           } catch (error) {
-            console.error('Failed to parse cached auth data:', error);
             return null;
           }
         }
@@ -143,7 +140,7 @@ export const authOptions: NextAuthOptions = {
             const parsedUser = JSON.parse(cachedUser);
             return { ...token, ...parsedUser };
           } catch (error) {
-            console.error('Error parsing cached user:', error);
+            // Error parsing cached user, fallback to database
           }
         }
 

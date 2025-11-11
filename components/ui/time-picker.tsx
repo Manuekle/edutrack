@@ -5,7 +5,10 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 
 interface TimePickerProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'className' | 'step' | 'type'> {
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    'value' | 'onChange' | 'className' | 'step' | 'type'
+  > {
   value: string; // Expected format: "HH:mm"
   onChange: (value: string) => void;
   className?: string;
@@ -45,7 +48,6 @@ export function TimePicker({ value, onChange, className, step = 60, ...rest }: T
       const mm = String(dt.getMinutes()).padStart(2, '0');
       return `${hh}:${mm}`;
     }
-    console.warn('[TimePicker] Unparseable time value:', v);
     return '';
   };
 

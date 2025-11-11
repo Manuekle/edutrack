@@ -415,7 +415,6 @@ export function TeacherReport() {
         setTeachers(data);
         setFilteredTeachers(data);
       } catch (err: unknown) {
-        console.error('Error fetching teachers:', err);
         setError(err instanceof Error ? err.message : 'No se pudo cargar la lista de docentes.');
       } finally {
         setLoadingTeachers(false);
@@ -482,7 +481,6 @@ export function TeacherReport() {
             // Asegurarnos de que la fecha es un objeto Date válido
             const classDate = new Date(cls.date);
             if (isNaN(classDate.getTime())) {
-              console.warn('Fecha de clase inválida:', cls.date);
               return; // Saltar esta clase si la fecha no es válida
             }
 
@@ -513,7 +511,6 @@ export function TeacherReport() {
         const finalChartData = sortedDates.map(date => rowsByDate[date]);
         setChartData(finalChartData);
       } catch (err: unknown) {
-        console.error('Error fetching historic data:', err);
         setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado.');
         setChartData([]);
         setSubjects([]);

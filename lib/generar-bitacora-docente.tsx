@@ -792,7 +792,7 @@ export async function generateAttendanceReportPDF(
         logoDataUri = `data:image/png;base64,${imageBase64}`;
       }
     } catch (error) {
-      console.warn('No se pudo obtener el logo:', error);
+      // Could not get logo
     }
 
     // Procesar firma del docente
@@ -809,7 +809,7 @@ export async function generateAttendanceReportPDF(
           }
         }
       } catch (error) {
-        console.warn('No se pudo procesar la firma:', error);
+        // Could not process signature
       }
     }
 
@@ -853,7 +853,6 @@ export async function generateAttendanceReportPDF(
             supportEmail: 'soporte@institucion.edu.co',
           }),
         });
-        console.log(`Notificación enviada a: ${requestedBy.correoPersonal}`);
 
         //Actualizar el estado del reporte si se proporcionó un ID
         if (reportId) {
@@ -863,7 +862,6 @@ export async function generateAttendanceReportPDF(
           });
         }
       } catch (emailError) {
-        console.error('Error al enviar el correo de notificación:', emailError);
         if (reportId) {
           await db.report.update({
             where: { id: reportId },
@@ -879,7 +877,6 @@ export async function generateAttendanceReportPDF(
 
     return { buffer, fileName };
   } catch (error) {
-    console.error('Error generando PDF:', error);
     throw error;
   }
 }

@@ -52,7 +52,7 @@ export function SubjectCombobox({
         setSubjects(data.subjects);
       }
     } catch (error) {
-      console.error('Error fetching subjects:', error);
+      // Error fetching subjects
     } finally {
       setLoading(false);
     }

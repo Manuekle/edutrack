@@ -3,7 +3,7 @@ import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { code: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ code: string }> }) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -12,7 +12,7 @@ export async function GET(request: Request, { params }: { params: { code: string
       return NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 });
     }
 
-    const { code } = params;
+    const { code } = await params;
 
     if (!code) {
       return NextResponse.json(
@@ -48,7 +48,6 @@ export async function GET(request: Request, { params }: { params: { code: string
       subject,
     });
   } catch (error) {
-    console.error('Error al buscar la asignatura:', error);
     return NextResponse.json(
       {
         success: false,

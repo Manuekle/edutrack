@@ -13,7 +13,7 @@ import {
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { Ban, Edit, MoreHorizontal, Signature, UserCheck } from 'lucide-react';
+import { Ban, MoreHorizontal, Signature, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import type { ClassStatusInfo } from './class-status-calculator';
 import type { ClassWithStatus } from './classes-table';
@@ -28,7 +28,6 @@ interface ClassTableRowProps {
     formatDisplayDate: (date: Date) => string;
     createLocalDate: (dateString: string) => Date;
   };
-  onEdit: () => void;
   onCancel: () => void;
   onMarkAsDone: () => void;
 }
@@ -62,12 +61,11 @@ export function ClassTableRow({
   statusLabel,
   statusColor,
   dateUtils,
-  onEdit,
   onCancel,
   onMarkAsDone,
 }: ClassTableRowProps) {
   const classDate = dateUtils.createLocalDate(cls.date);
-  const { canEdit, canCancel, canMarkAsDone, canTakeAttendance, isToday, isFuture } = statusInfo;
+  const { canCancel, canMarkAsDone, canTakeAttendance, isToday, isFuture } = statusInfo;
 
   const getTooltipMessage = () => {
     if (cls.status === 'CANCELADA') {
@@ -166,18 +164,6 @@ export function ClassTableRow({
                 <UserCheck className="mr-2 h-4 w-4" aria-hidden="true" />
                 <span>Asistencia</span>
               </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={!canEdit}
-              onSelect={e => {
-                e.preventDefault();
-                if (canEdit) onEdit();
-              }}
-              className={!canEdit ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-              aria-disabled={!canEdit}
-            >
-              <Edit className="mr-2 h-4 w-4" aria-hidden="true" />
-              <span className="flex items-center w-full">Editar</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -1,35 +1,14 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import { UsersPreviewSection, type UserPreviewItem } from '@/components/users/preview-section';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { CheckCircle, Download, Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 // --- Tipos de Datos ---
-interface UserData {
-  name: string;
-  document: string;
-  correoPersonal: string;
-  role: string;
-  codigoInstitucional?: string;
-}
-
-interface PreviewResult {
-  data: UserData;
-  status: 'success' | 'warning' | 'error';
-  message: string;
-}
-
 interface FinalResult {
   document: string;
   name: string;
@@ -40,8 +19,8 @@ interface FinalResult {
 export default function CargarUsuariosPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isPreview, setIsPreview] = useState(false);
-  const [previewData, setPreviewData] = useState<PreviewResult[]>([]);
-  const [finalResults, setFinalResults] = useState<FinalResult[]>([]);
+  const [previewData, setPreviewData] = useState<UserPreviewItem[]>([]);
+  const [finalResults, setFinalResults] = useState<FinalResult[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -50,9 +29,9 @@ export default function CargarUsuariosPage() {
     if (!selectedFile) {
       setIsPreview(false);
       setPreviewData([]);
-      setFinalResults([]);
+      setFinalResults(null);
     } else {
-      setFinalResults([]);
+      setFinalResults(null);
       setIsPreview(false);
       setPreviewData([]);
     }
@@ -60,7 +39,7 @@ export default function CargarUsuariosPage() {
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecciona un archivo .xlsx para continuar.');
+      toast.error('Por favor, selecciona un archivo .xlsx o .csv para continuar.');
       return;
     }
     setIsLoading(true);
@@ -127,59 +106,87 @@ export default function CargarUsuariosPage() {
     setFile(null);
     setIsPreview(false);
     setPreviewData([]);
-    setFinalResults([]);
+    setFinalResults(null);
+  };
+
+  const handleNewUpload = () => {
+    setFile(null);
+    setIsPreview(false);
+    setPreviewData([]);
+    setFinalResults(null);
   };
 
   return (
-    <main className="space-y-4">
+    <>
+      {/* Header */}
       <div className="pb-4 col-span-1 w-full">
         <CardTitle className="text-2xl font-semibold tracking-heading">Cargar Usuarios</CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .xlsx para cargar masivamente usuarios.
+          Sube un archivo .xlsx o .csv para cargar masivamente usuarios.
         </CardDescription>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
+          {/* Download Template */}
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold tracking-heading">
-                Plantilla de Carga
+                Opciones de Carga
               </CardTitle>
-              <CardDescription>
-                Descarga la plantilla para asegurar que tu archivo tiene el formato correcto.
+              <CardDescription className="text-xs text-muted-foreground">
+                Elige cómo quieres cargar tus usuarios.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <a href="/formatos/plantilla_usuarios.xlsx" download>
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Descargar Plantilla
-                </Button>
-              </a>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 gap-2">
+                <a href="/formatos/plantilla_usuarios.xlsx" download>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Download className="mr-2 h-4 w-4" />
+                    Descargar Plantilla
+                  </Button>
+                </a>
+              </div>
+
+              <div>
+                <div className="space-y-2 mt-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Download className="h-4 w-4" />
+                    <span className="font-medium">Formatos soportados:</span>
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
+                    <li>Excel (.xlsx) - Formato tradicional</li>
+                    <li>CSV (.csv) - Formato de texto plano</li>
+                    <li>Compatible con sistemas externos</li>
+                    <li>Mapeo flexible de columnas</li>
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
+          {/* Upload Form */}
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold tracking-heading">
-                Subir Archivo
+                Subir Archivo (Excel o CSV)
               </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                Si ya tienes un archivo Excel (.xlsx) o CSV (.csv) con tus datos, súbelo aquí.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
               <div className="flex gap-2 mt-4 flex-col">
                 <Button
                   onClick={handlePreview}
-                  disabled={!file || isLoading || isPreview}
+                  disabled={!file || isLoading}
                   className="w-full text-xs"
                 >
-                  {isLoading && !isPreview ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <></>}
                   Vista Previa
                 </Button>
-                {file && (
+                {isPreview && (
                   <Button onClick={handleCancel} variant="destructive" className="w-full text-xs">
                     Cancelar
                   </Button>
@@ -188,116 +195,17 @@ export default function CargarUsuariosPage() {
             </CardContent>
           </Card>
         </div>
-        {/* card */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
-                Previsualización y Confirmación
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                Revisa los datos antes de confirmar la carga. Las filas con errores no serán
-                procesadas.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col justify-center h-full">
-              {isLoading && !isPreview ? (
-                <div className="flex items-center justify-center h-64">
-                  <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
-                </div>
-              ) : isPreview && previewData.length > 0 ? (
-                <div className="flex flex-col h-full">
-                  <div className="rounded-lg border max-h-[60vh] overflow-y-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-muted/60">
-                          <TableHead className="px-4 py-3">Nombre</TableHead>
-                          <TableHead className="px-4 py-3">Documento</TableHead>
-                          <TableHead className="px-4 py-3">Correo</TableHead>
-                          <TableHead className="px-4 py-3">Rol</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {previewData.map((item, index) => (
-                          <TableRow key={index}>
-                            {item.status === 'error' ? (
-                              <TableCell colSpan={6} className="text-xs text-red-500">
-                                {item.message}
-                              </TableCell>
-                            ) : (
-                              <>
-                                <TableCell className="px-4 py-3">{item.data.name}</TableCell>
-                                <TableCell className="px-4 py-3">{item.data.document}</TableCell>
-                                <TableCell className="px-4 py-3">
-                                  {item.data.correoPersonal}
-                                </TableCell>
-                                <TableCell className="px-4 py-3 lowercase">
-                                  {item.data.role}
-                                </TableCell>
-                              </>
-                            )}
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button
-                      onClick={handleConfirmUpload}
-                      disabled={
-                        isConfirming || previewData.filter(i => i.status === 'success').length === 0
-                      }
-                    >
-                      {isConfirming && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Confirmar Carga
-                    </Button>
-                  </div>
-                </div>
-              ) : finalResults.length > 0 ? (
-                (() => {
-                  const createdCount = finalResults.filter(r => r.status === 'created').length;
-                  const notCreatedCount = finalResults.length - createdCount;
 
-                  return (
-                    <div className="text-center p-8 flex flex-col items-center justify-center h-full">
-                      <CheckCircle className="h-16 w-16 text-green-500" />
-                      <h3 className="mt-4 text-xl font-semibold tracking-heading">
-                        Proceso Completado
-                      </h3>
-                      <div className="mt-3 text-xs text-muted-foreground space-y-1">
-                        <p>
-                          <span className="font-semibold text-primary">{createdCount}</span>{' '}
-                          {createdCount === 1 ? 'usuario creado' : 'usuarios creados'} con éxito.
-                        </p>
-                        {notCreatedCount > 0 && (
-                          <p>
-                            <span className="font-semibold text-destructive">
-                              {notCreatedCount}
-                            </span>{' '}
-                            {notCreatedCount === 1
-                              ? 'usuario no fue creado'
-                              : 'usuarios no fueron creados'}{' '}
-                            (omitidos o con errores).
-                          </p>
-                        )}
-                      </div>
-                      <Button onClick={handleCancel} className="mt-8">
-                        Cargar Otro Archivo
-                      </Button>
-                    </div>
-                  );
-                })()
-              ) : (
-                <div className="min-h-[400px] sm:h-[calc(75vh-11.5rem)]">
-                  <div className="text-center text-xs flex h-full font-normal items-center justify-center text-muted-foreground py-24">
-                    <p>Sube un archivo para ver la previsualización aquí.</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <UsersPreviewSection
+          isLoading={isLoading}
+          isPreview={isPreview}
+          previewData={previewData}
+          finalResults={finalResults}
+          onUpload={handleConfirmUpload}
+          onNewUpload={handleNewUpload}
+          isConfirming={isConfirming}
+        />
       </div>
-    </main>
+    </>
   );
 }

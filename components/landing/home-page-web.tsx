@@ -338,7 +338,7 @@ export default function HomePageWeb() {
                         </span>
                         <div className="h-px w-4 bg-gradient-to-r from-muted/50 to-muted/20" />
                       </div>
-                      <h3 className="text-base font-medium tracking-card mb-1 text-foreground">
+                      <h3 className="text-xs font-medium tracking-card mb-1 text-foreground">
                         {step.title}
                       </h3>
                       <p className="text-xs text-muted-foreground">{step.description}</p>

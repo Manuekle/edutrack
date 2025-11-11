@@ -1,11 +1,11 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-// Removed unused imports
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loading, LoadingPage } from '@/components/ui/loading';
-import { format } from 'date-fns';
-import { AlertTriangle, BarChart3, BookOpen, Calendar, Clock, MapPin } from 'lucide-react';
+import { LiveClassCard } from '@/components/estudiante/live-class-card';
+import { StatCard } from '@/components/estudiante/stat-card';
+import { SubjectsCard } from '@/components/estudiante/subjects-card';
+import { UpcomingEventsCard } from '@/components/estudiante/upcoming-events-card';
+import { LoadingPage } from '@/components/ui/loading';
+import { AlertTriangle, BarChart3, BookOpen, Calendar } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 type EventType = 'EXAMEN' | 'TRABAJO' | 'LIMITE' | 'ANUNCIO' | 'INFO';
@@ -68,32 +68,6 @@ interface LiveClass {
   classroom?: string;
 }
 
-function StatCard({
-  title,
-  value,
-  subtitle,
-  icon: Icon,
-}: {
-  title: string;
-  value: string | number;
-  subtitle?: string;
-  icon: React.ComponentType<{ className?: string }>;
-}) {
-  const IconComponent = Icon;
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xs font-medium">{title}</CardTitle>
-        <IconComponent className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-semibold">{value}</div>
-        <p className="text-xs text-muted-foreground">{subtitle}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function EstudianteDashboard() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [upcomingClasses, setUpcomingClasses] = useState<UpcomingClass[]>([]);
@@ -146,7 +120,7 @@ export default function EstudianteDashboard() {
       } else {
         setLiveClass(null);
       }
-    } catch (error) {
+    } catch {
       setLiveClass(null);
     } finally {
       setIsLoadingLiveClass(false);
@@ -201,7 +175,7 @@ export default function EstudianteDashboard() {
           weeklyAttendanceAverage: data.cards.weeklyAttendanceAverage || 0,
         }));
       }
-    } catch (error) {
+    } catch {
       setSubjects([]);
       setUpcomingClasses([]);
     } finally {
@@ -220,8 +194,8 @@ export default function EstudianteDashboard() {
 
       try {
         await Promise.all([fetchDashboardData(), fetchLiveClass()]);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+      } catch {
+        // Error fetching dashboard data
       } finally {
         if (isMounted) {
           setIsInitialLoad(false);
@@ -234,18 +208,26 @@ export default function EstudianteDashboard() {
 
     // Only set up polling if component is still mounted
     if (isMounted) {
-      // Dashboard data refreshes every 10 minutes
-      dashboardInterval = setInterval(fetchDashboardData, 10 * 60 * 1000);
+      // OPTIMIZATION: Dashboard data refreshes every 5 minutes (reduced from 10)
+      // Cache is 5 minutes, so this aligns with cache invalidation
+      dashboardInterval = setInterval(fetchDashboardData, 5 * 60 * 1000);
 
-      // Live class only polls when there's an active class
+      // OPTIMIZATION: Live class polls every 2 minutes (increased from 30 seconds)
+      // This reduces server load while still being responsive
       const checkLiveClass = () => {
         if (liveClass?.id) {
+          fetchLiveClass();
+        } else {
+          // If no live class, check occasionally (every 5 minutes) for new classes
           fetchLiveClass();
         }
       };
 
-      // Initial check with shorter interval
-      liveClassInterval = setInterval(checkLiveClass, 30000);
+      // Poll every 2 minutes if there's a live class, every 5 minutes if not
+      liveClassInterval = setInterval(
+        checkLiveClass,
+        liveClass?.id ? 2 * 60 * 1000 : 5 * 60 * 1000
+      );
     }
 
     return () => {
@@ -267,65 +249,8 @@ export default function EstudianteDashboard() {
       </div>
 
       {/* Live Class Card */}
-      {liveClass && (
-        <Card className="mb-8 border shadow-sm">
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <CardTitle className="text-xl font-semibold tracking-card">
-                  Clase en curso
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">
-                  {liveClass.subjectName} • {liveClass.topic}
-                </p>
-              </div>
-              <div className="flex items-center md:space-x-2 md:bg-foreground/5 px-2 md:px-3 py-1 rounded-full">
-                <div className="w-2 h-2 rounded-full bg-foreground animate-pulse"></div>
-                <span className="text-xs font-medium hidden md:block">En curso</span>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="mt-0">
-            <div className="flex flex-col md:flex-row justify-between gap-6">
-              <div className="space-y-1">
-                <h3 className="text-xs font-medium">Detalles de la Clase</h3>
-                <div className="flex gap-3">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-xs">
-                      {liveClass.startTime
-                        ? format(new Date(liveClass.startTime), 'h:mm a')
-                        : 'Sin hora'}
-                      {liveClass.endTime && ` - ${format(new Date(liveClass.endTime), 'h:mm a')}`}
-                    </span>
-                  </div>
-                  {liveClass.classroom && (
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-xs">Aula {liveClass.classroom}</span>
-                    </div>
-                  )}
-                </div>
-                {liveClass.myStatus === 'PRESENTE' ? (
-                  <div className="flex items-center gap-2 mt-3">
-                    <span className="text-green-700 text-xs font-medium">
-                      ¡Estás presente en esta clase!
-                    </span>
-                  </div>
-                ) : // <Link
-                //   href={`/dashboard/estudiante/escanear/${liveClass.qrToken}`}
-                //   className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2"
-                //   tabIndex={!liveClass.qrToken ? -1 : 0}
-                //   aria-disabled={!liveClass.qrToken}
-                // >
-                //   Unirse a la clase
-                // </Link>
-                null}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {liveClass && <LiveClassCard liveClass={liveClass} />}
+
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatCard
@@ -353,120 +278,12 @@ export default function EstudianteDashboard() {
           icon={BarChart3}
         />
       </div>
-      {/* Asignaturas */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {subjects.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-3">
-              {subjects.map(subject => (
-                <Card key={subject.id}>
-                  <CardContent className="px-4">
-                    <div className="flex justify-between items-start gap-2">
-                      <div className="space-y-1">
-                        <h3 className="font-medium tracking-card">{subject.name}</h3>
-                        <p className="text-xs text-muted-foreground">{subject.teacher}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs font-medium text-primary">
-                          {subject.attendancePercentage}%
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {subject.attendedClasses}/{subject.totalClasses} clases
-                        </div>
-                      </div>
-                    </div>
 
-                    {subject.nextClass && (
-                      <div className="mt-3 pt-3 border-t">
-                        <div className="flex items-start gap-2">
-                          <div className="flex items-center gap-2 justify-center">
-                            <div className="flex items-center gap-2 text-xs">
-                              <Badge variant="outline" className="text-xs font-medium lowercase">
-                                {subject.nextClass.timeUntil}
-                              </Badge>
-                            </div>
-                            {subject.nextClass.topic && (
-                              <div>
-                                <p className="text-xs text-muted-foreground line-clamp-2">
-                                  {subject.nextClass.topic}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-xs text-muted-foreground flex flex-col items-center justify-center h-32">
-              <p className="text-xs text-muted-foreground">No tienes asignaturas registradas</p>
-              <p className="text-xs text-muted-foreground/70">Tus asignaturas aparecerán aquí</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Asignaturas */}
+      <SubjectsCard subjects={subjects} />
 
       {/* Próximas Clases */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-card">Próximas Fechas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoadingUpcomingClasses ? (
-            <div className="flex justify-center py-8">
-              <Loading />
-            </div>
-          ) : upcomingClasses.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-              {upcomingClasses.map((item, index) => (
-                <Card key={`${item.id}-${index}`} className="p-0">
-                  <CardContent className="p-4 flex flex-col h-full justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-md tracking-card text-foreground">
-                          {item.title}
-                        </span>
-                        <Badge variant="outline" className="text-xs font-normal lowercase">
-                          {item.type}
-                        </Badge>
-                      </div>
-                      {item.subjectName && (
-                        <span className="text-xs text-muted-foreground">{item.subjectName}</span>
-                      )}
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(item.date).toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: 'long',
-                        })}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-xs text-muted-foreground">No hay eventos programados</p>
-              <p className="text-xs text-muted-foreground/70">
-                Los próximos eventos aparecerán aquí
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <UpcomingEventsCard upcomingClasses={upcomingClasses} isLoading={isLoadingUpcomingClasses} />
     </div>
   );
 }

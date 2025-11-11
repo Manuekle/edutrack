@@ -1,7 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
+import { redis } from '@/lib/redis';
 import { ClassStatus, EventType } from '@prisma/client';
-import { format } from 'date-fns';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
@@ -51,6 +51,18 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    // CACHE: Try to get from cache first (5 minutes TTL)
+    const cacheKey = `dashboard:estudiante:${session.user.id}`;
+    let cached = null;
+    try {
+      cached = await redis.get(cacheKey);
+      if (cached) {
+        return NextResponse.json(cached);
+      }
+    } catch {
+      // Cache not available, continue without cache
+    }
+
     const now = new Date();
 
     // Variables for general cards statistics
@@ -82,49 +94,163 @@ export async function GET() {
       },
     });
 
-    // Process subjects
+    const subjectIds = subjects.map(s => s.id);
+
+    // OPTIMIZATION: Get all classes for all subjects in a single query
+    const allClasses = await db.class.findMany({
+      where: {
+        subjectId: {
+          in: subjectIds,
+        },
+        status: 'PROGRAMADA',
+      },
+      select: {
+        id: true,
+        subjectId: true,
+        date: true,
+        topic: true,
+        status: true,
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+
+    // OPTIMIZATION: Get all attendances for this student in all subjects in a single query
+    const allAttendances = await db.attendance.findMany({
+      where: {
+        studentId: session.user.id,
+        class: {
+          subjectId: {
+            in: subjectIds,
+          },
+          status: { not: ClassStatus.CANCELADA },
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+        class: {
+          select: {
+            id: true,
+            subjectId: true,
+            date: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    // OPTIMIZATION: Get weekly classes in a single query
+    const weeklyClasses = await db.class.findMany({
+      where: {
+        subjectId: {
+          in: subjectIds,
+        },
+        date: {
+          gte: fourWeeksAgo,
+          lte: now,
+        },
+        status: 'PROGRAMADA',
+      },
+      select: {
+        id: true,
+        subjectId: true,
+      },
+    });
+
+    // OPTIMIZATION: Get weekly attendances in a single query
+    const weeklyAttendances = await db.attendance.findMany({
+      where: {
+        studentId: session.user.id,
+        class: {
+          subjectId: {
+            in: subjectIds,
+          },
+          date: {
+            gte: fourWeeksAgo,
+            lte: now,
+          },
+          status: 'PROGRAMADA',
+        },
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    // OPTIMIZATION: Get next classes for all subjects in a single query
+    const nextClasses = await db.class.findMany({
+      where: {
+        subjectId: {
+          in: subjectIds,
+        },
+        date: { gte: now },
+        status: { not: ClassStatus.CANCELADA },
+      },
+      select: {
+        id: true,
+        subjectId: true,
+        date: true,
+        topic: true,
+      },
+      orderBy: { date: 'asc' },
+    });
+
+    // Group data by subjectId for efficient lookup
+    const classesBySubject = new Map<string, typeof allClasses>();
+    allClasses.forEach(cls => {
+      if (!classesBySubject.has(cls.subjectId)) {
+        classesBySubject.set(cls.subjectId, []);
+      }
+      classesBySubject.get(cls.subjectId)!.push(cls);
+    });
+
+    const attendancesBySubject = new Map<string, typeof allAttendances>();
+    allAttendances.forEach(att => {
+      const subjectId = att.class.subjectId;
+      if (!attendancesBySubject.has(subjectId)) {
+        attendancesBySubject.set(subjectId, []);
+      }
+      attendancesBySubject.get(subjectId)!.push(att);
+    });
+
+    const weeklyClassesBySubject = new Map<string, number>();
+    weeklyClasses.forEach(cls => {
+      weeklyClassesBySubject.set(
+        cls.subjectId,
+        (weeklyClassesBySubject.get(cls.subjectId) || 0) + 1
+      );
+    });
+
+    const weeklyAttendedCount = weeklyAttendances.filter(
+      att => att.status === 'PRESENTE' || att.status === 'TARDANZA'
+    ).length;
+
+    const nextClassesBySubject = new Map<string, (typeof nextClasses)[0]>();
+    nextClasses.forEach(cls => {
+      if (!nextClassesBySubject.has(cls.subjectId)) {
+        nextClassesBySubject.set(cls.subjectId, cls);
+      }
+    });
+
+    // Process subjects using the pre-fetched data
     const processedSubjects: SubjectResponse[] = [];
     for (const subject of subjects) {
-      // Get ALL classes for this subject (not just past ones)
-      const allSubjectClasses = await db.class.findMany({
-        where: {
-          subjectId: subject.id,
-          status: 'PROGRAMADA', // Only include PROGRAMADA classes
-        },
-        orderBy: {
-          date: 'asc',
-        },
-      });
-
-      // Get ALL attendances for this student in this subject
-      const allAttendances = await db.attendance.findMany({
-        where: {
-          studentId: session.user.id,
-          class: {
-            subjectId: subject.id,
-            status: { not: ClassStatus.CANCELADA },
-          },
-        },
-        include: {
-          class: {
-            select: {
-              id: true,
-              date: true,
-              status: true,
-            },
-          },
-        },
-      });
+      const subjectClasses = classesBySubject.get(subject.id) || [];
+      const subjectAttendances = attendancesBySubject.get(subject.id) || [];
+      const nextClass = nextClassesBySubject.get(subject.id);
+      const subjectWeeklyClasses = weeklyClassesBySubject.get(subject.id) || 0;
 
       // Count total classes for this subject
-      const totalClasses = allSubjectClasses.length;
+      const totalClasses = subjectClasses.length;
 
       // Count attended classes (PRESENTE + TARDANZA) from attendance records
-      const attendedClasses = allAttendances.filter(
+      const attendedClasses = subjectAttendances.filter(
         att => att.status === 'PRESENTE' || att.status === 'TARDANZA'
       ).length;
 
-      // Calcular porcentaje de asistencia antes de usarlo
+      // Calcular porcentaje de asistencia
       let attendancePercentage = 0;
       if (totalClasses > 0) {
         attendancePercentage = Math.round((attendedClasses / totalClasses) * 100);
@@ -139,48 +265,8 @@ export async function GET() {
         subjectsAtRisk++;
       }
 
-      // Calculate weekly attendance for this subject (last 4 weeks)
-      const weeklyClasses = await db.class.findMany({
-        where: {
-          subjectId: subject.id,
-          date: {
-            gte: fourWeeksAgo,
-            lte: now,
-          },
-          status: 'PROGRAMADA', // Only include PROGRAMADA classes
-        },
-      });
-
-      const weeklyAttendances = await db.attendance.findMany({
-        where: {
-          studentId: session.user.id,
-          class: {
-            subjectId: subject.id,
-            date: {
-              gte: fourWeeksAgo,
-              lte: now,
-            },
-            status: 'PROGRAMADA',
-          },
-        },
-      });
-
-      const weeklySubjectAttended = weeklyAttendances.filter(
-        att => att.status === 'PRESENTE' || att.status === 'TARDANZA'
-      ).length;
-
-      weeklyTotalClasses += weeklyClasses.length;
-      weeklyAttendedClasses += weeklySubjectAttended;
-
-      // Find next class
-      const nextClass = await db.class.findFirst({
-        where: {
-          subjectId: subject.id,
-          date: { gte: now },
-          status: { not: ClassStatus.CANCELADA },
-        },
-        orderBy: { date: 'asc' },
-      });
+      // Add weekly counts
+      weeklyTotalClasses += subjectWeeklyClasses;
 
       // Calculate time until next class
       let timeUntilNextClass = '';
@@ -219,20 +305,28 @@ export async function GET() {
       });
     }
 
+    // Calculate weekly attendance (global)
+    weeklyAttendedClasses = weeklyAttendedCount;
+    weeklyTotalClasses = weeklyClasses.length;
+
     // Process events
+    // Obtener todos los eventos de las asignaturas del estudiante y filtrar en memoria
+    // Esto evita problemas de zona horaria al comparar fechas
     const upcomingEvents: EventResponse[] = [];
-    for (const subject of subjects) {
-      // Get events for this subject
-      const events = await db.subjectEvent.findMany({
+
+    // Solo buscar eventos si el estudiante tiene asignaturas
+    if (subjectIds.length > 0) {
+      // Obtener todos los eventos de las asignaturas del estudiante
+      const allEvents = await db.subjectEvent.findMany({
         where: {
-          subjectId: subject.id,
-          date: {
-            gte: now,
+          subjectId: {
+            in: subjectIds,
           },
         },
         include: {
           subject: {
             select: {
+              id: true,
               name: true,
               code: true,
               teacher: {
@@ -246,31 +340,53 @@ export async function GET() {
         orderBy: {
           date: 'asc',
         },
-        take: 10, // Limit to 10 upcoming events per subject
       });
 
-      for (const event of events) {
-        upcomingEvents.push({
-          id: event.id,
-          title: event.title || 'Evento sin título',
-          code: event.subject.code,
-          type: event.type,
-          date: event.date.toISOString().split('T')[0],
-          startTime: format(event.date, 'HH:mm'),
-          endTime: event.date
-            ? format(new Date(event.date.getTime() + 60 * 60 * 1000), 'HH:mm')
-            : '23:59',
-          location: 'No especificada',
-          teacher: event.subject.teacher?.name || 'Docente no asignado',
-          subjectName: event.subject.name,
-          description: event.description || 'Sin descripción',
-          isEvent: true,
-        });
+      // Normalizar la fecha actual al inicio del día para comparar
+      const startOfToday = new Date(now);
+      startOfToday.setHours(0, 0, 0, 0);
+
+      // Filtrar eventos en memoria para incluir solo eventos de hoy en adelante
+      for (const event of allEvents) {
+        const eventDate = new Date(event.date);
+        // Normalizar la fecha del evento al inicio del día para comparar
+        const eventDateNormalized = new Date(eventDate);
+        eventDateNormalized.setHours(0, 0, 0, 0);
+
+        // Solo incluir eventos que sean de hoy o futuros (comparando fechas normalizadas)
+        if (eventDateNormalized.getTime() >= startOfToday.getTime()) {
+          // Get date in YYYY-MM-DD format using local time
+          const year = eventDate.getFullYear();
+          const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+          const day = String(eventDate.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+
+          // Events are stored normalized to midnight, so startTime is 00:00
+          const startTime = '00:00';
+          const endTime = '23:59';
+
+          upcomingEvents.push({
+            id: event.id,
+            title: event.title || 'Evento sin título',
+            code: event.subject.code,
+            type: event.type,
+            date: dateStr,
+            startTime,
+            endTime,
+            location: 'No especificada',
+            teacher: event.subject.teacher?.name || 'Docente no asignado',
+            subjectName: event.subject.name,
+            description: event.description || 'Sin descripción',
+            isEvent: true,
+          });
+        }
+      }
+
+      // Limitar a 50 eventos después del filtrado
+      if (upcomingEvents.length > 50) {
+        upcomingEvents.splice(50);
       }
     }
-
-    // Sort events by date
-    upcomingEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     // Calculate global attendance percentage
     const globalAttendancePercentage =
@@ -289,12 +405,28 @@ export async function GET() {
       weeklyAttendanceAverage: weeklyAttendanceAverage,
     };
 
-    return NextResponse.json({
+    const response = {
       cards,
       subjects: processedSubjects,
       upcomingItems: upcomingEvents,
-    });
+    };
+
+    // CACHE: Store in cache for 5 minutes (300 seconds)
+    try {
+      await redis.set(cacheKey, response, { ex: 300 });
+    } catch {
+      // Cache not available, continue without caching
+    }
+
+    return NextResponse.json(response);
   } catch (error: unknown) {
-    return NextResponse.json({ error: 'Error al cargar los datos del dashboard' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+    return NextResponse.json(
+      {
+        error: 'Error al cargar los datos del dashboard',
+        details: errorMessage,
+      },
+      { status: 500 }
+    );
   }
 }

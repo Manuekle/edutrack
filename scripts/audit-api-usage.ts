@@ -146,8 +146,6 @@ const searchBases = [
   path.join(__dirname, '../lib'),
 ];
 
-console.log('🔎 Auditando endpoints API en uso...\n');
-
 const endpoints = getApiEndpoints(apiBase);
 
 const report: {
@@ -161,45 +159,9 @@ endpoints.forEach(({ endpoint, routeFile }) => {
   report.push({ endpoint, routeFile, usages });
 });
 
-// 4. Imprimir reporte
-report.forEach(({ endpoint, routeFile, usages }) => {
-  const status = usages.length === 0 ? 'NO USADO' : `Usado en ${usages.length} archivo(s)`;
-  console.log(
-    `\n${endpoint}\n  Archivo: ${path.relative(process.cwd(), routeFile)}\n  Estado: ${status}`
-  );
-  if (usages.length > 0) {
-    usages.forEach(u => {
-      const tipo = u.type === 'exact' ? 'coincidencia exacta' : 'coincidencia laxa';
-      console.log(`    - ${path.relative(process.cwd(), u.file)} (${u.count} vez/veces, ${tipo})`);
-    });
-  }
-});
-
-// 5. Resumen final
+// 4. Resumen final
 const unused = report.filter(
   r => r.usages.length === 0 && r.endpoint !== '/api/auth/[...nextauth]'
 );
 
-console.log('\n\n📊 === RESUMEN DE ENDPOINTS API EN USO ===');
 const used = report.filter(r => r.usages.length > 0);
-used.forEach(r => {
-  console.log(`\n✅ Endpoint: ${r.endpoint}`);
-  console.log(`   📄 Archivo: ${path.relative(process.cwd(), r.routeFile)}`);
-  console.log(`   🗂️ Usado en:`);
-  r.usages.forEach(u => {
-    const tipo = u.type === 'exact' ? '🔎 exacta' : '🧩 laxa/template';
-    console.log(`     - 📄 ${path.relative(process.cwd(), u.file)} (${tipo})`);
-  });
-});
-
-console.log('\n=== 🏁 FIN DEL RESUMEN ===\n');
-
-console.log(`  Total endpoints: ${endpoints.length}`);
-console.log(`  Endpoints en uso: ${used.length}`);
-console.log(`  Endpoints NO usados: ${unused.length}`);
-if (unused.length > 0) {
-  console.log(`\n  ❌ Endpoints candidatos a eliminar:`);
-  unused.forEach(u => {
-    console.log(`    - ${u.endpoint} (${path.relative(process.cwd(), u.routeFile)})`);
-  });
-}

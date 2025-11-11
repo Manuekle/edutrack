@@ -1,5 +1,6 @@
 import JustifyClassEmail from '@/app/emails/JustifyClassEmail';
 import { authOptions } from '@/lib/auth';
+import { clearSubjectCache } from '@/lib/cache';
 import { sendEmail } from '@/lib/email';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -128,6 +129,9 @@ export async function POST(request: Request) {
       },
     });
 
+    // CACHE: Invalidate cache for this subject (affects student and teacher)
+    await clearSubjectCache(classInfo.subjectId);
+
     // Enviar correo al profesor
     if (classWithSubject.subject.teacher?.correoInstitucional) {
       try {
@@ -155,7 +159,6 @@ export async function POST(request: Request) {
           }),
         });
       } catch (error) {
-        console.error('Error al enviar el correo:', error);
         // No fallar la petición si hay error en el envío de correo
       }
     }
@@ -165,7 +168,6 @@ export async function POST(request: Request) {
       message: 'Ausencia justificada correctamente',
     });
   } catch (error) {
-    console.error('Error al procesar la justificación:', error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }

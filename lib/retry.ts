@@ -13,10 +13,8 @@ export async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, delay =
       return await fn();
     } catch (error) {
       lastError = error;
-      console.warn(`Attempt ${attempt} failed:`, error);
 
       if (attempt < maxRetries) {
-        console.log(`Retrying in ${delay}ms... (${attempt}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }

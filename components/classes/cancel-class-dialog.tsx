@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -9,19 +9,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface CancelClassDialogProps {
-  isOpen: boolean
-  classTopic: string
-  classDate: string
-  cancelReason: string
-  isSubmitting: boolean
-  onReasonChange: (reason: string) => void
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
+  isOpen: boolean;
+  classTopic: string;
+  classDate: string;
+  cancelReason: string;
+  isSubmitting: boolean;
+  onReasonChange: (reason: string) => void;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
 }
 
 export function CancelClassDialog({
@@ -36,12 +36,15 @@ export function CancelClassDialog({
 }: CancelClassDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent onCloseAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent onCloseAutoFocus={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-tight">Cancelar Clase</DialogTitle>
+          <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
+            Cancelar Clase
+          </DialogTitle>
           <DialogDescription className="font-sans text-xs text-muted-foreground">
-            Estás a punto de cancelar la clase de <strong>{classTopic}</strong> del <strong>{classDate}</strong>. Se
-            enviará una notificación a todos los estudiantes matriculados.
+            Estás a punto de cancelar la clase de <strong>{classTopic}</strong> del{' '}
+            <strong>{classDate}</strong>. Se enviará una notificación a todos los estudiantes
+            matriculados.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4 space-y-2 font-sans">
@@ -54,7 +57,7 @@ export function CancelClassDialog({
             placeholder="Ej: calamidad doméstica, problemas de salud, etc."
             value={cancelReason}
             className="resize-none h-24"
-            onChange={(e) => onReasonChange(e.target.value)}
+            onChange={e => onReasonChange(e.target.value)}
             aria-required={true}
             aria-describedby="cancel-reason-description"
           />
@@ -74,10 +77,10 @@ export function CancelClassDialog({
             className="bg-rose-600 text-white hover:bg-rose-700 font-sans"
             aria-label="Confirmar cancelación de clase"
           >
-            {isSubmitting ? "Cancelando..." : "Confirmar Cancelación"}
+            {isSubmitting ? 'Cancelando...' : 'Confirmar Cancelación'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

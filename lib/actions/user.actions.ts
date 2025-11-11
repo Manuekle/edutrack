@@ -54,7 +54,6 @@ export async function uploadSignature(formData: FormData) {
           });
         }
       } catch (error) {
-        console.error('Error deleting old signature:', error);
         // Continue even if deletion fails
       }
     }
@@ -62,7 +61,6 @@ export async function uploadSignature(formData: FormData) {
     revalidatePath('/dashboard/profile');
     return { success: true, url: blob.url };
   } catch (error) {
-    console.error('Error uploading signature:', error);
     return { success: false, message: 'Failed to upload signature.' };
   }
 }

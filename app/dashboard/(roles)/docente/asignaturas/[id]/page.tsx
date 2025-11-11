@@ -217,7 +217,6 @@ export default function SubjectDetailPage() {
         classes={tableClasses}
         isLoading={isLoadingClasses}
         subjectId={subjectId}
-        handleEdit={classManagement.handleEditClass}
         handleCancel={classManagement.handleCancelClass}
         handleMarkAsDone={classManagement.handleMarkClassAsDone}
         classStatusMap={classStatusMap}
@@ -232,21 +231,7 @@ export default function SubjectDetailPage() {
           if (!open) classManagement.setClassToCancel(null);
         }}
         onConfirmCancel={classManagement.handleConfirmCancel}
-        isEditDialogOpen={classManagement.isEditClassDialogOpen}
-        onEditDialogOpenChange={classManagement.setIsEditClassDialogOpen}
-        classDate={classManagement.classDate || new Date()}
-        setClassDate={classManagement.setClassDate}
-        startTime={classManagement.startTime}
-        setStartTime={classManagement.setStartTime}
-        endTime={classManagement.endTime}
-        setEndTime={classManagement.setEndTime}
-        classTopic={classManagement.classTopic}
-        setClassTopic={classManagement.setClassTopic}
-        classDescription={classManagement.classDescription}
-        setClassDescription={classManagement.setClassDescription}
         isSubmitting={classManagement.isSubmitting}
-        onSubmitEdit={classManagement.handleSubmitEdit}
-        resetEditForm={classManagement.resetEditForm}
         formatClassDate={cls =>
           dateUtils.formatDisplayDate(
             typeof cls.date === 'string' ? dateUtils.createLocalDate(cls.date) : cls.date

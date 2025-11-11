@@ -1,6 +1,7 @@
 'use client';
 
 import { FileUpload } from '@/components/ui/file-upload';
+import { toast } from 'sonner';
 import { useState } from 'react';
 
 interface UploadedFile {
@@ -50,8 +51,13 @@ export function SubjectFileUpload({ onFileSelect, file }: SubjectFileUploadProps
   };
 
   const handleDropUnacceptedFiles = (files: FileList) => {
-    console.log('Unaccepted files', files);
-    // You can add a toast notification here to inform the user.
+    if (files.length > 0) {
+      const fileName = files[0].name;
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      toast.error(
+        `Tipo de archivo no válido: ${fileName}. Solo se permiten archivos .xlsx o .csv.`
+      );
+    }
   };
 
   const handleDeleteFile = () => {
@@ -63,8 +69,8 @@ export function SubjectFileUpload({ onFileSelect, file }: SubjectFileUploadProps
     <FileUpload.Root>
       <div className="flex flex-col gap-1.5">
         <FileUpload.DropZone
-          accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          hint="Solo se permiten archivos .xlsx"
+          accept=".xlsx,.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
+          hint="Solo se permiten archivos .xlsx o .csv"
           onDropFiles={handleDropFiles}
           onDropUnacceptedFiles={handleDropUnacceptedFiles}
           className="mb-4"

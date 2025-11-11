@@ -1,5 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
+import { redis } from '@/lib/redis';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
@@ -44,6 +45,18 @@ export async function GET() {
 
     if (!session || session.user.role !== 'DOCENTE') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    // CACHE: Try to get from cache first (5 minutes TTL)
+    const cacheKey = `dashboard:docente:${session.user.id}`;
+    let cached = null;
+    try {
+      cached = await redis.get(cacheKey);
+      if (cached) {
+        return NextResponse.json(cached);
+      }
+    } catch {
+      // Cache not available, continue without cache
     }
 
     // Obtener las asignaturas del docente
@@ -194,13 +207,21 @@ export async function GET() {
       )
       .slice(0, 3);
 
-    return NextResponse.json({
+    const response = {
       subjects: processedSubjects,
       lowProgressClasses,
       upcomingClasses,
-    });
+    };
+
+    // CACHE: Store in cache for 5 minutes (300 seconds)
+    try {
+      await redis.set(cacheKey, response, { ex: 300 });
+    } catch {
+      // Cache not available, continue without caching
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error('Error en el dashboard del docente:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

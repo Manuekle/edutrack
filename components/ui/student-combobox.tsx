@@ -50,7 +50,7 @@ export function StudentCombobox({
         setStudents(data.students);
       }
     } catch (e) {
-      console.error('Error fetching students:', e);
+      // Error fetching students
     } finally {
       setLoading(false);
     }

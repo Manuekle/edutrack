@@ -15,9 +15,10 @@ export default function Providers({ children }: Props) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minuto
+            staleTime: 5 * 60 * 1000, // 5 minutos (alineado con TTL de caché Redis)
             refetchOnWindowFocus: false,
             retry: 1,
+            gcTime: 10 * 60 * 1000, // 10 minutos (antes cacheTime)
           },
         },
       })
@@ -31,6 +32,7 @@ export default function Providers({ children }: Props) {
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          storageKey="theme"
         >
           {children}
         </ThemeProvider>
