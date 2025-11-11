@@ -22,13 +22,15 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run ESLint
         run: npm run lint
+        continue-on-error: false
 
       - name: Run Prettier
         run: npm run format:check
+        continue-on-error: false
 
   type-check:
     name: TypeScript Type Checking
@@ -46,10 +48,11 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run TypeScript Type Checking
         run: npm run type-check
+        continue-on-error: false
 
   build:
     name: Build Project
@@ -67,18 +70,17 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: |
-          npm install
-          # Install Playwright dependencies
-          npx playwright install --with-deps
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        if: contains(github.event.head_commit.message, '[test]') || github.event_name == 'pull_request'
 
       - name: Build
         run: npm run build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          # Required for Playwright in CI
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 'false'
-          PLAYWRIGHT_BROWSERS_PATH: '0'
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://user:password@localhost:5432/db' }}
+          NODE_OPTIONS: '--max-http-header-size=16384'
 
   deploy:
     name: Deploy to Vercel
@@ -90,20 +92,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel
-
-      - name: Install Dependencies
-        run: |
-          npm install
-          # Ensure Playwright dependencies are installed
-          npx playwright install --with-deps
-
       - name: Deploy to Vercel
-        run: |
-          vercel --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        uses: amondnet/vercel-action@v25
+        id: vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
         env:
-          # Required for Playwright in Vercel
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 'false'
-          PLAYWRIGHT_BROWSERS_PATH: '0'
           NODE_OPTIONS: '--max-http-header-size=16384'
