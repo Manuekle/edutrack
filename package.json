@@ -24,7 +24,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:all": "jest --passWithNoTests && playwright test",
-    "validate": "pnpm run lint && pnpm run type-check",
+    "validate": "pnpm run type-check && pnpm run test",
     "prepare": "husky",
     "postbuild": "next-sitemap",
     "postinstall": "prisma generate",

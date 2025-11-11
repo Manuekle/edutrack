@@ -14,6 +14,6 @@ const nextConfig: NextConfig = {
     // Opcional: también puedes ignorar errores de TypeScript durante el build
     // ignoreBuildErrors: true,
   },
-};
+} as NextConfig;
 
 export default nextConfig;

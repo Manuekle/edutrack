@@ -96,12 +96,13 @@ describe('Flujo de integración de usuario', () => {
 
       // EventForm se usa dentro de un Dialog, pero podemos testearlo directamente
       // usando el patrón que usa EventsTable
-      const { Dialog, DialogContent } = require('@/components/ui/dialog');
+      const { Dialog, DialogContent, DialogDescription } = require('@/components/ui/dialog');
 
       render(
         <QueryClientProvider client={queryClient}>
           <Dialog open={true}>
             <DialogContent>
+              <DialogDescription>Formulario para crear un nuevo evento</DialogDescription>
               <EventForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
             </DialogContent>
           </Dialog>

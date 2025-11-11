@@ -110,10 +110,10 @@ describe('API /api/asistencia/scan', () => {
         studentIds: ['test-student-id'],
       };
 
-      mockPrisma.class.findFirst.mockResolvedValue(mockClass);
-      mockPrisma.subject.findUnique.mockResolvedValue(mockSubject);
-      mockPrisma.attendance.findFirst.mockResolvedValue(null); // No hay asistencia previa
-      mockPrisma.attendance.create.mockResolvedValue({
+      (mockPrisma.class.findFirst as jest.Mock).mockResolvedValue(mockClass);
+      (mockPrisma.subject.findUnique as jest.Mock).mockResolvedValue(mockSubject);
+      (mockPrisma.attendance.findFirst as jest.Mock).mockResolvedValue(null); // No hay asistencia previa
+      (mockPrisma.attendance.create as jest.Mock).mockResolvedValue({
         id: 'attendance-id',
         classId: 'class-id',
         studentId: 'test-student-id',
@@ -162,7 +162,7 @@ describe('API /api/asistencia/scan', () => {
     });
 
     it('debería retornar 400 si el token QR es inválido o expirado', async () => {
-      mockPrisma.class.findFirst.mockResolvedValue(null); // No se encuentra la clase
+      (mockPrisma.class.findFirst as jest.Mock).mockResolvedValue(null); // No se encuentra la clase
 
       const request = new NextRequest('http://localhost:3000/api/asistencia/scan', {
         method: 'POST',
@@ -199,8 +199,8 @@ describe('API /api/asistencia/scan', () => {
         studentIds: ['other-student-id'], // El estudiante no está matriculado
       };
 
-      mockPrisma.class.findFirst.mockResolvedValue(mockClass);
-      mockPrisma.subject.findUnique.mockResolvedValue(mockSubject);
+      (mockPrisma.class.findFirst as jest.Mock).mockResolvedValue(mockClass);
+      (mockPrisma.subject.findUnique as jest.Mock).mockResolvedValue(mockSubject);
 
       const request = new NextRequest('http://localhost:3000/api/asistencia/scan', {
         method: 'POST',
@@ -268,9 +268,9 @@ describe('API /api/asistencia/scan', () => {
         studentId: 'test-student-id',
       };
 
-      mockPrisma.class.findFirst.mockResolvedValue(mockClass);
-      mockPrisma.subject.findUnique.mockResolvedValue(mockSubject);
-      mockPrisma.attendance.findFirst.mockResolvedValue(existingAttendance);
+      (mockPrisma.class.findFirst as jest.Mock).mockResolvedValue(mockClass);
+      (mockPrisma.subject.findUnique as jest.Mock).mockResolvedValue(mockSubject);
+      (mockPrisma.attendance.findFirst as jest.Mock).mockResolvedValue(existingAttendance);
 
       const request = new NextRequest('http://localhost:3000/api/asistencia/scan', {
         method: 'POST',
@@ -312,8 +312,8 @@ describe('API /api/asistencia/scan', () => {
         studentIds: ['test-student-id'],
       };
 
-      mockPrisma.class.findFirst.mockResolvedValue(mockClass);
-      mockPrisma.subject.findUnique.mockResolvedValue(mockSubject);
+      (mockPrisma.class.findFirst as jest.Mock).mockResolvedValue(mockClass);
+      (mockPrisma.subject.findUnique as jest.Mock).mockResolvedValue(mockSubject);
 
       const request = new NextRequest('http://localhost:3000/api/asistencia/scan', {
         method: 'POST',
@@ -354,8 +354,8 @@ describe('API /api/asistencia/scan', () => {
         studentIds: ['test-student-id'],
       };
 
-      mockPrisma.class.findFirst.mockResolvedValue(mockClass);
-      mockPrisma.subject.findUnique.mockResolvedValue(mockSubject);
+      (mockPrisma.class.findFirst as jest.Mock).mockResolvedValue(mockClass);
+      (mockPrisma.subject.findUnique as jest.Mock).mockResolvedValue(mockSubject);
 
       const request = new NextRequest('http://localhost:3000/api/asistencia/scan', {
         method: 'POST',

@@ -4,7 +4,13 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EventForm } from '@/components/events/event-form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const createTestQueryClient = () =>
@@ -34,6 +40,7 @@ describe('EventForm', () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Crear Evento</DialogTitle>
+              <DialogDescription>Formulario para crear un nuevo evento</DialogDescription>
             </DialogHeader>
             <EventForm
               onSubmit={mockOnSubmit}
