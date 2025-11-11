@@ -34,10 +34,30 @@
    - Índices de base de datos
    - Optimización de componentes React
 
-6. **[Variables de Entorno](./ENV_VARIABLES.md)**
-   - Configuración de variables de entorno
-   - Configuración de Redis
-   - Configuración de SMTP
+6. **[Estado del Proyecto](./06_PROJECT_STATUS.md)**
+   - Análisis de completitud
+   - Funcionalidades completadas y pendientes
+   - Estimaciones de tiempo
+
+7. **[Lista de Verificación](./07_COMPLETION_CHECKLIST.md)**
+   - Tareas completadas
+   - Tareas en progreso
+   - Tareas pendientes
+
+8. **[Resumen de Tareas Pendientes](./08_PENDING_TASKS_SUMMARY.md)**
+   - Resumen ejecutivo de tareas pendientes
+   - Plan de acción recomendado
+   - Prioridades y tiempos estimados
+
+9. **[Tareas Pendientes Detalladas](./PENDING_TASKS.md)**
+   - Lista completa de tareas pendientes
+   - Descripción detallada de cada tarea
+   - Plan de implementación
+
+10. **[Variables de Entorno](./ENV_VARIABLES.md)**
+    - Configuración de variables de entorno
+    - Configuración de Redis
+    - Configuración de SMTP
 
 ---
 
@@ -103,11 +123,15 @@ graph TD
 - Dashboard con métricas
 - Exportación de datos
 
-### **[Epic 7: Comunicaciones](./user_stories/EPIC_07_COMMUNICATION.md)** 🚧 EN DESARROLLO
+### **[Epic 7: Comunicaciones](./user_stories/EPIC_07_COMMUNICATION.md)** 🚧 EN DESARROLLO (60%)
 
-- Notificaciones por email
-- Integración WhatsApp Business
-- Plantillas personalizadas
+- ✅ Notificaciones por email (parcialmente implementado)
+- ✅ Sistema de cola de correos con reintentos
+- ❌ Integración WhatsApp Business
+- ❌ Panel de gestión de suscripciones
+- ❌ Plantillas personalizadas avanzadas
+- ❌ Programación de notificaciones
+- ❌ Notificaciones push
 
 ### **[Epic 8: Administración](./user_stories/EPIC_08_ADMINISTRATION.md)** ✅ COMPLETADO
 
@@ -146,17 +170,22 @@ Ver [Documentación de Optimizaciones](./05_OPTIMIZATIONS.md) para más detalles
 
 ### En Desarrollo 🚧
 
-- Sistema de notificaciones por email (parcialmente implementado)
-- Integración con WhatsApp Business
-- Testing automatizado completo
+- Sistema de notificaciones por email (60% - parcialmente implementado)
+- Testing automatizado completo (10% - pendiente)
+- React Query para caché del lado del cliente (30% - hooks creados)
+- Migración de formularios a react-hook-form (85% - 3 formularios pendientes)
 
 ### Pendiente ⏳
 
+- Integración con WhatsApp Business
+- Panel de gestión de suscripciones de notificaciones
 - Integración con calendario Outlook
 - Módulo de backup automático
-- React Query para caché del lado del cliente
-- Paginación en listas grandes
+- Autenticación de dos factores (2FA)
+- API pública documentada
+- Webhooks y auditoría de acciones
 - WebSockets/Server-Sent Events para actualizaciones en tiempo real
+- Mejoras de UX/UI (animaciones, accesibilidad, i18n)
 
 ---
 
@@ -173,6 +202,8 @@ Ver [Documentación de Optimizaciones](./05_OPTIMIZATIONS.md) para más detalles
 
 8. **[Lista de Verificación](./07_COMPLETION_CHECKLIST.md)** - Lista de verificación para completar el proyecto
 
-9. **[Estado Final](./08_FINAL_STATUS.md)** - Estado final del proyecto y próximos pasos
+9. **[Resumen de Tareas Pendientes](./08_PENDING_TASKS_SUMMARY.md)** - Resumen ejecutivo de tareas pendientes
+
+10. **[Tareas Pendientes Detalladas](./PENDING_TASKS.md)** - Lista completa de tareas pendientes con plan de implementación
 
 ---

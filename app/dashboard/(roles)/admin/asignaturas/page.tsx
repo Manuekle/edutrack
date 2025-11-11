@@ -22,35 +22,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useSubjects } from '@/hooks/use-subjects';
+import { useQueryClient } from '@tanstack/react-query';
 import { BookOpen, GraduationCap, Search, Users } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
 
-interface Teacher {
-  id: string;
-  name: string;
-  correoInstitucional: string;
-  codigoDocente: string;
-}
-
-interface Subject {
-  id: string;
-  name: string;
-  code: string;
-  program?: string | null;
-  semester?: number | null;
-  credits?: number | null;
-  teacherId: string;
-  teacher: Teacher;
-  studentCount: number;
-  classCount: number;
-}
-
 export default function GestionAsignaturasPage() {
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -58,60 +38,19 @@ export default function GestionAsignaturasPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  const handleSubjectCreated = (newSubject: Subject) => {
-    // Refrescar la lista desde el servidor para mantener la paginación consistente
-    setCurrentPage(1);
-    // El useEffect se encargará de recargar los datos
-  };
-
-  const [pagination, setPagination] = useState<{
-    total: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  }>({
-    total: 0,
-    totalPages: 0,
-    hasNextPage: false,
-    hasPreviousPage: false,
+  // Usar React Query para obtener asignaturas
+  const { subjects, pagination, isLoading, refetch } = useSubjects({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchTerm,
+    enabled: true,
   });
 
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: itemsPerPage.toString(),
-        });
-
-        if (searchTerm) {
-          params.append('search', searchTerm);
-        }
-
-        const response = await fetch(`/api/admin/subjects?${params.toString()}`);
-        if (!response.ok) {
-          throw new Error('Error al obtener las asignaturas');
-        }
-        const result = await response.json();
-        setSubjects(result.data || []);
-        setPagination(
-          result.pagination || {
-            total: 0,
-            totalPages: 0,
-            hasNextPage: false,
-            hasPreviousPage: false,
-          }
-        );
-      } catch {
-        toast.error('Error al cargar las asignaturas');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSubjects();
-  }, [currentPage, itemsPerPage, searchTerm]);
+  const handleSubjectCreated = () => {
+    // Invalidar la query para refrescar los datos
+    queryClient.invalidateQueries({ queryKey: ['subjects'] });
+    setCurrentPage(1);
+  };
 
   // Resetear a la primera página cuando cambia el término de búsqueda
   useEffect(() => {
@@ -149,9 +88,9 @@ export default function GestionAsignaturasPage() {
                 Lista de Asignaturas
               </CardTitle>
               <CardDescription className="text-xs">
-                {pagination.total} asignatura
-                {pagination.total !== 1 ? 's' : ''} encontrada
-                {pagination.total !== 1 ? 's' : ''}
+                {pagination?.total || 0} asignatura
+                {pagination?.total !== 1 ? 's' : ''} encontrada
+                {pagination?.total !== 1 ? 's' : ''}
               </CardDescription>
             </div>
             <div className="relative w-full md:w-auto">
@@ -196,7 +135,7 @@ export default function GestionAsignaturasPage() {
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-md hidden sm:block">
               Página <span className="font-normal">{currentPage}</span> de{' '}
-              <span className="font-normal">{pagination.totalPages || 1}</span>
+              <span className="font-normal">{pagination?.totalPages || 1}</span>
             </div>
           </div>
 
@@ -220,7 +159,7 @@ export default function GestionAsignaturasPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
+                {isLoading ? (
                   Array.from({ length: itemsPerPage }).map((_, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-xs px-4 py-3">
@@ -292,8 +231,11 @@ export default function GestionAsignaturasPage() {
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center gap-2">
                           <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                          <span className="truncate max-w-[150px]" title={subject.teacher.name}>
-                            {subject.teacher.name}
+                          <span
+                            className="truncate max-w-[150px]"
+                            title={subject.teacher?.name || ''}
+                          >
+                            {subject.teacher?.name || 'Sin docente'}
                           </span>
                         </div>
                       </TableCell>
@@ -324,7 +266,7 @@ export default function GestionAsignaturasPage() {
           <div className="border-t">
             <TablePagination
               currentPage={currentPage}
-              totalItems={pagination.total}
+              totalItems={pagination?.total || 0}
               itemsPerPage={itemsPerPage}
               onPageChange={handlePageChange}
             />

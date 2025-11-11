@@ -30,18 +30,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useUsers } from '@/hooks/use-users';
+import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
 import { MoreHorizontal, Search, UserCheck, UserCog, User as UserIcon, UserX } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
 
 export default function GestionUsuariosPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -51,87 +51,27 @@ export default function GestionUsuariosPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
+  // Usar React Query para obtener usuarios
+  const { users, pagination, isLoading, toggleActive, isTogglingActive, refetch } = useUsers({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchTerm,
+    enabled: true,
+  });
+
   const handleUserUpdate = (updatedUser: User) => {
-    setUsers(currentUsers =>
-      currentUsers.map(u => (u.id === updatedUser.id ? { ...u, role: updatedUser.role } : u))
-    );
+    // Invalidar la query para refrescar los datos
+    queryClient.invalidateQueries({ queryKey: ['users'] });
   };
 
   const handleUserCreated = (newUser: User) => {
-    setUsers(currentUsers => [newUser, ...currentUsers]);
+    // Invalidar la query para refrescar los datos
+    queryClient.invalidateQueries({ queryKey: ['users'] });
   };
 
   const handleToggleActive = async (user: User) => {
-    try {
-      const response = await fetch(`/api/admin/users/${user.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: !user.isActive }),
-      });
-
-      if (!response.ok) {
-        toast.error('Error al actualizar el estado del usuario.');
-        return;
-      }
-
-      const updatedUser = await response.json();
-      setUsers(currentUsers => currentUsers.map(u => (u.id === updatedUser.id ? updatedUser : u)));
-      toast.success(
-        `Usuario ${updatedUser.name} ${updatedUser.isActive ? 'activado' : 'desactivado'} correctamente.`
-      );
-    } catch (error) {
-      toast.error('Ha ocurrido un error inesperado.');
-    }
+    toggleActive({ userId: user.id, isActive: !user.isActive });
   };
-
-  const [pagination, setPagination] = useState<{
-    total: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  }>({
-    total: 0,
-    totalPages: 0,
-    hasNextPage: false,
-    hasPreviousPage: false,
-  });
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: itemsPerPage.toString(),
-        });
-
-        if (searchTerm) {
-          params.append('search', searchTerm);
-        }
-
-        const response = await fetch(`/api/admin/users?${params.toString()}`);
-        if (!response.ok) {
-          throw new Error('Error al obtener los usuarios');
-        }
-        const result = await response.json();
-        setUsers(result.data || []);
-        setPagination(
-          result.pagination || {
-            total: 0,
-            totalPages: 0,
-            hasNextPage: false,
-            hasPreviousPage: false,
-          }
-        );
-      } catch (error) {
-        toast.error('Error al cargar los usuarios');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, [currentPage, itemsPerPage, searchTerm]);
 
   // Resetear a la primera página cuando cambia el término de búsqueda
   useEffect(() => {
@@ -174,9 +114,9 @@ export default function GestionUsuariosPage() {
                 Lista de Usuarios
               </CardTitle>
               <CardDescription className="text-xs">
-                {pagination.total} usuario
-                {pagination.total !== 1 ? 's' : ''} encontrado
-                {pagination.total !== 1 ? 's' : ''}
+                {pagination?.total || 0} usuario
+                {pagination?.total !== 1 ? 's' : ''} encontrado
+                {pagination?.total !== 1 ? 's' : ''}
               </CardDescription>
             </div>
             <div className="relative w-full md:w-auto">
@@ -221,7 +161,7 @@ export default function GestionUsuariosPage() {
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-md hidden sm:block">
               Página <span className="font-normal">{currentPage}</span> de{' '}
-              <span className="font-normal">{pagination.totalPages || 1}</span>
+              <span className="font-normal">{pagination?.totalPages || 1}</span>
             </div>
           </div>
 
@@ -240,7 +180,7 @@ export default function GestionUsuariosPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading ? (
+                {isLoading ? (
                   Array.from({ length: itemsPerPage }).map((_, index) => (
                     <TableRow key={index}>
                       <TableCell className="text-xs px-4 py-3">
@@ -375,6 +315,7 @@ export default function GestionUsuariosPage() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleToggleActive(user)}
+                                disabled={isTogglingActive}
                                 className={cn(
                                   'cursor-pointer',
                                   user.isActive ? 'text-red-600' : 'text-green-600'
@@ -403,7 +344,7 @@ export default function GestionUsuariosPage() {
           <div className="px-4 py-3 border-t">
             <TablePagination
               currentPage={currentPage}
-              totalItems={pagination.total}
+              totalItems={pagination?.total || 0}
               itemsPerPage={itemsPerPage}
               onPageChange={handlePageChange}
             />

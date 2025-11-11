@@ -5,6 +5,7 @@ import type React from 'react';
 import { toLocalClass } from '@/lib/class-converters';
 import type { ClassStatus } from '@/lib/class-utils';
 import type { LocalClassWithStatus, TableClassWithStatus } from '@/types/class';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -12,9 +13,16 @@ interface UseClassManagementProps {
   classes: LocalClassWithStatus[];
   setClasses: React.Dispatch<React.SetStateAction<LocalClassWithStatus[]>>;
   fetchClasses: () => Promise<void>;
+  subjectId?: string;
 }
 
-export function useClassManagement({ classes, setClasses, fetchClasses }: UseClassManagementProps) {
+export function useClassManagement({
+  classes,
+  setClasses,
+  fetchClasses,
+  subjectId,
+}: UseClassManagementProps) {
+  const queryClient = useQueryClient();
   const [classToCancel, setClassToCancel] = useState<LocalClassWithStatus | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +56,12 @@ export function useClassManagement({ classes, setClasses, fetchClasses }: UseCla
         setClasses(prev => prev.map(c => (c.id === classId ? updatedClass : c)));
       }
       toast.success(`La clase ha sido marcada como ${status.toLowerCase()}.`);
+
+      // Invalidar queries de React Query si existe subjectId
+      if (subjectId) {
+        queryClient.invalidateQueries({ queryKey: ['subject-classes', subjectId] });
+      }
+
       await fetchClasses();
     } catch (error) {
       setClasses(originalClasses);

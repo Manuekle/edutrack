@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ClassesTable } from '@/components/classes/classes-table';
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { useClassManagement } from '@/hooks/use-class-management';
-import { useSubjectData } from '@/hooks/use-subject-data';
+import { useSubjectDetail } from '@/hooks/use-subject-detail';
 import { toTableClass } from '@/lib/class-converters';
 import { classStatusMap } from '@/lib/class-utils';
 import * as dateUtils from '@/lib/time-utils';
@@ -22,33 +22,49 @@ export default function SubjectDetailPage() {
   const params = useParams();
   const subjectId = Array.isArray(params?.id) ? params.id[0] : params?.id || '';
 
-  // Subject data hook
+  // Subject data hook with React Query
   const {
     subject,
     enrolledStudents,
     classes,
-    setClasses,
     isLoadingSubject,
     isLoadingStudents,
     isLoadingClasses,
     hasScheduledClasses,
     reportExistsForCurrentPeriod,
-    setReportExistsForCurrentPeriod,
     error,
-    fetchClasses,
-    fetchEnrolledStudents,
-  } = useSubjectData(subjectId);
+    refetchClasses,
+    generateReport,
+    isGeneratingReport,
+    unenrollStudent,
+    isUnenrolling,
+  } = useSubjectDetail({
+    subjectId,
+    enabled: !!subjectId,
+  });
+
+  // Local state for classes management - sync with React Query data
+  const [localClasses, setLocalClasses] = useState(classes);
+
+  // Sync local classes when React Query data changes
+  useEffect(() => {
+    if (classes.length > 0) {
+      setLocalClasses(classes);
+    }
+  }, [classes]);
 
   // Class management hook
   const classManagement = useClassManagement({
-    classes,
-    setClasses,
-    fetchClasses,
+    classes: localClasses,
+    setClasses: setLocalClasses,
+    fetchClasses: async () => {
+      await refetchClasses();
+    },
+    subjectId,
   });
 
   // Report modal state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
   // Student unenroll state
   const [currentStudentForUnenroll, setCurrentStudentForUnenroll] = useState<{
@@ -56,9 +72,8 @@ export default function SubjectDetailPage() {
     name: string;
   } | null>(null);
   const [unenrollReason, setUnenrollReason] = useState('');
-  const [isSubmittingUnenroll, setIsSubmittingUnenroll] = useState(false);
 
-  const handleGenerateReport = useCallback(async () => {
+  const handleGenerateReport = async () => {
     if (!subject) return;
 
     if (hasScheduledClasses) {
@@ -72,66 +87,26 @@ export default function SubjectDetailPage() {
       return;
     }
 
-    setIsSubmittingReport(true);
-    try {
-      const response = await fetch(`/api/docente/reportes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjectId: subject.id,
-          format: 'PDF',
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Error al generar el reporte');
-      }
-
-      toast.success('El reporte se está generando. Recibirás un correo cuando esté listo.');
-      setIsReportModalOpen(false);
-      setReportExistsForCurrentPeriod(true);
-      router.push('/dashboard/docente/reportes');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Error al generar el reporte');
-    } finally {
-      setIsSubmittingReport(false);
-    }
-  }, [
-    subject,
-    router,
-    hasScheduledClasses,
-    reportExistsForCurrentPeriod,
-    setReportExistsForCurrentPeriod,
-  ]);
+    generateReport(subjectId, {
+      onSuccess: () => {
+        setIsReportModalOpen(false);
+        router.push('/dashboard/docente/reportes');
+      },
+    });
+  };
 
   const handleUnenrollRequest = async (studentId: string, reason: string) => {
     if (!subjectId) return;
 
-    setIsSubmittingUnenroll(true);
-    try {
-      const response = await fetch('/api/docente/solicitudes/desmatricula', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subjectId, studentId, reason }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al enviar la solicitud de desmatriculación');
+    unenrollStudent(
+      { studentId, reason },
+      {
+        onSuccess: () => {
+          setUnenrollReason('');
+          setCurrentStudentForUnenroll(null);
+        },
       }
-
-      fetchEnrolledStudents();
-      toast.success('Solicitud de desmatriculación enviada correctamente');
-      setUnenrollReason('');
-      setCurrentStudentForUnenroll(null);
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Error al enviar la solicitud de desmatriculación'
-      );
-    } finally {
-      setIsSubmittingUnenroll(false);
-    }
+    );
   };
 
   // Loading state
@@ -161,8 +136,6 @@ export default function SubjectDetailPage() {
     );
   }
 
-  const tableClasses = classes.map(cls => toTableClass(cls));
-
   return (
     <div className="space-y-6">
       <GenerateReportModal
@@ -170,7 +143,7 @@ export default function SubjectDetailPage() {
         onClose={() => setIsReportModalOpen(false)}
         onGenerate={handleGenerateReport}
         subjectName={subject?.name || 'Cargando asignatura...'}
-        isLoading={isSubmittingReport}
+        isLoading={isGeneratingReport}
       />
 
       <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
@@ -210,11 +183,11 @@ export default function SubjectDetailPage() {
         setUnenrollReason={setUnenrollReason}
         setCurrentStudentForUnenroll={setCurrentStudentForUnenroll}
         handleUnenrollRequest={handleUnenrollRequest}
-        isSubmitting={isSubmittingUnenroll}
+        isSubmitting={isUnenrolling}
       />
 
       <ClassesTable
-        classes={tableClasses}
+        classes={localClasses.map(cls => toTableClass(cls))}
         isLoading={isLoadingClasses}
         subjectId={subjectId}
         handleCancel={classManagement.handleCancelClass}

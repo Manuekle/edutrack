@@ -1,51 +1,44 @@
-# 🎓 Sistema de Gestión de Asistencias (FUP)
+# EduTrack
 
-<div align="center">
-  <img src="https://fup.edu.co/wp-content/uploads/brand-white.svg" alt="Logo FUP" width="150"/>
-  <p>
-    <strong>Proyecto de Grado para la Fundación Universitaria de Popayán</strong>
-  </p>
-  <p>
-    Una solución moderna para automatizar el seguimiento de la asistencia estudiantil mediante roles, QR dinámicos y reportes en tiempo real.
-  </p>
-</div>
+Sistema de gestión de asistencia inteligente para la Fundación Universitaria de la Popayán.
 
----
+## 🚀 Características Principales
 
-## 🎯 Objetivo del Proyecto
+### 👥 **Gestión de Usuarios**
 
-Digitalizar y automatizar el proceso de registro de asistencia en la FUP, eliminando el registro manual tradicional y proporcionando herramientas analíticas para el seguimiento académico estudiantil.
+- ✅ Registro y autenticación de usuarios (Admin, Docente, Estudiante, Coordinador)
+- ✅ Gestión de perfiles y permisos
+- ✅ Carga masiva de usuarios desde archivos Excel/CSV
+- ✅ Gestión de roles y permisos
 
----
+### 📚 **Gestión de Asignaturas**
 
-## ✨ Características Principales
+- ✅ Creación y edición de asignaturas
+- ✅ Asignación de docentes a asignaturas
+- ✅ Matriculación de estudiantes
+- ✅ Carga masiva de asignaturas desde archivos Excel/CSV
+- ✅ Gestión de clases y horarios
 
-### 👤 **Gestión por Roles**
+### 📊 **Control de Asistencia**
 
-- ✅ Sistema de autenticación y autorización con 3 niveles (Admin, Docente, Estudiante).
-- ✅ Paneles de control personalizados para cada rol.
-- ✅ Gestión segura de perfiles y credenciales.
+- ✅ Registro de asistencia mediante código QR
+- ✅ Escaneo de QR en tiempo real
+- ✅ Justificación de ausencias
+- ✅ Reportes de asistencia
+- ✅ Estadísticas de asistencia por estudiante y asignatura
 
-### 📚 **Gestión Académica**
+### 📅 **Eventos y Calendario**
 
-- ✅ Creación y administración de asignaturas.
-- ✅ Inscripción de estudiantes.
-- ✅ Programación y gestión de clases.
-- ✅ Cronograma académico integrado.
+- ✅ Creación y gestión de eventos (exámenes, trabajos, fechas límite)
+- ✅ Visualización de eventos en calendario
+- ✅ Notificaciones de eventos próximos
 
-### 📱 **Sistema QR Inteligente**
+### 📈 **Dashboard y Reportes**
 
-- ✅ Generación automática de códigos QR únicos por clase.
-- ✅ Validación temporal para evitar fraudes.
-- ✅ Regeneración dinámica para mayor seguridad.
-
-### 📊 **Registro, Dashboard y Analíticas**
-
-- ✅ Marcado automático de asistencia vía escaneo QR.
-- ✅ Ajustes y registros manuales para casos especiales.
-- ✅ Dashboard de cumplimiento (docentes al día vs. en mora).
-- ✅ Porcentaje de bitácoras completadas y conteo de temas impartidos.
-- ✅ Reportes estadísticos descargables (PDF, Excel) para docentes y administradores.
+- ✅ Dashboard personalizado por rol
+- ✅ Estadísticas de asistencia
+- ✅ Reportes de asistencia en PDF
+- ✅ Gráficos y visualizaciones de datos
 
 ### 🔔 **Comunicaciones y Notificaciones**
 
@@ -53,211 +46,152 @@ Digitalizar y automatizar el proceso de registro de asistencia en la FUP, elimin
 
 ### 🏫 **Gestión de Aulas y Recursos**
 
-- ✅ Sistema de reserva de aulas con calendario interactivo
-- ✅ Gestión de inventario de recursos tecnológicos (proyectores, equipos, etc.)
-- ✅ Validación de disponibilidad en tiempo real
-- ✅ Notificaciones automáticas de reservas
-- ✅ Panel de administración de solicitudes
+- ✅ Gestión de aulas y recursos
+- ✅ Asignación de recursos a clases
 
-### 🛠️ **Herramientas y Utilidades**
+## 🛠️ Stack Tecnológico
 
-- ✅ Módulo de carga masiva de datos (CSV/Excel) con validación y rollback.
-- ✅ Sistema de observaciones para clases canceladas o no impartidas.
-- ✅ Integración con Outlook para sincronizar eventos académicos.
+- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Base de Datos**: MongoDB (con Prisma)
+- **Autenticación**: NextAuth.js
+- **UI Components**: Radix UI, shadcn/ui
+- **Formularios**: React Hook Form, Zod
+- **Estado**: React Query (TanStack Query)
+- **Testing**: Jest, React Testing Library, Playwright
+- **Estilos**: Tailwind CSS
+- **Email**: Nodemailer, React Email
+- **Almacenamiento**: Vercel Blob Storage
+- **PDF**: @react-pdf/renderer
+- **QR Codes**: qrcode.react
+- **Caché**: Redis (Upstash)
 
----
+## 📦 Instalación
 
-## 📚 Documentación Completa
+1. Clonar el repositorio:
+```bash
+git clone <repository-url>
+cd edutrack
+```
 
-Toda la documentación detallada del proyecto, incluyendo la visión, arquitectura, historias de usuario y especificaciones de la API, se encuentra centralizada en la carpeta `/docs`.
+2. Instalar dependencias:
+```bash
+pnpm install
+```
 
-### **[➡️ Documentación Completa](./docs/README.md)**
+3. Configurar variables de entorno:
+```bash
+cp .env.example .env
+# Editar .env con tus configuraciones
+```
 
----
+4. Configurar la base de datos:
+```bash
+pnpm prisma generate
+pnpm prisma db push
+pnpm prisma db seed
+```
 
-## 📋 Estado del Desarrollo - ACTUALIZADO
+5. Ejecutar el servidor de desarrollo:
+```bash
+pnpm dev
+```
 
-### 📊 Progreso del Proyecto  
-  
-| Fase                       | Progreso | Estado         |  
-| -------------------------- | -------- | -------------- |  
-| **1. Planeación**          | 100%     | ✅ Completado  |  
-| **2. Desarrollo Backend**  | 98%      | ✅ Casi completo |  
-| **3. Desarrollo Frontend** | 95%      | ✅ Casi completo |  
-| **4. Optimizaciones**      | 90%      | ✅ Completado  |  
-| **5. Testing**             | 45%      | 🚧 En progreso |  
-| **6. Despliegue**          | 70%      | 🚧 En progreso |  
-  
-### 🎯 Funcionalidades Completadas  
-  
-#### ✅ Panel de Administración (100%)  
+## 🧪 Testing
 
-- Gestión completa de usuarios (CRUD)  
-- Carga masiva de datos  
-- Dashboard con analíticas  
-- Reportes administrativos
-- Gestión de aulas y recursos tecnológicos
-- Aprobación de solicitudes de reserva
-- Calendario general de ocupación  
-  
-#### ✅ Panel Docente (95%)  
+### Tests Unitarios
+```bash
+pnpm test
+pnpm test:watch
+pnpm test:coverage
+```
 
-- Generación de códigos QR  
-- Control de asistencia manual  
-- Generación de reportes PDF  
-- Dashboard con estadísticas
-- Solicitud de reserva de aulas y recursos
-- Calendario personal de reservas
-- Historial de solicitudes  
-  
-#### ✅ Panel Estudiante (90%)  
+### Tests E2E con Playwright
+```bash
+pnpm test:e2e
+pnpm test:e2e:ui
+pnpm test:e2e:headed
+```
 
-- Escaneo de códigos QR  
-- Historial de asistencias  
-- Visualización de estadísticas personales
-- Dashboard con próximas clases y eventos
+### Ejecutar todos los tests
+```bash
+pnpm test:all
+```
 
-#### ✅ Optimizaciones de Rendimiento (90%)
+## 📝 Scripts Disponibles
 
-- **Sistema de caché Redis** para dashboards (TTL: 5 minutos)
-- **Eliminación de N+1 queries** en APIs críticas
-- **Índices de base de datos** para mejorar rendimiento
-- **Separación de componentes React** para mejor mantenibilidad
-- **Optimización de polling** (reducción del 80% en requests)
-- **Persistencia de tema** (modo oscuro/claro)
-- **Invalidación automática de caché** cuando se actualizan datos
-- **Soporte para 200+ usuarios simultáneos**
+- `pnpm dev` - Inicia el servidor de desarrollo
+- `pnpm build` - Construye la aplicación para producción
+- `pnpm start` - Inicia el servidor de producción
+- `pnpm lint` - Ejecuta el linter
+- `pnpm type-check` - Verifica los tipos de TypeScript
+- `pnpm test` - Ejecuta tests unitarios
+- `pnpm test:e2e` - Ejecuta tests E2E
+- `pnpm test:all` - Ejecuta todos los tests
 
-**Métricas de Rendimiento**:
-- Reducción del 90% en tiempo de respuesta (con caché)
-- Reducción del 80% en requests al servidor
-- Reducción del 95% en queries a la base de datos
+## 🔧 Configuración
 
-Ver [Documentación de Optimizaciones](./docs/05_OPTIMIZATIONS.md) para más detalles.
+### Variables de Entorno
 
-#### 🚧 Funcionalidades en Desarrollo  
+Ver [Documentación de Variables de Entorno](./docs/ENV_VARIABLES.md) para más detalles.
 
-- Notificaciones por email (parcialmente implementado)
-- Integración con calendario Outlook  
-- Testing automatizado completo  
+### Redis (Opcional)
 
-#### ⏳ Funcionalidades Pendientes
+Para usar caché con Redis:
+1. Configurar `KV_REST_API_URL` y `KV_REST_API_TOKEN` en `.env`
+2. La aplicación funciona sin Redis, pero sin caché
 
+## 📚 Documentación
+
+- [README de Documentación](./docs/README.md)
+- [Estado del Proyecto](./docs/06_PROJECT_STATUS.md)
+- [Lista de Verificación](./docs/07_COMPLETION_CHECKLIST.md)
+- [Resumen de Tareas Pendientes](./docs/08_PENDING_TASKS_SUMMARY.md)
+- [Optimizaciones](./docs/05_OPTIMIZATIONS.md)
+
+## 🚧 Estado del Proyecto
+
+### ✅ Completado (95%)
+
+- Gestión de usuarios y asignaturas
+- Control de asistencia con QR
+- Dashboard y reportes
+- Sistema de eventos
+- Notificaciones por email
+- Carga masiva de datos (Excel/CSV)
+- Optimizaciones de rendimiento
+- Migración a React Query (30% - hooks creados, componentes migrados)
+- Migración de formularios a react-hook-form (100%)
+- Tests unitarios (53+ tests pasando)
+- Tests de APIs con mocks completos (Prisma, Next.js, NextAuth)
+- Tests E2E con Playwright (flujos principales configurados)
+
+### 🚧 Funcionalidades en Desarrollo
+
+- Notificaciones por email (parcialmente implementado - 60%)
+- Testing automatizado completo (31 tests unitarios, tests E2E configurados)
+- React Query para caché del lado del cliente (30% - hooks creados, falta migrar más componentes)
+- Migración de formularios a react-hook-form (100% - completado)
+
+### ⏳ Funcionalidades Pendientes
+
+- Integración con WhatsApp Business
+- Panel de gestión de suscripciones de notificaciones
+- Integración con calendario Outlook
 - Módulo de backup automático
-- React Query para caché del lado del cliente
-- Paginación en listas grandes
+- Autenticación de dos factores (2FA)
+- API pública documentada
+- Webhooks y auditoría de acciones
 - WebSockets/Server-Sent Events para actualizaciones en tiempo real
+- Mejoras de UX/UI (animaciones, accesibilidad, i18n)
 
 Ver [Estado del Proyecto](./docs/06_PROJECT_STATUS.md) para más detalles sobre lo que falta para completar el proyecto al 100%.
-
----
-
-## ⚙️ Stack Tecnológico
-
-| Categoría         | Tecnología / Herramienta                              |
-| ----------------- | ----------------------------------------------------- |
-| **Frontend**      | Next.js 14, React, TypeScript, Tailwind CSS           |
-| **UI Components** | shadcn/ui                                             |
-| **Backend**       | Next.js API Routes                                    |
-| **Base de Datos** | MongoDB Atlas                                         |
-| **ORM**           | Prisma ORM (importado como 'db' desde '@/lib/prisma') |
-| **Autenticación** | NextAuth.js (JWT)                                     |
-| **Formularios**   | Zod + React Hook Form                                 |
-| **Deployment**    | Vercel                                                |
-| **Testing**       | Jest, Cypress                                         |
-| **CI/CD**         | GitHub Actions                                        |
-
----
-
-## 🏗️ Arquitectura del Sistema
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend API   │    │   Base de       │
-│   (Next.js)     │◄──►│   (Node.js)     │◄──►│   Datos         │
-│                 │    │                 │    │   (MongoDB)     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   UI Components │    │   Business      │    │   Data Layer    │
-│   shadcn/ui     │    │   Logic         │    │   Prisma ORM    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
----
-
-## 🚦 Inicio Rápido  
-  
-### **Prerrequisitos**  
-  
-- Node.js (v18+)  
-- npm (v9+)  
-- Una cuenta de MongoDB Atlas  
-  
-### **Instalación**  
-  
-1. **Clonar el repositorio:**  
-
-    ```bash  
-    git clone https://github.com/Manuekle/edutrack.git  
-    cd edutrack  
-    ```  
-  
-2. **Instalar dependencias:**  
-
-    ```bash  
-    npm install  
-    ```  
-  
-3. **Configurar variables de entorno:**  
-
-    ```bash  
-    cp .env.example .env.local  
-    ```  
-  
-4. **Sincronizar la base de datos:**  
-
-    ```bash  
-    npx prisma db push  
-    npx prisma db seed  
-    ```  
-  
-5. **Ejecutar el proyecto:**  
-
-    ```bash  
-    npm run dev  
-    ```  
-  
----  
-
-## 🤝 Contribución
-
-Este es un proyecto académico, pero las sugerencias son bienvenidas.
-
-1. Fork del repositorio.
-2. Crear una nueva rama para tu feature (`git checkout -b feature/AmazingFeature`).
-3. Realizar un commit con tus cambios (`git commit -m 'feat: Add some AmazingFeature'`).
-4. Hacer push a la rama (`git push origin feature/AmazingFeature`).
-5. Abrir un Pull Request.
-
----
-
-## 📞 Soporte y Contacto
-
-**Desarrollador Principal**: Manuel Esteban Erazo Medina  
-**Email**: <manuel.erazo@estudiante.fup.edu.co>  
-**Institución**: Fundación Universitaria de Popayán (FUP)  
-**Proyecto**: Trabajo de Grado - Ingeniería de Sistemas
-
-**Repositorio**: [Manuekle/edutrack](https://github.com/Manuekle/edutrack)  
-**Issues**: [Reportar un Bug o Solicitar una Feature](https://github.com/Manuekle/edutrack/issues)
-**Documentación**: [Documentación del Proyecto](https://deepwiki.com/Manuekle/edutrack/)
-
----
+Ver [Resumen de Tareas Pendientes](./docs/08_PENDING_TASKS_SUMMARY.md) para más detalles sobre lo que falta para completar el proyecto al 100%.
 
 ## 📄 Licencia
 
-Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.
+Este proyecto es privado y propiedad de la Fundación Universitaria de la Popayán.
 
-> **Nota**: Este es un proyecto académico desarrollado como trabajo de grado para la FUP.
+## 👥 Contribuidores
+
+- Equipo de desarrollo EduTrack

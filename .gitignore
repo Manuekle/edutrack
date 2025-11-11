@@ -4,3 +4,9 @@ node_modules
 .env.local
 .next
 backup-2025-08-01T22-21-07-669Z
+
+# testing
+/coverage
+/playwright-report
+/test-results
+/playwright/.cache

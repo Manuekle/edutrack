@@ -1,25 +1,47 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { AlertCircle, Mail } from 'lucide-react';
 import Link from 'next/link';
-// Removed unused router import
 import { useState } from 'react';
 
+const forgotPasswordSchema = z.object({
+  correo: z.string().email('Correo electrónico inválido'),
+});
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
 export default function ForgotPasswordPage() {
-  const [correo, setCorreo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{
     type: 'success' | 'error';
     text: string;
   } | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      correo: '',
+    },
+  });
+
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
     setIsLoading(true);
     setMessage(null);
 
@@ -27,19 +49,20 @@ export default function ForgotPasswordPage() {
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ correo }),
+        body: JSON.stringify({ correo: data.correo }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al procesar la solicitud');
+        throw new Error(result.message || 'Error al procesar la solicitud');
       }
 
       setMessage({
         type: 'success',
         text: 'Si el correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
       });
+      form.reset();
     } catch (error: unknown) {
       setMessage({
         type: 'error',
@@ -65,40 +88,49 @@ export default function ForgotPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {message && (
-              <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{message.text}</AlertDescription>
-              </Alert>
-            )}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {message && (
+                <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{message.text}</AlertDescription>
+                </Alert>
+              )}
 
-            <div className="space-y-2">
-              <Label htmlFor="correo">Correo electrónico</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-                <Input
-                  id="correo"
-                  type="email"
-                  placeholder="tu@correo.com"
-                  className="pl-10 text-xs"
-                  value={correo}
-                  onChange={e => setCorreo(e.target.value)}
-                  required
-                />
+              <FormField
+                control={form.control}
+                name="correo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Correo electrónico</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                        <Input
+                          type="email"
+                          placeholder="tu@correo.com"
+                          className="pl-10 text-xs"
+                          disabled={isLoading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Enviando...' : 'Enviar enlace de recuperación'}
+              </Button>
+
+              <div className="text-center text-xs">
+                <Link href="/login" className="text-primary hover:underline">
+                  Volver al inicio de sesión
+                </Link>
               </div>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Enviando...' : 'Enviar enlace de recuperación'}
-            </Button>
-
-            <div className="text-center text-xs">
-              <Link href="/login" className="text-primary hover:underline">
-                Volver al inicio de sesión
-              </Link>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
