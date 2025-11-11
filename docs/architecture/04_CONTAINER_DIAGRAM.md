@@ -9,23 +9,33 @@ graph TD
         C --> E[Asistencias]
         C --> F[Clases]
         C --> G[Reportes]
+        C --> H[Usuarios]
+        C --> I[Asignaturas]
 
-        D --> H[(MongoDB Atlas)]
-        E --> H
-        F --> H
-        G --> H
+        D --> J[(MongoDB Atlas)]
+        E --> J
+        F --> J
+        G --> J
+        H --> J
+        I --> J
+        
+        D --> K[Redis Cache]
+        E --> K
+        F --> K
+        G --> K
     end
 
     subgraph "Servicios Externos"
-        I[Nodemailer] -->|Envío de emails| J[Usuarios]
-        K[NextAuth] -->|Autenticación| D
+        L[Nodemailer] -->|Envío de emails| M[Email Queue]
+        M -->|Cola con reintentos| L
+        N[NextAuth] -->|Autenticación| D
     end
 
     subgraph "Monitoreo"
-        L[Vercel Analytics]
-        M[Sentry]
+        O[Vercel Analytics]
+        P[Sentry]
     end
 
-    B --> L
-    C --> M
+    B --> O
+    C --> P
 ```

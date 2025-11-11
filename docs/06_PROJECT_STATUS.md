@@ -6,9 +6,9 @@ Este documento analiza el estado actual del proyecto y identifica lo que falta p
 
 | Categoría | Progreso | Estado |
 |-----------|----------|--------|
-| **Funcionalidades Core** | 95% | ✅ Casi completo |
+| **Funcionalidades Core** | 90% | ✅ Casi completo |
 | **Optimizaciones** | 90% | ✅ Completado |
-| **Testing** | 45% | 🚧 En progreso |
+| **Testing** | 10% | 🚧 En progreso |
 | **Documentación** | 85% | ✅ Bien documentado |
 | **Despliegue** | 70% | 🚧 En progreso |
 
@@ -76,26 +76,32 @@ Este documento analiza el estado actual del proyecto y identifica lo que falta p
 - ✅ Persistencia de tema
 - ✅ Invalidación automática de caché
 
-### 9. Gestión de Aulas y Recursos (100%)
-- ✅ Sistema de reserva de aulas
-- ✅ Gestión de recursos tecnológicos
-- ✅ Validación de disponibilidad
-- ✅ Notificaciones automáticas
-- ✅ Panel de administración de solicitudes
-- ✅ Calendario de reservas
+### 9. Gestión de Aulas y Recursos (0%)
+- ❌ Sistema de reserva de aulas (pendiente)
+- ❌ Gestión de recursos tecnológicos (pendiente)
+- ❌ Validación de disponibilidad (pendiente)
+- ❌ Notificaciones automáticas (pendiente)
+- ❌ Panel de administración de solicitudes (pendiente)
+- ❌ Calendario de reservas (pendiente)
+- ℹ️ Nota: Solo existe un campo `classroom` (String opcional) en el modelo Class, pero no hay un sistema completo de gestión de aulas y recursos.
 
 ---
 
 ## Funcionalidades Parcialmente Implementadas 🚧
 
-### 1. Sistema de Notificaciones (60%)
-- ✅ Notificaciones por email (parcialmente implementado)
+### 1. Sistema de Notificaciones (65%)
+- ✅ Notificaciones por email (implementado)
+- ✅ Sistema de plantillas personalizables
+- ✅ Sistema de cola de correos con reintentos automáticos
+- ✅ Configuración de preferencias de notificación
 - ❌ Integración con WhatsApp Business
+- ❌ Panel de gestión de suscripciones
 - ❌ Plantillas personalizadas avanzadas
 - ❌ Programación de notificaciones
 - ❌ Notificaciones push
+- ❌ Panel de estadísticas de notificaciones
 
-### 2. Testing (45%)
+### 2. Testing (10%)
 - ✅ Configuración de Jest
 - ✅ Configuración de Testing Library
 - ❌ Tests unitarios completos
@@ -232,7 +238,7 @@ Este documento analiza el estado actual del proyecto y identifica lo que falta p
 
 ## Conclusión
 
-El proyecto está **aproximadamente al 85-90% de completitud**. Las funcionalidades core están implementadas y funcionando, y se han realizado optimizaciones significativas de rendimiento. Para completar el proyecto al 100%, se recomienda:
+El proyecto está **aproximadamente al 85-88% de completitud**. Las funcionalidades core están implementadas y funcionando, y se han realizado optimizaciones significativas de rendimiento. Para completar el proyecto al 100%, se recomienda:
 
 1. Completar el testing (prioridad alta)
 2. Terminar el sistema de notificaciones (prioridad alta)

@@ -46,7 +46,7 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
-    ClassTopic {
+    Class {
         ObjectId id PK
         datetime date
         datetime startTime
@@ -59,6 +59,7 @@ erDiagram
         string classroom
         string qrToken
         datetime qrTokenExpiresAt
+        datetime notificationSentAt
         int totalStudents
         int presentCount
         int absentCount
@@ -82,6 +83,8 @@ erDiagram
         ObjectId requestedById FK
         ReportStatus status
         ReportFormat format
+        int period
+        int year
         string fileUrl
         string fileName
         string error
@@ -119,11 +122,11 @@ erDiagram
     User ||--o{ UnenrollRequest : "solicita (requestedById)"
     User ||--o{ UnenrollRequest : "es_estudiante (studentId)"
     User ||--o{ UnenrollRequest : "revisa (reviewedById)"
-    Subject ||--o{ ClassTopic : "tiene (subjectId)"
+    Subject ||--o{ Class : "tiene (subjectId)"
     Subject ||--o{ Report : "genera (subjectId)"
     Subject ||--o{ SubjectEvent : "contiene (subjectId)"
     Subject ||--o{ UnenrollRequest : "involucra (subjectId)"
-    ClassTopic ||--o{ Attendance : "registra (classId)"
-    User }|--|| Subject : "se_matricula_en"
+    Subject }o--o{ User : "tiene_estudiantes (studentIds array)"
+    Class ||--o{ Attendance : "registra (classId)"
 
 ```

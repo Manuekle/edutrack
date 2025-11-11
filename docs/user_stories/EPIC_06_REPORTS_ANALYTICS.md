@@ -14,9 +14,10 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [ ] Selección de parámetros (rango de fechas, asignatura, grupo)
-- [ ] Filtros avanzados por estado de asistencia
-- [ ] Exportación en PDF
+- [x] Selección de parámetros (rango de fechas, asignatura, período, año)
+- [x] Filtros por estado de asistencia (incluido en reportes)
+- [x] Exportación en PDF
+- [x] Firmas digitales en reportes
 
 **Requisitos Técnicos:**
 
@@ -66,10 +67,10 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [ ] Porcentaje de asistencia por asignatura
-- [ ] Gráficos de tendencia temporal
-- [ ] Comparación con el promedio del grupo
-- [ ] Historial detallado por clase
+- [x] Porcentaje de asistencia por asignatura (dashboard estudiante)
+- [ ] Gráficos de tendencia temporal (pendiente)
+- [ ] Comparación con el promedio del grupo (pendiente)
+- [x] Historial detallado por clase (dashboard estudiante)
 
 **Requisitos Técnicos:**
 
@@ -91,13 +92,15 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [ ] Filtros por período, facultad, programa y asignatura
-- [ ] Identificación de tendencias y anomalías
-- [ ] Exportación de datos para análisis avanzado (PDF, Excel)
-- [ ] Conteo de temas impartidos en un rango de fechas
-- [ ] Indicadores porcentuales globales para administradores/directores
-- [ ] Vista consolidada de cumplimiento de objetivos
-- [ ] Comparativas históricas y entre grupos
+- [x] Filtros por período, programa y asignatura (en reportes)
+- [ ] Filtros por facultad (pendiente - no existe en el modelo)
+- [ ] Identificación de tendencias y anomalías (pendiente)
+- [x] Exportación de datos para análisis avanzado (PDF)
+- [ ] Exportación en Excel (pendiente)
+- [x] Conteo de clases impartidas (métricas en dashboards)
+- [x] Indicadores porcentuales globales (dashboard admin con estadísticas)
+- [ ] Vista consolidada de cumplimiento de objetivos (pendiente)
+- [ ] Comparativas históricas y entre grupos (pendiente)
 
 **Requisitos Técnicos:**
 

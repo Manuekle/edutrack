@@ -2,14 +2,14 @@
 
 ## 🎯 Estado General del Proyecto
 
-**Progreso Total: ~90%**
+**Progreso Total: ~88%**
 
 | Área | Progreso | Estado |
 |------|----------|--------|
-| Funcionalidades Core | 95% | ✅ Casi completo |
+| Funcionalidades Core | 90% | ✅ Casi completo |
 | Optimizaciones | 90% | ✅ Completado |
 | Testing | 10% | 🚧 Pendiente |
-| Notificaciones | 60% | 🚧 Parcial |
+| Notificaciones | 65% | 🚧 Parcial |
 | Documentación | 85% | ✅ Bien documentado |
 | Despliegue | 70% | 🚧 En progreso |
 
@@ -38,7 +38,13 @@
 ---
 
 ### 2. Sistema de Notificaciones
-**Progreso: 60% → Necesario: 100%**
+**Progreso: 65% → Necesario: 100%**
+
+**Estado Actual:**
+- ✅ Envío de correos electrónicos (implementado)
+- ✅ Sistema de plantillas personalizables
+- ✅ Sistema de cola de correos con reintentos automáticos
+- ✅ Configuración de preferencias de notificación
 
 **Qué falta:**
 - [ ] Integración con WhatsApp Business
@@ -173,7 +179,7 @@
 
 ## ✅ Lo que YA está Completo
 
-### Funcionalidades Core (100%)
+### Funcionalidades Core (90%)
 - ✅ Autenticación y autorización
 - ✅ Gestión de usuarios (CRUD)
 - ✅ Gestión de asignaturas (CRUD)
@@ -182,8 +188,8 @@
 - ✅ Dashboards (estudiante, docente, admin)
 - ✅ Reportes PDF
 - ✅ Carga masiva de datos (CSV/Excel)
-- ✅ Gestión de aulas y recursos
 - ✅ Sistema de observaciones
+- ❌ Gestión de aulas y recursos (pendiente - Epic 9)
 
 ### Optimizaciones (90%)
 - ✅ Sistema de caché Redis
@@ -226,14 +232,14 @@
 
 ## 📊 Métricas Actuales
 
-- **Funcionalidades Core:** 95% ✅
+- **Funcionalidades Core:** 90% ✅
 - **Optimizaciones:** 90% ✅
 - **Testing:** 10% 🚧
-- **Notificaciones:** 60% 🚧
+- **Notificaciones:** 65% 🚧
 - **Documentación:** 85% ✅
 - **Despliegue:** 70% 🚧
 
-**Progreso Total: ~90%**
+**Progreso Total: ~88%**
 
 ---
 

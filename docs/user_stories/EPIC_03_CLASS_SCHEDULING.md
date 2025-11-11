@@ -14,13 +14,17 @@ Sistema completo para la planificación, programación y control de clases, perm
 
 **Criterios de Aceptación:**
 
-- [ ] Creación de clases individuales o recurrentes
-- [ ] Configuración de horarios, aulas y modalidad (presencial/virtual)
-- [ ] Validación de disponibilidad de aulas y docentes
-- [ ] Asignación de temas y objetivos de aprendizaje
-- [ ] Configuración de políticas de asistencia
-- [ ] Vista previa del calendario antes de guardar
-- [ ] Notificaciones automáticas a estudiantes
+- [x] Creación de clases individuales
+- [ ] Clases recurrentes (pendiente)
+- [x] Configuración de horarios (startTime, endTime)
+- [x] Configuración de aulas (classroom - campo de texto)
+- [ ] Modalidad (presencial/virtual) (pendiente - no implementado)
+- [ ] Validación de disponibilidad de aulas (pendiente - Epic 9 no implementado)
+- [x] Asignación de temas (topic) y descripción
+- [ ] Objetivos de aprendizaje (pendiente - no implementado)
+- [ ] Configuración de políticas de asistencia (pendiente)
+- [x] Vista de calendario de clases
+- [x] Notificaciones automáticas a estudiantes (parcialmente implementado - email)
 
 **Requisitos Técnicos:**
 
@@ -43,13 +47,14 @@ Sistema completo para la planificación, programación y control de clases, perm
 
 **Criterios de Aceptación:**
 
-- [ ] Inicio/cierre de sesión de asistencia
-- [ ] Registro manual de asistencia
-- [ ] Escaneo de códigos QR para registro automático
-- [ ] Control de retrasos y justificaciones
-- [ ] Vista en tiempo real de asistencias/ausencias
-- [ ] Exportación de reportes de asistencia
-- [ ] Historial de cambios en registros
+- [x] Inicio de sesión de asistencia (generación de QR)
+- [x] Cierre de sesión de asistencia (marcar clase como REALIZADA o CANCELADA)
+- [x] Registro manual de asistencia
+- [x] Escaneo de códigos QR para registro automático
+- [x] Control de retrasos (estado TARDANZA) y justificaciones (estado JUSTIFICADO)
+- [x] Vista en tiempo real de asistencias/ausencias
+- [x] Exportación de reportes de asistencia (PDF)
+- [ ] Historial de cambios en registros (pendiente - no hay auditoría detallada)
 
 **Requisitos de UX:**
 
@@ -68,13 +73,14 @@ Sistema completo para la planificación, programación y control de clases, perm
 
 **Criterios de Aceptación:**
 
-- [ ] Vista semanal/mensual de clases programadas
-- [ ] Filtros por asignatura, docente o tipo de clase
-- [ ] Indicadores de estado (pasada, en curso, próxima)
-- [ ] Detalles de cada clase con un clic
-- [ ] Sincronización con calendarios externos
-- [ ] Notificaciones de próximas clases
-- [ ] Vista móvil optimizada
+- [x] Vista semanal/mensual de clases programadas (dashboard)
+- [x] Filtros por asignatura (en dashboard de docente)
+- [ ] Filtros por tipo de clase (pendiente)
+- [x] Indicadores de estado (PROGRAMADA, REALIZADA, CANCELADA)
+- [x] Detalles de cada clase con un clic
+- [ ] Sincronización con calendarios externos (pendiente - Outlook, Google Calendar)
+- [x] Notificaciones de próximas clases (parcialmente implementado - email)
+- [x] Vista móvil optimizada (responsive design)
 
 **Requisitos Técnicos:**
 

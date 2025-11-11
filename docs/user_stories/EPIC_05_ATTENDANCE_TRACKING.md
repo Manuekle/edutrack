@@ -14,13 +14,13 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 
 **Criterios de Aceptación:**
 
-- [ ] Escaneo de código QR de la clase
-- [ ] Confirmación visual del registro exitoso
-- [ ] Visualización de mi estado de asistencia
-- [ ] Historial personal de asistencias
-- [ ] Notificaciones de registro exitoso/fallido
-- [ ] Funcionalidad sin conexión con sincronización posterior
-- [ ] Soporte para diferentes dispositivos móviles
+- [x] Escaneo de código QR de la clase
+- [x] Confirmación visual del registro exitoso
+- [x] Visualización de mi estado de asistencia (dashboard estudiante)
+- [x] Historial personal de asistencias
+- [x] Notificaciones de registro exitoso/fallido
+- [ ] Funcionalidad sin conexión con sincronización posterior (pendiente)
+- [x] Soporte para diferentes dispositivos móviles (responsive design)
 
 **Requisitos Técnicos:**
 
@@ -43,13 +43,14 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 
 **Criterios de Aceptación:**
 
-- [ ] Vista en tiempo real de asistencias/ausencias
-- [ ] Filtros por fecha, estudiante o estado
-- [ ] Indicadores visuales de estado (presente/ausente/justificado)
-- [ ] Estadísticas de asistencia por clase
-- [ ] Exportación de reportes en múltiples formatos
-- [ ] Búsqueda rápida de estudiantes
-- [ ] Vista móvil optimizada
+- [x] Vista en tiempo real de asistencias/ausencias
+- [x] Filtros por fecha, estudiante o estado (en página de clase)
+- [x] Indicadores visuales de estado (PRESENTE, AUSENTE, TARDANZA, JUSTIFICADO)
+- [x] Estadísticas de asistencia por clase (métricas en tiempo real)
+- [x] Exportación de reportes en PDF
+- [ ] Exportación en múltiples formatos (CSV pendiente)
+- [x] Búsqueda rápida de estudiantes
+- [x] Vista móvil optimizada (responsive design)
 
 **Requisitos de UX:**
 
@@ -66,46 +67,19 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 
 ### HU-015: Gestión de Asistencias Manuales
 
-... (contenido existente)
-
----
-
-### HU-031: Sistema de Observación de Clases Canceladas
-
-**Como** coordinador académico
-**Quiero** registrar observaciones cuando una clase no se imparte o se cancela
-**Para** llevar un control y justificar ausencias ante auditorías
-
-**Criterios de Aceptación:**
-
-- [ ] Formulario para detallar motivo de cancelación/ausencia
-- [ ] Adjuntar evidencias (documentos, capturas)
-- [ ] Flujo de aprobación/rechazo de observación
-- [ ] Reporte exportable de observaciones
-
-**Requisitos Técnicos:**
-
-- Estado de observación: pendiente, aprobado, rechazado
-- Notificaciones automáticas a los interesados
-
-**Prioridad:** Alta  
-**Story Points:** 5  
-**Sprint:** 5  
-**Dependencias:** HU-013, HU-014
-
 **Como** docente  
 **Quiero** realizar ajustes manuales en las asistencias  
 **Para** corregir registros o manejar casos especiales
 
 **Criterios de Aceptación:**
 
-- [ ] Modificación individual de estados de asistencia
-- [ ] Registro de justificaciones detalladas
-- [ ] Historial de cambios con marca de tiempo y usuario
-- [ ] Notificaciones automáticas a estudiantes afectados
-- [ ] Diferenciación clara entre registros automáticos y manuales
-- [ ] Aprobación requerida para ciertos cambios
-- [ ] Reporte de modificaciones realizadas
+- [x] Modificación individual de estados de asistencia
+- [x] Registro de justificaciones detalladas (campo justification)
+- [ ] Historial de cambios con marca de tiempo y usuario (pendiente - no hay auditoría detallada)
+- [ ] Notificaciones automáticas a estudiantes afectados (pendiente)
+- [ ] Diferenciación clara entre registros automáticos y manuales (pendiente)
+- [ ] Aprobación requerida para ciertos cambios (pendiente)
+- [x] Reporte de modificaciones realizadas (reportes PDF incluyen asistencias)
 
 **Requisitos de Seguridad:**
 
@@ -117,3 +91,33 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 **Story Points:** 8  
 **Sprint:** 5  
 **Dependencias:** HU-014
+
+---
+
+### HU-031: Sistema de Observación de Clases Canceladas
+
+**Como** docente o coordinador académico
+**Quiero** registrar observaciones cuando una clase no se imparte o se cancela
+**Para** llevar un control y justificar ausencias ante auditorías
+
+**Criterios de Aceptación:**
+
+- [x] Formulario para detallar motivo de cancelación/ausencia (campo cancellationReason)
+- [x] Registro de motivo de cancelación al marcar clase como CANCELADA
+- [x] Notificaciones automáticas a estudiantes cuando se cancela una clase
+- [ ] Adjuntar evidencias (documentos, capturas) (pendiente)
+- [ ] Flujo de aprobación/rechazo de observación (pendiente - solo docentes pueden cancelar)
+- [x] Estado de clase: PROGRAMADA, REALIZADA, CANCELADA
+- [ ] Reporte exportable de observaciones (pendiente - reportes incluyen clases canceladas pero no específicamente observaciones)
+
+**Requisitos Técnicos:**
+
+- Estado de clase con motivo de cancelación
+- Notificaciones automáticas a estudiantes (email)
+
+**Prioridad:** Alta  
+**Story Points:** 5  
+**Sprint:** 5  
+**Dependencias:** HU-013, HU-014
+
+**Nota**: Funcionalidad parcialmente implementada. Existe el campo `cancellationReason` en el modelo Class y se envían notificaciones automáticas, pero no hay un sistema completo de observaciones con aprobación/rechazo por coordinadores.

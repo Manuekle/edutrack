@@ -14,9 +14,11 @@ graph TD
     G -->|Persistencia| H[(MongoDB Atlas)]
     
     %% Servicios Externos
-    E -->|Envío de emails| I[Nodemailer]
-    E -->|Generación de PDFs| J[PDFKit]
-    E -->|Generación de QR| K[QR Code]
+    E -->|Envío de emails| I[Email Queue]
+    I -->|Procesa cola| J[Nodemailer]
+    E -->|Generación de PDFs| K[PDFKit]
+    E -->|Generación de QR| L[QR Code]
+    E -->|Caché| M[Redis]
     
     %% Subsistemas
     subgraph "Aplicación Web (Vercel)"
@@ -30,10 +32,12 @@ graph TD
         I
         J
         K
+        M
     end
     
     subgraph "Almacenamiento"
         H
+        M
     end
 ```
 
@@ -50,6 +54,8 @@ graph TD
    - **ORM**: Prisma como capa de abstracción sobre MongoDB.
 
 3. **Integraciones Externas**:
+   - **Email Queue**: Sistema de cola de correos con reintentos automáticos.
    - **Nodemailer**: Para envío de notificaciones por correo.
    - **PDFKit**: Generación de reportes en formato PDF.
    - **QR Code**: Generación de códigos QR para registro de asistencia.
+   - **Redis**: Sistema de caché para optimizar rendimiento (dashboards, autenticación).

@@ -28,16 +28,21 @@ sequenceDiagram
     participant E as Estudiante
     participant FE as Frontend
     participant BE as Backend (API)
+    participant Cache as Redis Cache
     participant DB as Base de Datos
 
     E->>FE: Escanea Código QR
     FE->>BE: POST /api/asistencia/scan (con token del QR)
+    BE->>Cache: Verificar caché (opcional)
+    Cache-->>BE: No encontrado en caché
     BE->>DB: Buscar token QR en la base de datos
     alt Token Válido y Activo
         DB-->>BE: Token encontrado y válido
         BE->>DB: Verificar inscripción del estudiante en la asignatura
         DB-->>BE: Estudiante inscrito
         BE->>DB: Registrar asistencia como "PRESENTE"
+        BE->>Cache: Invalidar caché del dashboard del estudiante
+        BE->>Cache: Invalidar caché del dashboard del docente
         DB-->>BE: Confirmación de registro
         BE-->>FE: Respuesta de Éxito (200)
         FE-->>E: Mostrar mensaje de confirmación

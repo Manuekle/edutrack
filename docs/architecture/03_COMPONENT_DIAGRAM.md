@@ -41,6 +41,8 @@ graph TD
         N["Nodemailer (Emails)"]
         O["PDFKit (Reportes)"]
         P["QR Code (Generación)"]
+        Q["Redis (Caché)"]
+        R["Email Queue (Cola de Correos)"]
     end
     
     %% Conexiones entre capas
@@ -61,6 +63,14 @@ graph TD
     I --> O
     G --> P
     F --> N
+    F --> R
+    R --> N
+    E --> Q
+    F --> Q
+    G --> Q
+    H --> Q
+    I --> Q
+    J --> Q
     
     A -- "Se usan en" --> B
     C -- "Manejan estado en" --> B
@@ -100,6 +110,8 @@ graph TD
 - **Nodemailer**: Envío de notificaciones por correo electrónico
 - **PDFKit**: Generación de documentos PDF para reportes
 - **QR Code**: Generación de códigos QR para registro de asistencia
+- **Redis**: Sistema de caché para optimizar rendimiento (dashboards, autenticación)
+- **Email Queue**: Sistema de cola de correos con reintentos automáticos
 
 ## Base de Datos
 

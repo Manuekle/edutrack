@@ -14,10 +14,11 @@ Sistema completo para la gestión de usuarios, autenticación segura y administr
 
 **Criterios de Aceptación:**
 
-- [ ] Carga masiva mediante archivo CSV/Excel con plantilla descargable
-- [ ] Validación de datos (formato, duplicados, integridad) antes del procesamiento
-- [ ] Generación automática de credenciales temporales seguras
-- [ ] Notificación por correo electrónico con instrucciones de primer acceso
+- [x] Carga masiva mediante archivo CSV/Excel con plantilla descargable
+- [x] Validación de datos (formato, duplicados, integridad) antes del procesamiento
+- [x] Vista previa de datos antes de confirmar carga
+- [x] Generación automática de credenciales temporales seguras
+- [x] Notificación por correo electrónico con instrucciones de primer acceso (parcialmente implementado)
 
 **Requisitos Técnicos:**
 
@@ -40,11 +41,11 @@ Sistema completo para la gestión de usuarios, autenticación segura y administr
 
 **Criterios de Aceptación:**
 
-- [ ] Formulario de inicio de sesión con validación
-- [ ] Autenticación en dos pasos (2FA) opcional
-- [ ] Mecanismo de recuperación de cuenta seguro
-- [ ] Registro de actividad sospechosa
-- [ ] Bloqueo temporal tras 5 intentos fallidos
+- [x] Formulario de inicio de sesión con validación
+- [ ] Autenticación en dos pasos (2FA) opcional (pendiente)
+- [x] Mecanismo de recuperación de cuenta seguro (forgot password / reset password)
+- [ ] Registro de actividad sospechosa (pendiente)
+- [ ] Bloqueo temporal tras 5 intentos fallidos (pendiente)
 
 **Requisitos de Seguridad:**
 
@@ -67,10 +68,10 @@ Sistema completo para la gestión de usuarios, autenticación segura y administr
 
 **Criterios de Aceptación:**
 
-- [ ] Edición de información personal (nombre, correo, teléfono)
-- [ ] Cambio de contraseña con requisitos de seguridad
-- [ ] Firma digital del usuario
-- [ ] Validación de correo electrónico
+- [x] Edición de información personal (nombre, correo, teléfono)
+- [x] Cambio de contraseña con requisitos de seguridad
+- [x] Firma digital del usuario (signatureUrl)
+- [ ] Validación de correo electrónico (pendiente - verificación por email)
 
 **Requisitos de UX:**
 

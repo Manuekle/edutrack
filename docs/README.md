@@ -123,21 +123,31 @@ graph TD
 - Dashboard con métricas
 - Exportación de datos
 
-### **[Epic 7: Comunicaciones](./user_stories/EPIC_07_COMMUNICATION.md)** 🚧 EN DESARROLLO (60%)
+### **[Epic 7: Comunicaciones](./user_stories/EPIC_07_COMMUNICATION.md)** 🚧 EN DESARROLLO (65%)
 
-- ✅ Notificaciones por email (parcialmente implementado)
-- ✅ Sistema de cola de correos con reintentos
+- ✅ Notificaciones por email (implementado)
+- ✅ Sistema de plantillas personalizables
+- ✅ Sistema de cola de correos con reintentos automáticos
+- ✅ Configuración de preferencias de notificación
 - ❌ Integración WhatsApp Business
 - ❌ Panel de gestión de suscripciones
 - ❌ Plantillas personalizadas avanzadas
 - ❌ Programación de notificaciones
 - ❌ Notificaciones push
+- ❌ Panel de estadísticas de notificaciones
 
 ### **[Epic 8: Administración](./user_stories/EPIC_08_ADMINISTRATION.md)** ✅ COMPLETADO
 
 - Panel de administración
 - Carga masiva de datos
 - Configuración del sistema
+
+### **[Epic 9: Gestión de Aulas y Recursos](./user_stories/EPIC_09_CLASSROOM_MANAGEMENT.md)** ❌ NO IMPLEMENTADO
+
+- Sistema de reserva de aulas (pendiente)
+- Gestión de recursos tecnológicos (pendiente)
+- Calendario de disponibilidad (pendiente)
+- Panel de administración de solicitudes (pendiente)
 
 ---
 

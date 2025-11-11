@@ -30,10 +30,10 @@ Sistema integral de comunicación que mantiene a todos los usuarios informados s
   - [ ] Activación/desactivación por tipo de notificación
   - [ ] Frecuencia de resúmenes (diario/semanal)
   - [ ] Previsualización de plantillas
-- [ ] Sistema de cola de correos con reintentos automáticos
-  - [ ] Reintentos configurados (máx 3 intentos, 15 min entre intentos)
-  - [ ] Manejo de rebotes y correos inválidos
-  - [ ] Registro detallado de envíos (timestamp, estado, intentos)
+- [x] Sistema de cola de correos con reintentos automáticos
+  - [x] Reintentos configurados (máx 3 intentos, 15 min entre intentos)
+  - [x] Manejo de errores y reintentos automáticos
+  - [x] Procesamiento de cola con batches
 - [ ] Panel de estadísticas de notificaciones
   - [ ] Tasa de apertura por tipo de notificación
   - [ ] Tasa de clics en enlaces
