@@ -25,7 +25,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:all": "jest --passWithNoTests && playwright test",
     "validate": "pnpm run type-check && pnpm run test",
-    "prepare": "husky",
+    "prepare": "command -v husky >/dev/null 2>&1 && husky || true",
     "postbuild": "next-sitemap",
     "postinstall": "prisma generate",
     "update": "ncu -u"
