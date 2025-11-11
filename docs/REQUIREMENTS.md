@@ -148,7 +148,7 @@ Este documento especifica los requisitos funcionales (RF) y no funcionales (RNF)
 - **Implementados**: 19 requisitos (100%)
 
 ### Prioridades
-- **Crítica**: 2 requisitos (RF-02, RNF-05, RNF-07)
+- **Crítica**: 3 requisitos (RF-02, RNF-05, RNF-07)
 - **Alta**: 20 requisitos funcionales, 12 requisitos no funcionales
 - **Media**: 3 requisitos funcionales, 3 requisitos no funcionales
 

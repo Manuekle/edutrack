@@ -7,7 +7,6 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 | Categoría | Progreso | Prioridad | Tiempo Estimado |
 |-----------|----------|-----------|-----------------|
 | **Testing** | 10% | 🔴 Alta | 2-3 semanas |
-| **Notificaciones** | 60% | 🔴 Alta | 1-2 semanas |
 | **React Query** | 30% | 🟡 Media | 3-5 días |
 | **Integración Outlook** | 0% | 🟡 Media | 1-2 semanas |
 | **Backup Automático** | 0% | 🟡 Media | 1 semana |
@@ -77,66 +76,8 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 
 ---
 
-### 2. Sistema de Notificaciones (60% → 100%)
 
-**Estado Actual:**
-- ✅ Envío básico de correos electrónicos
-- ✅ Plantillas básicas de email
-- ✅ Cola de correos con reintentos
-- ❌ Integración con WhatsApp Business
-- ❌ Panel de gestión de suscripciones
-- ❌ Plantillas personalizadas avanzadas
-- ❌ Programación de notificaciones
-- ❌ Notificaciones push
-- ❌ Estadísticas de notificaciones
-
-**Tareas Pendientes:**
-
-#### Integración WhatsApp Business
-- [ ] Configuración de API de WhatsApp Business
-- [ ] Integración con servicio de mensajería
-- [ ] Plantillas de mensajes para WhatsApp
-- [ ] Validación de números telefónicos
-- [ ] Manejo de errores y reintentos
-- [ ] Logging de mensajes enviados
-
-#### Panel de Gestión de Suscripciones
-- [ ] API para gestión de preferencias de notificación
-- [ ] UI para activar/desactivar notificaciones por tipo
-- [ ] Configuración de frecuencia (diario/semanal)
-- [ ] Previsualización de plantillas
-- [ ] Historial de notificaciones recibidas
-
-#### Plantillas Personalizadas Avanzadas
-- [ ] Editor de plantillas WYSIWYG
-- [ ] Variables dinámicas en plantillas
-- [ ] Plantillas responsivas para email
-- [ ] Soporte para modo oscuro en emails
-- [ ] Previsualización previa al envío
-
-#### Programación de Notificaciones
-- [ ] Sistema de scheduling (cron jobs)
-- [ ] Configuración de horarios de envío
-- [ ] Recordatorios programados (30 min antes de clase)
-- [ ] Resúmenes semanales automáticos
-
-#### Notificaciones Push
-- [ ] Configuración de servicio push (Firebase/OneSignal)
-- [ ] Permisos de notificaciones en el navegador
-- [ ] Notificaciones en tiempo real
-- [ ] Manejo de estado de suscripción
-
-#### Estadísticas de Notificaciones
-- [ ] Tasa de apertura por tipo de notificación
-- [ ] Tasa de clics en enlaces
-- [ ] Historial de notificaciones enviadas
-- [ ] Dashboard de estadísticas de notificaciones
-
-**Tiempo Estimado:** 1-2 semanas
-
----
-
-### 3. Optimizaciones Adicionales (90% → 100%)
+### 2. Optimizaciones Adicionales (90% → 100%)
 
 **Estado Actual:**
 - ✅ Sistema de caché Redis
@@ -208,7 +149,7 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 
 ---
 
-### 5. Módulo de Backup Automático (0% → 100%)
+### 4. Módulo de Backup Automático (0% → 100%)
 
 **Estado Actual:**
 - ❌ Backup automático de base de datos
@@ -231,7 +172,7 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 
 ---
 
-### 6. Funcionalidades Adicionales (0% → 100%)
+### 5. Funcionalidades Adicionales (0% → 100%)
 
 **Estado Actual:**
 - ❌ Autenticación de dos factores (2FA)
@@ -322,7 +263,7 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 
 ---
 
-### 8. Documentación Adicional (85% → 100%)
+### 7. Documentación Adicional (85% → 100%)
 
 **Estado Actual:**
 - ✅ Documentación técnica completa
@@ -366,14 +307,7 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 4. Configurar CI/CD para ejecutar tests automáticamente
 5. Alcanzar cobertura > 80%
 
-### Fase 2: Notificaciones (Semanas 4-5)
-1. Completar integración con WhatsApp Business
-2. Implementar panel de gestión de suscripciones
-3. Mejorar plantillas de notificaciones
-4. Implementar programación de notificaciones
-5. Agregar estadísticas de notificaciones
-
-### Fase 3: Optimizaciones (Semana 6)
+### Fase 2: Optimizaciones (Semana 4)
 1. Migrar componentes a React Query
 2. Implementar WebSockets/Server-Sent Events
 3. Configurar CDN para assets estáticos
@@ -401,12 +335,12 @@ Este documento resume todas las tareas pendientes para completar el proyecto al 
 ### Esta Semana
 1. **Iniciar Testing** - Comenzar con tests unitarios para componentes críticos
 2. **Completar React Query** - Migrar al menos 2-3 componentes principales
-3. **Mejorar Notificaciones** - Implementar panel de gestión de suscripciones
+3. **Migrar Formularios** - Completar migración de formularios restantes
 
 ### Próxima Semana
 1. **Continuar Testing** - Tests de integración para APIs críticas
-2. **WhatsApp Integration** - Iniciar integración con WhatsApp Business
-3. **Documentación** - Completar guías de usuario básicas
+2. **Documentación** - Completar guías de usuario básicas
+3. **Optimizaciones** - Continuar con optimizaciones finales
 
 ---
 

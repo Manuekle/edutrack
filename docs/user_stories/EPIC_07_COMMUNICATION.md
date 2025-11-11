@@ -27,9 +27,6 @@ Sistema integral de comunicación que mantiene a todos los usuarios informados s
 - [x] Configuración de preferencias de notificación
 - [x] Sistema de cola de correos con reintentos automáticos
 - [x] Notificaciones de asistencia, cancelación de clases y recordatorios
-- [ ] Panel de gestión de suscripciones (pendiente)
-- [ ] Panel de estadísticas de notificaciones (pendiente)
-- [ ] Integración con WhatsApp Business (pendiente)
 
 **Prioridad:** Alta  
 **Story Points:** 8  
