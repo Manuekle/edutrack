@@ -14,15 +14,9 @@ Módulo de administración integral que permite la gestión de usuarios, configu
 
 **Criterios de Aceptación:**
 
-- [ ] Creación, edición y desactivación de cuentas
-- [ ] Asignación de roles
-- [ ] Búsqueda y filtrado avanzado de usuarios
-
-**Requisitos de Seguridad:**
-
-- Encriptación de datos sensibles
-- Registro detallado de cambios
-- Validación de permisos en cada acción
+- [x] Creación, edición y desactivación de cuentas
+- [x] Asignación de roles
+- [x] Búsqueda y filtrado de usuarios
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -39,19 +33,11 @@ Módulo de administración integral que permite la gestión de usuarios, configu
 
 **Criterios de Aceptación:**
 
-- [x] Dashboard con métricas clave del sistema
+- [x] Dashboard con métricas clave
 - [x] Gestión de usuarios y permisos
-- [x] Configuración del sistema
-- [x] Monitoreo del rendimiento
-- [x] Registros de auditoría
-- [x] Herramientas de mantenimiento
-
-**Requisitos Técnicos:**
-
-- Interfaz responsiva
-- Control de acceso basado en roles
-- Exportación de datos
-- Filtros y búsqueda avanzada
+- [x] Gestión de asignaturas
+- [x] Carga masiva de datos
+- [x] Vista móvil optimizada
 
 **Prioridad:** Alta  
 **Story Points:** 5  

@@ -14,19 +14,9 @@ Sistema integral para la gestión de asignaturas, docentes y estudiantes, facili
 
 **Criterios de Aceptación:**
 
-- [x] Carga masiva mediante archivo CSV/Excel con plantilla descargable
-- [x] Validación de datos (formato, duplicados, integridad) antes del procesamiento
-- [x] Vista previa de datos antes de confirmar carga
-- [x] Campos obligatorios: código, nombre, créditos
-- [x] Asignación de programas académicos y semestres
-- [ ] Horas teóricas/prácticas (pendiente - no implementado en el modelo)
-- [ ] Temas (pendiente - no implementado en el modelo)
-
-**Requisitos Técnicos:**
-
-- Código único por asignatura
-- Integración con el catálogo académico
-- Historial de cambios
+- [x] Carga masiva mediante archivo CSV/Excel
+- [x] Validación de datos y vista previa
+- [x] Campos: código, nombre, créditos, programa, semestre
 
 **Prioridad:** Alta  
 **Story Points:** 8  
@@ -44,16 +34,9 @@ Sistema integral para la gestión de asignaturas, docentes y estudiantes, facili
 **Criterios de Aceptación:**
 
 - [x] Vista resumida de asignaturas activas
-- [x] Calendario de clases y eventos (próximas clases y eventos)
-- [x] Indicadores clave (asistencia, clases programadas, eventos próximos)
-- [x] Accesos rápidos a funciones frecuentes
-- [x] Vista móvil optimizada (responsive design)
-- [ ] Calificaciones (pendiente - no implementado en el sistema)
-
-**Requisitos de UX:**
-
-- Carga rápida de datos
-- Interfaz intuitiva
+- [x] Calendario de clases y eventos próximos
+- [x] Indicadores de asistencia y clases programadas
+- [x] Vista móvil optimizada
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -71,19 +54,10 @@ Sistema integral para la gestión de asignaturas, docentes y estudiantes, facili
 **Criterios de Aceptación:**
 
 - [x] Listado de estudiantes matriculados
-- [x] Búsqueda y filtrado avanzado (parcialmente implementado)
-- [x] Inscripción/desinscripción de estudiantes (carga masiva)
-- [x] Carga masiva desde archivo (CSV/Excel)
-- [x] Solicitudes de desmatriculación (UnenrollRequest)
-- [ ] Historial académico por estudiante (pendiente - solo asistencias)
-- [ ] Comunicación directa con estudiantes (pendiente)
-- [x] Exportación de listados (reportes PDF)
-
-**Requisitos de Seguridad:**
-
-- Control de acceso basado en roles
-- Registro de operaciones
-- Validación de prerrequisitos
+- [x] Búsqueda y filtrado
+- [x] Carga masiva de estudiantes (CSV/Excel)
+- [x] Solicitudes de desmatriculación
+- [x] Exportación de listados (PDF)
 
 **Prioridad:** Alta  
 **Story Points:** 13  

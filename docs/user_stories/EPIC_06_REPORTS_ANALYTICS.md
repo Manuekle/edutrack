@@ -14,16 +14,9 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [x] Selección de parámetros (rango de fechas, asignatura, período, año)
-- [x] Filtros por estado de asistencia (incluido en reportes)
-- [x] Exportación en PDF
-- [x] Firmas digitales en reportes
-
-**Requisitos Técnicos:**
-
-- Motor de generación de reportes eficiente
-- Caché de reportes frecuentes
-- API para integración con otras herramientas
+- [x] Selección de parámetros (fechas, asignatura, período, año)
+- [x] Filtros por estado de asistencia
+- [x] Exportación en PDF con firmas digitales
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -40,17 +33,10 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [ ] Registro detallado por sesión de clase
-- [ ] Incrustación de evidencias (fotos, documentos)
-- [ ] Aprobación de coordinación académica
-- [ ] Histórico de versiones
-- [ ] Exportación en formatos institucionales
-
-**Requisitos de UX:**
-
-- Editor WYSIWYG intuitivo
-- Guardado automático de avances
-- Vista previa antes de imprimir
+- [ ] Registro detallado por sesión de clase (pendiente)
+- [ ] Incrustación de evidencias (pendiente)
+- [ ] Aprobación de coordinación académica (pendiente)
+- [ ] Exportación en formatos institucionales (pendiente)
 
 **Prioridad:** Media  
 **Story Points:** 8  
@@ -67,15 +53,10 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [x] Porcentaje de asistencia por asignatura (dashboard estudiante)
+- [x] Porcentaje de asistencia por asignatura
+- [x] Historial detallado por clase
 - [ ] Gráficos de tendencia temporal (pendiente)
-- [ ] Comparación con el promedio del grupo (pendiente)
-- [x] Historial detallado por clase (dashboard estudiante)
-
-**Requisitos Técnicos:**
-
-- Cálculos en tiempo real
-- Modo fuera de línea con datos recientes
+- [ ] Comparación con promedio del grupo (pendiente)
 
 **Prioridad:** Media  
 **Story Points:** 8  
@@ -92,23 +73,13 @@ Sistema completo de generación de reportes y análisis de datos que permite a d
 
 **Criterios de Aceptación:**
 
-- [x] Filtros por período, programa y asignatura (en reportes)
-- [ ] Filtros por facultad (pendiente - no existe en el modelo)
-- [ ] Identificación de tendencias y anomalías (pendiente)
-- [x] Exportación de datos para análisis avanzado (PDF)
+- [x] Filtros por período, programa y asignatura
+- [x] Métricas de clases impartidas
+- [x] Indicadores porcentuales globales
+- [x] Exportación de datos (PDF)
 - [ ] Exportación en Excel (pendiente)
-- [x] Conteo de clases impartidas (métricas en dashboards)
-- [x] Indicadores porcentuales globales (dashboard admin con estadísticas)
-- [ ] Vista consolidada de cumplimiento de objetivos (pendiente)
+- [ ] Identificación de tendencias y anomalías (pendiente)
 - [ ] Comparativas históricas y entre grupos (pendiente)
-
-**Requisitos Técnicos:**
-
-- Fuentes de datos en tiempo real mediante API
-- Control de acceso basado en roles
-- Anonimización de datos sensibles
-- Registro de auditoría de consultas
-- Caché para consultas frecuentes
 
 **Prioridad:** Alta  
 **Story Points:** 13  

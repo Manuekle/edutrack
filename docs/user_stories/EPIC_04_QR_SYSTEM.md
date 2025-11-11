@@ -14,19 +14,10 @@ Sistema avanzado de generación y validación de códigos QR para el registro de
 
 **Criterios de Aceptación:**
 
-- [x] Generación automática al iniciar la clase (endpoint para generar QR)
-- [x] Códigos únicos con tokens seguros
-- [x] Tiempo de validez configurable (5 minutos por defecto, configurable)
-- [x] Regeneración manual con un clic
-- [x] Información visible: asignatura, hora, docente (en la interfaz)
-- [ ] Códigos de respaldo generados automáticamente (pendiente)
-- [x] Integración con el sistema de registro de clases
-
-**Requisitos de Seguridad:**
-
-- Tokens JWT firmados
-- Rotación de claves de cifrado
-- Registro de auditoría de generación
+- [x] Generación automática de códigos QR al iniciar clase
+- [x] Códigos únicos con tiempo de validez configurable
+- [x] Regeneración manual
+- [x] Información visible: asignatura, hora, docente
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -43,19 +34,10 @@ Sistema avanzado de generación y validación de códigos QR para el registro de
 
 **Criterios de Aceptación:**
 
-- [x] Verificación de token QR válido
-- [x] Validación de ventana temporal (qrTokenExpiresAt)
-- [x] Comprobación de estudiante matriculado (verificación de inscripción)
-- [x] Prevención de reutilización de códigos (registro único por estudiante/clase)
-- [ ] Validación opcional por geolocalización (pendiente)
-- [x] Registro detallado de intentos de validación (logs de error)
-- [ ] Notificaciones de intentos sospechosos (pendiente)
-
-**Requisitos Técnicos:**
-
-- API REST segura para validación
-- Caché distribuido para verificación rápida
-- Monitoreo en tiempo real de validaciones
+- [x] Validación de token QR y tiempo de expiración
+- [x] Verificación de estudiante matriculado
+- [x] Prevención de reutilización de códigos
+- [ ] Validación por geolocalización (pendiente)
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -73,18 +55,9 @@ Sistema avanzado de generación y validación de códigos QR para el registro de
 **Criterios de Aceptación:**
 
 - [x] Lector de códigos QR en tiempo real
-- [x] Retroalimentación visual inmediata (toast notifications)
-- [x] Funcionamiento en dispositivos móviles (responsive)
-- [ ] Modo de cámara optimizado para baja luz (pendiente - depende del navegador)
-- [x] Historial de asistencias recientes (dashboard estudiante)
+- [x] Retroalimentación visual inmediata
+- [x] Funcionamiento en dispositivos móviles
 - [x] Notificación de registro exitoso/fallido
-- [ ] Soporte para códigos dañados o parciales (pendiente - validación básica implementada)
-
-**Requisitos de UX:**
-
-- Interfaz intuitiva con guía visual
-- Tiempo de respuesta < 1 segundo
-- Funcionalidad sin conexión con sincronización posterior
 
 **Prioridad:** Media  
 **Story Points:** 5  

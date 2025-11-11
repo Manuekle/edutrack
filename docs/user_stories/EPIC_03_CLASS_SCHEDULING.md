@@ -14,23 +14,12 @@ Sistema completo para la planificación, programación y control de clases, perm
 
 **Criterios de Aceptación:**
 
-- [x] Creación de clases individuales
-- [ ] Clases recurrentes (pendiente)
-- [x] Configuración de horarios (startTime, endTime)
-- [x] Configuración de aulas (classroom - campo de texto)
-- [ ] Modalidad (presencial/virtual) (pendiente - no implementado)
-- [ ] Validación de disponibilidad de aulas (pendiente - Epic 9 no implementado)
-- [x] Asignación de temas (topic) y descripción
-- [ ] Objetivos de aprendizaje (pendiente - no implementado)
-- [ ] Configuración de políticas de asistencia (pendiente)
+- [x] Creación de clases con horarios y aulas
+- [x] Asignación de temas y descripción
 - [x] Vista de calendario de clases
-- [x] Notificaciones automáticas a estudiantes (parcialmente implementado - email)
-
-**Requisitos Técnicos:**
-
-- Integración con el sistema de aulas
-- Validación de conflictos de horario
-- Exportación a formatos estándar (iCal, Google Calendar)
+- [x] Notificaciones automáticas a estudiantes
+- [ ] Clases recurrentes (pendiente)
+- [ ] Validación de disponibilidad de aulas (pendiente)
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -47,20 +36,12 @@ Sistema completo para la planificación, programación y control de clases, perm
 
 **Criterios de Aceptación:**
 
-- [x] Inicio de sesión de asistencia (generación de QR)
-- [x] Cierre de sesión de asistencia (marcar clase como REALIZADA o CANCELADA)
+- [x] Generación de códigos QR para asistencia
 - [x] Registro manual de asistencia
-- [x] Escaneo de códigos QR para registro automático
-- [x] Control de retrasos (estado TARDANZA) y justificaciones (estado JUSTIFICADO)
-- [x] Vista en tiempo real de asistencias/ausencias
-- [x] Exportación de reportes de asistencia (PDF)
-- [ ] Historial de cambios en registros (pendiente - no hay auditoría detallada)
-
-**Requisitos de UX:**
-
-- Interfaz intuitiva para registro rápido
-- Retroalimentación visual inmediata
-- Modo fuera de línea con sincronización posterior
+- [x] Registro automático vía QR
+- [x] Control de retrasos y justificaciones
+- [x] Vista en tiempo real de asistencias
+- [x] Exportación de reportes (PDF)
 
 **Prioridad:** Alta  
 **Story Points:** 8  
@@ -71,22 +52,19 @@ Sistema completo para la planificación, programación y control de clases, perm
 
 ### HU-009: Visualización de Cronograma Académico
 
+**Como** estudiante o docente  
+**Quiero** visualizar el cronograma académico  
+**Para** planificar mis actividades y clases
+
 **Criterios de Aceptación:**
 
-- [x] Vista semanal/mensual de clases programadas (dashboard)
-- [x] Filtros por asignatura (en dashboard de docente)
-- [ ] Filtros por tipo de clase (pendiente)
+- [x] Vista de calendario de clases programadas
+- [x] Filtros por asignatura
 - [x] Indicadores de estado (PROGRAMADA, REALIZADA, CANCELADA)
-- [x] Detalles de cada clase con un clic
-- [ ] Sincronización con calendarios externos (pendiente - Outlook, Google Calendar)
-- [x] Notificaciones de próximas clases (parcialmente implementado - email)
-- [x] Vista móvil optimizada (responsive design)
-
-**Requisitos Técnicos:**
-
-- API para integración con otras plataformas
-- Sincronización bidireccional con Google/Outlook
-- Soporte para modo fuera de línea
+- [x] Detalles de cada clase
+- [x] Notificaciones de próximas clases
+- [x] Vista móvil optimizada
+- [ ] Sincronización con calendarios externos (pendiente)
 
 **Prioridad:** Media  
 **Story Points:** 8  

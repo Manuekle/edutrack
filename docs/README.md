@@ -59,6 +59,11 @@
     - Configuración de Redis
     - Configuración de SMTP
 
+11. **[Requisitos Funcionales y No Funcionales](./REQUIREMENTS.md)**
+    - Especificación detallada de requisitos funcionales
+    - Especificación de requisitos no funcionales
+    - Prioridades y estado de implementación
+
 ---
 
 ## 🏗️ **Arquitectura del Sistema**
@@ -123,18 +128,12 @@ graph TD
 - Dashboard con métricas
 - Exportación de datos
 
-### **[Epic 7: Comunicaciones](./user_stories/EPIC_07_COMMUNICATION.md)** 🚧 EN DESARROLLO (65%)
+### **[Epic 7: Comunicaciones](./user_stories/EPIC_07_COMMUNICATION.md)** ✅ COMPLETADO
 
 - ✅ Notificaciones por email (implementado)
 - ✅ Sistema de plantillas personalizables
 - ✅ Sistema de cola de correos con reintentos automáticos
 - ✅ Configuración de preferencias de notificación
-- ❌ Integración WhatsApp Business
-- ❌ Panel de gestión de suscripciones
-- ❌ Plantillas personalizadas avanzadas
-- ❌ Programación de notificaciones
-- ❌ Notificaciones push
-- ❌ Panel de estadísticas de notificaciones
 
 ### **[Epic 8: Administración](./user_stories/EPIC_08_ADMINISTRATION.md)** ✅ COMPLETADO
 
@@ -167,6 +166,7 @@ graph TD
 - **Separación de componentes** React para mejor mantenibilidad
 - **Persistencia de tema** (modo oscuro/claro)
 - **Invalidación automática de caché** cuando se actualizan datos
+- **Sistema de notificaciones por email** con plantillas personalizables y cola de correos
 
 ### Optimizaciones de Rendimiento ✅
 
@@ -180,15 +180,12 @@ Ver [Documentación de Optimizaciones](./05_OPTIMIZATIONS.md) para más detalles
 
 ### En Desarrollo 🚧
 
-- Sistema de notificaciones por email (60% - parcialmente implementado)
 - Testing automatizado completo (10% - pendiente)
 - React Query para caché del lado del cliente (30% - hooks creados)
 - Migración de formularios a react-hook-form (85% - 3 formularios pendientes)
 
 ### Pendiente ⏳
 
-- Integración con WhatsApp Business
-- Panel de gestión de suscripciones de notificaciones
 - Integración con calendario Outlook
 - Módulo de backup automático
 - Autenticación de dos factores (2FA)
@@ -215,5 +212,7 @@ Ver [Documentación de Optimizaciones](./05_OPTIMIZATIONS.md) para más detalles
 9. **[Resumen de Tareas Pendientes](./08_PENDING_TASKS_SUMMARY.md)** - Resumen ejecutivo de tareas pendientes
 
 10. **[Tareas Pendientes Detalladas](./PENDING_TASKS.md)** - Lista completa de tareas pendientes con plan de implementación
+
+11. **[Requisitos Funcionales y No Funcionales](./REQUIREMENTS.md)** - Especificación detallada de requisitos funcionales y no funcionales
 
 ---

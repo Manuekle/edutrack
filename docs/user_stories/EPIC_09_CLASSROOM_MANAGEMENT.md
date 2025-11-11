@@ -13,10 +13,8 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 **Para** asegurar que cuento con el espacio y equipamiento necesario para mis clases
 
 **Criterios de Aceptación:**
-- [ ] Formulario de solicitud con campos obligatorios
-- [ ] Selector de fechas y horarios con validación
-- [ ] Lista de recursos tecnológicos disponibles
-- [ ] Vista previa de la solicitud
+- [ ] Formulario de solicitud de reserva
+- [ ] Selección de fechas, horarios y recursos
 - [ ] Confirmación por correo electrónico
 
 **Prioridad:** Alta  
@@ -35,7 +33,6 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 - [ ] Vista de calendario con disponibilidad de aulas
 - [ ] Filtros por tipo de aula y recursos
 - [ ] Indicación visual de horarios ocupados/disponibles
-- [ ] Vista detallada al seleccionar un horario
 
 **Prioridad:** Alta  
 **Story Points:** 3  
@@ -51,8 +48,7 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 
 **Criterios de Aceptación:**
 - [ ] Listado de solicitudes pendientes
-- [ ] Opciones de aprobación/rechazo
-- [ ] Campo para observaciones
+- [ ] Aprobación/rechazo de solicitudes
 - [ ] Notificación automática al docente
 
 **Prioridad:** Alta  
@@ -68,10 +64,9 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 **Para** mantener actualizada la disponibilidad de equipos
 
 **Criterios de Aceptación:**
-- [ ] CRUD de recursos tecnológicos
+- [ ] Gestión de recursos tecnológicos (CRUD)
 - [ ] Estado de disponibilidad en tiempo real
 - [ ] Historial de uso por recurso
-- [ ] Alertas de mantenimiento
 
 **Prioridad:** Media  
 **Story Points:** 3  
@@ -86,10 +81,9 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 **Para** tener una visión completa de la ocupación
 
 **Criterios de Aceptación:**
-- [ ] Vista mensual/semanal/diaria
+- [ ] Vista de calendario general (mensual/semanal/diaria)
 - [ ] Filtros por aula y recursos
 - [ ] Exportación a diferentes formatos
-- [ ] Vista detallada de cada reserva
 
 **Prioridad:** Media  
 **Story Points:** 5  
@@ -104,10 +98,8 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 **Para** estar informado sobre el estado de mis solicitudes
 
 **Criterios de Aceptación:**
-- [ ] Notificación al crear solicitud
-- [ ] Notificación de aprobación/rechazo
+- [ ] Notificaciones de creación, aprobación/rechazo y cancelación
 - [ ] Recordatorio 24h antes de la reserva
-- [ ] Notificación en caso de cancelación
 
 **Prioridad:** Baja  
 **Story Points:** 3  
@@ -125,7 +117,6 @@ Módulo que permite la gestión integral de aulas y recursos tecnológicos, faci
 - [ ] Filtros por fechas y tipos de recursos
 - [ ] Métricas de ocupación
 - [ ] Exportación a PDF/Excel
-- [ ] Gráficos de uso
 
 **Prioridad:** Baja  
 **Story Points:** 5  

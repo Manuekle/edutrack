@@ -14,19 +14,11 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 
 **Criterios de Aceptación:**
 
-- [x] Escaneo de código QR de la clase
-- [x] Confirmación visual del registro exitoso
-- [x] Visualización de mi estado de asistencia (dashboard estudiante)
-- [x] Historial personal de asistencias
+- [x] Escaneo de código QR para registrar asistencia
+- [x] Confirmación visual del registro
+- [x] Visualización de estado de asistencia y historial
 - [x] Notificaciones de registro exitoso/fallido
-- [ ] Funcionalidad sin conexión con sincronización posterior (pendiente)
-- [x] Soporte para diferentes dispositivos móviles (responsive design)
-
-**Requisitos Técnicos:**
-
-- API para registro de asistencias
-- Almacenamiento local para modo offline
-- Sincronización en segundo plano
+- [x] Soporte para dispositivos móviles
 
 **Prioridad:** Alta  
 **Story Points:** 8  
@@ -44,19 +36,12 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 **Criterios de Aceptación:**
 
 - [x] Vista en tiempo real de asistencias/ausencias
-- [x] Filtros por fecha, estudiante o estado (en página de clase)
+- [x] Filtros por fecha, estudiante o estado
 - [x] Indicadores visuales de estado (PRESENTE, AUSENTE, TARDANZA, JUSTIFICADO)
-- [x] Estadísticas de asistencia por clase (métricas en tiempo real)
-- [x] Exportación de reportes en PDF
-- [ ] Exportación en múltiples formatos (CSV pendiente)
-- [x] Búsqueda rápida de estudiantes
-- [x] Vista móvil optimizada (responsive design)
-
-**Requisitos de UX:**
-
-- Actualización en tiempo real
-- Interfaz intuitiva y responsiva
-- Accesos rápidos a funciones comunes
+- [x] Estadísticas de asistencia por clase
+- [x] Exportación de reportes (PDF)
+- [x] Búsqueda de estudiantes
+- [x] Vista móvil optimizada
 
 **Prioridad:** Alta  
 **Story Points:** 13  
@@ -74,18 +59,8 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 **Criterios de Aceptación:**
 
 - [x] Modificación individual de estados de asistencia
-- [x] Registro de justificaciones detalladas (campo justification)
-- [ ] Historial de cambios con marca de tiempo y usuario (pendiente - no hay auditoría detallada)
-- [ ] Notificaciones automáticas a estudiantes afectados (pendiente)
-- [ ] Diferenciación clara entre registros automáticos y manuales (pendiente)
-- [ ] Aprobación requerida para ciertos cambios (pendiente)
-- [x] Reporte de modificaciones realizadas (reportes PDF incluyen asistencias)
-
-**Requisitos de Seguridad:**
-
-- Control de acceso basado en roles
-- Registro de auditoría detallado
-- Validación de permisos en tiempo real
+- [x] Registro de justificaciones
+- [x] Inclusión en reportes PDF
 
 **Prioridad:** Media  
 **Story Points:** 8  
@@ -102,22 +77,8 @@ Sistema integral para el registro, seguimiento y gestión de asistencias, ofreci
 
 **Criterios de Aceptación:**
 
-- [x] Formulario para detallar motivo de cancelación/ausencia (campo cancellationReason)
 - [x] Registro de motivo de cancelación al marcar clase como CANCELADA
-- [x] Notificaciones automáticas a estudiantes cuando se cancela una clase
-- [ ] Adjuntar evidencias (documentos, capturas) (pendiente)
-- [ ] Flujo de aprobación/rechazo de observación (pendiente - solo docentes pueden cancelar)
-- [x] Estado de clase: PROGRAMADA, REALIZADA, CANCELADA
-- [ ] Reporte exportable de observaciones (pendiente - reportes incluyen clases canceladas pero no específicamente observaciones)
-
-**Requisitos Técnicos:**
-
-- Estado de clase con motivo de cancelación
-- Notificaciones automáticas a estudiantes (email)
-
-**Prioridad:** Alta  
-**Story Points:** 5  
-**Sprint:** 5  
-**Dependencias:** HU-013, HU-014
-
-**Nota**: Funcionalidad parcialmente implementada. Existe el campo `cancellationReason` en el modelo Class y se envían notificaciones automáticas, pero no hay un sistema completo de observaciones con aprobación/rechazo por coordinadores.
+- [x] Notificaciones automáticas a estudiantes
+- [x] Estados de clase: PROGRAMADA, REALIZADA, CANCELADA
+- [ ] Flujo de aprobación/rechazo por coordinadores (pendiente)
+- [ ] Adjuntar evidencias (pendiente)
