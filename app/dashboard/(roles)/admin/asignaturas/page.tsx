@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/table';
 import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
-import { BookOpen, GraduationCap, Search, Users } from 'lucide-react';
+import { Search, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
@@ -212,9 +212,6 @@ export default function GestionAsignaturasPage() {
                     <TableRow key={subject.id} className="hover:bg-muted/50 group">
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center space-x-3">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                            <BookOpen className="h-5 w-5 text-muted-foreground" />
-                          </div>
                           <div>
                             <div className="font-normal text-foreground">{subject.name}</div>
                             <div className="text-xs text-muted-foreground">
@@ -230,7 +227,6 @@ export default function GestionAsignaturasPage() {
                       </TableCell>
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <GraduationCap className="h-4 w-4 text-muted-foreground" />
                           <span
                             className="truncate max-w-[150px]"
                             title={subject.teacher?.name || ''}

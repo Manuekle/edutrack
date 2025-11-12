@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { LoadingPage } from '@/components/ui/loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { uploadSignature } from '@/lib/actions/user.actions';
@@ -734,7 +735,7 @@ export default function ProfilePage() {
                   {/* Subir Archivo */}
                   <div className="space-y-3 h-full flex flex-col">
                     <div>
-                      <FormLabel className="text-xs font-medium">Subir Firma</FormLabel>
+                      <Label className="text-xs font-medium">Subir Firma</Label>
                     </div>
                     <div className="flex-1 min-h-[180px]">
                       <SignatureFileUpload onFileSelect={handleFileSelect} file={signatureFile} />
@@ -743,7 +744,7 @@ export default function ProfilePage() {
 
                   {/* Dibujar Firma */}
                   <div className="space-y-3 h-full flex flex-col">
-                    <FormLabel className="text-xs font-medium">Dibujar Firma</FormLabel>
+                    <Label className="text-xs font-medium">Dibujar Firma</Label>
                     <div className="flex-1 flex flex-col">
                       <div
                         ref={canvasWrapperRef}
@@ -801,7 +802,7 @@ export default function ProfilePage() {
 
                 {/* Vista Previa */}
                 <div className="space-y-3">
-                  <FormLabel className="text-xs font-medium">Vista Previa</FormLabel>
+                  <Label className="text-xs font-medium">Vista Previa</Label>
                   <div className="border border-muted-foreground/20 rounded-md p-4 flex items-center justify-center h-48 sm:h-56 bg-card">
                     {signaturePreview ? (
                       <div className="relative w-full h-full">

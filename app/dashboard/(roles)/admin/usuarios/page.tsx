@@ -31,10 +31,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useUsers } from '@/hooks/use-users';
-import { useQueryClient } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
-import { MoreHorizontal, Search, UserCheck, UserCog, User as UserIcon, UserX } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { MoreHorizontal, Search, UserCheck, UserCog, UserX } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -234,9 +234,6 @@ export default function GestionUsuariosPage() {
                     <TableRow key={user.id} className="hover:bg-muted/50 group">
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center space-x-3">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                            <UserIcon className="h-5 w-5 text-muted-foreground" />
-                          </div>
                           <div>
                             <div className="font-normal text-foreground">
                               {user.name || 'Usuario sin nombre'}

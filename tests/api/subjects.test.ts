@@ -4,6 +4,7 @@
  */
 
 import { GET, POST } from '@/app/api/admin/subjects/route';
+import { PATCH, DELETE } from '@/app/api/admin/subjects/[id]/route';
 import { NextRequest } from 'next/server';
 
 // Mock de Prisma - debe ser definido antes de los mocks
@@ -311,6 +312,352 @@ describe('API /api/admin/subjects', () => {
       expect(response.status).toBe(403);
       expect(data).toHaveProperty('message', 'Acceso denegado');
       expect(mockPrisma.subject.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('PATCH /api/admin/subjects/[id]', () => {
+    it('debería actualizar una asignatura existente', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: [],
+        program: null,
+        semester: null,
+        credits: null,
+      };
+
+      const updatedSubject = {
+        ...existingSubject,
+        name: 'Updated Subject',
+        program: 'Ingeniería',
+        semester: 5,
+        credits: 3,
+        teacher: {
+          id: 'teacher1',
+          name: 'Test Teacher',
+          correoInstitucional: 'teacher@example.com',
+          codigoDocente: 'T001',
+        },
+        _count: {
+          classes: 5,
+        },
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValueOnce(existingSubject); // Para verificar existencia
+      mockPrisma.subject.findUnique.mockResolvedValueOnce(null); // Para verificar que el código no existe
+      mockPrisma.subject.update.mockResolvedValue(updatedSubject);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Updated Subject',
+          program: 'Ingeniería',
+          semester: '5',
+          credits: '3',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.name).toBe('Updated Subject');
+      expect(data.program).toBe('Ingeniería');
+      expect(data.studentCount).toBe(0);
+      expect(data.classCount).toBe(5);
+      expect(mockPrisma.subject.update).toHaveBeenCalled();
+    });
+
+    it('debería retornar 404 si la asignatura no existe', async () => {
+      mockPrisma.subject.findUnique.mockResolvedValue(null);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/non-existent-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Updated Subject',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.message).toContain('no encontrada');
+      expect(mockPrisma.subject.update).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 409 si el código ya está en uso', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: [],
+      };
+
+      const subjectWithCode = {
+        id: 'other-subject-id',
+        code: 'NEWCODE001',
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValueOnce(existingSubject); // Para verificar existencia
+      mockPrisma.subject.findUnique.mockResolvedValueOnce(subjectWithCode); // El código ya existe
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          code: 'NEWCODE001',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(409);
+      expect(data.message).toContain('código');
+      expect(mockPrisma.subject.update).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 404 si el docente no existe', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: [],
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValueOnce(existingSubject);
+      mockPrisma.user.findUnique.mockResolvedValue(null); // El docente no existe
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          teacherId: 'non-existent-teacher',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.message).toContain('docente');
+      expect(mockPrisma.subject.update).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 400 si el usuario seleccionado no es docente', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: [],
+      };
+
+      const nonTeacher = {
+        id: 'student-id',
+        role: 'ESTUDIANTE',
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValueOnce(existingSubject);
+      mockPrisma.user.findUnique.mockResolvedValue(nonTeacher);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          teacherId: 'student-id',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.message).toContain('docente');
+      expect(mockPrisma.subject.update).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 403 si el usuario no es ADMIN', async () => {
+      mockSession = {
+        user: {
+          id: 'test-user-id',
+          role: 'ESTUDIANTE',
+        },
+      };
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Updated Subject',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(403);
+      expect(data).toHaveProperty('message', 'Acceso denegado');
+      expect(mockPrisma.subject.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('DELETE /api/admin/subjects/[id]', () => {
+    it('debería eliminar una asignatura existente sin estudiantes ni clases', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: [],
+        _count: {
+          classes: 0,
+        },
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValue(existingSubject);
+      mockPrisma.subject.delete.mockResolvedValue(existingSubject);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toHaveProperty('message', 'Asignatura eliminada correctamente.');
+      expect(mockPrisma.subject.delete).toHaveBeenCalledWith({
+        where: { id: 'subject-id' },
+      });
+    });
+
+    it('debería retornar 404 si la asignatura no existe', async () => {
+      mockPrisma.subject.findUnique.mockResolvedValue(null);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/non-existent-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'non-existent-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(404);
+      expect(data.message).toContain('no encontrada');
+      expect(mockPrisma.subject.delete).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 400 si la asignatura tiene estudiantes matriculados', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: ['student1', 'student2'],
+        _count: {
+          classes: 0,
+        },
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValue(existingSubject);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.message).toContain('estudiantes');
+      expect(mockPrisma.subject.delete).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 400 si la asignatura tiene clases programadas', async () => {
+      const existingSubject = {
+        id: 'subject-id',
+        name: 'Test Subject',
+        code: 'TEST001',
+        teacherId: 'teacher1',
+        studentIds: [],
+        _count: {
+          classes: 5,
+        },
+      };
+
+      mockPrisma.subject.findUnique.mockResolvedValue(existingSubject);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.message).toContain('clases');
+      expect(mockPrisma.subject.delete).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 403 si el usuario no es ADMIN', async () => {
+      mockSession = {
+        user: {
+          id: 'test-user-id',
+          role: 'ESTUDIANTE',
+        },
+      };
+
+      const request = new NextRequest('http://localhost:3000/api/admin/subjects/subject-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ id: 'subject-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(403);
+      expect(data).toHaveProperty('message', 'Acceso denegado');
+      expect(mockPrisma.subject.delete).not.toHaveBeenCalled();
     });
   });
 });

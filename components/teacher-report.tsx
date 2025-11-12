@@ -409,13 +409,18 @@ export function TeacherReport() {
     const fetchTeachers = async () => {
       try {
         setLoadingTeachers(true);
-        const response = await fetch('/api/admin/users?role=DOCENTE');
+        const response = await fetch('/api/admin/users?role=DOCENTE&limit=100');
         if (!response.ok) throw new Error('No se pudo cargar la lista de docentes.');
-        const data = await response.json();
-        setTeachers(data);
-        setFilteredTeachers(data);
+        const apiResponse = await response.json();
+        // La API devuelve { data: Teacher[], pagination: {...} }
+        const teachersList = Array.isArray(apiResponse.data) ? apiResponse.data : [];
+        setTeachers(teachersList);
+        setFilteredTeachers(teachersList);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'No se pudo cargar la lista de docentes.');
+        // Asegurarse de que filteredTeachers siempre sea un array
+        setTeachers([]);
+        setFilteredTeachers([]);
       } finally {
         setLoadingTeachers(false);
       }
@@ -522,8 +527,10 @@ export function TeacherReport() {
   }, [selectedTeacher, period, selectedSubjectId]);
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredTeachers.length / TEACHERS_PER_PAGE);
-  const paginatedTeachers = filteredTeachers.slice(
+  // Asegurarse de que filteredTeachers siempre sea un array
+  const safeFilteredTeachers = Array.isArray(filteredTeachers) ? filteredTeachers : [];
+  const totalPages = Math.ceil(safeFilteredTeachers.length / TEACHERS_PER_PAGE);
+  const paginatedTeachers = safeFilteredTeachers.slice(
     (currentPage - 1) * TEACHERS_PER_PAGE,
     currentPage * TEACHERS_PER_PAGE
   );

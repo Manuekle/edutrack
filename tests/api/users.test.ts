@@ -4,7 +4,31 @@
  */
 
 import { GET, POST } from '@/app/api/admin/users/route';
+import { PATCH, DELETE } from '@/app/api/admin/users/[userId]/route';
 import { NextRequest } from 'next/server';
+
+// Mock de @prisma/client para el error de Prisma (solo lo necesario)
+jest.mock('@prisma/client', () => {
+  const actual = jest.requireActual('@prisma/client');
+  class PrismaClientKnownRequestError extends Error {
+    code = 'P2003';
+    meta?: unknown;
+    constructor(message: string, meta?: unknown) {
+      super(message);
+      this.name = 'PrismaClientKnownRequestError';
+      this.code = 'P2003';
+      this.meta = meta;
+    }
+  }
+
+  return {
+    ...actual,
+    Prisma: {
+      ...actual.Prisma,
+      PrismaClientKnownRequestError,
+    },
+  };
+});
 
 // Mock de Prisma - debe ser definido antes de los mocks
 jest.mock('@/lib/prisma', () => {
@@ -12,7 +36,10 @@ jest.mock('@/lib/prisma', () => {
     user: {
       findMany: jest.fn(),
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
       count: jest.fn(),
     },
   };
@@ -362,6 +389,208 @@ describe('API /api/admin/users', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('PATCH /api/admin/users/[userId]', () => {
+    it('debería actualizar un usuario existente', async () => {
+      const updatedUser = {
+        id: 'user-id',
+        name: 'Updated User',
+        correoPersonal: 'updated@example.com',
+        correoInstitucional: 'updated@institution.com',
+        role: 'ESTUDIANTE',
+        isActive: true,
+        document: '1234567890',
+        telefono: '1234567890',
+        codigoEstudiantil: 'E001',
+        codigoDocente: null,
+        createdAt: new Date(),
+      };
+
+      mockPrisma.user.findFirst.mockResolvedValue(null); // No hay otro usuario con ese correo
+      mockPrisma.user.update.mockResolvedValue(updatedUser);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Updated User',
+          correoPersonal: 'updated@example.com',
+          role: 'ESTUDIANTE',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data.name).toBe('Updated User');
+      expect(data).not.toHaveProperty('password');
+      expect(mockPrisma.user.update).toHaveBeenCalled();
+    });
+
+    it('debería retornar 400 si no se proporciona ningún correo', async () => {
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Updated User',
+          correoPersonal: '',
+          correoInstitucional: '',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.message).toContain('correo');
+      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 409 si el correo ya está en uso por otro usuario', async () => {
+      const existingUser = {
+        id: 'other-user-id',
+        correoPersonal: 'existing@example.com',
+      };
+
+      mockPrisma.user.findFirst.mockResolvedValue(existingUser);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          correoPersonal: 'existing@example.com',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(409);
+      expect(data.message).toContain('correo');
+      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 403 si el usuario no es ADMIN', async () => {
+      mockSession = {
+        user: {
+          id: 'test-user-id',
+          role: 'ESTUDIANTE',
+        },
+      };
+
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Updated User',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await PATCH(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(403);
+      expect(data).toHaveProperty('message', 'Acceso denegado');
+      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('DELETE /api/admin/users/[userId]', () => {
+    it('debería eliminar un usuario existente', async () => {
+      mockPrisma.user.delete.mockResolvedValue({ id: 'user-id' });
+
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toHaveProperty('message', 'Usuario eliminado con éxito');
+      expect(mockPrisma.user.delete).toHaveBeenCalledWith({
+        where: { id: 'user-id' },
+      });
+    });
+
+    it('debería retornar 400 si se intenta eliminar la propia cuenta', async () => {
+      const request = new NextRequest('http://localhost:3000/api/admin/users/test-admin-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ userId: 'test-admin-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.message).toContain('No puedes eliminar tu propia cuenta');
+      expect(mockPrisma.user.delete).not.toHaveBeenCalled();
+    });
+
+    it('debería retornar 409 si el usuario tiene registros asociados', async () => {
+      const { Prisma } = require('@prisma/client');
+      // Crear una instancia del error de Prisma usando la clase mockeada
+      const error = new Prisma.PrismaClientKnownRequestError('Foreign key constraint failed', {
+        code: 'P2003',
+      });
+
+      mockPrisma.user.delete.mockRejectedValue(error);
+
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(409);
+      expect(data.message).toContain('registros asociados');
+    });
+
+    it('debería retornar 403 si el usuario no es ADMIN', async () => {
+      mockSession = {
+        user: {
+          id: 'test-user-id',
+          role: 'ESTUDIANTE',
+        },
+      };
+
+      const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
+        method: 'DELETE',
+      });
+
+      const response = await DELETE(request, {
+        params: Promise.resolve({ userId: 'user-id' }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(403);
+      expect(data).toHaveProperty('message', 'Acceso denegado');
+      expect(mockPrisma.user.delete).not.toHaveBeenCalled();
     });
   });
 });
