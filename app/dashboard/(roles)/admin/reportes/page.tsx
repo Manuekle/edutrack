@@ -7,7 +7,7 @@ export default function AdminReportesPage() {
   return (
     <div className="space-y-6">
       <CardHeader className="p-0 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-card">Reportes Docentes</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Reportes Docentes</CardTitle>
         <CardDescription className="text-xs">
           Selecciona un docente para ver los reportes detallados de sus asignaturas.
         </CardDescription>

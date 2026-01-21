@@ -75,7 +75,7 @@ export default function ScannerPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-card">Registrar Asistencia</h1>
+          <h1 className="sm:text-3xl text-2xl font-semibold tracking-card">Registrar Asistencia</h1>
           <p className="text-muted-foreground text-xs mt-2">
             Escanea el código QR mostrado por tu docente para registrar tu asistencia
           </p>

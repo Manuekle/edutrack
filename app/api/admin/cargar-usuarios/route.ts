@@ -79,6 +79,7 @@ export async function POST(request: Request) {
   }
 
   const url = new URL(request.url, `https://${request.headers.get('host')}`);
+  const forceRole = url.searchParams.get('forceRole');
   const isPreview = url.searchParams.get('preview') === 'true';
 
   // --- MODO PREVISUALIZACIÓN: Leer y validar archivo Excel/CSV ---
@@ -333,6 +334,7 @@ export async function POST(request: Request) {
             row.contraseña ||
             row.Contraseña,
           role:
+            forceRole ||
             (roleHeader ? row[roleHeader] : undefined) ||
             row.role ||
             row.Role ||

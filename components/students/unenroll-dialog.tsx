@@ -2,12 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,7 +35,7 @@ export function UnenrollDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-card">
+          <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
             Solicitar desmatrícula
           </DialogTitle>
           <DialogDescription className="space-y-4 font-sans">

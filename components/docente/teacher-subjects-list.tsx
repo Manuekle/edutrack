@@ -22,7 +22,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
         </div>
       </CardHeader>
       <CardContent>

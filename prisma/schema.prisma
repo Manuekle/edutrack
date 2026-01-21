@@ -95,6 +95,7 @@ model Subject {
   teacher          User              @relation("TeacherSubjects", fields: [teacherId], references: [id])
   teacherId        String            @db.ObjectId
   studentIds       String[]          @db.ObjectId
+  classroom        String?           // Aula por defecto
   classes          Class[]
   events           SubjectEvent[]
   reports          Report[]

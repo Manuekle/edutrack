@@ -37,7 +37,7 @@ export default function HomePageMobile() {
   }, []);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-background text-foreground font-sans overflow-hidden relative">
+    <div className="flex flex-col h-dvh bg-background text-foreground font-sans overflow-hidden relative">
       {/* Background Elements */}
       <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-primary/5 blur-3xl rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/5 blur-3xl rounded-full" />
@@ -50,7 +50,7 @@ export default function HomePageMobile() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center mb-12"
         >
-          <div className="w-20 h-20 bg-gradient-to-tr from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-primary/10 border border-primary/10 backdrop-blur-sm">
+          <div className="w-20 h-20 bg-linear-to-tr from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-primary/10 border border-primary/10 backdrop-blur-sm">
             <QrCode className="w-10 h-10 text-primary" />
           </div>
           <h1 className="text-3xl font-semibold tracking-card text-center">

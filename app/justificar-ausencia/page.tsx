@@ -7,12 +7,12 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { LoadingPage } from '@/components/ui/loading';
 import { Textarea } from '@/components/ui/textarea';
@@ -166,7 +166,7 @@ function JustificarAusenciaContent() {
       <div className="flex flex-col items-center justify-center min-h-[100dvh] p-4 font-sans">
         <Card className="w-full max-w-sm mx-auto">
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold tracking-card text-center">
+            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card text-center">
               Justificación Enviada
             </CardTitle>
             <CardDescription className="text-center">
@@ -191,7 +191,7 @@ function JustificarAusenciaContent() {
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-4 text-center">
         <Card className="w-full max-w-md p-8">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-semibold tracking-card text-center">
+            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card text-center">
               Enlace inválido
             </CardTitle>
             <CardDescription className="text-xs">
@@ -213,7 +213,7 @@ function JustificarAusenciaContent() {
     <div className="flex items-center justify-center min-h-[100dvh] p-4 font-sans">
       <Card className="w-full max-w-sm mx-auto my-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold tracking-card text-center">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card text-center">
             Justificar ausencia
           </CardTitle>
           <CardDescription className="text-center">

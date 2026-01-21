@@ -23,7 +23,7 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-semibold tracking-card">Próximas Clases</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Próximas Clases</CardTitle>
         </div>
       </CardHeader>
       <CardContent>

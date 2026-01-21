@@ -1,54 +1,20 @@
-// components/ui/import-dialog.tsx
 'use client';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, FileSpreadsheet } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
-
-interface ClassData {
-  id: string;
-  fechaClase: string;
-  horaInicio: string;
-  horaFin: string;
-  temaClase: string;
-  descripcionClase: string;
-}
-
-interface SubjectData {
-  id: string;
-  codigoAsignatura: string;
-  nombreAsignatura: string;
-  creditosClase: number;
-  programa: string;
-  semestreAsignatura: number;
-  classes: ClassData[];
-}
-
-interface ExcelRowData {
-  codigoAsignatura?: string | number;
-  nombreAsignatura?: string | number;
-  creditosClase?: string | number;
-  programa?: string | number;
-  semestreAsignatura?: string | number;
-  'fechaClase (YYYY-MM-DD)'?: string | number;
-  'horaInicio (HH:MM)'?: string | number;
-  'horaFin (HH:MM)'?: string | number;
-  temaClase?: string | number;
-  descripcionClase?: string | number;
-}
 
 interface ImportPreviewItem {
   codigoAsignatura: string;
@@ -57,6 +23,9 @@ interface ImportPreviewItem {
   programa: string;
   semestreAsignatura: number;
   classCount: number;
+  docente?: string;
+  salon?: string;
+  teacherFound?: boolean;
   status: 'new' | 'existing' | 'error';
   error?: string;
 }
@@ -64,107 +33,53 @@ interface ImportPreviewItem {
 interface AsignaturasImportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImport: (subjects: SubjectData[]) => void;
-  existingCodes: Set<string>;
+  onImport: () => void;
 }
 
 export function AsignaturasImportDialog({
   open,
   onOpenChange,
   onImport,
-  existingCodes,
 }: AsignaturasImportDialogProps) {
   const [dragOver, setDragOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [preview, setPreview] = useState<ImportPreviewItem[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
-  const [importData, setImportData] = useState<SubjectData[]>([]);
+  const [file, setFile] = useState<File | null>(null);
 
-  const generateId = () => Math.random().toString(36).substr(2, 9);
-
-  const handleFileSelect = async (file: File) => {
-    if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+  const handleFileSelect = async (selectedFile: File) => {
+    if (!selectedFile.name.endsWith('.xlsx') && !selectedFile.name.endsWith('.xls')) {
       toast.error('Por favor selecciona un archivo Excel válido (.xlsx o .xls)');
       return;
     }
 
+    setFile(selectedFile);
     setIsProcessing(true);
     setProcessingProgress(10);
 
     try {
-      const buffer = await file.arrayBuffer();
-      setProcessingProgress(30);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('preview', 'true');
 
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(sheet) as ExcelRowData[];
-      setProcessingProgress(60);
-
-      const importedSubjects: Record<string, SubjectData> = {};
-      const previewItems: ImportPreviewItem[] = [];
-
-      data.forEach((row, index) => {
-        const codigo = row.codigoAsignatura?.toString().trim();
-        if (!codigo) return;
-
-        if (!importedSubjects[codigo]) {
-          const status = existingCodes.has(codigo) ? 'existing' : 'new';
-
-          importedSubjects[codigo] = {
-            id: generateId(),
-            codigoAsignatura: codigo,
-            nombreAsignatura: row.nombreAsignatura?.toString() || '',
-            creditosClase: Number(row.creditosClase) || 3,
-            programa: row.programa?.toString() || '',
-            semestreAsignatura: Number(row.semestreAsignatura) || 1,
-            classes: [],
-          };
-
-          previewItems.push({
-            codigoAsignatura: codigo,
-            nombreAsignatura: row.nombreAsignatura?.toString() || '',
-            creditosClase: Number(row.creditosClase) || 3,
-            programa: row.programa?.toString() || '',
-            semestreAsignatura: Number(row.semestreAsignatura) || 1,
-            classCount: 0,
-            status,
-            error: status === 'existing' ? 'Esta asignatura ya existe en tu lista' : undefined,
-          });
-        }
-
-        // Add class data if present
-        const fechaClase = row['fechaClase (YYYY-MM-DD)']?.toString();
-        const horaInicio = row['horaInicio (HH:MM)']?.toString();
-        const horaFin = row['horaFin (HH:MM)']?.toString();
-
-        if (fechaClase && horaInicio && horaFin) {
-          importedSubjects[codigo].classes.push({
-            id: generateId(),
-            fechaClase,
-            horaInicio,
-            horaFin,
-            temaClase: row.temaClase?.toString() || '',
-            descripcionClase: row.descripcionClase?.toString() || '',
-          });
-
-          // Update class count in preview
-          const previewItem = previewItems.find(item => item.codigoAsignatura === codigo);
-          if (previewItem) {
-            previewItem.classCount++;
-          }
-        }
+      const response = await fetch('/api/admin/subjects/import', {
+        method: 'POST',
+        body: formData,
       });
 
-      setProcessingProgress(100);
-      setPreview(previewItems);
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      setPreview(result.previewData);
       setShowPreview(true);
-      setImportData(Object.values(importedSubjects));
-    } catch (error) {
-      toast.error('Error al procesar el archivo Excel');
+      setProcessingProgress(100);
+      
+    } catch (error: any) {
+        toast.error(error.message || 'Error al procesar el archivo');
+        setFile(null);
     } finally {
-      setIsProcessing(false);
-      setProcessingProgress(0);
+        setIsProcessing(false);
     }
   };
 
@@ -180,31 +95,43 @@ export function AsignaturasImportDialog({
     }
   };
 
-  const handleConfirmImport = () => {
-    const newSubjects = importData.filter(
-      (subject: SubjectData) => !existingCodes.has(subject.codigoAsignatura)
-    );
+  const handleConfirmImport = async () => {
+     if (!file) return;
+     
+     setIsProcessing(true);
+     try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('preview', 'false');
 
-    if (newSubjects.length > 0) {
-      onImport(newSubjects);
-      toast.success(`Se importaron ${newSubjects.length} asignaturas nuevas`);
-    } else {
-      toast.info('No se encontraron asignaturas nuevas para importar');
-    }
+        const response = await fetch('/api/admin/subjects/import', {
+            method: 'POST',
+            body: formData,
+        });
+        
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
 
-    // Reset state
-    setShowPreview(false);
-    setPreview([]);
-    setImportData([]);
-    onOpenChange(false);
+        toast.success(`Se procesaron ${result.processed} asignaturas.`);
+        if (result.errors && result.errors.length > 0) {
+            toast.warning(`Hubo ${result.errors.length} errores. Revisa la consola.`);
+            console.error(result.errors);
+        }
+
+        onImport();
+        handleCancel();
+     } catch(e: any) {
+         toast.error(e.message);
+         setIsProcessing(false);
+     }
   };
 
   const handleCancel = () => {
     setShowPreview(false);
     setPreview([]);
-    setImportData([]);
-    setIsProcessing(false);
     setProcessingProgress(0);
+    setFile(null);
+    setIsProcessing(false);
     onOpenChange(false);
   };
 
@@ -212,7 +139,7 @@ export function AsignaturasImportDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-xl tracking-card">Importar desde Excel</DialogTitle>
+          <DialogTitle className="sm:text-3xl text-2xl tracking-card">Importar desde Excel</DialogTitle>
           <DialogDescription className="text-xs">
             Importa asignaturas y clases desde un archivo Excel existente
           </DialogDescription>
@@ -223,7 +150,7 @@ export function AsignaturasImportDialog({
             <div className="space-y-4 py-8">
               <div className="text-center">
                 <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
-                <h3 className="text-2xl font-medium mb-2">Procesando archivo...</h3>
+                <h3 className="sm:text-3xl text-2xl font-medium mb-2">Procesando archivo...</h3>
                 <p className="text-xs text-muted-foreground mb-4">
                   Analizando los datos del archivo Excel
                 </p>
@@ -248,42 +175,38 @@ export function AsignaturasImportDialog({
                   <div
                     key={index}
                     className={`p-4 rounded-lg border ${
-                      item.status === 'existing'
-                        ? 'border-destructive bg-destructive text-white'
-                        : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800 dark:text-white'
+                      item.status === 'existing' || item.status === 'error'
+                        ? 'border-destructive/20 bg-destructive/5'
+                        : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h1
-                            className={`font-medium text-xs ${item.status === 'existing' ? 'text-white' : 'text-black'}`}
-                          >
+                          <h1 className="font-medium text-xs text-foreground">
                             {item.nombreAsignatura} ({item.codigoAsignatura})
                           </h1>
+                          {item.status === 'existing' && <Badge variant="destructive" className="text-[10px]">Existe</Badge>}
+                          {item.status === 'new' && <Badge className="bg-emerald-500 text-[10px]">Nuevo</Badge>}
                         </div>
 
-                        <div
-                          className={`grid grid-cols-3 gap-4 text-xs ${item.status === 'existing' ? 'text-white' : 'text-black'}`}
-                        >
-                          <div>Créditos: {item.creditosClase}</div>
-                          <div>Semestre: {item.semestreAsignatura}</div>
+                        <div className="grid grid-cols-3 gap-4 text-xs text-muted-foreground mb-2">
+                          <div>Créditos: {item.creditosClase || 0}</div>
+                          <div>Semestre: {item.semestreAsignatura || 1}</div>
                           <div>Clases: {item.classCount}</div>
                         </div>
 
-                        {item.programa && (
-                          <div
-                            className={`text-xs ${item.status === 'existing' ? 'text-white' : 'text-black'}`}
-                          >
-                            Programa: {item.programa}
-                          </div>
-                        )}
+                        <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground border-t pt-2 mt-2">
+                            <div className={!item.teacherFound && item.docente ? "text-destructive font-medium" : ""}>
+                                Docente: {item.docente || 'Sin asignar'}
+                                {!item.teacherFound && item.docente && " (No encontrado)"}
+                            </div>
+                            <div>Salón: {item.salon || 'N/A'}</div>
+                        </div>
 
                         {item.error && (
-                          <div
-                            className={`text-xs ${item.status === 'existing' ? 'text-white' : 'text-black'}`}
-                          >
-                            {item.error}
+                          <div className="text-xs text-destructive mt-2 font-medium">
+                            Error: {item.error}
                           </div>
                         )}
                       </div>
@@ -298,9 +221,9 @@ export function AsignaturasImportDialog({
                   <span className="font-medium">Información importante:</span>
                 </div>
                 <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                  <li>Solo se importarán las asignaturas nuevas (marcadas en verde)</li>
-                  <li>Las asignaturas existentes se omitirán para evitar duplicados</li>
-                  <li>Todas las clases asociadas serán importadas junto con sus asignaturas</li>
+                  <li>Solo se importarán las asignaturas nuevas</li>
+                  <li>Las asignaturas existentes se omitirán</li>
+                  <li>Si el docente no se encuentra, se asignará al administrador actual</li>
                 </ul>
               </div>
             </div>
@@ -374,30 +297,10 @@ export function AsignaturasImportDialog({
               <div className="px-1 text-xs">
                 <h4 className="font-medium mb-2">Formato esperado del archivo:</h4>
                 <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-                  <li>
-                    <code>codigoAsignatura</code> - Código único de la asignatura
-                  </li>
-                  <li>
-                    <code>nombreAsignatura</code> - Nombre completo de la asignatura
-                  </li>
-                  <li>
-                    <code>creditosClase</code> - Número de créditos
-                  </li>
-                  <li>
-                    <code>programa</code> - Programa académico
-                  </li>
-                  <li>
-                    <code>semestreAsignatura</code> - Semestre correspondiente
-                  </li>
-                  <li>
-                    <code>fechaClase (YYYY-MM-DD)</code> - Fecha de cada clase
-                  </li>
-                  <li>
-                    <code>horaInicio (HH:MM)</code> - Hora de inicio
-                  </li>
-                  <li>
-                    <code>horaFin (HH:MM)</code> - Hora de finalización
-                  </li>
+                  <li><code>codigoAsignatura</code>, <code>nombreAsignatura</code></li>
+                  <li><code>creditosClase</code>, <code>programa</code>, <code>semestreAsignatura</code></li>
+                  <li><code>fechaClase (YYYY-MM-DD)</code>, <code>horaInicio (HH:MM)</code>, <code>horaFin</code></li>
+                  <li><code>docente</code> (email/doc), <code>salon</code></li>
                 </ul>
               </div>
             </div>

@@ -2,12 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { useSession } from 'next-auth/react';
 
@@ -33,7 +33,7 @@ export function GenerateReportModal({
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold tracking-card">
+          <DialogTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
             Generar Bitacora Docente
           </DialogTitle>
           <DialogDescription>

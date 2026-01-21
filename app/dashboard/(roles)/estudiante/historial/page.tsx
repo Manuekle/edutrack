@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -91,7 +91,7 @@ export default function HistorialAsistenciasPage() {
   return (
     <div>
       <div className="pb-4">
-        <CardTitle className="text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
           Historial de Asistencias
         </CardTitle>
         <CardDescription className="text-xs">Listado de tus asistencias</CardDescription>

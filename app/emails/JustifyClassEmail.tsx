@@ -1,16 +1,16 @@
 import {
-  Body,
-  Container,
-  Font,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Link,
-  Preview,
-  Section,
-  Tailwind,
-  Text,
+    Body,
+    Container,
+    Font,
+    Head,
+    Heading,
+    Hr,
+    Html,
+    Link,
+    Preview,
+    Section,
+    Tailwind,
+    Text,
 } from '@react-email/components';
 
 interface JustifyClassEmailProps {
@@ -82,7 +82,7 @@ const JustifyClassEmail = ({
           <Container className="mx-auto max-w-[580px] bg-white border border-zinc-200 rounded-[12px] overflow-hidden">
             {/* Header */}
             <Section className="bg-black px-[32px] py-[24px]">
-              <Heading className="text-xl font-semibold text-white m-0 leading-[28px]">
+              <Heading className="sm:text-3xl text-2xl font-semibold text-white m-0 leading-[28px]">
                 Justificación Recibida
               </Heading>
               <Text className="text-zinc-300 text-xs m-0 mt-[4px] leading-[20px]">
@@ -94,7 +94,7 @@ const JustifyClassEmail = ({
             <Section className="px-[32px] py-[32px]">
               {/* Status Message */}
               <Section className="mb-[32px] text-center">
-                <Heading className="text-xl font-semibold text-black m-0 mb-[8px] leading-[32px]">
+                <Heading className="sm:text-3xl text-2xl font-semibold text-black m-0 mb-[8px] leading-[32px]">
                   Justificación Registrada
                 </Heading>
                 <Text className="text-zinc-600 text-xs leading-[24px] m-0">

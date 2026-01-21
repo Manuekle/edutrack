@@ -1,10 +1,10 @@
 'use client';
 
-import { useRef, useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Home, Info, Menu, Moon, Sun, User, X, Zap } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 interface NavigationItem {
   name: string;
@@ -109,7 +109,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
+              <span className="sm:text-3xl text-2xl font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
                 edu<span className="text-amber-500">Track</span>
               </span>
             </Link>

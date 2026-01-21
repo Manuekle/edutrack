@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
-  getLiveClassData,
-  getTeacherDashboardData,
-  type LiveClassData,
+    getLiveClassData,
+    getTeacherDashboardData,
+    type LiveClassData,
 } from '@/services/dashboardService';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -121,7 +121,7 @@ export default function DocenteDashboard() {
     <div className="mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-card">Mi Panel</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mi Panel</CardTitle>
           <CardDescription className="text-xs">
             Gestiona tus asignaturas y clases en vivo.
           </CardDescription>

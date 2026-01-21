@@ -73,7 +73,7 @@ export default async function PreviewPage({ params }: PageProps) {
   if (!subject) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-semibold text-red-600 dark:text-red-400">
+        <h1 className="sm:text-3xl text-2xl font-semibold text-red-600 dark:text-red-400">
           Asignatura no encontrada
         </h1>
       </div>
@@ -83,7 +83,7 @@ export default async function PreviewPage({ params }: PageProps) {
   if (subject.teacherId !== session.user.id) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-semibold text-red-600 dark:text-red-400">No autorizado</h1>
+        <h1 className="sm:text-3xl text-2xl font-semibold text-red-600 dark:text-red-400">No autorizado</h1>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export default async function PreviewPage({ params }: PageProps) {
     <div className="space-y-6">
       <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
         <div>
-          <CardTitle className="text-2xl font-semibold tracking-card dark:text-gray-100">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card dark:text-gray-100">
             Bitacora Docente
           </CardTitle>
           <CardDescription className="text-xs dark:text-gray-300">
@@ -133,7 +133,7 @@ export default async function PreviewPage({ params }: PageProps) {
 
           {/* Títulos */}
           <div className="w-full sm:w-1/2 text-center">
-            <div className="text-[#003366] dark:text-blue-200 font-semibold text-2xl">
+            <div className="text-[#003366] dark:text-blue-200 font-semibold sm:text-3xl text-2xl">
               REGISTRO DE CLASES Y ASISTENCIA
             </div>
             <div className="text-[#003366] dark:text-blue-200 text-xs">DOCENCIA</div>

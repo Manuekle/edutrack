@@ -7,20 +7,20 @@ import { z } from 'zod';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
@@ -90,7 +90,7 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-sm mx-auto my-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold tracking-card text-center">
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card text-center">
           Iniciar Sesión
         </CardTitle>
         <CardDescription className="text-center">

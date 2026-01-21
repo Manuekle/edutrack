@@ -30,7 +30,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
       </CardHeader>
       <CardContent>
         {subjects.length > 0 ? (

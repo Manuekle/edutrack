@@ -7,20 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
 import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,10 +29,13 @@ import { useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
 
+import { AsignaturasImportDialog } from '@/components/ui/asignaturas-import-dialog';
+
 export default function GestionAsignaturasPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +69,7 @@ export default function GestionAsignaturasPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-card">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
             Gestión de Asignaturas
           </CardTitle>
           <CardDescription className="text-xs">
@@ -74,6 +77,9 @@ export default function GestionAsignaturasPage() {
           </CardDescription>
         </CardHeader>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsImportModalOpen(true)} className="gap-2">
+             <span>Cargar Asignaturas</span>
+          </Button>
           <Button variant="default" onClick={() => setIsCreateModalOpen(true)} className="gap-2">
             <span>Nueva Asignatura</span>
           </Button>
@@ -84,7 +90,7 @@ export default function GestionAsignaturasPage() {
         <CardHeader className="border-b px-4 pb-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Lista de Asignaturas
               </CardTitle>
               <CardDescription className="text-xs">
@@ -274,6 +280,12 @@ export default function GestionAsignaturasPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubjectCreated={handleSubjectCreated}
+      />
+
+      <AsignaturasImportDialog
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+        onImport={handleSubjectCreated}
       />
     </div>
   );

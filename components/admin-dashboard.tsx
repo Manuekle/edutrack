@@ -1,20 +1,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
+import { CHART_COLORS } from '@/lib/chart-colors';
 import { AlertCircle, BookOpen, TrendingUp, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  Tooltip,
-  XAxis,
-  YAxis,
+    Area,
+    AreaChart,
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Cell,
+    Legend,
+    Pie,
+    PieChart,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from 'recharts';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -105,7 +106,7 @@ const AdminDashboardComponent = () => {
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
           <AlertCircle className="h-12 w-12 text-white mb-4" />
-          <h2 className="text-2xl text-white text-center font-semibold tracking-card pb-2">
+          <h2 className="sm:text-3xl text-2xl text-white text-center font-semibold tracking-card pb-2">
             Error al cargar datos
           </h2>
           <p className="text-white text-xs text-center mb-6">
@@ -127,19 +128,19 @@ const AdminDashboardComponent = () => {
     return <Icon className="h-4 w-4" />;
   };
 
-  // Paleta colorida solo para la dona
-  const PIE_COLORS = ['#4CAF50', '#4E71FF', '#F44336', '#FF9800'];
-  // Paleta neutra para área y barras
-  const NEUTRAL_PALETTE = ['#525252', '#737373', '#a3a3a3', '#d4d4d4', '#e5e7eb'];
+  // Paleta colorida usando CHART_COLORS
+  const PIE_COLORS = CHART_COLORS.primary;
+  // Paleta vibrante para barras
+  const BAR_COLORS = CHART_COLORS.primary;
 
-  const axisStyle = { fontSize: '0.75rem', fill: 'hsl(var(--muted-foreground))' } as const;
+  const axisStyle = { fontSize: '0.75rem', fill: 'var(--foreground)' } as const;
   const gridStyle = { stroke: 'hsl(var(--border) / 0.5)' } as const;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-card">Mi Panel</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mi Panel</CardTitle>
           <CardDescription className="text-xs">Resumen y gestión académica</CardDescription>
         </CardHeader>
         <div className="flex items-center gap-2 w-full justify-start sm:justify-end">
@@ -162,7 +163,7 @@ const AdminDashboardComponent = () => {
               <div className="text-muted-foreground">{getCardIcon(index)}</div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-semibold">{card.value}</div>
+              <div className="sm:text-3xl text-2xl font-semibold">{card.value}</div>
               <p className="text-xs text-muted-foreground mt-1">{card.subtitle}</p>
               <div className="mt-2 flex items-center text-xs text-muted-foreground">
                 <span className={card.trend.includes('+') ? 'text-green-500' : 'text-red-500'}>
@@ -180,7 +181,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Distribución de Usuarios
               </CardTitle>
             </div>
@@ -239,7 +240,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="text-xl font-semibold tracking-card">Clases por Mes</CardTitle>
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Clases por Mes</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="flex-1 pb-0">
@@ -253,8 +254,8 @@ const AdminDashboardComponent = () => {
               >
                 <defs>
                   <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={NEUTRAL_PALETTE[0]} stopOpacity={0.18} />
-                    <stop offset="95%" stopColor={NEUTRAL_PALETTE[3]} stopOpacity={0.04} />
+                    <stop offset="5%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={CHART_COLORS.primary[0]} stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" style={gridStyle} />
@@ -264,7 +265,7 @@ const AdminDashboardComponent = () => {
                 <Area
                   type="monotone"
                   dataKey="clases"
-                  stroke={NEUTRAL_PALETTE[0]}
+                  stroke={CHART_COLORS.primary[0]}
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorCount)"
@@ -278,7 +279,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Estado de Asistencias
               </CardTitle>
             </div>
@@ -298,21 +299,15 @@ const AdminDashboardComponent = () => {
                   margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
                   barSize={40}
                 >
-                  <defs>
-                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={NEUTRAL_PALETTE[0]} />
-                      <stop offset="100%" stopColor={NEUTRAL_PALETTE[2]} />
-                    </linearGradient>
-                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} style={gridStyle} />
                   <XAxis dataKey="label" tick={axisStyle} tickLine={false} />
                   <YAxis tick={axisStyle} tickLine={false} />
                   <Tooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="asistencia" fill={NEUTRAL_PALETTE[0]} radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="asistencia" fill={CHART_COLORS.primary[0]} radius={[4, 4, 0, 0]}>
                     {data.charts.attendanceDistribution.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={NEUTRAL_PALETTE[index % NEUTRAL_PALETTE.length]}
+                        fill={BAR_COLORS[index % BAR_COLORS.length]}
                       />
                     ))}
                   </Bar>
@@ -326,7 +321,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Materias con Más Estudiantes
               </CardTitle>
             </div>

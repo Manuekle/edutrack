@@ -87,7 +87,7 @@ export default function GestionUsuariosPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-card">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
             Gestión de Usuarios
           </CardTitle>
           <CardDescription className="text-xs">
@@ -110,7 +110,7 @@ export default function GestionUsuariosPage() {
         <CardHeader className="border-b px-4 pb-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Lista de Usuarios
               </CardTitle>
               <CardDescription className="text-xs">

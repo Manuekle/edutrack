@@ -1,34 +1,34 @@
 'use client';
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from '@/components/ui/dialog';
 import { Loading } from '@/components/ui/loading';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
 import { type EventType, type SubjectEvent, getErrorMessage } from '@/types';
 import { format } from 'date-fns';
@@ -187,7 +187,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         <CardHeader>
           <div className="flex justify-between items-center flex-wrap gap-2">
             <div>
-              <CardTitle className="text-xl font-semibold tracking-card font-sans">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card font-sans">
                 Gestión de Eventos Especiales
               </CardTitle>
               <CardDescription className="text-xs font-sans">
@@ -202,7 +202,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="font-sans font-semibold text-xl tracking-card">
+                  <DialogTitle className="font-sans font-semibold sm:text-3xl text-2xl tracking-card">
                     Crear Nuevo Evento
                   </DialogTitle>
                   <DialogDescription className="text-xs font-sans text-muted-foreground">
@@ -269,7 +269,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="font-sans text-xl font-semibold tracking-card">
+                              <AlertDialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
                                 ¿Estás seguro?
                               </AlertDialogTitle>
                               <AlertDialogDescription className="font-sans text-xs text-muted-foreground">
@@ -312,7 +312,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="font-sans text-xl font-semibold tracking-card">
+              <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
                 Editar Evento
               </DialogTitle>
               <DialogDescription className="font-sans text-xs text-muted-foreground">

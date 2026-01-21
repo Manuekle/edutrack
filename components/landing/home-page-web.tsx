@@ -4,18 +4,18 @@ import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import { motion } from 'framer-motion';
 import {
-  BarChart2,
-  BellRing,
-  CheckCircle2,
-  Clock,
-  QrCode,
-  ScanLine,
-  Settings,
-  Shield,
-  ShieldCheck,
-  Smartphone,
-  Users,
-  Zap,
+    BarChart2,
+    BellRing,
+    CheckCircle2,
+    Clock,
+    QrCode,
+    ScanLine,
+    Settings,
+    Shield,
+    ShieldCheck,
+    Smartphone,
+    Users,
+    Zap,
 } from 'lucide-react';
 
 export default function HomePageWeb() {
@@ -211,7 +211,7 @@ export default function HomePageWeb() {
                           <div className="w-12 h-12 bg-muted/50 dark:bg-muted/50 rounded-xl flex items-center justify-center backdrop-blur-sm border border-border/20">
                             {feature.icon}
                           </div>
-                          <h3 className="text-xl font-semibold tracking-card text-foreground">
+                          <h3 className="sm:text-3xl text-2xl font-semibold tracking-card text-foreground">
                             {feature.title}
                           </h3>
                         </div>
@@ -245,7 +245,7 @@ export default function HomePageWeb() {
               <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border text-muted-foreground">
                 Características
               </div>
-              <h2 className="text-2xl font-semibold tracking-card sm:text-4xl text-foreground">
+              <h2 className="sm:text-3xl text-2xl font-semibold tracking-card sm:text-4xl text-foreground">
                 Potencia tu gestión educativa
               </h2>
               <p className="max-w-2xl mx-auto text-xs text-muted-foreground">
@@ -271,7 +271,7 @@ export default function HomePageWeb() {
                           <div className="w-12 h-12 bg-muted/50 rounded-xl flex items-center justify-center backdrop-blur-sm">
                             {feature.icon}
                           </div>
-                          <h3 className="text-xl font-semibold tracking-card text-foreground">
+                          <h3 className="sm:text-3xl text-2xl font-semibold tracking-card text-foreground">
                             {feature.title}
                           </h3>
                         </div>
@@ -304,7 +304,7 @@ export default function HomePageWeb() {
               <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border text-muted-foreground">
                 Proceso
               </div>
-              <h2 className="text-2xl font-semibold tracking-card sm:text-4xl text-foreground">
+              <h2 className="sm:text-3xl text-2xl font-semibold tracking-card sm:text-4xl text-foreground">
                 Así de fácil es comenzar
               </h2>
               <p className="max-w-2xl mx-auto text-xs text-muted-foreground">
@@ -363,7 +363,7 @@ export default function HomePageWeb() {
                         </div>
                       </div>
                       <div className="mt-8 text-center">
-                        <h3 className="text-2xl font-medium tracking-card mb-2 text-foreground">
+                        <h3 className="sm:text-3xl text-2xl font-medium tracking-card mb-2 text-foreground">
                           Confirmar Asistencia
                         </h3>
                         <p className="text-muted-foreground mb-6 max-w-md text-xs">
@@ -409,7 +409,7 @@ export default function HomePageWeb() {
                 <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border text-muted-foreground mb-4">
                   Nuestra Historia
                 </div>
-                <h2 className="text-2xl font-semibold tracking-card sm:text-3xl md:text-4xl mb-6 text-foreground">
+                <h2 className="sm:text-3xl text-2xl font-semibold tracking-card sm:text-3xl md:text-4xl mb-6 text-foreground">
                   Conoce más sobre{' '}
                   <span className="bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
                     edu<span className="text-amber-500">Track</span>
@@ -429,7 +429,7 @@ export default function HomePageWeb() {
                   className="space-y-8"
                 >
                   <div className="space-y-4">
-                    <h3 className="text-xl font-semibold tracking-card text-foreground">
+                    <h3 className="sm:text-3xl text-2xl font-semibold tracking-card text-foreground">
                       Nuestra Misión
                     </h3>
                     <p className="text-muted-foreground text-xs">

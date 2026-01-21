@@ -16,7 +16,7 @@ interface FinalResult {
   message: string;
 }
 
-export default function CargarUsuariosPage() {
+export default function CargarEstudiantesPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isPreview, setIsPreview] = useState(false);
   const [previewData, setPreviewData] = useState<UserPreviewItem[]>([]);
@@ -48,7 +48,8 @@ export default function CargarUsuariosPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/admin/cargar-usuarios?preview=true', {
+      // Force Role: ESTUDIANTE
+      const res = await fetch('/api/admin/cargar-usuarios?preview=true&forceRole=ESTUDIANTE', {
         method: 'POST',
         body: formData,
       });
@@ -120,9 +121,9 @@ export default function CargarUsuariosPage() {
     <>
       {/* Header */}
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-card">Cargar Usuarios</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Cargar Estudiantes</CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .xlsx o .csv para cargar masivamente usuarios.
+          Sube un archivo .xlsx o .csv para cargar masivamente estudiantes.
         </CardDescription>
       </div>
 
@@ -131,11 +132,11 @@ export default function CargarUsuariosPage() {
           {/* Download Template */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Elige cómo quieres cargar tus usuarios.
+                Elige cómo quieres cargar tus estudiantes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -168,7 +169,7 @@ export default function CargarUsuariosPage() {
           {/* Upload Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Subir Archivo (Excel o CSV)
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">

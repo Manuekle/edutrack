@@ -3,12 +3,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { StudentCombobox } from '@/components/ui/student-combobox';
@@ -214,7 +214,7 @@ export default function AsignarEstudiantePage() {
     <main className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-card">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
             Asignar Estudiante a Asignatura
           </CardTitle>
           <CardDescription className="text-xs">
@@ -268,7 +268,7 @@ export default function AsignarEstudiantePage() {
 
           {searchResults && (
             <div className="mt-8 border-t pt-6">
-              <h3 className="text-xl mb-4 font-semibold tracking-card">Resultado de la búsqueda</h3>
+              <h3 className="sm:text-3xl text-2xl mb-4 font-semibold tracking-card">Resultado de la búsqueda</h3>
 
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -320,7 +320,7 @@ export default function AsignarEstudiantePage() {
       <Dialog open={showUnassignDialog} onOpenChange={setShowUnassignDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="tracking-card text-xl">Confirmar retiro</DialogTitle>
+            <DialogTitle className="tracking-card sm:text-3xl text-2xl">Confirmar retiro</DialogTitle>
             <DialogDescription className="text-xs">
               ¿Está seguro de retirar a este estudiante de la asignatura?
             </DialogDescription>
@@ -353,7 +353,7 @@ export default function AsignarEstudiantePage() {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="tracking-card text-xl">{showErrorDialog.title}</DialogTitle>
+            <DialogTitle className="tracking-card sm:text-3xl text-2xl">{showErrorDialog.title}</DialogTitle>
             <DialogDescription className="text-xs">{showErrorDialog.message}</DialogDescription>
           </DialogHeader>
           <DialogFooter>

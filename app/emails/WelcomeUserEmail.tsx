@@ -1,17 +1,17 @@
 import {
-  Body,
-  Button,
-  Container,
-  Font,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Link,
-  Preview,
-  Section,
-  Tailwind,
-  Text,
+    Body,
+    Button,
+    Container,
+    Font,
+    Head,
+    Heading,
+    Hr,
+    Html,
+    Link,
+    Preview,
+    Section,
+    Tailwind,
+    Text,
 } from '@react-email/components';
 
 interface WelcomeUserEmailProps {
@@ -52,7 +52,7 @@ const WelcomeUserEmail = ({
           <Container className="mx-auto max-w-[580px] bg-white border border-zinc-200 rounded-[12px] overflow-hidden">
             {/* Header */}
             <Section className="bg-black px-[32px] py-[24px]">
-              <Heading className="text-xl font-semibold text-white m-0 leading-[28px]">
+              <Heading className="sm:text-3xl text-2xl font-semibold text-white m-0 leading-[28px]">
                 ¡Bienvenido/a!
               </Heading>
               <Text className="text-zinc-300 text-xs m-0 mt-[4px] leading-[20px]">
@@ -65,9 +65,9 @@ const WelcomeUserEmail = ({
               {/* Welcome Message */}
               <Section className="mb-[32px] text-center">
                 <div className="inline-flex items-center justify-center w-[64px] h-[64px] rounded-full bg-zinc-100 mb-[16px]">
-                  <Text className="text-2xl text-zinc-600 m-0">👋</Text>
+                  <Text className="sm:text-3xl text-2xl text-zinc-600 m-0">👋</Text>
                 </div>
-                <Heading className="text-xl font-semibold text-black m-0 mb-[8px] leading-[32px]">
+                <Heading className="sm:text-3xl text-2xl font-semibold text-black m-0 mb-[8px] leading-[32px]">
                   Hola, {name}
                 </Heading>
                 <Text className="text-zinc-600 text-xs leading-[24px] m-0">

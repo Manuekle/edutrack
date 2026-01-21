@@ -2,12 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card';
 import { CheckCircle, Info, Loader2, RotateCw, XCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -245,7 +245,7 @@ export default function ScanPage() {
       <div className="w-full max-w-md">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl tracking-card">Registro de Asistencia</CardTitle>
+            <CardTitle className="sm:text-3xl text-2xl tracking-card">Registro de Asistencia</CardTitle>
             <CardDescription>
               {authStatus === 'authenticated'
                 ? scanState.status === 'loading'

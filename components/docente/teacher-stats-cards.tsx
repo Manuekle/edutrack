@@ -29,7 +29,7 @@ export function TeacherStatsCards({
           <BookOpen className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl tracking-card font-semibold">{subjectsCount}</div>
+          <div className="sm:text-3xl text-2xl tracking-card font-semibold">{subjectsCount}</div>
           <p className="text-xs text-muted-foreground">En este semestre</p>
         </CardContent>
       </Card>
@@ -40,7 +40,7 @@ export function TeacherStatsCards({
           <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl tracking-card font-semibold">{totalClasses}</div>
+          <div className="sm:text-3xl text-2xl tracking-card font-semibold">{totalClasses}</div>
           <p className="text-xs text-muted-foreground">Programadas</p>
         </CardContent>
       </Card>
@@ -51,7 +51,7 @@ export function TeacherStatsCards({
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl tracking-card font-semibold">{completedClasses}</div>
+          <div className="sm:text-3xl text-2xl tracking-card font-semibold">{completedClasses}</div>
           <p className="text-xs text-muted-foreground">Completadas</p>
         </CardContent>
       </Card>
@@ -66,7 +66,7 @@ export function TeacherStatsCards({
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-2xl font-semibold tracking-card">{nextClass.subjectName}</h4>
+                  <h4 className="sm:text-3xl text-2xl font-semibold tracking-card">{nextClass.subjectName}</h4>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">

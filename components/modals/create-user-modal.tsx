@@ -6,28 +6,28 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import type { User } from '@/types';
 import { Role } from '@prisma/client';
@@ -132,7 +132,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card text-xl">Crear Nuevo Usuario</DialogTitle>
+          <DialogTitle className="tracking-card sm:text-3xl text-2xl">Crear Nuevo Usuario</DialogTitle>
           <DialogDescription className="text-xs">
             Completa los datos para crear un nuevo usuario. Al menos un correo es requerido.
           </DialogDescription>

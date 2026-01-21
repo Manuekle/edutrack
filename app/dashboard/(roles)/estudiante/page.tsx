@@ -18,7 +18,7 @@ export default function EstudianteDashboard() {
   return (
     <div className="mx-auto">
       <div className="p-0 w-full mb-8">
-        <h1 className="text-2xl font-semibold tracking-card mb-1">Mi Panel</h1>
+        <h1 className="sm:text-3xl text-2xl font-semibold tracking-card mb-1">Mi Panel</h1>
         <p className="text-xs text-muted-foreground">Resumen de tu progreso académico</p>
       </div>
 

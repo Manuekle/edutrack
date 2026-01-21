@@ -166,7 +166,7 @@ export function PreviewSection({
     <div className="lg:col-span-2">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-xl font-semibold tracking-card">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
             Previsualización y Confirmación
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground">
@@ -182,7 +182,7 @@ export function PreviewSection({
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <CheckCircle className="h-12 w-12 text-primary" />
               <div className="text-center space-y-1">
-                <h3 className="text-2xl tracking-card font-semibold">Carga completada</h3>
+                <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">Carga completada</h3>
                 <p className="text-xs text-muted-foreground">
                   Se procesaron {uploadResult.processed} asignaturas.
                 </p>

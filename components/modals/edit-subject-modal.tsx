@@ -6,28 +6,28 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -187,7 +187,7 @@ export function EditSubjectModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card text-xl">Editar Asignatura</DialogTitle>
+          <DialogTitle className="tracking-card sm:text-3xl text-2xl">Editar Asignatura</DialogTitle>
           <DialogDescription className="text-xs">
             Modifica los datos de la asignatura {subject.name}.
           </DialogDescription>

@@ -4,19 +4,19 @@ import { TablePagination } from '@/components/shared/table-pagination';
 import { CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Loading } from '@/components/ui/loading';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getCurrentPeriod, useTeacherSubjects } from '@/hooks/use-teacher-subjects';
@@ -50,7 +50,7 @@ export default function SubjectsPage() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <div className="pb-4 col-span-1 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
           <CardDescription className="text-xs">
             Listado de asignaturas por período académico
           </CardDescription>

@@ -9,20 +9,20 @@ import { SignatureFileUpload } from '@/components/profile/signature-file-upload'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from '@/components/ui/card';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -441,7 +441,7 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto space-y-8">
       <CardHeader className="p-0 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-card">Mi Perfil</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mi Perfil</CardTitle>
         <CardDescription className="text-xs">
           Gestiona tu información personal y preferencias de cuenta.
         </CardDescription>
@@ -478,7 +478,7 @@ export default function ProfilePage() {
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Información Personal
               </CardTitle>
               <CardDescription className="text-xs">
@@ -491,7 +491,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     <div className="relative">
                       <Avatar className="h-24 w-24 bg-primary/10 border border-zinc-200 dark:border-zinc-700">
-                        <AvatarFallback className="text-2xl">
+                        <AvatarFallback className="sm:text-3xl text-2xl">
                           {session?.user?.name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
@@ -631,7 +631,7 @@ export default function ProfilePage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-card">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                 Cambiar Contraseña
               </CardTitle>
               <CardDescription className="text-xs">
@@ -723,7 +723,7 @@ export default function ProfilePage() {
           <TabsContent value="signature" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl font-semibold tracking-card">Firma Digital</CardTitle>
+                <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Firma Digital</CardTitle>
                 <CardDescription className="text-xs">
                   Sube tu firma digital para usarla en documentos oficiales.
                 </CardDescription>

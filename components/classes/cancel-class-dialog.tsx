@@ -2,13 +2,13 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,7 +38,7 @@ export function CancelClassDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent onCloseAutoFocus={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-card">
+          <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
             Cancelar Clase
           </DialogTitle>
           <DialogDescription className="font-sans text-xs text-muted-foreground">

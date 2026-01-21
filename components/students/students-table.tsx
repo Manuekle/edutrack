@@ -77,7 +77,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-semibold tracking-card">
+            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
               Gestión de Estudiantes
             </CardTitle>
             <CardDescription className="text-xs">

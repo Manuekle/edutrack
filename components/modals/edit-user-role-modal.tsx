@@ -6,27 +6,27 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import type { Role, User } from '@/types';
 import { ROLES } from '@/types';
@@ -97,7 +97,7 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans" onInteractOutside={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-card">
+          <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
             Editar Rol de {user.name}
           </DialogTitle>
           <DialogDescription>

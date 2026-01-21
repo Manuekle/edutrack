@@ -15,7 +15,7 @@ export function StatCard({ title, value, subtitle, icon: Icon }: StatCardProps) 
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-semibold">{value}</div>
+        <div className="sm:text-3xl text-2xl font-semibold">{value}</div>
         {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
       </CardContent>
     </Card>

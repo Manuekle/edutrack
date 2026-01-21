@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CHART_COLORS } from '@/lib/chart-colors';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, Tooltip, XAxis } from 'recharts';
@@ -78,13 +79,30 @@ const getBadgeClass = (percentage: number) => {
   return 'bg-amber-600 text-white';
 };
 
-const NEUTRAL_PALETTE = ['#404040', '#525252', '#737373', '#a3a3a3', '#d4d4d4'] as const;
+// ----------------------------------------------------------------------
+// LÍMITE DE ASISTENCIA: 25% de inasistencia (aprox) para perder la materia
+// Si el porcentaje de asistencia es < 75%, está en RIESGO.
+// ----------------------------------------------------------------------
+const ATTENDANCE_RISK_THRESHOLD = 75; // Menos de 75% es riesgo
+
+const getRiskBadge = (percentage: number) => {
+  if (percentage < ATTENDANCE_RISK_THRESHOLD) {
+    return (
+      <Badge variant="destructive" className="ml-2 text-[10px] h-5 px-1.5 uppercase font-bold animate-pulse">
+        RIESGO DE PÉRDIDA
+      </Badge>
+    );
+  }
+  return null;
+};
 
 // Paleta de colores más sutiles y contrastantes para el gráfico de pastel
+// Usando CHART_COLORS
 const PIE_COLORS = [
-  '#4CAF50', // Presente - verde suave
-  '#F44336', // Ausente - rojo vibrante
-  '#FF9800', // Justificado - naranja cálido
+  CHART_COLORS.attendance.present,    // Presente
+  CHART_COLORS.attendance.absent,     // Ausente
+  CHART_COLORS.attendance.late,       // Tarde
+  CHART_COLORS.attendance.justified,  // Justificado
 ] as const;
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
@@ -183,7 +201,7 @@ function SubjectDetailsPanel({
       <CardHeader>
         <div className="flex items-center gap-2">
           <div>
-            <CardTitle className="text-2xl font-semibold tracking-card">{subject.name}</CardTitle>
+            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">{subject.name}</CardTitle>
             <p className="text-xs text-muted-foreground">Código: {subject.code}</p>
           </div>
         </div>
@@ -224,7 +242,7 @@ function SubjectDetailsPanel({
                           <span className="text-xs font-normal text-muted-foreground">
                             {dayName}
                           </span>
-                          <span className="text-2xl font-semibold">{day}</span>
+                          <span className="sm:text-3xl text-2xl font-semibold">{day}</span>
                           <span className="text-xs text-muted-foreground uppercase">{month}</span>
                         </div>
                         <div>
@@ -324,13 +342,14 @@ function SubjectDetailsPanel({
                   >
                     <div className="flex items-center gap-2 mb-1.5">
                       <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        className="w-3 h-3 rounded-full shrink-0"
                         style={{ backgroundColor: PIE_COLORS[index % PIE_COLORS.length] }}
                       />
                       <span className="text-xs font-normal text-foreground">{item.name}</span>
                     </div>
                     <div className="flex flex-col items-baseline gap-1.5">
-                      <span className="text-2xl font-semibold">{item.percentage}%</span>
+                      <span className="sm:text-3xl text-2xl font-semibold">{item.percentage}%</span>
+                      {item.name === 'Presente' && getRiskBadge(item.percentage)}
                       <span className="text-xs text-muted-foreground">
                         ({item.value} {item.value === 1 ? 'estudiante' : 'estudiantes'})
                       </span>
@@ -364,7 +383,7 @@ export function TeacherReport() {
   const [currentPage, setCurrentPage] = useState(1);
   const TEACHERS_PER_PAGE = 5;
 
-  const lineColors = NEUTRAL_PALETTE;
+  const lineColors = CHART_COLORS.primary;
 
   // Update period options based on teacher's historic data
   useEffect(() => {
@@ -639,7 +658,7 @@ export function TeacherReport() {
                         .toUpperCase()}
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-semibold tracking-card">
+                      <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
                         {selectedTeacher.name}
                       </CardTitle>
                       {selectedTeacher.codigoDocente && (
@@ -720,7 +739,7 @@ export function TeacherReport() {
                           tickLine={false}
                           axisLine={false}
                           interval="preserveStartEnd"
-                          className="fill-muted-foreground font-mono"
+                          className="fill-foreground font-mono"
                           tickFormatter={(_value, index) => chartData[index]?.displayDate ?? ''}
                         />
                         <Tooltip content={<CustomTooltip />} />

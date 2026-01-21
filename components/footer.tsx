@@ -11,7 +11,7 @@ export default function Footer() {
           {/* Branding */}
           <div className="text-center md:text-left mb-4 md:mb-0">
             <Link href="/" className="flex items-center justify-center md:justify-start space-x-2">
-              <span className="text-xl font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
+              <span className="sm:text-3xl text-2xl font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
                 edu<span className="text-amber-500">Track</span>
               </span>
             </Link>
