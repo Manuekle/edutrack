@@ -120,7 +120,7 @@ export default function SubjectDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
-          <h2 className="text-2xl text-white text-center font-semibold tracking-tight pb-2">
+          <h2 className="text-2xl text-white text-center font-semibold tracking-card pb-2">
             No disponible
           </h2>
           <p className="text-white text-center mb-4 text-xs">{error}</p>
@@ -148,7 +148,7 @@ export default function SubjectDetailPage() {
 
       <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
         <div>
-          <CardTitle className="text-2xl font-semibold tracking-heading">Mis Clases</CardTitle>
+          <CardTitle className="text-2xl font-semibold tracking-card">Mis Clases</CardTitle>
           <CardDescription className="text-xs">Gestiona tus clases y eventos.</CardDescription>
         </div>
         <div className="flex gap-2">

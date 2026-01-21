@@ -16,7 +16,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -98,7 +97,7 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans" onInteractOutside={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
+          <DialogTitle className="font-sans text-xl font-semibold tracking-card">
             Editar Rol de {user.name}
           </DialogTitle>
           <DialogDescription>

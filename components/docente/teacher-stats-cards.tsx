@@ -66,7 +66,7 @@ export function TeacherStatsCards({
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-lg font-semibold tracking-card">{nextClass.subjectName}</h4>
+                  <h4 className="text-2xl font-semibold tracking-card">{nextClass.subjectName}</h4>
                 </div>
 
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">

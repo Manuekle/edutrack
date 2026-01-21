@@ -10,8 +10,8 @@ export const metadata = {
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-4 text-center">
-      <h1 className="text-6xl tracking-heading font-bold mb-4">404</h1>
-      <h2 className="text-2xl tracking-heading font-semibold mb-6">Página no encontrada</h2>
+      <h1 className="text-6xl tracking-card font-semibold mb-4">404</h1>
+      <h2 className="text-2xl tracking-card font-semibold mb-6">Página no encontrada</h2>
       <p className="text-xs mb-8 max-w-md">
         Lo sentimos, no pudimos encontrar la página que estás buscando.
       </p>

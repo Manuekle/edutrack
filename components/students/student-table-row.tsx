@@ -51,7 +51,7 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
           'N/A'
         )}
       </TableCell>
-      <TableCell className="text-xs tracking-tight text-right px-4 py-2">
+      <TableCell className="text-xs tracking-card text-right px-4 py-2">
         <DialogTrigger asChild>
           <Button
             variant="ghost"

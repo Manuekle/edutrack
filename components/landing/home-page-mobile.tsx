@@ -1,103 +1,116 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Clock, QrCode, Users } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Clock, QrCode, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
+
+const features = [
+  {
+    icon: <QrCode className="w-8 h-8 text-primary" />,
+    title: 'Registro QR Instantáneo',
+    description: 'Registra tu asistencia escaneando el código en segundos.',
+  },
+  {
+    icon: <Clock className="w-8 h-8 text-primary" />,
+    title: 'Seguimiento en Tiempo Real',
+    description: 'Consulta tus estadísticas y asistencias al momento.',
+  },
+  {
+    icon: <ShieldCheck className="w-8 h-8 text-primary" />,
+    title: 'Seguro y Confiable',
+    description: 'Tu información académica siempre protegida y validada.',
+  },
+];
 
 export default function HomePageMobile() {
   const router = useRouter();
+  const [currentFeature, setCurrentFeature] = useState(0);
 
-  const features = [
-    {
-      icon: <QrCode className="w-6 h-6 text-foreground" />,
-      title: 'Registro con QR',
-      description: 'Escanea y registra en segundos',
-    },
-    {
-      icon: <Clock className="w-6 h-6 text-foreground" />,
-      title: 'Tiempo Real',
-      description: 'Control instantáneo',
-    },
-    {
-      icon: <Users className="w-6 h-6 text-foreground" />,
-      title: 'Gestión Simple',
-      description: 'Administra tus grupos fácilmente',
-    },
-  ];
+  // Auto-rotate features
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentFeature(prev => (prev + 1) % features.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Background blur elements - shadcn style */}
-      <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-10 w-24 h-24 bg-secondary/20 rounded-full blur-3xl"></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-accent/10 rounded-full blur-3xl"></div>
+    <div className="flex flex-col h-[100dvh] bg-background text-foreground font-sans overflow-hidden relative">
+      {/* Background Elements */}
+      <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-primary/5 blur-3xl rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/5 blur-3xl rounded-full" />
 
-      <div className="relative z-10 p-6">
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-md mx-auto">
+        {/* Logo Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-md mx-auto pt-16 text-center"
+          className="flex flex-col items-center mb-12"
         >
-          {/* Logo and Title */}
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="mb-12"
-          >
-            <div className="w-16 h-16 bg-primary rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg">
-              <QrCode className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight text-foreground mb-3">
-              edu<span className="text-amber-500">Track</span>
-            </h1>
-            <p className="text-muted-foreground text-xs max-w-xs mx-auto">
-              Gestión de asistencia inteligente para la Fundación Universitaria de la Popayán
-            </p>
-          </motion.div>
-
-          {/* Features */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="space-y-4 mb-10"
-          >
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-card border border-border hover:bg-accent/50 transition-all duration-300 shadow-sm p-4"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-5 h-5 flex items-center justify-center">{feature.icon}</div>
-                  <div className="flex flex-col justify-end items-start w-full">
-                    <h3 className="font-normal text-foreground text-xs">{feature.title}</h3>
-                    <p className="text-muted-foreground text-xs">{feature.description}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="w-full"
-          >
-            <Button
-              size="lg"
-              onClick={() => router.push('/login')}
-              variant="default"
-              className="w-full"
-            >
-              Iniciar Sesión
-            </Button>
-          </motion.div>
+          <div className="w-20 h-20 bg-gradient-to-tr from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-primary/10 border border-primary/10 backdrop-blur-sm">
+            <QrCode className="w-10 h-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-semibold tracking-card text-center">
+            edu<span className="text-primary">Track</span>
+          </h1>
         </motion.div>
-      </div>
+
+        {/* Feature Carousel (App-like Onboarding) */}
+        <div className="w-full h-48 relative flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentFeature}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 flex flex-col items-center text-center px-4"
+            >
+              <div className="mb-4 p-4 bg-card/50 rounded-full border border-border/50 backdrop-blur-sm">
+                {features[currentFeature].icon}
+              </div>
+              <h2 className="text-md tracking-card font-medium mb-2">
+                {features[currentFeature].title}
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {features[currentFeature].description}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="flex gap-2 mt-4 mb-8">
+          {features.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
+              }`}
+            />
+          ))}
+        </div>
+      </main>
+
+      {/* Bottom Action Area (Safe Area) */}
+      <footer className="p-6 pb-10 w-full max-w-md mx-auto relative z-10">
+        <div className="flex flex-col gap-3">
+          <Button
+            size="lg"
+            className="w-full text-xs font-semibold rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98]"
+            onClick={() => router.push('/login')}
+          >
+            Iniciar Sesión
+          </Button>
+
+          <p className="text-center text-[10px] text-muted-foreground mt-4">
+            Sistema de Gestión FUP v1.0.0
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

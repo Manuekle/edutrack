@@ -166,7 +166,7 @@ export function PreviewSection({
     <div className="lg:col-span-2">
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-xl font-semibold tracking-heading">
+          <CardTitle className="text-xl font-semibold tracking-card">
             Previsualización y Confirmación
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground">
@@ -182,7 +182,7 @@ export function PreviewSection({
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <CheckCircle className="h-12 w-12 text-primary" />
               <div className="text-center space-y-1">
-                <h3 className="text-lg tracking-card font-semibold">Carga completada</h3>
+                <h3 className="text-2xl tracking-card font-semibold">Carga completada</h3>
                 <p className="text-xs text-muted-foreground">
                   Se procesaron {uploadResult.processed} asignaturas.
                 </p>
@@ -260,7 +260,7 @@ export function PreviewSection({
                           >
                             <div className="grid grid-cols-4 gap-3 flex-1 text-xs">
                               <div className="min-h-[2.25rem]">
-                                <p className="text-muted-foreground text-[10px] mb-0.5">Fecha</p>
+                                <p className="text-muted-foreground text-xs mb-0.5">Fecha</p>
                                 {isEditing ? (
                                   <div className="[&_input]:h-9 [&_input]:text-xs">
                                     <DatePicker
@@ -291,9 +291,7 @@ export function PreviewSection({
                                 )}
                               </div>
                               <div className="min-h-[2.25rem]">
-                                <p className="text-muted-foreground text-[10px] mb-0.5">
-                                  Hora Inicio
-                                </p>
+                                <p className="text-muted-foreground text-xs mb-0.5">Hora Inicio</p>
                                 {isEditing ? (
                                   <div className="[&_input]:h-9 [&_input]:text-xs">
                                     <TimePicker
@@ -316,7 +314,7 @@ export function PreviewSection({
                                 )}
                               </div>
                               <div className="min-h-[2.25rem]">
-                                <p className="text-muted-foreground text-[10px] mb-0.5">Hora Fin</p>
+                                <p className="text-muted-foreground text-xs mb-0.5">Hora Fin</p>
                                 {isEditing ? (
                                   <div className="[&_input]:h-9 [&_input]:text-xs">
                                     <TimePicker
@@ -339,7 +337,7 @@ export function PreviewSection({
                                 )}
                               </div>
                               <div className="min-h-[2.25rem]">
-                                <p className="text-muted-foreground text-[10px] mb-0.5">Tema</p>
+                                <p className="text-muted-foreground text-xs mb-0.5">Tema</p>
                                 {isEditing ? (
                                   <Input
                                     value={currentData.temaClase || ''}

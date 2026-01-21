@@ -245,7 +245,7 @@ export default function ScanPage() {
       <div className="w-full max-w-md">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl tracking-tight">Registro de Asistencia</CardTitle>
+            <CardTitle className="text-2xl tracking-card">Registro de Asistencia</CardTitle>
             <CardDescription>
               {authStatus === 'authenticated'
                 ? scanState.status === 'loading'

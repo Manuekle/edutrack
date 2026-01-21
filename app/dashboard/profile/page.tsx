@@ -19,7 +19,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -442,7 +441,7 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto space-y-8">
       <CardHeader className="p-0 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-tight">Mi Perfil</CardTitle>
+        <CardTitle className="text-2xl font-semibold tracking-card">Mi Perfil</CardTitle>
         <CardDescription className="text-xs">
           Gestiona tu información personal y preferencias de cuenta.
         </CardDescription>

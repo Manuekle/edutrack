@@ -93,7 +93,7 @@ export default function StudentAttendancePage() {
   return (
     <div className="sm:pt-56 max-w-md mx-auto p-4 space-y-4">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Registrar Asistencia</h1>
+        <h1 className="text-2xl font-semibold tracking-card">Registrar Asistencia</h1>
         <p className="text-xs text-muted-foreground">
           Busca el código de asistencia en la pantalla de la clase
         </p>

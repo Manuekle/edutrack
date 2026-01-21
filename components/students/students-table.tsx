@@ -77,7 +77,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-semibold tracking-heading">
+            <CardTitle className="text-xl font-semibold tracking-card">
               Gestión de Estudiantes
             </CardTitle>
             <CardDescription className="text-xs">
@@ -96,22 +96,22 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/60">
-                      <TableHead className="text-xs tracking-tight font-normal px-4 py-2">
+                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                         Nombre
                       </TableHead>
-                      <TableHead className="text-xs tracking-tight font-normal px-4 py-2">
+                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                         Documento
                       </TableHead>
-                      <TableHead className="text-xs tracking-tight font-normal px-4 py-2">
+                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                         Correo Institucional
                       </TableHead>
-                      <TableHead className="text-xs tracking-tight font-normal px-4 py-2">
+                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                         Correo Personal
                       </TableHead>
-                      <TableHead className="text-xs tracking-tight font-normal px-4 py-2">
+                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                         Teléfono
                       </TableHead>
-                      <TableHead className="text-xs tracking-tight font-normal text-right px-4 py-2">
+                      <TableHead className="text-xs tracking-card font-normal text-right px-4 py-2">
                         Acciones
                       </TableHead>
                     </TableRow>

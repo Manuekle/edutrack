@@ -212,7 +212,7 @@ export function AsignaturasImportDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-xl tracking-heading">Importar desde Excel</DialogTitle>
+          <DialogTitle className="text-xl tracking-card">Importar desde Excel</DialogTitle>
           <DialogDescription className="text-xs">
             Importa asignaturas y clases desde un archivo Excel existente
           </DialogDescription>
@@ -223,7 +223,7 @@ export function AsignaturasImportDialog({
             <div className="space-y-4 py-8">
               <div className="text-center">
                 <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
-                <h3 className="text-lg font-medium mb-2">Procesando archivo...</h3>
+                <h3 className="text-2xl font-medium mb-2">Procesando archivo...</h3>
                 <p className="text-xs text-muted-foreground mb-4">
                   Analizando los datos del archivo Excel
                 </p>

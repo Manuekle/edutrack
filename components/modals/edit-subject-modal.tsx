@@ -16,7 +16,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -188,7 +187,7 @@ export function EditSubjectModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-tight text-xl">Editar Asignatura</DialogTitle>
+          <DialogTitle className="tracking-card text-xl">Editar Asignatura</DialogTitle>
           <DialogDescription className="text-xs">
             Modifica los datos de la asignatura {subject.name}.
           </DialogDescription>

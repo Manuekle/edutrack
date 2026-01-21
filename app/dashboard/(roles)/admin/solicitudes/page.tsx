@@ -137,7 +137,7 @@ export default function UnenrollRequestsPage() {
       {/* Header */}
       <div className="space-y-2">
         <CardHeader className="p-0 w-full mb-8">
-          <CardTitle className="text-2xl font-semibold tracking-tight">
+          <CardTitle className="text-2xl font-semibold tracking-card">
             Solicitudes de Desmatriculación
           </CardTitle>
           <CardDescription className="text-xs">
@@ -170,7 +170,7 @@ export default function UnenrollRequestsPage() {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="space-y-2">
                           <CardTitle className="flex items-center gap-2">
-                            <span className="text-lg font-semibold tracking-card">
+                            <span className="text-2xl font-semibold tracking-card">
                               {request.student.name || 'Estudiante'}
                             </span>
                             <span className="text-xs font-normal">
@@ -243,7 +243,7 @@ export default function UnenrollRequestsPage() {
       <Dialog open={!!showRejectDialog} onOpenChange={open => !open && setShowRejectDialog(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="tracking-tight text-xl">Rechazar solicitud</DialogTitle>
+            <DialogTitle className="tracking-card text-xl">Rechazar solicitud</DialogTitle>
             <DialogDescription className="text-xs">
               Por favor, proporciona un motivo detallado para el rechazo de esta solicitud.
             </DialogDescription>

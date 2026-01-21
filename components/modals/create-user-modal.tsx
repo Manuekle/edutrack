@@ -16,7 +16,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -133,7 +132,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-tight text-xl">Crear Nuevo Usuario</DialogTitle>
+          <DialogTitle className="tracking-card text-xl">Crear Nuevo Usuario</DialogTitle>
           <DialogDescription className="text-xs">
             Completa los datos para crear un nuevo usuario. Al menos un correo es requerido.
           </DialogDescription>

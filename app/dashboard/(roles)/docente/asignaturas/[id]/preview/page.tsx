@@ -73,7 +73,7 @@ export default async function PreviewPage({ params }: PageProps) {
   if (!subject) {
     return (
       <div className="p-6">
-        <h1 className="text-lg font-semibold text-red-600 dark:text-red-400">
+        <h1 className="text-2xl font-semibold text-red-600 dark:text-red-400">
           Asignatura no encontrada
         </h1>
       </div>
@@ -83,7 +83,7 @@ export default async function PreviewPage({ params }: PageProps) {
   if (subject.teacherId !== session.user.id) {
     return (
       <div className="p-6">
-        <h1 className="text-lg font-semibold text-red-600 dark:text-red-400">No autorizado</h1>
+        <h1 className="text-2xl font-semibold text-red-600 dark:text-red-400">No autorizado</h1>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export default async function PreviewPage({ params }: PageProps) {
     <div className="space-y-6">
       <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
         <div>
-          <CardTitle className="text-2xl font-semibold tracking-heading dark:text-gray-100">
+          <CardTitle className="text-2xl font-semibold tracking-card dark:text-gray-100">
             Bitacora Docente
           </CardTitle>
           <CardDescription className="text-xs dark:text-gray-300">
@@ -133,7 +133,7 @@ export default async function PreviewPage({ params }: PageProps) {
 
           {/* Títulos */}
           <div className="w-full sm:w-1/2 text-center">
-            <div className="text-[#003366] dark:text-blue-200 font-bold text-lg">
+            <div className="text-[#003366] dark:text-blue-200 font-semibold text-2xl">
               REGISTRO DE CLASES Y ASISTENCIA
             </div>
             <div className="text-[#003366] dark:text-blue-200 text-xs">DOCENCIA</div>
@@ -143,15 +143,15 @@ export default async function PreviewPage({ params }: PageProps) {
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
             <div className="text-xs border border-[#005a9c] dark:border-blue-400 rounded dark:text-gray-100">
               <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
-                <span className="font-bold">Código:</span>
+                <span className="font-semibold">Código:</span>
                 <span>FO-DO-005</span>
               </div>
               <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
-                <span className="font-bold">Versión:</span>
+                <span className="font-semibold">Versión:</span>
                 <span>08</span>
               </div>
               <div className="flex gap-1 py-1 px-3">
-                <span className="font-bold">Fecha:</span>
+                <span className="font-semibold">Fecha:</span>
                 <span className="capitalize">{metaMonthYear}</span>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default async function PreviewPage({ params }: PageProps) {
         </div>
 
         {/* Tabla principal */}
-        <div className="text-[11px] dark:text-gray-100">
+        <div className="text-xs dark:text-gray-100">
           <div className="-mx-4 sm:mx-0 overflow-x-auto">
             <div className="min-w-[720px] w-full border border-[#ECEEDF] dark:border-gray-700">
               {/* Header principal */}
@@ -244,37 +244,37 @@ export default async function PreviewPage({ params }: PageProps) {
                       style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}
                     >
                       {/* No. */}
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-[10px]">
+                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
                         {idx + 1}
                       </div>
 
                       {/* Fecha DD/MM */}
                       <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
-                        <div className="flex items-center justify-center text-[10px]">
+                        <div className="flex items-center justify-center text-xs">
                           {formatDD(dateObj)}
                         </div>
-                        <div className="flex items-center justify-center text-[10px] border-l border-[#ECEEDF] dark:border-gray-700">
+                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
                           {formatMM(dateObj)}
                         </div>
                       </div>
 
                       {/* Hora Inicio/Final */}
                       <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
-                        <div className="flex items-center justify-center text-[10px]">
+                        <div className="flex items-center justify-center text-xs">
                           {formatTimeHHmm(cls.startTime as Date | null)}
                         </div>
-                        <div className="flex items-center justify-center text-[10px] border-l border-[#ECEEDF] dark:border-gray-700">
+                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
                           {formatTimeHHmm(cls.endTime as Date | null)}
                         </div>
                       </div>
 
                       {/* Tema */}
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 p-2 text-center text-[10px]">
+                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 p-2 text-center text-xs">
                         {cls.topic?.trim() || `Sesión ${idx + 1}`}
                       </div>
 
                       {/* Total Horas */}
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-[10px]">
+                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
                         {calculateHours(cls.startTime as Date | null, cls.endTime as Date | null)}
                       </div>
 
@@ -290,7 +290,7 @@ export default async function PreviewPage({ params }: PageProps) {
                           />
                         ) : (
                           // Nota: “finalizada” (PROGRAMADA con endTime pasado) NO muestra firma
-                          <span className="text-[10px] text-gray-400 dark:text-gray-400">
+                          <span className="text-xs text-gray-400 dark:text-gray-400">
                             {cls.status === 'PROGRAMADA'
                               ? finalizada
                                 ? 'Finalizada'

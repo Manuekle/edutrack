@@ -183,7 +183,7 @@ function SubjectDetailsPanel({
       <CardHeader>
         <div className="flex items-center gap-2">
           <div>
-            <CardTitle className="text-lg font-semibold tracking-card">{subject.name}</CardTitle>
+            <CardTitle className="text-2xl font-semibold tracking-card">{subject.name}</CardTitle>
             <p className="text-xs text-muted-foreground">Código: {subject.code}</p>
           </div>
         </div>
@@ -193,7 +193,7 @@ function SubjectDetailsPanel({
           {/* Lista de clases */}
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-2">
-              <h4 className="text-xs font-medium text-foreground tracking-tight flex items-center gap-2">
+              <h4 className="text-xs font-medium text-foreground tracking-card flex items-center gap-2">
                 Clases Impartidas
               </h4>
               <Badge variant="outline" className="font-normal bg-muted/50 font-sans text-xs">
@@ -224,7 +224,7 @@ function SubjectDetailsPanel({
                           <span className="text-xs font-normal text-muted-foreground">
                             {dayName}
                           </span>
-                          <span className="text-lg font-semibold">{day}</span>
+                          <span className="text-2xl font-semibold">{day}</span>
                           <span className="text-xs text-muted-foreground uppercase">{month}</span>
                         </div>
                         <div>
@@ -274,7 +274,7 @@ function SubjectDetailsPanel({
           {/* Gráfico de distribución */}
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-2">
-              <h4 className="text-xs font-medium text-foreground tracking-tight">
+              <h4 className="text-xs font-medium text-foreground tracking-card">
                 Distribución de Asistencia
               </h4>
               <Badge variant="outline" className="font-normal bg-muted/50 font-sans text-xs">
@@ -330,7 +330,7 @@ function SubjectDetailsPanel({
                       <span className="text-xs font-normal text-foreground">{item.name}</span>
                     </div>
                     <div className="flex flex-col items-baseline gap-1.5">
-                      <span className="text-lg font-semibold">{item.percentage}%</span>
+                      <span className="text-2xl font-semibold">{item.percentage}%</span>
                       <span className="text-xs text-muted-foreground">
                         ({item.value} {item.value === 1 ? 'estudiante' : 'estudiantes'})
                       </span>
@@ -639,7 +639,7 @@ export function TeacherReport() {
                         .toUpperCase()}
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-semibold tracking-heading">
+                      <CardTitle className="text-xl font-semibold tracking-card">
                         {selectedTeacher.name}
                       </CardTitle>
                       {selectedTeacher.codigoDocente && (

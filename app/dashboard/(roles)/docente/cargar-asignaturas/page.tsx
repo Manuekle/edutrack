@@ -286,7 +286,7 @@ export default function UploadSubjectsPage() {
     <>
       {/* Header */}
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-heading">
+        <CardTitle className="text-2xl font-semibold tracking-card">
           Cargar Asignaturas y Clases
         </CardTitle>
         <CardDescription className="text-xs">
@@ -300,7 +300,7 @@ export default function UploadSubjectsPage() {
           {/* Download Template and Generator */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
+              <CardTitle className="text-xl font-semibold tracking-card">
                 Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -337,7 +337,7 @@ export default function UploadSubjectsPage() {
           {/* Upload Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
+              <CardTitle className="text-xl font-semibold tracking-card">
                 Subir Archivo (Excel o CSV)
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">

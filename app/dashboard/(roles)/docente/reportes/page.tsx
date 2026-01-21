@@ -166,7 +166,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-tight">
+          <CardTitle className="text-2xl font-semibold tracking-card">
             Reportes de Asistencia
           </CardTitle>
           <CardDescription className="text-xs">
@@ -179,12 +179,12 @@ export default function ReportsPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/60">
-              <TableHead className="text-xs tracking-tight font-normal px-4 py-2">
+              <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                 Asignatura
               </TableHead>
-              <TableHead className="text-xs tracking-tight font-normal px-4 py-2">Fecha</TableHead>
-              <TableHead className="text-xs tracking-tight font-normal px-4 py-2">Estado</TableHead>
-              <TableHead className="text-xs tracking-tight font-normal px-4 py-2 text-right">
+              <TableHead className="text-xs tracking-card font-normal px-4 py-2">Fecha</TableHead>
+              <TableHead className="text-xs tracking-card font-normal px-4 py-2">Estado</TableHead>
+              <TableHead className="text-xs tracking-card font-normal px-4 py-2 text-right">
                 Acciones
               </TableHead>
             </TableRow>

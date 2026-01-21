@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -80,7 +79,7 @@ export default function ForgotPasswordPage() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-semibold tracking-tight text-center">
+          <CardTitle className="text-2xl font-semibold tracking-card text-center">
             ¿Olvidaste tu contraseña?
           </CardTitle>
           <CardDescription className="text-center">

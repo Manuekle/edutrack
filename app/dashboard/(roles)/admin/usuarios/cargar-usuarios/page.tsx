@@ -1,9 +1,9 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
-import { UsersPreviewSection, type UserPreviewItem } from '@/components/users/preview-section';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { UsersPreviewSection, type UserPreviewItem } from '@/components/users/preview-section';
 import { Download, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -120,7 +120,7 @@ export default function CargarUsuariosPage() {
     <>
       {/* Header */}
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-heading">Cargar Usuarios</CardTitle>
+        <CardTitle className="text-2xl font-semibold tracking-card">Cargar Usuarios</CardTitle>
         <CardDescription className="text-xs">
           Sube un archivo .xlsx o .csv para cargar masivamente usuarios.
         </CardDescription>
@@ -131,7 +131,7 @@ export default function CargarUsuariosPage() {
           {/* Download Template */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
+              <CardTitle className="text-xl font-semibold tracking-card">
                 Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -168,7 +168,7 @@ export default function CargarUsuariosPage() {
           {/* Upload Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
+              <CardTitle className="text-xl font-semibold tracking-card">
                 Subir Archivo (Excel o CSV)
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">

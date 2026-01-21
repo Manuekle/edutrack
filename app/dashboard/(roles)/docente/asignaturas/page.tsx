@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTeacherSubjects, getCurrentPeriod } from '@/hooks/use-teacher-subjects';
+import { getCurrentPeriod, useTeacherSubjects } from '@/hooks/use-teacher-subjects';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -50,7 +50,7 @@ export default function SubjectsPage() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         <div className="pb-4 col-span-1 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-tight">Mis Asignaturas</CardTitle>
+          <CardTitle className="text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
           <CardDescription className="text-xs">
             Listado de asignaturas por período académico
           </CardDescription>
@@ -73,7 +73,7 @@ export default function SubjectsPage() {
 
       <CardContent className="p-0">
         {error && (
-          <div className="p-4 mb-4 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+          <div className="p-4 mb-4 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
             {error instanceof Error ? error.message : 'Ocurrió un error al cargar las asignaturas'}
           </div>
         )}

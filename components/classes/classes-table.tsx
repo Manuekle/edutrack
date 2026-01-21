@@ -83,9 +83,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-semibold tracking-heading">
-              Gestión de Clases
-            </CardTitle>
+            <CardTitle className="text-xl font-semibold tracking-card">Gestión de Clases</CardTitle>
             <CardDescription className="text-xs">
               Gestiona las sesiones de clase para esta asignatura.
             </CardDescription>

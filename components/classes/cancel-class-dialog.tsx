@@ -38,7 +38,7 @@ export function CancelClassDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent onCloseAutoFocus={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
+          <DialogTitle className="font-sans text-xl font-semibold tracking-card">
             Cancelar Clase
           </DialogTitle>
           <DialogDescription className="font-sans text-xs text-muted-foreground">

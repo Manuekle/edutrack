@@ -214,7 +214,7 @@ export default function AsignarEstudiantePage() {
     <main className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="text-2xl font-semibold tracking-tight">
+          <CardTitle className="text-2xl font-semibold tracking-card">
             Asignar Estudiante a Asignatura
           </CardTitle>
           <CardDescription className="text-xs">
@@ -320,7 +320,7 @@ export default function AsignarEstudiantePage() {
       <Dialog open={showUnassignDialog} onOpenChange={setShowUnassignDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="tracking-tight text-xl">Confirmar retiro</DialogTitle>
+            <DialogTitle className="tracking-card text-xl">Confirmar retiro</DialogTitle>
             <DialogDescription className="text-xs">
               ¿Está seguro de retirar a este estudiante de la asignatura?
             </DialogDescription>
@@ -353,7 +353,7 @@ export default function AsignarEstudiantePage() {
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="tracking-tight text-xl">{showErrorDialog.title}</DialogTitle>
+            <DialogTitle className="tracking-card text-xl">{showErrorDialog.title}</DialogTitle>
             <DialogDescription className="text-xs">{showErrorDialog.message}</DialogDescription>
           </DialogHeader>
           <DialogFooter>

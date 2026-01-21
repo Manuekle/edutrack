@@ -17,7 +17,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -91,7 +90,7 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-sm mx-auto my-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold tracking-tight text-center">
+        <CardTitle className="text-2xl font-semibold tracking-card text-center">
           Iniciar Sesión
         </CardTitle>
         <CardDescription className="text-center">

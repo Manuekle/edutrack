@@ -196,10 +196,10 @@ const ClassNotifyEmail = ({
 
             {/* Footer */}
             <Section className="bg-zinc-50 px-[32px] py-[16px] border-t border-zinc-200">
-              <Text className="text-[11px] text-zinc-400 text-center m-0">
+              <Text className="text-xs text-zinc-400 text-center m-0">
                 Este es un correo automático, por favor no respondas a este mensaje.
               </Text>
-              <Text className="text-[11px] text-zinc-400 text-center m-0 mt-[4px]">
+              <Text className="text-xs text-zinc-400 text-center m-0 mt-[4px]">
                 © {new Date().getFullYear()} Sistema de Gestión de Asistencias. Todos los derechos
                 reservados.
               </Text>

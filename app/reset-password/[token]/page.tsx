@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -148,7 +147,7 @@ function ResetPasswordContent() {
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-4 text-center">
         <Card className="w-full max-w-md p-8">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-semibold tracking-tight text-center">
+            <CardTitle className="text-2xl font-semibold tracking-card text-center">
               Enlace inválido
             </CardTitle>
             <CardDescription className="text-xs">
@@ -170,7 +169,7 @@ function ResetPasswordContent() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-semibold tracking-tight text-center">
+          <CardTitle className="text-2xl font-semibold tracking-card text-center">
             Restablecer contraseña
           </CardTitle>
           <CardDescription className="text-center">Ingresa tu nueva contraseña</CardDescription>

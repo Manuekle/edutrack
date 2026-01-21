@@ -81,9 +81,7 @@ const ResetPasswordEmail = ({ resetUrl, userEmail, supportEmail }: ResetPassword
                   O copia y pega este enlace en tu navegador:
                 </Text>
                 <div className="bg-zinc-50 border border-zinc-200 rounded-[6px] px-[12px] py-[8px] text-left">
-                  <Text className="text-[11px] text-zinc-700 m-0 break-all font-sans">
-                    {resetUrl}
-                  </Text>
+                  <Text className="text-xs text-zinc-700 m-0 break-all font-sans">{resetUrl}</Text>
                 </div>
               </Section>
 
@@ -115,10 +113,10 @@ const ResetPasswordEmail = ({ resetUrl, userEmail, supportEmail }: ResetPassword
 
             {/* Footer */}
             <Section className="bg-zinc-50 px-[32px] py-[16px] border-t border-zinc-200">
-              <Text className="text-[11px] text-zinc-400 text-center m-0">
+              <Text className="text-xs text-zinc-400 text-center m-0">
                 Este es un correo automático, por favor no respondas a este mensaje.
               </Text>
-              <Text className="text-[11px] text-zinc-400 text-center m-0 mt-[4px]">
+              <Text className="text-xs text-zinc-400 text-center m-0 mt-[4px]">
                 © {new Date().getFullYear()} Sistema de Gestión de Asistencias. Todos los derechos
                 reservados.
               </Text>

@@ -177,7 +177,7 @@ export default function UploadStudentsToSubjectsPage() {
   return (
     <main className="space-y-4">
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="text-2xl font-semibold tracking-heading">
+        <CardTitle className="text-2xl font-semibold tracking-card">
           Cargar Estudiantes a Asignaturas
         </CardTitle>
         <CardDescription className="text-xs">
@@ -189,7 +189,7 @@ export default function UploadStudentsToSubjectsPage() {
         <div className="lg:col-span-1 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
+              <CardTitle className="text-xl font-semibold tracking-card">
                 Plantilla de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -208,9 +208,7 @@ export default function UploadStudentsToSubjectsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
-                Subir Archivo
-              </CardTitle>
+              <CardTitle className="text-xl font-semibold tracking-card">Subir Archivo</CardTitle>
             </CardHeader>
             <CardContent>
               <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
@@ -238,7 +236,7 @@ export default function UploadStudentsToSubjectsPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold tracking-heading">
+              <CardTitle className="text-xl font-semibold tracking-card">
                 Previsualización y Confirmación
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -260,7 +258,7 @@ export default function UploadStudentsToSubjectsPage() {
                       <AlertCircle className="h-16 w-16 text-red-500" />
                     )}
                   </div>
-                  <h3 className="mt-4 text-xl font-semibold tracking-heading">
+                  <h3 className="mt-4 text-xl font-semibold tracking-card">
                     {uploadResult.success ? 'Carga completada' : 'Error en la carga'}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-2">
@@ -351,7 +349,7 @@ export default function UploadStudentsToSubjectsPage() {
                                       </DialogTrigger>
                                       <DialogContent className="max-w-2xl max-h-[80vh]">
                                         <DialogHeader>
-                                          <DialogTitle className="text-xl font-semibold tracking-heading">
+                                          <DialogTitle className="text-xl font-semibold tracking-card">
                                             {row.codigoAsignatura}
                                           </DialogTitle>
                                         </DialogHeader>

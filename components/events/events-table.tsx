@@ -1,7 +1,5 @@
 'use client';
 
-import type React from 'react';
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -189,7 +187,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         <CardHeader>
           <div className="flex justify-between items-center flex-wrap gap-2">
             <div>
-              <CardTitle className="text-xl font-semibold tracking-heading font-sans">
+              <CardTitle className="text-xl font-semibold tracking-card font-sans">
                 Gestión de Eventos Especiales
               </CardTitle>
               <CardDescription className="text-xs font-sans">
@@ -204,7 +202,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="font-sans font-semibold text-xl tracking-tight">
+                  <DialogTitle className="font-sans font-semibold text-xl tracking-card">
                     Crear Nuevo Evento
                   </DialogTitle>
                   <DialogDescription className="text-xs font-sans text-muted-foreground">
@@ -271,7 +269,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="font-sans text-xl font-semibold tracking-tight">
+                              <AlertDialogTitle className="font-sans text-xl font-semibold tracking-card">
                                 ¿Estás seguro?
                               </AlertDialogTitle>
                               <AlertDialogDescription className="font-sans text-xs text-muted-foreground">
@@ -314,7 +312,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="font-sans text-xl font-semibold tracking-tight">
+              <DialogTitle className="font-sans text-xl font-semibold tracking-card">
                 Editar Evento
               </DialogTitle>
               <DialogDescription className="font-sans text-xs text-muted-foreground">

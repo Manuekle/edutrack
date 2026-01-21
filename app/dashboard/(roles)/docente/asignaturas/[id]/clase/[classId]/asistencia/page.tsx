@@ -256,7 +256,7 @@ export default function AttendancePage() {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
-          <h2 className="text-2xl text-white text-center font-semibold tracking-tight pb-2">
+          <h2 className="text-2xl text-white text-center font-semibold tracking-card pb-2">
             No disponible
           </h2>
           <p className="text-white text-center mb-4 text-xs">
@@ -278,9 +278,7 @@ export default function AttendancePage() {
     <div className="space-y-4">
       <div className="flex justify-between items-start">
         <div>
-          <CardTitle className="font-semibold text-2xl tracking-heading">
-            Toma de Asistencia
-          </CardTitle>
+          <CardTitle className="font-semibold text-2xl tracking-card">Toma de Asistencia</CardTitle>
           {classInfo && (
             <CardDescription className="mt-1">
               {classInfo.subject.name} -{' '}
