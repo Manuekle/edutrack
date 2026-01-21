@@ -66,7 +66,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
             </div>
             {liveClass.myStatus === 'PRESENTE' && (
               <div className="flex items-center gap-2 mt-3">
-                <span className="text-green-700 text-xs font-medium">
+                <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium">
                   ¡Estás presente en esta clase!
                 </span>
               </div>

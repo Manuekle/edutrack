@@ -93,13 +93,7 @@ export const navLinkGroups: NavLinkGroup[] = [
           },
         ],
       },
-      {
-        href: '/dashboard/docente/cargar-asignaturas',
-        icon: BookMarked,
-        label: 'Cargar Asignaturas',
-        roles: ['DOCENTE'],
-        description: 'Cargar asignaturas y clases desde un archivo Excel',
-      },
+
       {
         href: '/dashboard/docente/reportes',
         icon: TrendingUp,

@@ -11,38 +11,37 @@ import * as React from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarTrigger,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarInset,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarProvider,
+    SidebarRail,
+    SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import Image from 'next/image';
 
 function AppSidebar({ homePath }: { homePath: string }) {
   const pathname = usePathname();
@@ -146,17 +145,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={homePath}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground overflow-hidden">
-                  <Image
-                    src="/icons/favicon-192x192.png"
-                    alt="Sistema de Gestión de Asistencias"
-                    width={32}
-                    height={32}
-                    priority
-                    className="h-full w-auto dark:invert"
-                    quality={100}
-                  />
-                </div>
+
                 <div className="grid flex-1 text-left text-xs leading-tight">
                   <span className="truncate font-semibold">Gestion de Asistencias</span>
                   <span className="truncate text-xs">Facultad de Ingeniería</span>
@@ -245,7 +234,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   onClick={() => router.push('/dashboard/profile')}
                   className="cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
                 >
-                  <Settings className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <Settings className="mr-3 h-4 w-4 shrink-0" />
                   <span>Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -273,9 +262,9 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   (theme === 'system' &&
                     typeof window !== 'undefined' &&
                     window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
-                    <Sun className="mr-3 h-4 w-4 flex-shrink-0" />
+                    <Sun className="mr-3 h-4 w-4 shrink-0" />
                   ) : (
-                    <Moon className="mr-3 h-4 w-4 flex-shrink-0" />
+                    <Moon className="mr-3 h-4 w-4 shrink-0" />
                   )}
                   <span className="font-sans">
                     {theme === 'dark' ||
@@ -291,7 +280,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   onClick={handleSignOut}
                   className="text-destructive cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
                 >
-                  <LogOut className="mr-3 h-4 w-4 flex-shrink-0" />
+                  <LogOut className="mr-3 h-4 w-4 shrink-0" />
                   <span className="font-sans">Cerrar sesión</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
