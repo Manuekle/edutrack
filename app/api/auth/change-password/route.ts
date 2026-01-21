@@ -23,7 +23,11 @@ export async function POST(req: Request) {
     // Get user with password
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { password: true },
+      select: {
+        password: true,
+        correoPersonal: true,
+        correoInstitucional: true,
+      },
     });
 
     if (!user?.password) {
@@ -44,6 +48,12 @@ export async function POST(req: Request) {
       where: { id: session.user.id },
       data: { password: hashedPassword },
     });
+
+    // Invalidate user cache
+    const emails = [user.correoPersonal, user.correoInstitucional].filter(Boolean) as string[];
+    // @ts-ignore - Dynamic import
+    const { clearAllUserCache } = await import('@/lib/cache');
+    await clearAllUserCache(session.user.id, emails);
 
     return NextResponse.json({ message: 'Contraseña actualizada exitosamente' });
   } catch (error) {

@@ -14,11 +14,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  eslint: {
-    // Ignorar errores de ESLint durante el build para permitir despliegues
-    // El lint seguirá ejecutándose en desarrollo y CI/CD
-    ignoreDuringBuilds: true,
-  },
+
   typescript: {
     // Opcional: también puedes ignorar errores de TypeScript durante el build
     // ignoreBuildErrors: true,

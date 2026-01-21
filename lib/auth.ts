@@ -31,17 +31,24 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         // Check cache first
+        // Check cache first
         const cacheKey = `auth:${credentials.email}`;
-        const cachedAuth = await redis.get(cacheKey);
+        try {
+          const cachedAuth = await redis.get(cacheKey);
 
-        if (cachedAuth && typeof cachedAuth === 'string') {
-          try {
-            const { user, hash } = JSON.parse(cachedAuth);
-            const isValid = await bcrypt.compare(credentials.password, hash);
-            return isValid ? user : null;
-          } catch (error) {
-            return null;
+          if (cachedAuth && typeof cachedAuth === 'string') {
+            try {
+              const { user, hash } = JSON.parse(cachedAuth);
+              const isValid = await bcrypt.compare(credentials.password, hash);
+              if (isValid) return user;
+              // If cache exists but password is wrong, it might be stale. Fallback to DB.
+            } catch (error) {
+              // Error parsing cache, fallback to DB
+            }
           }
+        } catch (error) {
+          console.error('Redis cache check error:', error);
+          // Continue to DB check
         }
 
         // Not in cache, check database
@@ -74,14 +81,19 @@ export const authOptions: NextAuthOptions = {
         const { password, ...userData } = user;
 
         // Cache successful login
-        await redis.set(
-          cacheKey,
-          JSON.stringify({
-            user: userData,
-            hash: user.password,
-          }),
-          { ex: CACHE_TTL.AUTH }
-        );
+        // Cache successful login
+        try {
+          await redis.set(
+            cacheKey,
+            JSON.stringify({
+              user: userData,
+              hash: user.password,
+            }),
+            { ex: CACHE_TTL.AUTH }
+          );
+        } catch (error) {
+          console.error('Redis cache set error:', error);
+        }
 
         return userData;
       },
@@ -126,22 +138,30 @@ export const authOptions: NextAuthOptions = {
           isActive: user.isActive,
         };
 
-        await redis.set(`user:${user.id}`, JSON.stringify(userData), {
-          ex: CACHE_TTL.USER_SESSION,
-        });
+        try {
+          await redis.set(`user:${user.id}`, JSON.stringify(userData), {
+            ex: CACHE_TTL.USER_SESSION,
+          });
+        } catch (error) {
+          console.error('Redis session cache error:', error);
+        }
         return { ...token, ...userData };
       }
 
       if (trigger === 'update') {
-        // Try cache first
-        const cachedUser = await redis.get(`user:${token.id}`);
-        if (cachedUser && typeof cachedUser === 'string') {
-          try {
-            const parsedUser = JSON.parse(cachedUser);
-            return { ...token, ...parsedUser };
-          } catch (error) {
-            // Error parsing cached user, fallback to database
+        try {
+          // Try cache first
+          const cachedUser = await redis.get(`user:${token.id}`);
+          if (cachedUser && typeof cachedUser === 'string') {
+            try {
+              const parsedUser = JSON.parse(cachedUser);
+              return { ...token, ...parsedUser };
+            } catch (error) {
+              // Error parsing cached user, fallback to database
+            }
           }
+        } catch (error) {
+          console.error('Redis update cache check error:', error);
         }
 
         // Fallback to database
@@ -163,9 +183,13 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (dbUser) {
-          await redis.set(`user:${token.id}`, JSON.stringify(dbUser), {
-            ex: CACHE_TTL.USER_SESSION,
-          });
+          try {
+            await redis.set(`user:${token.id}`, JSON.stringify(dbUser), {
+              ex: CACHE_TTL.USER_SESSION,
+            });
+          } catch (error) {
+            console.error('Redis update cache set error:', error);
+          }
           return { ...token, ...dbUser };
         }
       }

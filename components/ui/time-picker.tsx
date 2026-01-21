@@ -4,11 +4,10 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import React from 'react';
 
-interface TimePickerProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    'value' | 'onChange' | 'className' | 'step' | 'type'
-  > {
+interface TimePickerProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'value' | 'onChange' | 'className' | 'step' | 'type'
+> {
   value: string; // Expected format: "HH:mm"
   onChange: (value: string) => void;
   className?: string;

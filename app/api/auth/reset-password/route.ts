@@ -51,6 +51,12 @@ export async function POST(request: Request) {
       },
     });
 
+    // Invalidate user cache
+    const emails = [user.correoPersonal, user.correoInstitucional].filter(Boolean) as string[];
+    // @ts-ignore - Dynamic import to avoid cycles or ensure availability
+    const { clearAllUserCache } = await import('@/lib/cache');
+    await clearAllUserCache(user.id, emails);
+
     return NextResponse.json(
       {
         message:
