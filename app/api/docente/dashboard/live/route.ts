@@ -52,27 +52,17 @@ export async function GET() {
       });
     } else {
       // For teacher, count students in their subjects
-      const subjects = await db.subject.findMany({
+      const subjectsWithStudents = await db.subject.findMany({
         where: { teacherId },
-        select: { id: true },
+        select: { studentIds: true },
       });
 
-      const subjectIds = subjects.map(s => s.id);
-
       // Count unique students across all teacher's subjects
-      const uniqueStudentIds = new Set();
+      const uniqueStudentIds = new Set<string>();
 
-      // Get all students from each subject
-      for (const subjectId of subjectIds) {
-        const subject = await db.subject.findUnique({
-          where: { id: subjectId },
-          select: { studentIds: true },
-        });
-
-        if (subject) {
-          subject.studentIds.forEach(id => uniqueStudentIds.add(id));
-        }
-      }
+      subjectsWithStudents.forEach(subject => {
+        subject.studentIds.forEach(id => uniqueStudentIds.add(id));
+      });
 
       totalStudents = uniqueStudentIds.size;
     }
