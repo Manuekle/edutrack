@@ -18,10 +18,8 @@ const getRandomInt = (min: number, max: number) => {
 const SUBJECTS_DATA = [
   { name: 'Cálculo Diferencial', code: 'MAT-101', credits: 4, program: 'Ingeniería', teacherIdx: 0 },
   { name: 'Álgebra Lineal', code: 'MAT-102', credits: 3, program: 'Ingeniería', teacherIdx: 0 },
-  { name: 'Programación Web', code: 'SIS-201', credits: 3, program: 'Sistemas', teacherIdx: 1 },
-  { name: 'Estructura de Datos', code: 'SIS-202', credits: 4, program: 'Sistemas', teacherIdx: 1 },
-  { name: 'Ética Profesional', code: 'HUM-301', credits: 2, program: 'Humanas', teacherIdx: 2 },
-  { name: 'Historia del Arte', code: 'HUM-302', credits: 2, program: 'Humanas', teacherIdx: 2 },
+  { name: 'Programación Web', code: 'SIS-201', credits: 3, program: 'Sistemas', teacherIdx: 0 },
+  { name: 'Estructura de Datos', code: 'SIS-202', credits: 4, program: 'Sistemas', teacherIdx: 0 },
 ];
 
 async function main() {
@@ -41,16 +39,18 @@ async function main() {
     console.log('First run (tables empty)');
   }
 
-  // 2. Create Users
-  const password = await hashPassword('123456');
+  // 2. Create Users with specific test credentials
+  const adminPassword = await hashPassword('admin123');
+  const docentePassword = await hashPassword('docente123');
+  const estudiantePassword = await hashPassword('estudiante123');
 
   // Admin
   await prisma.user.create({
     data: {
       name: 'Admin General',
-      correoInstitucional: 'admin@edutrack.com',
-      correoPersonal: 'admin@personal.com',
-      password,
+      correoInstitucional: 'meerazo7@hotmail.com',
+      correoPersonal: 'meerazo7@hotmail.com',
+      password: adminPassword,
       role: Role.ADMIN,
       document: 'ADM-001',
     },
@@ -58,43 +58,47 @@ async function main() {
 
   // Teachers
   const teachers = [];
-  const teacherProfiles = [
-    { name: 'Prof. Matemáticas', email: 'math@edutrack.com', personal: 'math@personal.com' },
-    { name: 'Prof. Sistemas', email: 'dev@edutrack.com', personal: 'dev@personal.com' },
-    { name: 'Prof. Humanidades', email: 'human@edutrack.com', personal: 'human@personal.com' },
-  ];
-
-  for (let i = 0; i < teacherProfiles.length; i++) {
-    const t = await prisma.user.create({
-      data: {
-        name: teacherProfiles[i].name,
-        correoInstitucional: teacherProfiles[i].email,
-        correoPersonal: teacherProfiles[i].personal,
-        password,
-        role: Role.DOCENTE,
-        document: `DOC-00${i + 1}`,
-      },
-    });
-    teachers.push(t);
-  }
+  const teacher = await prisma.user.create({
+    data: {
+      name: 'Prof. Esteban Lustondo',
+      correoInstitucional: 'elustondo129@gmail.com',
+      correoPersonal: 'elustondo129@gmail.com',
+      password: docentePassword,
+      role: Role.DOCENTE,
+      document: 'DOC-001',
+    },
+  });
+  teachers.push(teacher);
 
   // Students
   const students = [];
-  for (let i = 1; i <= 15; i++) {
-    const s = await prisma.user.create({
-      data: {
-        name: `Estudiante ${i}`,
-        correoInstitucional: `student${i}@edutrack.com`,
-        correoPersonal: `student${i}@personal.com`,
-        password,
-        role: Role.ESTUDIANTE,
-        document: `EST-0${i < 10 ? '0' + i : i}`,
-        codigoEstudiantil: `2024-${i + 100}`,
-      },
-    });
-    students.push(s);
-  }
-  console.log(`bustUsers created: 1 Admin, ${teachers.length} Teachers, ${students.length} Students`);
+  const student1 = await prisma.user.create({
+    data: {
+      name: 'Manuel Erazo',
+      correoInstitucional: 'manuel.erazo@estudiante.fup.edu.co',
+      correoPersonal: 'manuel.erazo@estudiante.fup.edu.co',
+      password: estudiantePassword,
+      role: Role.ESTUDIANTE,
+      document: 'EST-001',
+      codigoEstudiantil: '2024-101',
+    },
+  });
+  students.push(student1);
+
+  const student2 = await prisma.user.create({
+    data: {
+      name: 'Andrés Peña',
+      correoInstitucional: 'andres.pena@estudiante.fup.edu.co',
+      correoPersonal: 'andres.pena@estudiante.fup.edu.co',
+      password: estudiantePassword,
+      role: Role.ESTUDIANTE,
+      document: 'EST-002',
+      codigoEstudiantil: '2024-102',
+    },
+  });
+  students.push(student2);
+
+  console.log(`✅ Users created: 1 Admin, ${teachers.length} Teacher, ${students.length} Students`);
 
   // 3. Create Subjects & Enrollments
   const subjects = [];
@@ -105,10 +109,8 @@ async function main() {
   const endDate = addDays(today, 60);
 
   for (const subData of SUBJECTS_DATA) {
-    // Randomly select 8-12 students for this subject
-    const shuffledStudents = [...students].sort(() => 0.5 - Math.random());
-    const enrolledStudents = shuffledStudents.slice(0, getRandomInt(8, 12));
-    const enrolledIds = enrolledStudents.map(s => s.id);
+    // Enroll both students in all subjects
+    const enrolledIds = students.map(s => s.id);
 
     const subject = await prisma.subject.create({
       data: {
@@ -152,7 +154,7 @@ async function main() {
         if (isPast) {
             let present = 0, absent = 0, late = 0, justified = 0;
 
-            for (const student of enrolledStudents) {
+            for (const student of students) {
                 const rand = Math.random();
                 let status: AttendanceStatus = AttendanceStatus.PRESENTE;
 
@@ -179,7 +181,7 @@ async function main() {
             await prisma.class.update({
                 where: { id: newClass.id },
                 data: {
-                    totalStudents: enrolledStudents.length,
+                    totalStudents: students.length,
                     presentCount: present,
                     absentCount: absent,
                     lateCount: late,
