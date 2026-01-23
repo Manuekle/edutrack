@@ -206,7 +206,106 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    /* Support for iPhone notch and safe areas */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
+
+  button,
+  a {
+    @apply cursor-pointer;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* For older browsers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  /* Firefox */
+}
+
+/* Estilos para el scroll horizontal de especialidades */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari y Opera */
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  /* IE y Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  /* Mejora el scroll en iOS */
+  padding-bottom: 4px;
+  /* Espacio para el gradiente */
+}
+
+/* Ocultar el scrollbar en navegadores compatibles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+/* Para WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Personalizar el thumb (barra desplazable) */
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 10px;
+}
+
+/* Personalizar el track (fondo del scrollbar) */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Ocultar completamente el scrollbar en algunos elementos si es necesario */
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Soporte para Tailwind (variables dinámicas) */
+:root {
+  --scroll-thumb: #c0c0c0;
+}
+
+.dark {
+  --scroll-thumb: #4a4a4a;
 }
