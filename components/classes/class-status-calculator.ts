@@ -31,8 +31,16 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
   const classDateOnly = new Date(classDate);
   classDateOnly.setHours(0, 0, 0, 0);
 
-  const classStartTime = cls.startTime ? new Date(cls.startTime) : null;
-  const classEndTime = cls.endTime ? new Date(cls.endTime) : null;
+  const combineDateTime = (date: Date, timeStr: string | undefined): Date | null => {
+    if (!timeStr) return null;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const combined = new Date(date);
+    combined.setHours(hours, minutes, 0, 0);
+    return combined;
+  };
+
+  const classStartTime = combineDateTime(classDateOnly, cls.startTime);
+  const classEndTime = combineDateTime(classDateOnly, cls.endTime);
 
   const isToday = dateUtils.isSameDay(classDateOnly, today);
   const isFuture = classDateOnly > today;
@@ -46,12 +54,20 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
     now <= classEndTime
   );
 
-  const isScheduledForToday = !!(isToday && classStartTime && now < classStartTime);
+  const tenMinutesInMs = 10 * 60 * 1000;
+  const isWithinEarlyBuffer = !!(
+    isToday &&
+    classStartTime &&
+    now >= new Date(classStartTime.getTime() - tenMinutesInMs) &&
+    now < classStartTime
+  );
+
+  const isScheduledForToday = !!(isToday && classStartTime && now < new Date(classStartTime.getTime() - tenMinutesInMs));
   const isTodayFinished = !!(isToday && classEndTime && now > classEndTime);
 
   let visualStatus: string = cls.status;
   if (cls.status === 'PROGRAMADA') {
-    if (isWithinClassTime) {
+    if (isWithinClassTime || isWithinEarlyBuffer) {
       visualStatus = 'EN_CURSO';
     } else if (isTodayFinished || isPast) {
       visualStatus = 'FINALIZADA';
@@ -65,7 +81,7 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
   const canCancel = !!(isProgramada && (isFuture || isScheduledForToday));
   const canMarkAsDone = !!((isProgramada || isEnCurso) && (isToday || isPast));
   const canTakeAttendance = !!(
-    (isWithinClassTime || isScheduledForToday || isTodayFinished || isPast) &&
+    (isWithinClassTime || isWithinEarlyBuffer || isTodayFinished || isPast) &&
     (isProgramada || isEnCurso) &&
     cls.status !== 'REALIZADA' &&
     cls.status !== 'CANCELADA'

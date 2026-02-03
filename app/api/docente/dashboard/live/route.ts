@@ -110,6 +110,7 @@ export async function GET() {
         topic: liveClass.topic,
         status: liveClass.status,
         subjectName: liveClass.subject.name,
+        classroom: liveClass.classroom,
         startTime: liveClass.startTime!.toISOString(),
         endTime: liveClass.endTime!.toISOString(),
         totalStudents,

@@ -73,6 +73,7 @@ export type LiveClassData = {
   id: string;
   topic: string;
   subjectName: string;
+  classroom?: string | null;
   startTime: string;
   endTime: string;
   totalStudents: number;

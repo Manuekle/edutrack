@@ -17,6 +17,7 @@ export interface ClassWithStatus {
   endTime?: string;
   topic?: string;
   description?: string;
+  classroom?: string;
   status: string;
   cancellationReason?: string | null;
 }
@@ -99,10 +100,11 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/60">
-                    <TableHead className="text-xs font-normal px-4 py-2">Fecha</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2">Tema</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2">Estado</TableHead>
-                    <TableHead className="text-xs font-normal text-right px-4 py-2">
+                    <TableHead className="text-xs font-normal px-4 py-2">Fecha y Hora</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2">Salón</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2">Tema</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2 text-center">Estado</TableHead>
+                  <TableHead className="text-xs font-normal text-right px-4 py-2 pr-6">
                       Acciones
                     </TableHead>
                   </TableRow>

@@ -1,15 +1,15 @@
 import type { NavLinkGroup } from '@/types/navigation';
 import {
-  BookMarked,
-  BookOpen,
-  GraduationCap,
-  Home,
-  QrCode,
-  Settings,
-  TrendingUp,
-  User,
-  UserPlus,
-  Users,
+    BookMarked,
+    BookOpen,
+    GraduationCap,
+    Home,
+    QrCode,
+    Settings,
+    TrendingUp,
+    User,
+    UserPlus,
+    Users,
 } from 'lucide-react';
 
 export const navLinkGroups: NavLinkGroup[] = [
@@ -83,12 +83,12 @@ export const navLinkGroups: NavLinkGroup[] = [
             icon: BookMarked,
           },
           {
-            href: '/dashboard/docente/asignaturas/[id]/clase/[id]/asistencia',
+            href: '/dashboard/docente/asignaturas/[id]/clase/[classId]/asistencia',
             label: 'Asistencia',
             description: 'Gestiona la asistencia de tus estudiantes.',
             roles: ['DOCENTE'],
             isSubLink: true,
-            parentHref: '/dashboard/docente/asignaturas/[id]/clase/[id]/asistencia',
+            parentHref: '/dashboard/docente/asignaturas/[id]/clase/[classId]/asistencia',
             icon: QrCode,
           },
         ],

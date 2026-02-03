@@ -14,6 +14,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
             <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Clase en curso</CardTitle>
             <p className="text-xs text-muted-foreground">
               {liveClass.subjectName} • {liveClass.topic}
+              {liveClass.classroom && ` • Salón: ${liveClass.classroom}`}
             </p>
           </div>
           <div className="flex items-center md:space-x-2 md:bg-foreground/5 px-2 md:px-3 py-1 rounded-full">

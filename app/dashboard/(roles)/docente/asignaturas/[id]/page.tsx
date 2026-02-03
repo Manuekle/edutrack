@@ -9,7 +9,7 @@ import { EventsTable } from '@/components/events/events-table';
 import { StudentsTable } from '@/components/students/students-table';
 import { GenerateReportModal } from '@/components/subjects/generate-report-modal';
 import { Button } from '@/components/ui/button';
-import { CardDescription, CardTitle } from '@/components/ui/card';
+import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { useClassManagement } from '@/hooks/use-class-management';
 import { useSubjectDetail } from '@/hooks/use-subject-detail';
@@ -146,12 +146,16 @@ export default function SubjectDetailPage() {
         isLoading={isGeneratingReport}
       />
 
-      <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
-        <div>
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mis Clases</CardTitle>
-          <CardDescription className="text-xs">Gestiona tus clases y eventos.</CardDescription>
-        </div>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
+        <CardHeader className="p-0 w-full">
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            Mis Clases
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Gestiona tus clases y eventos para esta asignatura.
+          </CardDescription>
+        </CardHeader>
+        <div className="flex gap-2 shrink-0">
           <Button
             variant="outline"
             onClick={() => setIsReportModalOpen(true)}
@@ -169,6 +173,7 @@ export default function SubjectDetailPage() {
           <Button
             variant="default"
             onClick={() => router.push(`/dashboard/docente/asignaturas/${subject?.id}/preview`)}
+            aria-label="Ver vista previa de la asignatura"
           >
             Vista Previa
           </Button>

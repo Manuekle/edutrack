@@ -124,7 +124,7 @@ export default async function PreviewPage({ params }: PageProps) {
                 alt="Logo FUP"
                 width={128}
                 height={128}
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain dark:brightness-0 dark:invert"
                 priority
                 unoptimized
               />
@@ -286,7 +286,7 @@ export default async function PreviewPage({ params }: PageProps) {
                             alt="Firma docente"
                             width={150}
                             height={48}
-                            className="h-12 max-w-full object-contain my-1"
+                            className="h-12 max-w-full object-contain my-1 dark:brightness-0 dark:invert"
                           />
                         ) : (
                           // Nota: “finalizada” (PROGRAMADA con endTime pasado) NO muestra firma

@@ -34,6 +34,7 @@ interface UpcomingClass {
   subjectId: string;
   subjectName: string;
   topic: string | null;
+  classroom?: string | null;
   date: Date;
 }
 
@@ -114,6 +115,7 @@ export default function DocenteDashboard() {
           subjectName: upcomingClasses[0].subjectName,
           date: upcomingClasses[0].date,
           topic: upcomingClasses[0].topic || 'Sin tema',
+          classroom: upcomingClasses[0].classroom || '',
         }
       : undefined;
 
@@ -128,7 +130,7 @@ export default function DocenteDashboard() {
         </CardHeader>
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={() => router.push('/dashboard/docente/asignaturas')}>
+            <Button type="button" variant="outline" onClick={() => router.push('/dashboard/docente/asignaturas')}>
               Ver todas las asignaturas
             </Button>
           </div>

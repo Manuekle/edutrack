@@ -32,9 +32,18 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
               const progress = (subject.completedClasses / subject.totalClasses) * 100;
               return (
                 <div
+                  role="button"
+                  tabIndex={0}
                   key={subject.id}
-                  className="group relative rounded-lg border transition-all duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4"
+                  className="group relative rounded-lg border transition-all duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   onClick={() => router.push(`/dashboard/docente/asignaturas/${subject.id}`)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      router.push(`/dashboard/docente/asignaturas/${subject.id}`);
+                    }
+                  }}
+                  aria-label={`Ver detalles de la asignatura ${subject.name}`}
                 >
                   <div className="flex items-end justify-between">
                     <div className="flex-1 min-w-0">

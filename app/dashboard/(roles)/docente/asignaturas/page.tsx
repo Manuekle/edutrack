@@ -1,7 +1,7 @@
 'use client';
 
 import { TablePagination } from '@/components/shared/table-pagination';
-import { CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loading } from '@/components/ui/loading';
 import {
     Select,
@@ -48,37 +48,47 @@ export default function SubjectsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-        <div className="pb-4 col-span-1 w-full">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
-          <CardDescription className="text-xs">
-            Listado de asignaturas por período académico
-          </CardDescription>
-        </div>
-        <div className="justify-end col-span-1 w-full items-center flex">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-            <SelectTrigger className="text-xs">
-              <SelectValue placeholder="Seleccionar período" />
-            </SelectTrigger>
-            <SelectContent>
-              {availablePeriods.map(period => (
-                <SelectItem key={period} value={period} className="text-xs font-sans">
-                  {period}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <CardContent className="p-0">
-        {error && (
-          <div className="p-4 mb-4 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-            {error instanceof Error ? error.message : 'Ocurrió un error al cargar las asignaturas'}
+      <Card className="border-none shadow-none bg-transparent">
+        <CardHeader className="px-0 pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="pb-4 col-span-1 w-full">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                Mis Asignaturas
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Listado de asignaturas por período académico
+              </CardDescription>
+            </div>
+            <div className="justify-end col-span-1 w-full items-center flex gap-2">
+              <label
+                htmlFor="period-select"
+                className="text-xs text-muted-foreground whitespace-nowrap"
+              >
+                Período:
+              </label>
+              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                <SelectTrigger id="period-select" className="text-xs w-[180px]">
+                  <SelectValue placeholder="Seleccionar período" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availablePeriods.map(period => (
+                    <SelectItem key={period} value={period} className="text-xs font-sans">
+                      {period}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        )}
-        <div>
-          <div className="border rounded-md">
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {error && (
+            <div className="p-4 mb-4 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+              {error instanceof Error ? error.message : 'Ocurrió un error al cargar las asignaturas'}
+            </div>
+          )}
+          <div className="border rounded-md bg-card shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/60">
@@ -120,7 +130,8 @@ export default function SubjectsPage() {
                               <TooltipTrigger asChild>
                                 <Link
                                   href={`/dashboard/docente/asignaturas/${subject.id}`}
-                                  className="hover:underline"
+                                  className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1"
+                                  aria-label={`Ver detalles de la asignatura ${subject.name}`}
                                 >
                                   {subject.name}
                                 </Link>
@@ -131,11 +142,11 @@ export default function SubjectsPage() {
                             </Tooltip>
                           </TooltipProvider>
                         </TableCell>
-                        <TableCell className="px-4 py-2">{subject.code}</TableCell>
-                        <TableCell className="px-4 py-2">{subject.program || 'N/A'}</TableCell>
-                        <TableCell className="px-4 py-2">{subject.semester || 'N/A'}</TableCell>
-                        <TableCell className="px-4 py-2 text-right">
-                          {subject.credits || 'N/A'}
+                        <TableCell className="px-4 py-2 text-xs font-mono">{subject.code}</TableCell>
+                        <TableCell className="px-4 py-2 text-xs">{subject.program || 'N/A'}</TableCell>
+                        <TableCell className="px-4 py-2 text-xs">{subject.semester || 'N/A'}</TableCell>
+                        <TableCell className="px-4 py-2 text-right text-xs">
+                          {subject.credits || '0'}
                         </TableCell>
                       </TableRow>
                     ))
@@ -153,8 +164,8 @@ export default function SubjectsPage() {
               </div>
             )}
           </div>
-        </div>
-      </CardContent>
+        </CardContent>
+      </Card>
     </div>
   );
 }

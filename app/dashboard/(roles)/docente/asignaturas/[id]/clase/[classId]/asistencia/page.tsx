@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Loader2, QrCode } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -51,7 +51,8 @@ type ClassInfo = {
 export default function AttendancePage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const subjectId = params.id as string;
+  const classId = params.classId as string;
 
   const [students, setStudents] = useState<StudentAttendance[]>([]);
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
@@ -85,14 +86,14 @@ export default function AttendancePage() {
   };
 
   const fetchData = useCallback(async () => {
-    if (!id) return;
+    if (!classId) return;
 
     if (!qrData) setIsLoading(true);
     setError(null);
     try {
       const [classRes, attendanceRes] = await Promise.all([
-        fetch(`/api/docente/clases/${id}`),
-        fetch(`/api/docente/clases/${id}/asistencia`),
+        fetch(`/api/docente/clases/${classId}`),
+        fetch(`/api/docente/clases/${classId}/asistencia`),
       ]);
 
       if (!classRes.ok) throw new Error('No se pudieron cargar los detalles de la clase.');
@@ -113,8 +114,8 @@ export default function AttendancePage() {
         classEndDate = new Date(classStartDate.getTime() + 2 * 60 * 60 * 1000);
       }
 
-      // Add a 15-minute buffer before and after class
-      const bufferMinutes = 15;
+      // Add a 10-minute buffer before and after class
+      const bufferMinutes = 10;
       const bufferMs = bufferMinutes * 60 * 1000;
 
       const isTooEarly = classStartDate
@@ -169,7 +170,7 @@ export default function AttendancePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [id, qrData, router, setError, setIsLoading]);
+  }, [classId, router]);
 
   useEffect(() => {
     fetchData();
@@ -204,7 +205,7 @@ export default function AttendancePage() {
   const handleSaveChanges = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/docente/clases/${id}/asistencia`, {
+      const response = await fetch(`/api/docente/clases/${classId}/asistencia`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -230,7 +231,7 @@ export default function AttendancePage() {
   const handleGenerateQr = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch(`/api/docente/clases/${id}/generar-qr`, {
+      const response = await fetch(`/api/docente/clases/${classId}/generar-qr`, {
         method: 'POST',
       });
       const responseData = await response.json();

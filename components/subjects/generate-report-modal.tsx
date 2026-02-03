@@ -59,7 +59,7 @@ export function GenerateReportModal({
             {isLoading ? (
               <>Generando...</>
             ) : !hasSignature ? (
-              <div className="flex items-center gap-2">Firma requerida</div>
+              <span className="flex items-center gap-2">Firma requerida</span>
             ) : (
               'Generar Reporte'
             )}

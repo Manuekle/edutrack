@@ -11,6 +11,7 @@ interface StatsProps {
     subjectName: string;
     date: Date;
     topic: string;
+    classroom?: string | null;
   };
 }
 
@@ -76,6 +77,7 @@ export function TeacherStatsCards({
                       day: 'numeric',
                       month: 'long',
                     })}
+                    {nextClass.classroom && ` • Salón: ${nextClass.classroom}`}
                   </span>
                 </div>
               </div>

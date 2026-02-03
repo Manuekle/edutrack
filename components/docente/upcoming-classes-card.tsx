@@ -9,6 +9,7 @@ interface UpcomingClass {
   subjectId: string;
   subjectName: string;
   topic: string | null;
+  classroom?: string | null;
   date: Date;
 }
 
@@ -66,6 +67,12 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                                 .replace(/p\.\s*m\./i, 'PM')
                             : 'Sin hora definida'}
                         </span>
+                        {cls.classroom && (
+                          <>
+                            {'-'}
+                            <span className="font-mono">{cls.classroom}</span>
+                          </>
+                        )}
                       </div>
                     </span>
                   </div>

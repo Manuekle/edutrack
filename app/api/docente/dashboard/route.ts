@@ -71,6 +71,7 @@ export async function GET() {
             date: true,
             startTime: true,
             topic: true,
+            classroom: true,
             status: true,
             attendances: {
               select: {
@@ -156,6 +157,7 @@ export async function GET() {
               date: upcomingClass.date.toISOString(),
               startTime: upcomingClass.startTime?.toISOString() || null,
               topic: upcomingClass.topic || 'Sin tema definido',
+              classroom: upcomingClass.classroom || null,
             }
           : undefined,
       };
@@ -199,6 +201,7 @@ export async function GET() {
             date: cls.date.toISOString(),
             startTime: cls.startTime?.toISOString() || null,
             topic: cls.topic || 'Sin tema definido',
+            classroom: cls.classroom || null,
           }))
       )
       .sort(

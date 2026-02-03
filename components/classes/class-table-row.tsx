@@ -109,6 +109,9 @@ export function ClassTableRow({
           )}
         </div>
       </TableCell>
+      <TableCell className="text-xs px-4 py-2 font-sans">
+        {cls.classroom || 'N/A'}
+      </TableCell>
       <TableCell className="text-xs px-4 py-2">
         <TooltipProvider>
           <Tooltip>
@@ -131,7 +134,7 @@ export function ClassTableRow({
           </Tooltip>
         </TooltipProvider>
       </TableCell>
-      <TableCell className="px-4 py-2">
+      <TableCell className="px-4 py-2 text-center">
         <Badge variant="outline" className={cn('font-light text-xs dark:text-white', statusColor)}>
           {statusLabel}
         </Badge>
