@@ -221,7 +221,7 @@ export default function DocenteAgendarPage() {
                           <div className="flex flex-col gap-0.5">
                             <div className="flex items-center gap-1.5 text-foreground font-semibold">
                               <Clock className="h-3 w-3 text-primary/50" />
-                              {format(new Date(booking.startTime), "HH:mm")} - {format(new Date(booking.endTime), "HH:mm")}
+                              {format(new Date(booking.startTime), "hh:mm a")} - {format(new Date(booking.endTime), "hh:mm a")}
                             </div>
                             <span className="text-xs text-muted-foreground capitalize">
                               {format(new Date(booking.startTime), "EEEE dd 'de' MMMM", { locale: es })}
