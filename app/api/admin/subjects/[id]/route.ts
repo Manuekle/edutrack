@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const { id } = await params;
     const body = await req.json();
-    const { name, code, program, semester, credits, teacherId } = body;
+    const { name, code, program, semester, credits, teacherId, group } = body;
 
     // Verificar que la asignatura existe
     const existingSubject = await db.subject.findUnique({
@@ -25,22 +25,31 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ message: 'Asignatura no encontrada.' }, { status: 404 });
     }
 
-    // Si se está actualizando el código, verificar que no exista
-    if (code && code !== existingSubject.code) {
+    // Si se está actualizando el código o el grupo, verificar que no exista la combinación
+    if (code || group !== undefined) {
+      const newCode = code || existingSubject.code;
+      const newGroup = group !== undefined ? (group || null) : existingSubject.group;
+
+      // Check if another subject exists with this combination
       const subjectWithCode = await db.subject.findUnique({
-        where: { code },
+        where: {
+          code_group: {
+            code: newCode,
+            group: newGroup,
+          },
+        },
       });
 
-      if (subjectWithCode) {
+      if (subjectWithCode && subjectWithCode.id !== id) {
         return NextResponse.json(
-          { message: 'El código de asignatura ya está en uso.' },
+          { message: 'Ya existe una asignatura con este código y grupo.' },
           { status: 409 }
         );
       }
     }
 
     // Si se está actualizando el docente, verificar que exista y tenga el rol correcto
-    if (teacherId && teacherId !== existingSubject.teacherId) {
+    if (teacherId && (!existingSubject.teacherIds.includes(teacherId))) {
       const teacher = await db.user.findUnique({
         where: { id: teacherId },
       });
@@ -65,10 +74,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         ...(program !== undefined && { program }),
         ...(semester !== undefined && { semester: semester ? parseInt(semester) : null }),
         ...(credits !== undefined && { credits: credits ? parseInt(credits) : null }),
-        ...(teacherId && { teacherId }),
+        ...(credits !== undefined && { credits: credits ? parseInt(credits) : null }),
+        ...(teacherId && { teacherIds: [teacherId] }),
+        ...(group !== undefined && { group: group || null }),
       },
       include: {
-        teacher: {
+        teachers: {
           select: {
             id: true,
             name: true,

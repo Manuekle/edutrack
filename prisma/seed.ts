@@ -1,25 +1,34 @@
-import { AttendanceStatus, ClassStatus, PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import { hash } from 'bcryptjs';
-import { addDays, isSameDay, subDays } from 'date-fns';
 
 const prisma = new PrismaClient();
 
 // --- Helpers ---
+const hashPassword = async (password: string) => hash(password, 12);
 
-const hashPassword = async (password: string): Promise<string> => {
-  return hash(password, 12);
-};
+const PROGRAMS = ['Ingeniería de Sistemas', 'Derecho', 'Psicología', 'Administración de Empresas'];
+const NAMES_FIRST = ['Juan', 'Maria', 'Carlos', 'Ana', 'Luis', 'Sofia', 'Pedro', 'Lucia', 'Jorge', 'Elena', 'Andres', 'Valentina'];
+const NAMES_LAST = ['Garcia', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Perez', 'Sanchez', 'Ramirez', 'Torres'];
 
-const getRandomInt = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-// --- Data ---
-const SUBJECTS_DATA = [
-  { name: 'Cálculo Diferencial', code: 'MAT-101', credits: 4, program: 'Ingeniería', teacherIdx: 0 },
-  { name: 'Álgebra Lineal', code: 'MAT-102', credits: 3, program: 'Ingeniería', teacherIdx: 0 },
-  { name: 'Programación Web', code: 'SIS-201', credits: 3, program: 'Sistemas', teacherIdx: 0 },
-  { name: 'Estructura de Datos', code: 'SIS-202', credits: 4, program: 'Sistemas', teacherIdx: 0 },
+const generateName = () => `${getRandomElement(NAMES_FIRST)} ${getRandomElement(NAMES_LAST)}`;
+
+const SUBJECT_TEMPLATES = [
+  // Sistemas
+  { name: 'Cálculo Diferencial', code: 'MAT-101', credits: 4, program: 'Ingeniería de Sistemas', semester: 1 },
+  { name: 'Programación Básica', code: 'SIS-101', credits: 3, program: 'Ingeniería de Sistemas', semester: 1 },
+  { name: 'Álgebra Lineal', code: 'MAT-102', credits: 3, program: 'Ingeniería de Sistemas', semester: 2 },
+  { name: 'Estructura de Datos', code: 'SIS-201', credits: 4, program: 'Ingeniería de Sistemas', semester: 3 },
+  { name: 'Bases de Datos', code: 'SIS-301', credits: 3, program: 'Ingeniería de Sistemas', semester: 4 },
+  // Derecho
+  { name: 'Introducción al Derecho', code: 'DER-101', credits: 3, program: 'Derecho', semester: 1 },
+  { name: 'Derecho Romano', code: 'DER-102', credits: 3, program: 'Derecho', semester: 1 },
+  { name: 'Derecho Constitucional', code: 'DER-201', credits: 4, program: 'Derecho', semester: 2 },
+  // Psicologia
+  { name: 'Fundamentos de Psicología', code: 'PSI-101', credits: 3, program: 'Psicología', semester: 1 },
+  { name: 'Psicología Evolutiva', code: 'PSI-201', credits: 3, program: 'Psicología', semester: 2 },
 ];
 
 async function main() {
@@ -36,148 +45,146 @@ async function main() {
     await prisma.user.deleteMany({});
     console.log('🧹 Database cleaned');
   } catch (e) {
-    console.log('First run (tables empty)');
+    console.log('first run');
   }
 
-  // 2. Create Users
-  const adminPassword = await hashPassword('admin123');
-  const docentePassword = await hashPassword('docente123');
-  const estudiantePassword = await hashPassword('estudiante123');
+  const commonPassword = await hashPassword('123456');
 
-  await prisma.user.create({
+  // 2. Create Core Users (Admin & Main Teacher)
+  const admin = await prisma.user.create({
     data: {
       name: 'Admin General',
       correoInstitucional: 'meerazo7@hotmail.com',
       correoPersonal: 'meerazo7@hotmail.com',
-      password: adminPassword,
+      password: commonPassword,
       role: Role.ADMIN,
       document: 'ADM-001',
     },
   });
 
-  const teacher = await prisma.user.create({
+  const mainTeacher = await prisma.user.create({
     data: {
       name: 'Prof. Esteban Lustondo',
       correoInstitucional: 'elustondo129@gmail.com',
-      correoPersonal: 'elustondo129@gmail.com',
-      password: docentePassword,
+      correoPersonal: 'elustondo@test.com',
+      password: commonPassword,
       role: Role.DOCENTE,
-      document: 'DOC-001',
+      document: 'DOC-MAIN',
+      codigoDocente: 'D-001',
     },
   });
 
-  const students = [];
-  for (let i = 1; i <= 2; i++) {
-    const student = await prisma.user.create({
+  // 3. Create Extra Teachers
+  const teachers = [mainTeacher];
+  for (let i = 1; i <= 5; i++) {
+    const t = await prisma.user.create({
       data: {
-        name: i === 1 ? 'Manuel Erazo' : 'Andrés Peña',
-        correoInstitucional: i === 1 ? 'manuel.erazo@estudiante.fup.edu.co' : 'andres.pena@estudiante.fup.edu.co',
-        correoPersonal: i === 1 ? 'manuel.erazo@estudiante.fup.edu.co' : 'andres.pena@estudiante.fup.edu.co',
-        password: estudiantePassword,
-        role: Role.ESTUDIANTE,
-        document: `EST-00${i}`,
-        codigoEstudiantil: `2024-10${i}`,
+        name: `Prof. ${generateName()}`,
+        correoInstitucional: `docente${i}@fup.edu.co`,
+        correoPersonal: `docente${i}@gmail.com`,
+        password: commonPassword,
+        role: Role.DOCENTE,
+        document: `DOC-00${i+1}`,
+        codigoDocente: `D-00${i+1}`,
       },
     });
-    students.push(student);
+    teachers.push(t);
   }
+  console.log(`✅ Created ${teachers.length} teachers`);
 
-  console.log('✅ Users created');
-
-  // 3. Create a single Subject
-  const today = new Date();
-  const subData = SUBJECTS_DATA[2]; // 'Programación Web'
-  const enrolledIds = students.map(s => s.id);
-
-  const subject = await prisma.subject.create({
-    data: {
-      name: subData.name,
-      code: subData.code,
-      credits: subData.credits,
-      program: subData.program,
-      teacherId: teacher.id,
-      studentIds: enrolledIds,
-    },
-  });
-
-  // 4. Generate 16 consecutive Classes
-  let currentDate = subDays(today, 8); // 8 days ago
-
-  for (let i = 1; i <= 16; i++) {
-    const isToday = isSameDay(currentDate, today);
-    const isPast = currentDate < today && !isToday;
-    
-    const classDate = new Date(currentDate);
-    const startTime = new Date(currentDate);
-    const endTime = new Date(currentDate);
-
-    if (isToday) {
-      // Force active class NOW (Current time 18:31)
-      startTime.setHours(18, 0, 0, 0);
-      endTime.setHours(20, 0, 0, 0);
-    } else {
-      // Random hours between 7 AM and 5 PM
-      const startHour = getRandomInt(7, 17);
-      startTime.setHours(startHour, 0, 0, 0);
-      endTime.setHours(startHour + 2, 0, 0, 0);
-    }
-
-    const newClass = await prisma.class.create({
+  // 4. Create Students (50)
+  const students = [];
+  for (let i = 1; i <= 50; i++) {
+    const s = await prisma.user.create({
       data: {
-        subjectId: subject.id,
-        date: classDate,
-        startTime: startTime,
-        endTime: endTime,
-        topic: `Sesión ${i}: Avance curricular - ${subject.name}`,
-        status: isPast ? ClassStatus.REALIZADA : ClassStatus.PROGRAMADA,
-        classroom: `Laboratorio ${getRandomInt(100, 500)}`,
+        name: generateName(),
+        correoInstitucional: `estudiante${i}@fup.edu.co`,
+        correoPersonal: `estudiante${i}@gmail.com`,
+        password: commonPassword,
+        role: Role.ESTUDIANTE,
+        document: `EST-${1000 + i}`,
+        codigoEstudiantil: `2024-${1000 + i}`,
       },
     });
+    students.push(s);
+  }
+  console.log(`✅ Created ${students.length} students`);
 
-    // 5. Generate Attendance for past classes
-    if (isPast) {
-      let present = 0, absent = 0, late = 0, justified = 0;
+  // 5. Create Subjects & Groups
+  for (const template of SUBJECT_TEMPLATES) {
+    // Decidir si crear 1 o 2 grupos
+    const groups = Math.random() > 0.6 ? ['A', 'B'] : ['A'];
 
-      for (const student of students) {
-        const rand = Math.random();
-        let status: AttendanceStatus = AttendanceStatus.PRESENTE;
+    for (const group of groups) {
+      // Assign random teacher
+      const teacher = getRandomElement(teachers);
+      
+      // Assign random students (10-20)
+      const subjectStudents = students
+        .sort(() => 0.5 - Math.random())
+        .slice(0, getRandomInt(10, 20));
+      
+      const studentIds = subjectStudents.map(s => s.id);
 
-        if (rand > 0.95) status = AttendanceStatus.JUSTIFICADO;
-        else if (rand > 0.85) status = AttendanceStatus.AUSENTE;
-        else if (rand > 0.75) status = AttendanceStatus.TARDANZA;
-
-        await prisma.attendance.create({
-          data: {
-            classId: newClass.id,
-            studentId: student.id,
-            status: status,
-            recordedAt: startTime,
-          }
-        });
-
-        if (status === AttendanceStatus.PRESENTE) present++;
-        else if (status === AttendanceStatus.AUSENTE) absent++;
-        else if (status === AttendanceStatus.TARDANZA) late++;
-        else justified++;
-      }
-
-      await prisma.class.update({
-        where: { id: newClass.id },
+      const subject = await prisma.subject.create({
         data: {
-          totalStudents: students.length,
-          presentCount: present,
-          absentCount: absent,
-          lateCount: late,
-          justifiedCount: justified
+            name: template.name,
+            code: template.code,
+            program: template.program,
+            semester: template.semester,
+            credits: template.credits,
+            group: group,
+            teachers: {
+              connect: [{ id: teacher.id }]
+            },
+            studentIds: studentIds, // Subject -> Student (Scalar list, assuming manual sync or handled)
+            classroom: `Salon ${getRandomInt(100, 300)}`,
         }
       });
-    }
 
-    currentDate = addDays(currentDate, 1);
+      // Update Students -> Subject (Two-way sync)
+      // Note: In a real app this might be handled by middleware or transaction, but in seed we do it manually
+      for (const student of subjectStudents) {
+         await prisma.user.update({
+             where: { id: student.id },
+             data: {
+                 enrolledSubjectIds: { push: subject.id }
+             }
+         });
+      }
+
+      // 6. Create Classes for this Subject (Past & Future)
+      // Generate 10 classes
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 15); // Start 15 days ago
+
+      for (let c = 0; c < 10; c++) {
+         const classDate = new Date(startDate);
+         classDate.setDate(startDate.getDate() + (c * 2)); // Every 2 days roughly
+         
+         const start = new Date(classDate);
+         start.setHours(8 + getRandomInt(0, 4), 0, 0); // Random morning time
+         
+         const end = new Date(start);
+         end.setHours(start.getHours() + 2); // 2 hours duration
+
+         await prisma.class.create({
+            data: {
+                subjectId: subject.id,
+                date: classDate,
+                startTime: start,
+                endTime: end,
+                topic: `Clase ${c + 1}: Tema ${c + 1}`,
+                description: 'Descripción de la clase de prueba',
+                classroom: subject.classroom 
+            }
+         });
+      }
+    }
   }
 
-  console.log(`✅ Subject '${subject.name}' with 16 classes created.`);
-  console.log('✅ Seed completed successfully!');
+  console.log('✅ Subjects, Groups, Enrollments & Classes created');
+  console.log('🌱 Seed finished');
 }
 
 main()

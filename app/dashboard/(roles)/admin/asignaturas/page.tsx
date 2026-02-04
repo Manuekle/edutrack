@@ -1,5 +1,6 @@
 'use client';
 
+import { BulkEnrollModal } from '@/components/modals/bulk-enroll-modal';
 import { CreateSubjectModal } from '@/components/modals/create-subject-modal';
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
@@ -34,18 +35,54 @@ export default function GestionAsignaturasPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isBulkEnrollModalOpen, setIsBulkEnrollModalOpen] = useState(false);
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Usar React Query para obtener asignaturas
+  const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
+  const [selectedProgram, setSelectedProgram] = useState<string>('');
+  const [selectedSemester, setSelectedSemester] = useState<string>('all');
+
+  // Usar React Query para obtener asignaturas
   const { subjects, pagination, isLoading, refetch } = useSubjects({
     page: currentPage,
     limit: itemsPerPage,
     search: searchTerm,
+    program: selectedProgram || undefined,
+    semester: selectedSemester !== 'all' ? parseInt(selectedSemester) : undefined,
     enabled: true,
   });
+
+  // Toggle selection
+  const toggleSelection = (id: string) => {
+    const newSelection = new Set(selectedSubjects);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      newSelection.add(id);
+    }
+    setSelectedSubjects(newSelection);
+  };
+
+  const toggleAll = () => {
+    if (selectedSubjects.size === subjects.length && subjects.length > 0) {
+      setSelectedSubjects(new Set());
+    } else {
+      setSelectedSubjects(new Set(subjects.map(s => s.id)));
+    }
+  };
+
+  const handleBulkEnroll = () => {
+    setIsBulkEnrollModalOpen(true);
+  };
+
+  const handleBulkEnrollSuccess = () => {
+    setSelectedSubjects(new Set());
+    queryClient.invalidateQueries({ queryKey: ['subjects'] });
+  };
 
   const handleSubjectCreated = () => {
     // Invalidar la query para refrescar los datos
@@ -110,6 +147,32 @@ export default function GestionAsignaturasPage() {
               />
             </div>
           </div>
+
+          <div className="flex gap-4 mt-4">
+            <Input
+              placeholder="Filtrar por Programa"
+              className="w-[200px] text-xs"
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
+            />
+            <Select value={selectedSemester} onValueChange={setSelectedSemester}>
+              <SelectTrigger className="w-[150px] h-9 text-xs">
+                <SelectValue placeholder="Semestre" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {[...Array(10)].map((_, i) => (
+                  <SelectItem key={i + 1} value={String(i + 1)}>{i + 1}° Semestre</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {selectedSubjects.size > 0 && (
+              <Button variant="secondary" size="sm" onClick={handleBulkEnroll}>
+                Matricular en {selectedSubjects.size} asignatura(s)
+              </Button>
+            )}
+          </div>
         </CardHeader>
 
         <CardContent className="p-0">
@@ -150,9 +213,17 @@ export default function GestionAsignaturasPage() {
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[30px] px-2">
+                    <input
+                      type="checkbox"
+                      className="translate-y-[2px]"
+                      checked={subjects.length > 0 && selectedSubjects.size === subjects.length}
+                      onChange={toggleAll}
+                    />
+                  </TableHead>
                   <TableHead className="text-xs font-normal px-4 py-2">Asignatura</TableHead>
                   <TableHead className="text-xs font-normal px-4 py-2">Código</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Docente</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2">Docente(s)</TableHead>
                   <TableHead className="text-xs font-normal px-4 py-2">Programa</TableHead>
                   <TableHead className="text-xs font-normal px-4 py-2 text-center">
                     Semestre
@@ -197,7 +268,7 @@ export default function GestionAsignaturasPage() {
                   ))
                 ) : subjects.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={8} className="h-24 text-center">
                       {searchTerm ? (
                         <div className="flex flex-col items-center justify-center py-6">
                           <Search className="h-8 w-8 text-muted-foreground mb-2" />
@@ -217,6 +288,14 @@ export default function GestionAsignaturasPage() {
                 ) : (
                   subjects.map(subject => (
                     <TableRow key={subject.id} className="hover:bg-muted/50 group">
+                      <TableCell className="px-2">
+                        <input
+                          type="checkbox"
+                          className="translate-y-[2px]"
+                          checked={selectedSubjects.has(subject.id)}
+                          onChange={() => toggleSelection(subject.id)}
+                        />
+                      </TableCell>
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center space-x-3">
                           <div>
@@ -228,17 +307,26 @@ export default function GestionAsignaturasPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-xs px-4 py-3">
-                        <Badge variant="outline" className="font-mono text-xs">
-                          {subject.code}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="outline" className="font-mono text-xs w-fit">
+                            {subject.code}
+                          </Badge>
+                          {subject.group && (
+                            <Badge variant="secondary" className="text-[10px] w-fit">
+                              Gr. {subject.group}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span
                             className="truncate max-w-[150px]"
-                            title={subject.teacher?.name || ''}
+                            title={subject.teachers?.map(t => t.name).join(', ') || ''}
                           >
-                            {subject.teacher?.name || 'Sin docente'}
+                            {subject.teachers && subject.teachers.length > 0
+                              ? subject.teachers.map(t => t.name || 'Sin nombre').join(', ')
+                              : 'Sin docente'}
                           </span>
                         </div>
                       </TableCell>
@@ -281,6 +369,13 @@ export default function GestionAsignaturasPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubjectCreated={handleSubjectCreated}
+      />
+
+      <BulkEnrollModal
+        isOpen={isBulkEnrollModalOpen}
+        onClose={() => setIsBulkEnrollModalOpen(false)}
+        selectedSubjectIds={selectedSubjects}
+        onSuccess={handleBulkEnrollSuccess}
       />
     </div>
   );

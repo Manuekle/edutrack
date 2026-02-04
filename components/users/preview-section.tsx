@@ -216,7 +216,7 @@ export function UsersPreviewSection({
             <div className="flex flex-col items-center justify-center min-h-[300px] py-12">
               <FileText className="h-10 w-10 text-muted-foreground/50 mb-3" />
               <p className="text-xs text-muted-foreground text-center max-w-md">
-                Sube un archivo Excel (.xlsx) o CSV (.csv) para ver la previsualización aquí.
+                Sube un archivo CSV (.csv) para ver la previsualización aquí.
               </p>
             </div>
           )}

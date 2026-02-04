@@ -32,13 +32,24 @@ export async function GET(req: NextRequest) {
         { program: { contains: search, mode: Prisma.QueryMode.insensitive } },
       ];
     }
+    
+    // Filtros específicos
+    const program = searchParams.get('program');
+    if (program && program !== 'all') {
+      whereClause.program = program;
+    }
+
+    const semester = searchParams.get('semester');
+    if (semester && semester !== 'all') {
+      whereClause.semester = parseInt(semester);
+    }
 
     // Obtener asignaturas con paginación
     const [subjects, total] = await Promise.all([
       db.subject.findMany({
         where: Object.keys(whereClause).length > 0 ? whereClause : {},
         include: {
-          teacher: {
+          teachers: {
             select: {
               id: true,
               name: true,
@@ -97,7 +108,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, code, program, semester, credits, teacherId } = body;
+    const { name, code, program, semester, credits, teacherId, group } = body;
 
     if (!name || !code || !teacherId) {
       return NextResponse.json(
@@ -107,13 +118,22 @@ export async function POST(req: NextRequest) {
     }
 
     // Verificar que el código no exista
+    // Verificar que el código + grupo no exista
+    // Note: Assuming 'group' defaults to null if undefined.
+    // Use findFirst because findUnique requires exact composite match which might be tricky with nulls in some prisma versions?
+    // Actually findUnique with composite unique works fine.
     const existingSubject = await db.subject.findUnique({
-      where: { code },
+      where: {
+        code_group: {
+          code,
+          group: group || null, // Ensure explicit null if falsy/undefined
+        },
+      },
     });
 
     if (existingSubject) {
       return NextResponse.json(
-        { message: 'El código de asignatura ya está en uso.' },
+        { message: 'Ya existe una asignatura con este código y grupo.' },
         { status: 409 }
       );
     }
@@ -141,11 +161,13 @@ export async function POST(req: NextRequest) {
         program,
         semester: semester ? parseInt(semester) : null,
         credits: credits ? parseInt(credits) : null,
-        teacherId,
+        credits: credits ? parseInt(credits) : null,
+        teacherIds: [teacherId],
         studentIds: [],
+        group: group || null,
       },
       include: {
-        teacher: {
+        teachers: {
           select: {
             id: true,
             name: true,

@@ -39,7 +39,7 @@ export default function CargarEstudiantesPage() {
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecciona un archivo .xlsx o .csv para continuar.');
+      toast.error('Por favor, selecciona un archivo .csv para continuar.');
       return;
     }
     setIsLoading(true);
@@ -141,7 +141,7 @@ export default function CargarEstudiantesPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-1 gap-2">
-                <a href="/formatos/plantilla_usuarios.xlsx" download>
+                <a href="/formatos/plantilla_usuarios.csv" download>
                   <Button variant="outline" className="w-full justify-start">
                     <Download className="mr-2 h-4 w-4" />
                     Descargar Plantilla
@@ -156,7 +156,6 @@ export default function CargarEstudiantesPage() {
                     <span className="font-medium">Formatos soportados:</span>
                   </div>
                   <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                    <li>Excel (.xlsx) - Formato tradicional</li>
                     <li>CSV (.csv) - Formato de texto plano</li>
                     <li>Compatible con sistemas externos</li>
                     <li>Mapeo flexible de columnas</li>
@@ -170,10 +169,10 @@ export default function CargarEstudiantesPage() {
           <Card>
             <CardHeader>
               <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
-                Subir Archivo (Excel o CSV)
+                Subir Archivo (CSV)
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Si ya tienes un archivo Excel (.xlsx) o CSV (.csv) con tus datos, súbelo aquí.
+                Si ya tienes un archivo CSV (.csv) con tus datos, súbelo aquí.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -2,7 +2,7 @@
  * Hook personalizado para gestionar asignaturas con React Query
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 interface Subject {
@@ -12,13 +12,14 @@ interface Subject {
   program?: string | null;
   semester?: number | null;
   credits?: number | null;
-  teacherId: string;
-  teacher?: {
+  group?: string | null;
+  teacherIds: string[];
+  teachers: {
     id: string;
     name: string | null;
     correoInstitucional: string | null;
     codigoDocente: string | null;
-  };
+  }[];
   studentIds: string[];
   studentCount: number;
   classCount: number;
@@ -42,24 +43,26 @@ interface UseSubjectsOptions {
   page?: number;
   limit?: number;
   search?: string;
+  program?: string;
+  semester?: number;
   enabled?: boolean;
 }
 
 export function useSubjects(options: UseSubjectsOptions = {}) {
-  const { page = 1, limit = 10, search = '', enabled = true } = options;
+  const { page = 1, limit = 10, search = '', program, semester, enabled = true } = options;
   const queryClient = useQueryClient();
 
   const query = useQuery<SubjectsResponse>({
-    queryKey: ['subjects', page, limit, search],
+    queryKey: ['subjects', page, limit, search, program, semester],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
       });
 
-      if (search) {
-        params.append('search', search);
-      }
+      if (search) params.append('search', search);
+      if (program) params.append('program', program);
+      if (semester) params.append('semester', semester.toString());
 
       const response = await fetch(`/api/admin/subjects?${params.toString()}`);
       if (!response.ok) {

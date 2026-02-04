@@ -71,7 +71,8 @@ model User {
   updatedAt        DateTime  @updatedAt
 
   // Relaciones como Docente
-  subjectsAsTeacher Subject[]      @relation("TeacherSubjects")
+  subjectsAsTeacherIds String[]     @db.ObjectId
+  subjectsAsTeacher    Subject[]    @relation("TeacherSubjects", fields: [subjectsAsTeacherIds], references: [id])
   createdEvents     SubjectEvent[]
   generatedReports  Report[]
 
@@ -91,12 +92,13 @@ model User {
 model Subject {
   id               String            @id @default(auto()) @map("_id") @db.ObjectId
   name             String
-  code             String            @unique
+  code             String
+  group            String?           // Seccion o Grupo (A, B, 1, 2)
   program          String?
   semester         Int?
   credits          Int?
-  teacher          User              @relation("TeacherSubjects", fields: [teacherId], references: [id])
-  teacherId        String            @db.ObjectId
+  teachers         User[]            @relation("TeacherSubjects", fields: [teacherIds], references: [id])
+  teacherIds       String[]          @db.ObjectId
   studentIds       String[]          @db.ObjectId
   classroom        String?           // Aula por defecto
   classes          Class[]
@@ -106,7 +108,8 @@ model Subject {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
-  @@index([teacherId])
+  @@index([teacherIds])
+  @@unique([code, group])
 }
 
 model Class {

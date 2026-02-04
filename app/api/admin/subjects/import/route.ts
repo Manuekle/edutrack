@@ -3,7 +3,6 @@ import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
-import * as XLSX from 'xlsx';
 
 // Interface for the raw data from the API/Excel/CSV file
 interface RowData {
@@ -19,6 +18,7 @@ interface RowData {
   creditosClase?: number;
   programa?: string;
   semestreAsignatura?: string;
+  grupo?: string;
 }
 
 // Función para dividir cadenas de hora de manera segura (Reused logic)
@@ -93,19 +93,36 @@ export async function POST(request: Request) {
     }
 
     const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, {
-        defval: '',
-        raw: true
-    }) as RowData[];
 
-    if (rows.length === 0) {
-      return NextResponse.json({ error: 'El archivo está vacío' }, { status: 400 });
+    // CSV Parsing Logic
+    const text = new TextDecoder('utf-8').decode(buffer);
+    const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+    if (lines.length === 0) {
+      return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
     }
 
-    // Header Mapping
-    const headers = Object.keys(rows[0] || {});
+    const parseCSVLine = (line: string): string[] => {
+      const values: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+             if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+             else { inQuotes = !inQuotes; }
+        } else if (char === ',' && !inQuotes) {
+             values.push(current.trim());
+             current = '';
+        } else {
+             current += char;
+        }
+      }
+      values.push(current.trim());
+      return values.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
+    };
+
+    const headers = parseCSVLine(lines[0]);
     const normalize = (s: string) => s.toString().trim().toLowerCase().replace(/\s+/g, '');
     const findKey = (base: string) => headers.find(h => normalize(h).includes(base));
 
@@ -122,11 +139,19 @@ export async function POST(request: Request) {
       credits: findKey('creditos') || 'creditosClase',
       program: findKey('programa') || 'programa',
       semester: findKey('semestre') || 'semestreAsignatura',
+      group: findKey('grupo') || findKey('seccion') || 'grupo',
     };
 
+    const rows = lines.slice(1).map(line => {
+      const values = parseCSVLine(line);
+      const row: any = {};
+      headers.forEach((h, i) => { row[h] = values[i] || ''; });
+      return row;
+    }).filter(row => row[keys.code as string]); // Filter out empty rows based on code
+
     // Cache existing data for validation
-    const existingSubjects = await db.subject.findMany({ select: { code: true } });
-    const existingCodes = new Set(existingSubjects.map(s => s.code));
+    const existingSubjects = await db.subject.findMany({ select: { code: true, group: true } });
+    const existingKeys = new Set(existingSubjects.map(s => `${s.code}-${s.group || ''}`));
     
     // Cache teachers
     const teachers = await db.user.findMany({ 
@@ -134,32 +159,50 @@ export async function POST(request: Request) {
         select: { id: true, correoInstitucional: true, correoPersonal: true, document: true } 
     });
 
-    const findTeacher = (identifier: string) => {
-        if (!identifier) return null;
-        const id = identifier.trim().toLowerCase();
-        return teachers.find(t => 
-            t.correoInstitucional?.toLowerCase() === id || 
-            t.correoPersonal?.toLowerCase() === id || 
-            t.document === identifier.trim()
-        );
+    const findTeachers = (identifier: string): { found: any[], missing: string[] } => {
+        if (!identifier) return { found: [], missing: [] };
+        
+        // Split by semicolon for multiple teachers
+        const ids = identifier.split(';').map(s => s.trim()).filter(Boolean);
+        const found = ids.map(id => {
+            const lowerId = id.toLowerCase();
+            return teachers.find(t => 
+                t.correoInstitucional?.toLowerCase() === lowerId || 
+                t.correoPersonal?.toLowerCase() === lowerId || 
+                t.document === id
+            );
+        }).filter(Boolean);
+        
+        // Determine missing
+        const foundIds = new Set(found.map(t => t?.correoInstitucional || t?.correoPersonal || t?.document));
+        const missing = ids.filter(id => !found.some(t => 
+             t?.correoInstitucional?.toLowerCase() === id.toLowerCase() || 
+             t?.correoPersonal?.toLowerCase() === id.toLowerCase() || 
+             t?.document === id
+        ));
+
+        return { found: found as any[], missing };
     };
 
     if (isPreview) {
       const previewData = rows.map(row => {
          const code = String(row[keys.code as keyof RowData] || '').trim();
-         const teacherIden = String(row[keys.teacher as keyof RowData] || '').trim();
-         const teacher = findTeacher(teacherIden);
-         
-         let error = null;
-         if (!code) error = 'Falta código';
-         else if (existingCodes.has(code)) error = 'Ya existe';
-         else if (teacherIden && !teacher) error = `Docente no encontrado: ${teacherIden}`;
+          const teacherIden = String(row[keys.teacher as keyof RowData] || '').trim();
+          const { found, missing } = findTeachers(teacherIden);
+          const group = String(row[keys.group as keyof RowData] || '').trim();
+          const uniqueKey = `${code}-${group}`;
+
+          let error = null;
+          if (!code) error = 'Falta código';
+          else if (existingKeys.has(uniqueKey)) error = 'Ya existe (Código + Grupo)';
+          else if (missing.length > 0) error = `Docentes no encontrados: ${missing.join(', ')}`;
 
          return {
             codigoAsignatura: code,
             nombreAsignatura: row[keys.name as keyof RowData],
+            grupo: group,
             docente: teacherIden,
-            teacherFound: !!teacher,
+            teacherFound: missing.length === 0,
             salon: row[keys.classroom as keyof RowData],
             creditosClase: row[keys.credits as keyof RowData],
             programa: row[keys.program as keyof RowData],
@@ -173,14 +216,15 @@ export async function POST(request: Request) {
       // Group by subject to count classes
       const grouped: any = {};
       previewData.forEach((item: any) => {
-          if (!grouped[item.codigoAsignatura]) {
-              grouped[item.codigoAsignatura] = { ...item, classCount: 0 };
+          const uniqueKey = `${item.codigoAsignatura}-${item.grupo}`;
+          if (!grouped[uniqueKey]) {
+              grouped[uniqueKey] = { ...item, classCount: 0 };
           }
-          grouped[item.codigoAsignatura].classCount++;
+          grouped[uniqueKey].classCount++;
           // Persist error if any row has error
-          if (item.error && !grouped[item.codigoAsignatura].error) {
-              grouped[item.codigoAsignatura].error = item.error;
-              grouped[item.codigoAsignatura].status = 'error';
+          if (item.error && !grouped[uniqueKey].error) {
+              grouped[uniqueKey].error = item.error;
+              grouped[uniqueKey].status = 'error';
           }
       });
 
@@ -198,25 +242,35 @@ export async function POST(request: Request) {
         const code = String(row[keys.code as keyof RowData] || '').trim();
         if (!code) continue;
 
-        if (!subjectsMap.has(code)) {
-            subjectsMap.set(code, {
+        const group = String(row[keys.group as keyof RowData] || '').trim();
+        const uniqueKey = `${code}-${group}`;
+        
+        if (!subjectsMap.has(uniqueKey)) {
+            subjectsMap.set(uniqueKey, {
                 meta: row,
-                classes: []
+                classes: [],
+                group // Store group explicitly
             });
         }
-        subjectsMap.get(code).classes.push(row);
+        subjectsMap.get(uniqueKey).classes.push(row);
     }
 
-    for (const [code, data] of subjectsMap.entries()) {
+    for (const [uniqueKey, data] of subjectsMap.entries()) {
+        const { code } = data.meta;
         try {
-            if (existingCodes.has(code)) continue;
+            if (existingKeys.has(uniqueKey)) continue;
 
             const teacherIden = String(data.meta[keys.teacher as keyof RowData] || '').trim();
-            const teacher = findTeacher(teacherIden);
+            const { found } = findTeachers(teacherIden);
             
-            // If no teacher specified, we might skip or assign to current admin (bad practice)
-            // Ideally require teacher.
-            
+            // Map inputs to creation object
+            const teacherIds = found.map(t => t.id);
+            // If no teachers found, maybe fallback to admin or empty?
+            // With m-n, empty is allowed but strictly we want teachers.
+            // Fallback to session user if empty for now or strict? 
+            // Previous code used session.user.id if not found, let's keep that fallback if completely empty
+            if (teacherIds.length === 0) teacherIds.push(session.user.id);
+
             const subject = await db.subject.create({
                 data: {
                     code,
@@ -224,8 +278,9 @@ export async function POST(request: Request) {
                     credits: Number(data.meta[keys.credits as keyof RowData]) || 0,
                     program: String(data.meta[keys.program as keyof RowData] || ''),
                     semester: Number(data.meta[keys.semester as keyof RowData]) || 0,
-                    teacherId: teacher?.id || session.user.id, // Fallback to Admin if not found (should warn)
+                    teacherIds: teacherIds,
                     classroom: String(data.meta[keys.classroom as keyof RowData] || ''),
+                    group: data.group || null,
                 }
             });
 

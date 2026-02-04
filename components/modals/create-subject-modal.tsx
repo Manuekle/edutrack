@@ -6,28 +6,28 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -46,10 +46,11 @@ interface Subject {
   program?: string | null;
   semester?: number | null;
   credits?: number | null;
-  teacherId: string;
-  teacher: Teacher;
+  teacherIds: string[];
+  teachers: Teacher[];
   studentCount: number;
   classCount: number;
+  group?: string | null;
 }
 
 interface CreateSubjectModalProps {
@@ -77,6 +78,7 @@ const createSubjectSchema = z.object({
       'Los créditos deben ser un número entre 1 y 10'
     ),
   teacherId: z.string().min(1, 'El docente es requerido'),
+  group: z.string().optional(),
 });
 
 type CreateSubjectFormValues = z.infer<typeof createSubjectSchema>;
@@ -95,6 +97,7 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
       semester: '',
       credits: '',
       teacherId: '',
+      group: '',
     },
   });
 
@@ -131,6 +134,7 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
           semester: data.semester ? parseInt(data.semester, 10) : null,
           credits: data.credits ? parseInt(data.credits, 10) : null,
           program: data.program || undefined,
+          group: data.group || undefined,
         }),
       });
 
@@ -243,6 +247,20 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="group"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Grupo/Sección (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ej: A, B, 1, 101" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

@@ -6,28 +6,28 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -46,8 +46,8 @@ interface Subject {
   program?: string | null;
   semester?: number | null;
   credits?: number | null;
-  teacherId: string;
-  teacher: Teacher;
+  teacherIds: string[];
+  teachers: Teacher[];
   studentCount: number;
   classCount: number;
 }
@@ -112,7 +112,7 @@ export function EditSubjectModal({
         program: subject.program || '',
         semester: subject.semester?.toString() || '',
         credits: subject.credits?.toString() || '',
-        teacherId: subject.teacherId,
+        teacherId: subject.teacherIds[0] || '',
       });
       fetchTeachers();
     }

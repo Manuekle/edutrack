@@ -2,7 +2,6 @@ import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
-import * as XLSX from 'xlsx';
 
 interface ExcelRow {
   [key: string]: string | number;
@@ -97,9 +96,9 @@ export async function POST(request: Request) {
     }
 
     // Validar el archivo
-    if (!uploadedFile.name.endsWith('.xlsx')) {
+    if (!uploadedFile.name.endsWith('.csv')) {
       return NextResponse.json(
-        { success: false, message: 'Tipo de archivo no válido, se requiere un Excel (.xlsx)' },
+        { success: false, message: 'Tipo de archivo no válido, se requiere un archivo CSV (.csv)' },
         { status: 400 }
       );
     }
@@ -111,12 +110,43 @@ export async function POST(request: Request) {
       );
     }
 
-    // Procesar el archivo Excel
+    // Procesar el archivo CSV
     const fileBuffer = await uploadedFile.arrayBuffer();
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    const rows: ExcelRow[] = XLSX.utils.sheet_to_json(worksheet);
+    // CSV Parsing Logic
+    const text = new TextDecoder('utf-8').decode(fileBuffer);
+    const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+    if (lines.length === 0) {
+      return NextResponse.json({ success: false, message: 'El archivo CSV está vacío' }, { status: 400 });
+    }
+
+    const parseCSVLine = (line: string): string[] => {
+      const values: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+             if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+             else { inQuotes = !inQuotes; }
+        } else if (char === ',' && !inQuotes) {
+             values.push(current.trim());
+             current = '';
+        } else {
+             current += char;
+        }
+      }
+      values.push(current.trim());
+      return values.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
+    };
+
+    const headers = parseCSVLine(lines[0]);
+    const rows = lines.slice(1).map(line => {
+      const values = parseCSVLine(line);
+      const row: any = {};
+      headers.forEach((h, i) => { row[h] = values[i] || ''; });
+      return row;
+    });
 
     if (!rows || rows.length === 0) {
       return NextResponse.json(
@@ -126,9 +156,9 @@ export async function POST(request: Request) {
     }
 
     // Validar columnas mínimas
-    const headers = Object.keys(rows[0]);
+    const csvHeaders = Object.keys(rows[0]);
     const requiredHeaders = ['codigoAsignatura', 'documentoEstudiante'];
-    const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+    const missingHeaders = requiredHeaders.filter(header => !csvHeaders.includes(header));
 
     if (missingHeaders.length > 0) {
       return NextResponse.json(
@@ -140,8 +170,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Convertir datos de Excel al formato esperado
-    const excelData: RowCargaEstudiantes[] = rows.map((row: ExcelRow) => {
+    // Convertir datos al formato esperado
+    const excelData: RowCargaEstudiantes[] = rows.map((row: any) => {
       const estudiantes = String(row.documentoEstudiante || '')
         .split(',')
         .map((e: string) => e.trim())
@@ -294,6 +324,16 @@ export async function POST(request: Request) {
             where: { id: subject.id },
             data: { studentIds: { set: finalStudentIds } },
           });
+
+          // Sync: Update each added student's enrolledSubjectIds
+          for (const studentToAdd of addedStudents) {
+              await tx.user.update({
+                  where: { id: studentToAdd.id },
+                  data: {
+                      enrolledSubjectIds: { push: subject.id }
+                  }
+              });
+          }
 
           resultados.push({
             codigoAsignatura,

@@ -6,7 +6,6 @@ import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
-import * as XLSX from 'xlsx';
 
 // Interfaces para la carga de usuarios
 interface ExcelRow {
@@ -94,13 +93,12 @@ export async function POST(request: Request) {
 
       const fileName = file.name.toLowerCase();
       const isCSV = fileName.endsWith('.csv');
-      const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
 
-      if (!isCSV && !isExcel) {
+      if (!isCSV) {
         return NextResponse.json(
           {
             error:
-              'Tipo de archivo no válido. Se requiere un archivo Excel (.xlsx, .xls) o CSV (.csv).',
+              'Tipo de archivo no válido. Se requiere un archivo CSV (.csv).',
           },
           { status: 400 }
         );
@@ -109,91 +107,77 @@ export async function POST(request: Request) {
       const buffer = await file.arrayBuffer();
       let rows: ExcelRow[] = [];
 
-      if (isCSV) {
-        // Para CSV, leer manualmente como texto
-        const text = new TextDecoder('utf-8').decode(buffer);
-        const lines = text.split(/\r?\n/).filter(line => line.trim());
+      // CSV Logic Only
+      const text = new TextDecoder('utf-8').decode(buffer);
+      const lines = text.split(/\r?\n/).filter(line => line.trim());
 
-        if (lines.length === 0) {
-          return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
-        }
-
-        // Función para parsear una línea CSV manejando comas dentro de comillas
-        const parseCSVLine = (line: string): string[] => {
-          const values: string[] = [];
-          let current = '';
-          let inQuotes = false;
-
-          for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const nextChar = line[i + 1];
-
-            if (char === '"') {
-              if (inQuotes && nextChar === '"') {
-                // Comilla escapada ("" dentro de comillas)
-                current += '"';
-                i++; // Saltar la siguiente comilla
-              } else {
-                // Toggle estado de comillas
-                inQuotes = !inQuotes;
-              }
-            } else if (char === ',' && !inQuotes) {
-              // Separador de campo (solo fuera de comillas)
-              values.push(current.trim());
-              current = '';
-            } else {
-              current += char;
-            }
-          }
-          // Agregar el último valor
-          values.push(current.trim());
-
-          // Limpiar comillas de los valores
-          return values.map(val => {
-            // Remover comillas externas si existen
-            if (
-              (val.startsWith('"') && val.endsWith('"')) ||
-              (val.startsWith("'") && val.endsWith("'"))
-            ) {
-              return val.slice(1, -1).replace(/""/g, '"'); // Reemplazar comillas escapadas
-            }
-            return val;
-          });
-        };
-
-        // Parsear headers
-        const headers = parseCSVLine(lines[0]).map(h => h.trim());
-
-        // Parsear filas
-        rows = lines
-          .slice(1)
-          .map(line => {
-            const values = parseCSVLine(line);
-
-            // Crear objeto con headers
-            const row: Record<string, string> = {};
-            headers.forEach((header, index) => {
-              row[header] = values[index] || '';
-            });
-            return row as ExcelRow;
-          })
-          .filter(row => {
-            // Filtrar filas vacías
-            return Object.values(row).some(val => val && String(val).trim());
-          });
-      } else {
-        // Para Excel, usar XLSX
-        const workbook = XLSX.read(buffer, {
-          type: 'buffer',
-          cellDates: false,
-        });
-
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        rows = XLSX.utils.sheet_to_json(sheet, {
-          defval: '',
-          raw: true,
-        }) as ExcelRow[];
+      if (lines.length === 0) {
+        return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
       }
+
+      // Función para parsear una línea CSV manejando comas dentro de comillas
+      const parseCSVLine = (line: string): string[] => {
+        const values: string[] = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          const nextChar = line[i + 1];
+
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Comilla escapada ("" dentro de comillas)
+              current += '"';
+              i++; // Saltar la siguiente comilla
+            } else {
+              // Toggle estado de comillas
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            // Separador de campo (solo fuera de comillas)
+            values.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        // Agregar el último valor
+        values.push(current.trim());
+
+        // Limpiar comillas de los valores
+        return values.map(val => {
+          // Remover comillas externas si existen
+          if (
+            (val.startsWith('"') && val.endsWith('"')) ||
+            (val.startsWith("'") && val.endsWith("'"))
+          ) {
+            return val.slice(1, -1).replace(/""/g, '"'); // Reemplazar comillas escapadas
+          }
+          return val;
+        });
+      };
+
+      // Parsear headers
+      const headers = parseCSVLine(lines[0]).map(h => h.trim());
+
+      // Parsear filas
+      rows = lines
+        .slice(1)
+        .map(line => {
+          const values = parseCSVLine(line);
+
+          // Crear objeto con headers
+          const row: Record<string, string> = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index] || '';
+          });
+          return row as ExcelRow;
+        })
+        .filter(row => {
+          // Filtrar filas vacías
+          return Object.values(row).some(val => val && String(val).trim());
+        });
 
       const previewResults: PreviewResult[] = [];
 

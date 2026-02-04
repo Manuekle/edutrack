@@ -55,7 +55,7 @@ export default function CargarAsignaturasPage() {
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecciona un archivo .xlsx para continuar.');
+      toast.error('Por favor, selecciona un archivo .csv para continuar.');
       return;
     }
     setIsLoading(true);
@@ -151,7 +151,7 @@ export default function CargarAsignaturasPage() {
       <div className="pb-4 col-span-1 w-full">
         <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Cargar Asignaturas</CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .xlsx para registrar masivamente asignaturas y sus horarios.
+          Sube un archivo .csv para registrar masivamente asignaturas y sus horarios.
         </CardDescription>
       </div>
 
@@ -168,7 +168,7 @@ export default function CargarAsignaturasPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <a href="/formatos/plantilla_asignaturas.xlsx" download>
+              <a href="/formatos/plantilla_asignaturas.csv" download>
                 <Button variant="outline" className="w-full justify-start">
                   <Download className="mr-2 h-4 w-4" />
                   Descargar Plantilla
@@ -181,7 +181,7 @@ export default function CargarAsignaturasPage() {
                   <span className="font-medium">Requisitos del archivo:</span>
                 </div>
                 <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                  <li>Formato Excel (.xlsx)</li>
+                  <li>Formato CSV (.csv)</li>
                   <li>Inclusión de código y nombre</li>
                   <li>Horarios y asignación de docentes</li>
                   <li>Créditos y programas académicos</li>
@@ -281,8 +281,8 @@ export default function CargarAsignaturasPage() {
                       <div
                         key={index}
                         className={`p-4 rounded-2xl border transition-all ${item.status === 'existing' || item.status === 'error'
-                            ? 'border-destructive/20 bg-destructive/5'
-                            : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
+                          ? 'border-destructive/20 bg-destructive/5'
+                          : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
                           }`}
                       >
                         <div className="flex items-start justify-between">
@@ -361,7 +361,7 @@ export default function CargarAsignaturasPage() {
                 <div className="flex flex-col items-center justify-center min-h-[400px] py-12 text-center">
                   <FileSpreadsheet className="h-12 w-12 text-muted-foreground/30 mb-4" />
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    Sube un archivo Excel para previsualizar los datos y confirmar la importación masiva de asignaturas.
+                    Sube un archivo CSV para previsualizar los datos y confirmar la importación masiva de asignaturas.
                   </p>
                 </div>
               )}
