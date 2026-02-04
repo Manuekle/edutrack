@@ -1,6 +1,5 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { redis } from '@/lib/redis';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
@@ -9,6 +8,7 @@ interface ClassWithProgress {
   date: Date;
   startTime: Date | null;
   topic: string | null;
+  classroom: string | null;
   status: string;
   progress: number;
   attendances: Array<{
@@ -31,6 +31,7 @@ type PrismaSubject = Awaited<ReturnType<typeof db.subject.findFirst>> & {
     date: Date;
     startTime: Date | null;
     topic: string | null;
+    classroom: string | null;
     status: string;
     attendances: Array<{
       id: string;
@@ -48,6 +49,7 @@ export async function GET() {
     }
 
     // CACHE: Try to get from cache first (5 minutes TTL)
+    /*
     const cacheKey = `dashboard:docente:${session.user.id}`;
     let cached = null;
     try {
@@ -58,6 +60,7 @@ export async function GET() {
     } catch {
       // Cache not available, continue without cache
     }
+    */
 
     // Obtener las asignaturas del docente
     const subjects = (await db.subject.findMany({
@@ -100,6 +103,7 @@ export async function GET() {
           date: cls.date,
           startTime: cls.startTime,
           topic: cls.topic,
+          classroom: cls.classroom,
           status: cls.status,
           progress,
           attendances: attendance
@@ -217,11 +221,13 @@ export async function GET() {
     };
 
     // CACHE: Store in cache for 5 minutes (300 seconds)
+    /*
     try {
       await redis.set(cacheKey, response, { ex: 300 });
     } catch {
       // Cache not available, continue without caching
     }
+    */
 
     return NextResponse.json(response);
   } catch (error) {

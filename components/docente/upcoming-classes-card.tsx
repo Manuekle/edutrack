@@ -67,10 +67,15 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                                 .replace(/p\.\s*m\./i, 'PM')
                             : 'Sin hora definida'}
                         </span>
-                        {cls.classroom && (
+                        {cls.classroom ? (
                           <>
                             {'-'}
-                            <span className="font-mono">{cls.classroom}</span>
+                            <span className="font-sans">{cls.classroom}</span>
+                          </>
+                        ) : (
+                          <>
+                            {'-'}
+                            <span className="text-muted-foreground/50">N/A</span>
                           </>
                         )}
                       </div>

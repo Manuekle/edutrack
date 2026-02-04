@@ -11,6 +11,7 @@ type SubjectStats = {
     id: string;
     date: string;
     topic: string;
+    classroom: string | null;
   };
 };
 
@@ -29,6 +30,7 @@ export async function getTeacherDashboardData(): Promise<
       subjectCode: string;
       date: string;
       topic: string;
+      classroom: string | null;
     }>;
   }>
 > {

@@ -8,9 +8,9 @@ import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
-    getLiveClassData,
-    getTeacherDashboardData,
-    type LiveClassData,
+  getLiveClassData,
+  getTeacherDashboardData,
+  type LiveClassData,
 } from '@/services/dashboardService';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,7 @@ type SubjectStats = {
     id: string;
     date: Date;
     topic: string;
+    classroom: string | null;
   };
 };
 
@@ -63,11 +64,12 @@ export default function DocenteDashboard() {
             const transformedSubjects = dashboardRes.data.subjects.map(subject => ({
               ...subject,
               nextClass: subject.nextClass
-                ? {
-                    ...subject.nextClass,
-                    date: new Date(subject.nextClass.date),
-                  }
-                : undefined,
+                  ? {
+                      ...subject.nextClass,
+                      date: new Date(subject.nextClass.date),
+                      classroom: subject.nextClass.classroom,
+                    }
+                  : undefined,
             }));
             setSubjects(transformedSubjects);
 
