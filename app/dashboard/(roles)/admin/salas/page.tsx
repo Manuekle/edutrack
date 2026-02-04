@@ -671,7 +671,7 @@ export default function AdminSalasPage() {
                 <span>Nueva Sala</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-4xl border-none shadow-2xl">
+            <DialogContent className="sm:max-w-[425px] rounded-4xl border-none">
               <form onSubmit={handleSubmit} className="space-y-6 p-2">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-semibold">
@@ -731,7 +731,7 @@ export default function AdminSalasPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" className="w-full h-12 rounded-xl font-semibold">
+                  <Button type="submit" variant="default" className="w-full">
                     {editingRoomId ? 'Guardar Cambios' : 'Crear Espacio'}
                   </Button>
                 </DialogFooter>
@@ -983,7 +983,7 @@ export default function AdminSalasPage() {
 
       {/* Audit Dialog Rediseñado */}
       <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-4xl border-none shadow-2xl bg-card">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-4xl border-none bg-card">
           <DialogHeader className="sr-only">
             <DialogTitle>Detalle de Reserva</DialogTitle>
             <DialogDescription>Revisa los detalles de la solicitud de espacio institucional.</DialogDescription>
