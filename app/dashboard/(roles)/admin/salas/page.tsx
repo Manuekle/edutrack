@@ -494,7 +494,7 @@ export default function AdminSalasPage() {
     setFormData({
       name: room.name,
       type: room.type,
-      capacity: room.capacity || '',
+      capacity: room.capacity?.toString() || '',
       description: room.description || '',
     });
     setIsDialogOpen(true);
