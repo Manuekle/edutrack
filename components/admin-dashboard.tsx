@@ -49,6 +49,10 @@ interface DashboardData {
       students: number;
       classes: number;
     }>;
+    classroomOccupancy: Array<{
+      name: string;
+      value: number;
+    }>;
   };
   metrics: {
     completedClasses: number;
@@ -305,6 +309,48 @@ const AdminDashboardComponent = () => {
                   <Tooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="asistencia" fill={CHART_COLORS.primary[0]} radius={[4, 4, 0, 0]}>
                     {data.charts.attendanceDistribution.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={BAR_COLORS[index % BAR_COLORS.length]}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Ocupación de Salones */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                Ocupación de Salones
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1 pb-0">
+            {data.charts.classroomOccupancy.length === 0 ? (
+              <div className="flex items-center justify-center h-32 sm:h-full">
+                <p className="text-muted-foreground text-xs">No hay salones registrados</p>
+              </div>
+            ) : (
+              <ChartContainer
+                config={{}}
+                className="mx-auto aspect-square max-h-[310px] sm:max-h-[250px] w-full justify-center items-center"
+              >
+                <BarChart
+                  data={data.charts.classroomOccupancy}
+                  layout="vertical"
+                  margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} style={gridStyle} />
+                  <XAxis type="number" tick={axisStyle} tickLine={false} />
+                  <YAxis dataKey="name" type="category" tick={axisStyle} tickLine={false} width={80} />
+                  <Tooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" fill={CHART_COLORS.primary[0]} radius={[0, 4, 4, 0]}>
+                    {data.charts.classroomOccupancy.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={BAR_COLORS[index % BAR_COLORS.length]}

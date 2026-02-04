@@ -29,6 +29,7 @@ export async function GET() {
       unenrollRequestStats,
       monthlyClassesData,
       subjectEnrollmentData,
+      classroomOccupancyRaw,
     ] = await Promise.all([
       // Total de usuarios
       prisma.user.count({ where: { isActive: true } }),
@@ -99,7 +100,39 @@ export async function GET() {
         },
         take: 10,
       }),
+
+      // Datos de ocupación de salones
+      prisma.subject.findMany({
+        where: {
+          classroom: {
+            not: null,
+          },
+        },
+        select: {
+          classroom: true,
+          studentIds: true,
+        },
+      }),
     ]);
+
+    // Calcular ocupación de salones
+    const occupancyMap = new Map<string, number>();
+    (classroomOccupancyRaw as Array<{ classroom: string | null; studentIds: string[] }>).forEach(
+      item => {
+        if (item.classroom) {
+          const current = occupancyMap.get(item.classroom) || 0;
+          occupancyMap.set(item.classroom, current + item.studentIds.length);
+        }
+      }
+    );
+
+    const classroomOccupancy = Array.from(occupancyMap.entries())
+      .map(([name, value]) => ({
+        name,
+        value,
+      }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10); // Top 10 salones más ocupados
 
     // Calcular porcentaje de asistencia general
     const totalAttendances = attendanceStats.reduce(
@@ -246,6 +279,7 @@ export async function GET() {
         unenrollDistribution,
         monthlyClasses,
         topSubjects,
+        classroomOccupancy,
       },
 
       // Métricas adicionales

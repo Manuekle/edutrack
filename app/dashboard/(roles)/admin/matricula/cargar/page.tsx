@@ -176,33 +176,47 @@ export default function UploadStudentsToSubjectsPage() {
   // --- Renderizado ---
   return (
     <main className="space-y-4">
+      {/* Header */}
       <div className="pb-4 col-span-1 w-full">
         <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
           Cargar Estudiantes a Asignaturas
         </CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .xlsx para cargar masivamente estudiantes a las asignaturas.
+          Sube un archivo .xlsx para inscribir masivamente estudiantes en sus respectivas asignaturas.
         </CardDescription>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
+          {/* Template Card */}
           <Card>
             <CardHeader>
               <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
-                Plantilla de Carga
+                Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
                 Descarga la plantilla para asegurar que tu archivo tiene el formato correcto.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
               <a href="/formatos/plantilla_admin_estudiantes_asignatura.xlsx" download>
-                <Button variant="outline">
+                <Button variant="outline" className="w-full justify-start">
                   <Download className="mr-2 h-4 w-4" />
                   Descargar Plantilla
                 </Button>
               </a>
+
+              <div className="space-y-2 mt-4">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Download className="h-4 w-4" />
+                  <span className="font-medium">Requisitos del archivo:</span>
+                </div>
+                <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
+                  <li>Formato Excel (.xlsx)</li>
+                  <li>Columnas: Código Asignatura, Documento Estudiante</li>
+                  <li>Inscripción automática en sistema</li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
 

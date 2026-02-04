@@ -222,7 +222,7 @@ export default function AsignarEstudiantePage() {
           </CardDescription>
         </CardHeader>
         <div className="flex gap-2">
-          <Link href="/dashboard/admin/asignar-estudiante/cargar-estudiantes-asignatura">
+          <Link href="/dashboard/admin/matricula/cargar">
             <Button variant="outline" className="gap-2">
               <span>Cargar Estudiantes</span>
             </Button>

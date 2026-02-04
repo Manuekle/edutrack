@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CHART_COLORS } from '@/lib/chart-colors';
@@ -88,7 +88,7 @@ const ATTENDANCE_RISK_THRESHOLD = 75; // Menos de 75% es riesgo
 const getRiskBadge = (percentage: number) => {
   if (percentage < ATTENDANCE_RISK_THRESHOLD) {
     return (
-      <Badge variant="destructive" className="ml-2 text-[10px] h-5 px-1.5 uppercase font-bold animate-pulse">
+      <Badge variant="destructive" className="ml-2 text-xs h-5 px-1.5 uppercase font-semibold animate-pulse">
         RIESGO DE PÉRDIDA
       </Badge>
     );

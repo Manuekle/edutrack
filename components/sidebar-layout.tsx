@@ -11,35 +11,35 @@ import * as React from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarInset,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
-    SidebarRail,
-    SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -66,7 +66,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).catch(() => {}); // No bloqueamos si falla
+      }).catch(() => { }); // No bloqueamos si falla
 
       // Cerrar sesión en NextAuth
       await signOut({
@@ -143,7 +143,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton size="sm" asChild>
               <Link href={homePath}>
 
                 <div className="grid flex-1 text-left text-xs leading-tight">
@@ -259,18 +259,18 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
                 >
                   {theme === 'dark' ||
-                  (theme === 'system' &&
-                    typeof window !== 'undefined' &&
-                    window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
+                    (theme === 'system' &&
+                      typeof window !== 'undefined' &&
+                      window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
                     <Sun className="mr-3 h-4 w-4 shrink-0" />
                   ) : (
                     <Moon className="mr-3 h-4 w-4 shrink-0" />
                   )}
                   <span className="font-sans">
                     {theme === 'dark' ||
-                    (theme === 'system' &&
-                      typeof window !== 'undefined' &&
-                      window.matchMedia('(prefers-color-scheme: dark)').matches)
+                      (theme === 'system' &&
+                        typeof window !== 'undefined' &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches)
                       ? 'Modo Claro'
                       : 'Modo Oscuro'}
                   </span>

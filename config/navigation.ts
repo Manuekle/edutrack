@@ -2,14 +2,16 @@ import type { NavLinkGroup } from '@/types/navigation';
 import {
     BookMarked,
     BookOpen,
+    Calendar,
     GraduationCap,
     Home,
+    Layout,
     QrCode,
     Settings,
     TrendingUp,
     User,
     UserPlus,
-    Users,
+    Users
 } from 'lucide-react';
 
 export const navLinkGroups: NavLinkGroup[] = [
@@ -101,6 +103,13 @@ export const navLinkGroups: NavLinkGroup[] = [
         roles: ['DOCENTE'],
         description: 'Ver y generar reportes de asistencia',
       },
+      {
+        href: '/dashboard/docente/agendar',
+        icon: Calendar,
+        label: 'Agendar Sala',
+        roles: ['DOCENTE'],
+        description: 'Solicitar reserva de una sala o auditorio',
+      },
     ],
   },
   {
@@ -166,6 +175,13 @@ export const navLinkGroups: NavLinkGroup[] = [
         label: 'Reportes Docentes',
         roles: ['ADMIN'],
         description: 'Reportes generales de docentes',
+      },
+      {
+        href: '/dashboard/admin/salas',
+        icon: Layout,
+        label: 'Gestión de Salas',
+        roles: ['ADMIN'],
+        description: 'Administrar salas, salones y auditorios',
       },
     ],
   },

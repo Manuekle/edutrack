@@ -83,6 +83,9 @@ model User {
   requestedUnenrolls UnenrollRequest[] @relation("RequestedUnenrolls")
   unenrollRequests   UnenrollRequest[] @relation("StudentUnenrolls")
   reviewedUnenrolls  UnenrollRequest[] @relation("ReviewedUnenrolls")
+
+  // Relaciones con gestión de salas
+  roomBookings RoomBooking[] @relation("TeacherBookings")
 }
 
 model Subject {
@@ -211,6 +214,53 @@ model SubjectEvent {
   updatedAt DateTime @updatedAt
 
   @@index([subjectId, date])
+}
+
+enum RoomType {
+  SALA_COMPUTO
+  SALON
+  AUDITORIO
+}
+
+enum BookingStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+model Room {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  type        RoomType      @default(SALON)
+  capacity    Int?
+  description String?
+  isActive    Boolean       @default(true)
+  bookings    RoomBooking[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([type])
+}
+
+model RoomBooking {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  room          Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId        String        @db.ObjectId
+  teacher       User          @relation("TeacherBookings", fields: [teacherId], references: [id], onDelete: Cascade)
+  teacherId     String        @db.ObjectId
+  startTime     DateTime
+  endTime       DateTime
+  reason        String
+  status        BookingStatus @default(PENDIENTE)
+  signatureUrl  String? // URL de la firma base64 o storage
+  reviewComment String?
+  reviewedAt    DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([roomId, startTime, endTime])
+  @@index([teacherId])
+  @@index([status])
 }
 
 model UnenrollRequest {

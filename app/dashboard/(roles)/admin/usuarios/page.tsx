@@ -98,7 +98,7 @@ export default function GestionUsuariosPage() {
           <Button variant="default" onClick={() => setIsCreateModalOpen(true)} className="gap-2">
             <span>Nuevo Usuario</span>
           </Button>
-          <Link href="/dashboard/admin/usuarios/cargar-usuarios">
+          <Link href="/dashboard/admin/docentes/cargar">
             <Button variant="outline" className="gap-2">
               <span>Cargar Usuarios</span>
             </Button>

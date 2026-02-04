@@ -36,7 +36,7 @@ export function QRViewer({
   const toggleFullscreen = () => {
     if (!qrContainerRef.current) return;
     if (!document.fullscreenElement) {
-      qrContainerRef.current.requestFullscreen().catch(() => {});
+      qrContainerRef.current.requestFullscreen().catch(() => { });
       setIsFullscreen(true);
     } else {
       document.exitFullscreen();
@@ -121,20 +121,18 @@ export function QRViewer({
                   className="h-8 w-8 p-0 relative overflow-visible"
                 >
                   <div
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${
-                      copied
-                        ? 'translate-y-0 opacity-100'
-                        : '-translate-y-2 opacity-0 pointer-events-none'
-                    }`}
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
+                      ? 'translate-y-0 opacity-100'
+                      : '-translate-y-2 opacity-0 pointer-events-none'
+                      }`}
                   >
                     <Check className="h-3 w-3 text-green-500" />
                   </div>
                   <div
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${
-                      copied
-                        ? 'translate-y-2 opacity-0 pointer-events-none'
-                        : 'translate-y-0 opacity-100'
-                    }`}
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
+                      ? 'translate-y-2 opacity-0 pointer-events-none'
+                      : 'translate-y-0 opacity-100'
+                      }`}
                   >
                     <Copy className="h-3 w-3" />
                   </div>

@@ -3,13 +3,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, FileSpreadsheet } from 'lucide-react';
@@ -74,12 +74,12 @@ export function AsignaturasImportDialog({
       setPreview(result.previewData);
       setShowPreview(true);
       setProcessingProgress(100);
-      
+
     } catch (error: any) {
-        toast.error(error.message || 'Error al procesar el archivo');
-        setFile(null);
+      toast.error(error.message || 'Error al procesar el archivo');
+      setFile(null);
     } finally {
-        setIsProcessing(false);
+      setIsProcessing(false);
     }
   };
 
@@ -96,34 +96,34 @@ export function AsignaturasImportDialog({
   };
 
   const handleConfirmImport = async () => {
-     if (!file) return;
-     
-     setIsProcessing(true);
-     try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('preview', 'false');
+    if (!file) return;
 
-        const response = await fetch('/api/admin/subjects/import', {
-            method: 'POST',
-            body: formData,
-        });
-        
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error);
+    setIsProcessing(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('preview', 'false');
 
-        toast.success(`Se procesaron ${result.processed} asignaturas.`);
-        if (result.errors && result.errors.length > 0) {
-            toast.warning(`Hubo ${result.errors.length} errores. Revisa la consola.`);
-            console.error(result.errors);
-        }
+      const response = await fetch('/api/admin/subjects/import', {
+        method: 'POST',
+        body: formData,
+      });
 
-        onImport();
-        handleCancel();
-     } catch(e: any) {
-         toast.error(e.message);
-         setIsProcessing(false);
-     }
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
+      toast.success(`Se procesaron ${result.processed} asignaturas.`);
+      if (result.errors && result.errors.length > 0) {
+        toast.warning(`Hubo ${result.errors.length} errores. Revisa la consola.`);
+        console.error(result.errors);
+      }
+
+      onImport();
+      handleCancel();
+    } catch (e: any) {
+      toast.error(e.message);
+      setIsProcessing(false);
+    }
   };
 
   const handleCancel = () => {
@@ -174,11 +174,10 @@ export function AsignaturasImportDialog({
                 {preview.map((item, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded-lg border ${
-                      item.status === 'existing' || item.status === 'error'
-                        ? 'border-destructive/20 bg-destructive/5'
-                        : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
-                    }`}
+                    className={`p-4 rounded-lg border ${item.status === 'existing' || item.status === 'error'
+                      ? 'border-destructive/20 bg-destructive/5'
+                      : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -186,8 +185,8 @@ export function AsignaturasImportDialog({
                           <h1 className="font-medium text-xs text-foreground">
                             {item.nombreAsignatura} ({item.codigoAsignatura})
                           </h1>
-                          {item.status === 'existing' && <Badge variant="destructive" className="text-[10px]">Existe</Badge>}
-                          {item.status === 'new' && <Badge className="bg-emerald-500 text-[10px]">Nuevo</Badge>}
+                          {item.status === 'existing' && <Badge variant="destructive" className="text-xs">Existe</Badge>}
+                          {item.status === 'new' && <Badge className="bg-emerald-500 text-xs">Nuevo</Badge>}
                         </div>
 
                         <div className="grid grid-cols-3 gap-4 text-xs text-muted-foreground mb-2">
@@ -197,11 +196,11 @@ export function AsignaturasImportDialog({
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground border-t pt-2 mt-2">
-                            <div className={!item.teacherFound && item.docente ? "text-destructive font-medium" : ""}>
-                                Docente: {item.docente || 'Sin asignar'}
-                                {!item.teacherFound && item.docente && " (No encontrado)"}
-                            </div>
-                            <div>Salón: {item.salon || 'N/A'}</div>
+                          <div className={!item.teacherFound && item.docente ? "text-destructive font-medium" : ""}>
+                            Docente: {item.docente || 'Sin asignar'}
+                            {!item.teacherFound && item.docente && " (No encontrado)"}
+                          </div>
+                          <div>Salón: {item.salon || 'N/A'}</div>
                         </div>
 
                         {item.error && (
@@ -230,9 +229,8 @@ export function AsignaturasImportDialog({
           ) : (
             <div className="space-y-6">
               <div
-                className={`relative flex flex-col items-center gap-3 cursor-pointer rounded-lg border border-dashed border-muted-foreground/25 bg-background px-6 py-8 text-center transition-colors hover:bg-muted/50 ${
-                  dragOver ? 'border-primary bg-primary/5 cursor-grabbing' : ''
-                }`}
+                className={`relative flex flex-col items-center gap-3 cursor-pointer rounded-lg border border-dashed border-muted-foreground/25 bg-background px-6 py-8 text-center transition-colors hover:bg-muted/50 ${dragOver ? 'border-primary bg-primary/5 cursor-grabbing' : ''
+                  }`}
                 onDragOver={e => {
                   e.preventDefault();
                   e.stopPropagation();
