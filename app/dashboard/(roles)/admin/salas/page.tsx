@@ -429,18 +429,7 @@ export default function AdminSalasPage() {
     try {
       const response = await fetch('/api/admin/rooms');
       const data = await response.json();
-      if (response.ok && data.length > 0) {
-        setRooms(data);
-      } else {
-        // Mock data fallback if API is empty
-        setRooms([
-          { id: '1', name: 'Laboratorio de Cómputo 101', type: 'SALA_COMPUTO', capacity: '30', description: 'Equipado con i9 y 32GB RAM' },
-          { id: '2', name: 'Auditorio Central', type: 'AUDITORIO', capacity: '150', description: 'Sistema de sonido envolvente' },
-          { id: '3', name: 'Aula Magna 402', type: 'SALON', capacity: '45', description: 'Proyector 4K y aire acondicionado' },
-          { id: '4', name: 'Sala de Juntas B', type: 'SALON', capacity: '12', description: 'Ideal para sesiones privadas' },
-          { id: '5', name: 'Lab. Química Avanzada', type: 'SALA_COMPUTO', capacity: '20', description: 'Simuladores de alta precisión' },
-        ]);
-      }
+      setRooms(response.ok ? data : []);
     } catch (error) {
       toast.error('Error al cargar salas');
     }
@@ -451,43 +440,7 @@ export default function AdminSalasPage() {
       const response = await fetch('/api/rooms/bookings');
       const data = await response.json();
 
-      let finalData = data;
-      if (!response.ok || data.length === 0) {
-        // Mock data fallback
-        finalData = [
-          {
-            id: 'b1',
-            room: { name: 'Laboratorio de Cómputo 101' },
-            teacher: { name: 'Prof. Carlos Méndez' },
-            startTime: new Date(new Date().setHours(9, 0, 0, 0)).toISOString(),
-            endTime: new Date(new Date().setHours(11, 0, 0, 0)).toISOString(),
-            status: 'APROBADO',
-            reason: 'Clase Práctica de Programación Funcional',
-            signatureUrl: 'https://i.postimg.cc/85z1Xz6p/signature-mock.png'
-          },
-          {
-            id: 'b2',
-            room: { name: 'Auditorio Central' },
-            teacher: { name: 'Dra. Elena Rivas' },
-            startTime: new Date(new Date().setHours(14, 0, 0, 0)).toISOString(),
-            endTime: new Date(new Date().setHours(16, 0, 0, 0)).toISOString(),
-            status: 'PENDIENTE',
-            reason: 'Conferencia sobre Inteligencia Artificial',
-            signatureUrl: 'https://i.postimg.cc/85z1Xz6p/signature-mock.png'
-          },
-          {
-            id: 'b3',
-            room: { name: 'Aula Magna 402' },
-            teacher: { name: 'Mtro. Roberto Solis' },
-            startTime: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
-            endTime: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
-            status: 'APROBADO',
-            reason: 'Examen Parcial de Cálculo Multivariable',
-            signatureUrl: 'https://i.postimg.cc/85z1Xz6p/signature-mock.png'
-          }
-        ];
-      }
-
+      const finalData = response.ok ? data : [];
       setBookings(finalData);
       const approved = finalData.filter((b: any) => b.status === 'APROBADO');
       const formatted = approved.map((b: any) => ({
