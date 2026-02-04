@@ -7,35 +7,33 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
-import { Search, Users } from 'lucide-react';
+import { Download, Search, Users } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
-
-import { AsignaturasImportDialog } from '@/components/ui/asignaturas-import-dialog';
 
 export default function GestionAsignaturasPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,10 +75,13 @@ export default function GestionAsignaturasPage() {
           </CardDescription>
         </CardHeader>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsImportModalOpen(true)} className="gap-2">
-             <span>Cargar Asignaturas</span>
-          </Button>
-          <Button variant="default" onClick={() => setIsCreateModalOpen(true)} className="gap-2">
+          <Link href="/dashboard/admin/asignaturas/cargar">
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              <span>Cargar Asignaturas</span>
+            </Button>
+          </Link>
+          <Button variant="default" onClick={() => setIsCreateModalOpen(true)} className="gap-2 text-xs">
             <span>Nueva Asignatura</span>
           </Button>
         </div>
@@ -280,12 +281,6 @@ export default function GestionAsignaturasPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubjectCreated={handleSubjectCreated}
-      />
-
-      <AsignaturasImportDialog
-        open={isImportModalOpen}
-        onOpenChange={setIsImportModalOpen}
-        onImport={handleSubjectCreated}
       />
     </div>
   );
