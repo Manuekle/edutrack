@@ -1,0 +1,4 @@
+codigoAsignatura,nombreAsignatura,grupo,program,semestre,creditos,docente,salon,fechaClase,horaInicio,horaFin,temaClase
+MAT101,Cálculo Diferencial,A,Ingeniería,1,4,profesor@fup.edu.co,101,2024-02-01,08:00,10:00,Introducción
+MAT101,Cálculo Diferencial,B,Ingeniería,1,4,otroprofesor@fup.edu.co,102,2024-02-01,10:00,12:00,Introducción
+SIS201,Programación Web,Unico,Sistemas,3,3,profesorweb@fup.edu.co,Laboratorio 1,2024-02-02,14:00,16:00,HTML y CSS

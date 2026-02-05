@@ -113,9 +113,10 @@ async function main() {
   // 5. Create Subjects & Groups
   for (const template of SUBJECT_TEMPLATES) {
     // Decidir si crear 1 o 2 grupos
-    const groups = Math.random() > 0.6 ? ['A', 'B'] : ['A'];
-
-    for (const group of groups) {
+    // Decidir si crear 1 o 2 grupos
+    const groups = Math.random() > 0.6 ? ['A', 'B'] : ['A']; // Revert to random groups
+    
+    for (const [index, group] of groups.entries()) {
       // Assign random teacher
       const teacher = getRandomElement(teachers);
       
@@ -137,8 +138,9 @@ async function main() {
             teachers: {
               connect: [{ id: teacher.id }]
             },
-            studentIds: studentIds, // Subject -> Student (Scalar list, assuming manual sync or handled)
-            classroom: `Salon ${getRandomInt(100, 300)}`,
+            studentIds: studentIds, // Subject -> Student (manual sync needed if no relation set)
+            // Use a classroom name that matches one of the Rooms we will create
+            classroom: `${['Torre A', 'Torre B', 'Bloque C'][index % 3]} - Salon ${getRandomInt(100, 300)}`,
         }
       });
 
@@ -184,7 +186,30 @@ async function main() {
   }
 
   console.log('✅ Subjects, Groups, Enrollments & Classes created');
-  console.log('🌱 Seed finished');
+  // --- SEED ROOMS (SALAS) ---
+  console.log('🏗️  Creating Rooms...');
+  const roomTypes = ['SALON', 'SALA_COMPUTO', 'AUDITORIO'];
+  const baseNames = ['Torre A', 'Torre B', 'Bloque C'];
+  
+  for (const block of baseNames) {
+      for (let i = 1; i <= 5; i++) {
+          await prisma.room.create({
+              data: {
+                  name: `${block} - Salon ${100 + i}`,
+                  type: 'SALON',
+                  capacity: 35,
+                  description: 'Salón estándar con videobeam',
+                  isActive: true
+              }
+          });
+      }
+  }
+
+  // Create Special Rooms
+  await prisma.room.create({ data: { name: 'Laboratorio de Sistemas 1', type: 'SALA_COMPUTO', capacity: 25, description: 'PCs i7, 16GB RAM' } });
+  await prisma.room.create({ data: { name: 'Auditorio Mayor', type: 'AUDITORIO', capacity: 200, description: 'Sistema de sonido y proyección' } });
+
+  console.log('✅ Seed completed successfully!');
 }
 
 main()

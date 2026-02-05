@@ -4,19 +4,19 @@ import { SubjectFileUpload } from '@/components/subject-file-upload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { AlertCircle, CheckCircle, Download, Loader2 } from 'lucide-react';
 import { useState } from 'react';
@@ -72,7 +72,7 @@ export default function UploadStudentsToSubjectsPage() {
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecciona un archivo .xlsx para continuar.');
+      toast.error('Por favor, selecciona un archivo .csv para continuar.');
       return;
     }
     setIsLoading(true);
@@ -182,7 +182,7 @@ export default function UploadStudentsToSubjectsPage() {
           Cargar Estudiantes a Asignaturas
         </CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .xlsx para inscribir masivamente estudiantes en sus respectivas asignaturas.
+          Sube un archivo .csv para inscribir masivamente estudiantes en sus respectivas asignaturas.
         </CardDescription>
       </div>
 
@@ -199,7 +199,7 @@ export default function UploadStudentsToSubjectsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <a href="/formatos/plantilla_admin_estudiantes_asignatura.xlsx" download>
+              <a href="/formatos/plantilla_admin_estudiantes_asignatura.csv" download>
                 <Button variant="outline" className="w-full justify-start">
                   <Download className="mr-2 h-4 w-4" />
                   Descargar Plantilla
@@ -212,7 +212,7 @@ export default function UploadStudentsToSubjectsPage() {
                   <span className="font-medium">Requisitos del archivo:</span>
                 </div>
                 <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                  <li>Formato Excel (.xlsx)</li>
+                  <li>Formato CSV (.csv)</li>
                   <li>Columnas: Código Asignatura, Documento Estudiante</li>
                   <li>Inscripción automática en sistema</li>
                 </ul>
