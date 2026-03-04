@@ -186,25 +186,15 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-[100dvh] p-4 font-sans">
-      <div className="flex flex-col items-center gap-6 w-full max-w-sm">
-        {/* Logo */}
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25 bg-background">
-            <img src="/icon-light.jpeg" alt="SIRA Logo" className="w-full h-full object-cover" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">SIRA</h1>
-          <p className="text-sm text-muted-foreground">Sistema Integral de Registro Académico</p>
-        </div>
-        <Suspense
-          fallback={
-            <Card className="w-full mx-auto my-auto p-8">
-              <div className="text-center">Cargando...</div>
-            </Card>
-          }
-        >
-          <LoginForm />
-        </Suspense>
-      </div>
+      <Suspense
+        fallback={
+          <Card className="w-full max-w-sm mx-auto my-auto p-8">
+            <div className="text-center">Cargando...</div>
+          </Card>
+        }
+      >
+        <LoginForm />
+      </Suspense>
     </div>
   );
 }
