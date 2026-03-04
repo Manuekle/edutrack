@@ -52,7 +52,7 @@ export default function HomePageMobile() {
         >
           {/* Logo Icon */}
           <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25 mb-4 bg-background flex items-center justify-center">
-            <img src="/icons/icon-192x192.png" alt="SIRA Logo" className="w-full h-full" />
+            <img src="/icons/favicon-192x192.png" alt="SIRA Logo" className="w-full h-full" />
           </div>
           <h1 className="text-3xl font-bold tracking-card text-center">SIRA</h1>
           <p className="text-sm text-muted-foreground mt-1">
