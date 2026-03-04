@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         { program: { contains: search, mode: Prisma.QueryMode.insensitive } },
       ];
     }
-    
+
     // Filtros específicos
     const program = searchParams.get('program');
     if (program && program !== 'all') {
@@ -160,7 +160,6 @@ export async function POST(req: NextRequest) {
         code,
         program,
         semester: semester ? parseInt(semester) : null,
-        credits: credits ? parseInt(credits) : null,
         credits: credits ? parseInt(credits) : null,
         teacherIds: [teacherId],
         studentIds: [],

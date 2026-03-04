@@ -51,21 +51,29 @@ export default function GestionUsuariosPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
+  // Debounce para búsqueda
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Usar React Query para obtener usuarios
   const { users, pagination, isLoading, toggleActive, isTogglingActive, refetch } = useUsers({
     page: currentPage,
     limit: itemsPerPage,
-    search: searchTerm,
+    search: debouncedSearch,
     enabled: true,
   });
 
   const handleUserUpdate = (updatedUser: User) => {
-    // Invalidar la query para refrescar los datos
     queryClient.invalidateQueries({ queryKey: ['users'] });
   };
 
   const handleUserCreated = (newUser: User) => {
-    // Invalidar la query para refrescar los datos
     queryClient.invalidateQueries({ queryKey: ['users'] });
   };
 
@@ -76,7 +84,7 @@ export default function GestionUsuariosPage() {
   // Resetear a la primera página cuando cambia el término de búsqueda
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [debouncedSearch]);
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -120,10 +128,15 @@ export default function GestionUsuariosPage() {
               </CardDescription>
             </div>
             <div className="relative w-full md:w-auto">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
               <Input
-                placeholder="Buscar por nombre o email..."
+                placeholder="Buscar por nombre o email…"
                 className="pl-9 w-full md:w-[300px] text-xs"
+                name="search"
+                autoComplete="off"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />

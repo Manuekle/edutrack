@@ -1,7 +1,10 @@
-export const metadata = {
-  title: 'Admin - FUP',
-  description: 'Panel de control para gestionar tus datos',
-  keywords: 'admin, panel de control, FUP',
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Panel de Administración',
+  description:
+    'Gestiona usuarios, asignaturas, matrículas y reportes del sistema de asistencias FUP',
+  robots: { index: false, follow: false },
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -14,7 +14,9 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarLayout>
-      <div className="font-sans">{children}</div>
+      <div className="font-sans" id="main-content">
+        {children}
+      </div>
     </SidebarLayout>
   );
 }

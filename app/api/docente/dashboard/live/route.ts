@@ -20,7 +20,7 @@ export async function GET() {
     const liveClass = await db.class.findFirst({
       where: {
         subject: {
-          teacherId: teacherId,
+          teacherIds: { has: teacherId },
         },
         status: 'PROGRAMADA',
         startTime: {
@@ -53,7 +53,7 @@ export async function GET() {
     } else {
       // For teacher, count students in their subjects
       const subjectsWithStudents = await db.subject.findMany({
-        where: { teacherId },
+        where: { teacherIds: { has: teacherId } },
         select: { studentIds: true },
       });
 

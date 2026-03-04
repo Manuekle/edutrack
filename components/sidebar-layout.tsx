@@ -2,7 +2,7 @@
 
 import { navLinkGroups } from '@/config/navigation';
 import type { Role } from '@/types';
-import { ChevronDown, LogOut, Moon, Settings, Sun } from 'lucide-react';
+import { BookOpen, ChevronDown, LogOut, Moon, Settings, Sun } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -66,7 +66,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).catch(() => { }); // No bloqueamos si falla
+      }).catch(() => {}); // No bloqueamos si falla
 
       // Cerrar sesión en NextAuth
       await signOut({
@@ -139,16 +139,29 @@ function AppSidebar({ homePath }: { homePath: string }) {
   };
 
   return (
-    <Sidebar variant="inset" className="h-screen fixed font-sans">
+    <Sidebar
+      variant="inset"
+      className="h-screen fixed font-sans border-r bg-sidebar pt-[env(safe-area-inset-top)]"
+    >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="sm" asChild>
+            <SidebarMenuButton size="sm" asChild className="h-auto py-3">
               <Link href={homePath}>
-
-                <div className="grid flex-1 text-left text-xs leading-tight">
-                  <span className="truncate font-semibold">Gestion de Asistencias</span>
-                  <span className="truncate text-xs">Facultad de Ingeniería</span>
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-lg overflow-hidden shadow-sm bg-background">
+                    <img
+                      src="/icon-light.jpeg"
+                      alt="SIRA Logo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="grid flex-1 text-left">
+                    <span className="truncate font-semibold text-sm">SIRA</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      Facultad de Ingeniería
+                    </span>
+                  </div>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -172,22 +185,38 @@ function AppSidebar({ homePath }: { homePath: string }) {
           <SidebarMenu>
             {accessibleNavGroups.map(group => (
               <SidebarGroup key={group.title}>
-                <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-                <SidebarGroupContent className="flex flex-col gap-1">
-                  {group.links.map(link => (
-                    <SidebarMenuItem key={link.href}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isLinkActive(link.href)}
-                        className="flex items-center gap-2"
-                      >
-                        <Link href={link.href}>
-                          {/* <link.icon className="size-4" /> */}
-                          <span className="text-xs">{link.label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  {group.title}
+                </SidebarGroupLabel>
+                <SidebarGroupContent className="flex flex-col gap-1 px-2">
+                  {group.links.map(link => {
+                    const Icon = link.icon;
+                    const isActive = isLinkActive(link.href);
+                    return (
+                      <SidebarMenuItem key={link.href}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                            isActive
+                              ? 'bg-primary/10 text-primary font-medium'
+                              : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+                          }`}
+                        >
+                          <Link href={link.href} className="flex items-center gap-3 w-full">
+                            {Icon && (
+                              <Icon
+                                className={`h-4 w-4 shrink-0 ${
+                                  isActive ? 'text-primary' : 'text-muted-foreground'
+                                }`}
+                              />
+                            )}
+                            <span className="text-sm">{link.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
                 </SidebarGroupContent>
               </SidebarGroup>
             ))}
@@ -195,24 +224,26 @@ function AppSidebar({ homePath }: { homePath: string }) {
         )}
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center p-2 rounded-lg hover:bg-sidebar-accent transition-colors">
-                  <Avatar className="h-8 w-8 border border-zinc-200 dark:border-zinc-700 text-xs">
-                    <AvatarFallback>{session?.user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                <button className="w-full flex items-center p-3 rounded-lg hover:bg-sidebar-accent transition-colors mx-2 my-1">
+                  <Avatar className="h-9 w-9 border-2 border-primary/20 text-sm font-medium">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {session?.user?.name?.charAt(0) || 'U'}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="ml-3 text-left overflow-hidden">
-                    <p className="text-xs font-normal truncate font-sans">
+                    <p className="text-sm font-medium truncate font-sans">
                       {session?.user?.name?.split(' ')[0] || 'Usuario'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate font-sans">
                       {getRoleDisplayName(userRole as Role)}
                     </p>
                   </div>
-                  <ChevronDown className="ml-auto h-4 w-4" />
+                  <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -259,18 +290,18 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
                 >
                   {theme === 'dark' ||
-                    (theme === 'system' &&
-                      typeof window !== 'undefined' &&
-                      window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
+                  (theme === 'system' &&
+                    typeof window !== 'undefined' &&
+                    window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
                     <Sun className="mr-3 h-4 w-4 shrink-0" />
                   ) : (
                     <Moon className="mr-3 h-4 w-4 shrink-0" />
                   )}
                   <span className="font-sans">
                     {theme === 'dark' ||
-                      (theme === 'system' &&
-                        typeof window !== 'undefined' &&
-                        window.matchMedia('(prefers-color-scheme: dark)').matches)
+                    (theme === 'system' &&
+                      typeof window !== 'undefined' &&
+                      window.matchMedia('(prefers-color-scheme: dark)').matches)
                       ? 'Modo Claro'
                       : 'Modo Oscuro'}
                   </span>
@@ -413,7 +444,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <SidebarProvider>
         <AppSidebar homePath={homePath} />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 px-4 font-sans">
+          <header className="flex h-16 shrink-0 items-center gap-2 px-4 font-sans pt-[env(safe-area-inset-top)]">
             <SidebarTrigger className="-ml-1" />
             <Breadcrumb>
               <BreadcrumbList>
@@ -434,7 +465,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               </BreadcrumbList>
             </Breadcrumb>
           </header>
-          <main className="flex-1 p-4 sm:p-6 font-sans">{children}</main>
+          <main className="flex-1 p-4 sm:p-6 font-sans pb-safe">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

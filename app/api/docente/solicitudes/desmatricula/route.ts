@@ -32,10 +32,10 @@ export async function POST(request: Request) {
     }
 
     // Verificar que la asignatura exista y pertenezca al docente
-    const subject = await db.subject.findUnique({
+    const subject = await db.subject.findFirst({
       where: {
         id: subjectId,
-        teacherId: session.user.id,
+        teacherIds: { has: session.user.id },
       },
     });
 
@@ -48,18 +48,19 @@ export async function POST(request: Request) {
 
     // Checking for 12-day rule
     const firstClass = await db.class.findFirst({
-        where: { subjectId: subjectId },
-        orderBy: { date: 'asc' }
+      where: { subjectId: subjectId },
+      orderBy: { date: 'asc' },
     });
 
     if (firstClass) {
-        const daysSinceStart = (new Date().getTime() - new Date(firstClass.date).getTime()) / (1000 * 3600 * 24);
-        if (daysSinceStart > 12) {
-             return NextResponse.json(
-                { message: 'El periodo de desmatriculación (12 días desde el inicio) ha finalizado.' },
-                { status: 400 }
-            );
-        }
+      const daysSinceStart =
+        (new Date().getTime() - new Date(firstClass.date).getTime()) / (1000 * 3600 * 24);
+      if (daysSinceStart > 12) {
+        return NextResponse.json(
+          { message: 'El periodo de desmatriculación (12 días desde el inicio) ha finalizado.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Verificar que el estudiante exista

@@ -14,7 +14,7 @@ async function verifyTeacherOwnership(classId: string, teacherId: string) {
     include: { subject: true },
   });
 
-  if (!classWithSubject || classWithSubject.subject.teacherId !== teacherId) {
+  if (!classWithSubject || !classWithSubject.subject.teacherIds.includes(teacherId)) {
     return false;
   }
   return true;
@@ -39,7 +39,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ clas
     });
 
     // Verificar que la clase exista y pertenezca al docente
-    if (!classInfo || classInfo.subject.teacherId !== teacherId) {
+    if (!classInfo || !classInfo.subject.teacherIds.includes(teacherId)) {
       return NextResponse.json(
         { message: 'Clase no encontrada o no pertenece al docente' },
         { status: 404 }
@@ -145,7 +145,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
         include: {
           subject: {
             include: {
-              teacher: {
+              teachers: {
                 select: { name: true },
               },
             },
@@ -166,9 +166,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
         if (studentEmails.length > 0) {
           try {
             // Create the email content once to be reused
+            const teacherName = classToCancel.subject.teachers[0]?.name || 'El docente';
             const emailComponent = React.createElement(ClassCancellationEmail, {
               subjectName: classToCancel.subject.name,
-              teacherName: classToCancel.subject.teacher.name || 'El docente',
+              teacherName: teacherName,
               classDate: classToCancel.date.toISOString(),
               reason: reason,
               supportEmail: process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co',

@@ -4,19 +4,19 @@ import { TablePagination } from '@/components/shared/table-pagination';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loading } from '@/components/ui/loading';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getCurrentPeriod, useTeacherSubjects } from '@/hooks/use-teacher-subjects';
@@ -66,7 +66,7 @@ export default function SubjectsPage() {
               >
                 Período:
               </label>
-              <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <Select value={selectedPeriod} onValueChange={setSelectedPeriod} name="period">
                 <SelectTrigger id="period-select" className="text-xs w-[180px]">
                   <SelectValue placeholder="Seleccionar período" />
                 </SelectTrigger>
@@ -85,7 +85,9 @@ export default function SubjectsPage() {
         <CardContent className="p-0">
           {error && (
             <div className="p-4 mb-4 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-              {error instanceof Error ? error.message : 'Ocurrió un error al cargar las asignaturas'}
+              {error instanceof Error
+                ? error.message
+                : 'Ocurrió un error al cargar las asignaturas'}
             </div>
           )}
           <div className="border rounded-md bg-card shadow-sm">
@@ -142,9 +144,15 @@ export default function SubjectsPage() {
                             </Tooltip>
                           </TooltipProvider>
                         </TableCell>
-                        <TableCell className="px-4 py-2 text-xs font-mono">{subject.code}</TableCell>
-                        <TableCell className="px-4 py-2 text-xs">{subject.program || 'N/A'}</TableCell>
-                        <TableCell className="px-4 py-2 text-xs">{subject.semester || 'N/A'}</TableCell>
+                        <TableCell className="px-4 py-2 text-xs font-mono">
+                          {subject.code}
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-xs">
+                          {subject.program || 'N/A'}
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-xs">
+                          {subject.semester || 'N/A'}
+                        </TableCell>
                         <TableCell className="px-4 py-2 text-right text-xs">
                           {subject.credits || '0'}
                         </TableCell>

@@ -133,7 +133,8 @@ export default function StudentAttendancePage() {
               <div className="space-y-2">
                 <Input
                   type="text"
-                  placeholder="Código de asistencia"
+                  name="token"
+                  placeholder="Código de asistencia…"
                   value={token}
                   onChange={e => setToken(e.target.value.toLowerCase())}
                   className="text-center font-mono text-xs"

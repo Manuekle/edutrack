@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     const subject = await db.subject.findFirst({
       where: {
         id: query.subjectId,
-        teacherId: session.user.id,
+        teacherIds: { has: session.user.id },
       },
     });
     if (!subject) {
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
       const data = DocenteEventoCreateSchema.parse(body);
       // Security check
       const subject = await db.subject.findFirst({
-        where: { id: data.subjectId, teacherId: session.user.id },
+        where: { id: data.subjectId, teacherIds: { has: session.user.id } },
       });
       if (!subject) {
         return NextResponse.json(
@@ -212,7 +212,7 @@ export async function POST(request: Request) {
       const data = DocenteClaseCreateSchema.parse(body);
       // Security check
       const subject = await db.subject.findFirst({
-        where: { id: data.subjectId, teacherId: session.user.id },
+        where: { id: data.subjectId, teacherIds: { has: session.user.id } },
       });
       if (!subject) {
         return NextResponse.json(

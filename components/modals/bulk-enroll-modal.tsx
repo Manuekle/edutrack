@@ -22,7 +22,12 @@ interface BulkEnrollModalProps {
   onSuccess: () => void;
 }
 
-export function BulkEnrollModal({ isOpen, onClose, selectedSubjectIds, onSuccess }: BulkEnrollModalProps) {
+export function BulkEnrollModal({
+  isOpen,
+  onClose,
+  selectedSubjectIds,
+  onSuccess,
+}: BulkEnrollModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -74,7 +79,8 @@ export function BulkEnrollModal({ isOpen, onClose, selectedSubjectIds, onSuccess
         <DialogHeader>
           <DialogTitle className="tracking-card sm:text-2xl">Matriculación Masiva</DialogTitle>
           <DialogDescription className="text-sm">
-            Vas a matricular estudiantes en <strong>{selectedSubjectIds.size}</strong> asignatura(s) seleccionada(s).
+            Vas a matricular estudiantes en <strong>{selectedSubjectIds.size}</strong> asignatura(s)
+            seleccionada(s).
             <p className="mt-2 text-xs text-muted-foreground">
               Sube un archivo CSV con una columna 'documento' o 'correo'.
             </p>
@@ -85,12 +91,18 @@ export function BulkEnrollModal({ isOpen, onClose, selectedSubjectIds, onSuccess
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="csv-file">Archivo de Estudiantes (.csv)</Label>
             <Input id="csv-file" type="file" accept=".csv" onChange={handleFileChange} />
-            {file && <p className="text-xs text-muted-foreground mt-1">Archivo seleccionado: {file.name}</p>}
+            {file && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Archivo seleccionado: {file.name}
+              </p>
+            )}
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isUploading}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose} disabled={isUploading}>
+            Cancelar
+          </Button>
           <Button onClick={handleSubmit} disabled={!file || isUploading}>
             {isUploading ? (
               <>Procesando...</>

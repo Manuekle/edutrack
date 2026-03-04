@@ -97,8 +97,7 @@ export async function POST(request: Request) {
       if (!isCSV) {
         return NextResponse.json(
           {
-            error:
-              'Tipo de archivo no válido. Se requiere un archivo CSV (.csv).',
+            error: 'Tipo de archivo no válido. Se requiere un archivo CSV (.csv).',
           },
           { status: 400 }
         );
@@ -420,117 +419,157 @@ export async function POST(request: Request) {
     // Filtrar solo los elementos con status 'success' para evitar duplicados
     const validUsers = previewData.filter(item => item.status === 'success');
 
+    if (validUsers.length === 0) {
+      return NextResponse.json({
+        success: true,
+        results: [],
+        summary: { total: 0, created: 0, skipped: 0, errors: 0 },
+      });
+    }
+
     const finalResults: FinalResult[] = [];
     const validRoles = Object.values(Role);
     const emailQueue: Array<{ email: string; name: string; password: string }> = [];
 
-    // Crear usuarios de forma secuencial para evitar condiciones de carrera
+    // Extraer datos únicos para verificación masiva
+    const uniqueDocuments = [...new Set(validUsers.map(u => u.data?.document).filter(Boolean))];
+    const uniqueEmails = [...new Set(validUsers.map(u => u.data?.correoPersonal).filter(Boolean))];
+
+    // Verificación masiva de usuarios existentes
+    const existingUsers = await db.user.findMany({
+      where: {
+        OR: [{ document: { in: uniqueDocuments } }, { correoPersonal: { in: uniqueEmails } }],
+      },
+      select: { document: true, correoPersonal: true, correoInstitucional: true },
+    });
+
+    const existingDocs = new Set(existingUsers.map(u => u.document));
+    const existingEmailsSet = new Set([
+      ...existingUsers.map(u => u.correoPersonal),
+      ...existingUsers.map(u => u.correoInstitucional).filter(Boolean),
+    ]);
+
+    // Preparar usuarios válidos para creación masiva
+    const usersToCreate: Array<{
+      name: string;
+      document: string;
+      correoPersonal: string;
+      correoInstitucional: string;
+      password: string;
+      role: Role;
+      emailVerified: Date;
+    }> = [];
+
+    const skippedUsers: Set<string> = new Set();
+
+    // Validar y preparar cada usuario
     for (const item of validUsers) {
       const { name, document, correoPersonal, correoInstitucional, role } = item.data || {};
 
-      try {
-        // Validar rol
-        if (!validRoles.includes(role as Role)) {
-          finalResults.push({
-            document: document || 'N/A',
-            name: name || 'Usuario desconocido',
-            status: 'error',
-            message: `Rol inválido: '${role}'. Roles válidos: ${validRoles.join(', ')}`,
-          });
-          continue;
-        }
-
-        // Verificar si el usuario ya existe (verificación adicional)
-        const existingUser = await db.user.findFirst({
-          where: {
-            OR: [
-              { document },
-              { correoPersonal },
-              { correoInstitucional: correoInstitucional || correoPersonal },
-            ],
-          },
-          select: {
-            id: true,
-            document: true,
-            correoPersonal: true,
-            correoInstitucional: true,
-          },
-        });
-
-        if (existingUser) {
-          let conflictField = 'registro';
-          if (existingUser.document === document) {
-            conflictField = 'documento';
-          } else if (existingUser.correoPersonal === correoPersonal) {
-            conflictField = 'correo personal';
-          } else if (existingUser.correoInstitucional === (correoInstitucional || correoPersonal)) {
-            conflictField = 'correo institucional';
-          }
-
-          finalResults.push({
-            document: document || 'N/A',
-            name: name || 'Usuario desconocido',
-            status: 'skipped',
-            message: `El ${conflictField} ya está registrado en el sistema.`,
-          });
-          continue;
-        }
-
-        // Generar contraseña segura
-        const plainPassword = item.data.password || generatePassword(12);
-        const hashedPassword = await bcrypt.hash(plainPassword, 12);
-
-        // Crear usuario (SIN transacción para evitar timeouts)
-        const user = await db.user.create({
-          data: {
-            name,
-            document,
-            correoPersonal,
-            correoInstitucional: correoInstitucional || correoPersonal,
-            password: hashedPassword,
-            role: role as Role,
-            emailVerified: new Date(),
-          },
-        });
-
-        // Agregar email a la cola para envío posterior
-        const emailToSend = correoInstitucional || correoPersonal;
-        emailQueue.push({
-          email: emailToSend,
-          name: name,
-          password: plainPassword,
-        });
-
-        finalResults.push({
-          document: document || 'N/A',
-          name: name || 'Usuario desconocido',
-          status: 'created',
-          message: 'Usuario creado exitosamente.',
-        });
-      } catch (error) {
+      // Validar rol
+      if (!validRoles.includes(role as Role)) {
         finalResults.push({
           document: document || 'N/A',
           name: name || 'Usuario desconocido',
           status: 'error',
-          message: error instanceof Error ? error.message : 'Error desconocido al crear el usuario',
+          message: `Rol inválido: '${role}'. Roles válidos: ${validRoles.join(', ')}`,
         });
+        continue;
+      }
+
+      // Verificar si ya existe
+      if (
+        existingDocs.has(document) ||
+        existingEmailsSet.has(correoPersonal) ||
+        (correoInstitucional && existingEmailsSet.has(correoInstitucional))
+      ) {
+        let conflictField = 'registro';
+        if (existingDocs.has(document)) conflictField = 'documento';
+        else if (existingEmailsSet.has(correoPersonal)) conflictField = 'correo personal';
+        else conflictField = 'correo institucional';
+
+        finalResults.push({
+          document: document || 'N/A',
+          name: name || 'Usuario desconocido',
+          status: 'skipped',
+          message: `El ${conflictField} ya está registrado en el sistema.`,
+        });
+        skippedUsers.add(document);
+        continue;
+      }
+
+      // Generar contraseña
+      const plainPassword = item.data.password || generatePassword(12);
+      const hashedPassword = await bcrypt.hash(plainPassword, 12);
+
+      usersToCreate.push({
+        name,
+        document,
+        correoPersonal,
+        correoInstitucional: correoInstitucional || correoPersonal,
+        password: hashedPassword,
+        role: role as Role,
+        emailVerified: new Date(),
+      });
+
+      // Agregar a colas
+      const emailToSend = correoInstitucional || correoPersonal;
+      emailQueue.push({ email: emailToSend, name, password: plainPassword });
+
+      // Marcar como existente para evitar duplicados en el mismo batch
+      existingDocs.add(document);
+      existingEmailsSet.add(correoPersonal);
+      if (correoInstitucional) existingEmailsSet.add(correoInstitucional);
+    }
+
+    // Creación masiva usando transacción
+    if (usersToCreate.length > 0) {
+      // Procesar en lotes para evitar sobrecarga
+      const BATCH_SIZE = 100;
+      const createdDocuments: string[] = [];
+
+      for (let i = 0; i < usersToCreate.length; i += BATCH_SIZE) {
+        const batch = usersToCreate.slice(i, i + BATCH_SIZE);
+
+        await db.$transaction(async tx => {
+          for (const user of batch) {
+            // Verificar si ya existe dentro de la transacción
+            const existing = await tx.user.findFirst({
+              where: {
+                OR: [{ document: user.document }, { correoPersonal: user.correoPersonal }],
+              },
+              select: { document: true },
+            });
+
+            if (!existing) {
+              await tx.user.create({ data: user });
+              createdDocuments.push(user.document);
+            }
+          }
+        });
+
+        // Agregar resultados de este lote
+        for (const user of batch) {
+          if (createdDocuments.includes(user.document)) {
+            finalResults.push({
+              document: user.document,
+              name: user.name,
+              status: 'created',
+              message: 'Usuario creado exitosamente.',
+            });
+          }
+        }
       }
     }
 
-    // Enviar correos de bienvenida de forma asíncrona (después de crear todos los usuarios)
-    // Enviar correos en lotes pequeños para no sobrecargar el servidor de email
+    // Enviar correos de bienvenida en lotes
     const EMAIL_BATCH_SIZE = 3;
     for (let i = 0; i < emailQueue.length; i += EMAIL_BATCH_SIZE) {
       const emailBatch = emailQueue.slice(i, i + EMAIL_BATCH_SIZE);
-
-      // Enviar lote actual sin esperar (fire and forget)
       Promise.all(
         emailBatch.map(({ email, name, password }) => sendWelcomeEmailAsync(email, name, password))
-      ).catch(() => {
-        // Error sending email batch
-      });
+      ).catch(() => {});
 
-      // Pequeña pausa entre lotes para evitar rate limiting
       if (i + EMAIL_BATCH_SIZE < emailQueue.length) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }

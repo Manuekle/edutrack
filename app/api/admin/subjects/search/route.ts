@@ -23,8 +23,10 @@ export async function GET(request: Request) {
             { code: { contains: query, mode: Prisma.QueryMode.insensitive } },
             { name: { contains: query, mode: Prisma.QueryMode.insensitive } },
             {
-              teacher: {
-                name: { contains: query, mode: Prisma.QueryMode.insensitive },
+              teachers: {
+                some: {
+                  name: { contains: query, mode: Prisma.QueryMode.insensitive },
+                },
               },
             },
           ],
@@ -34,7 +36,7 @@ export async function GET(request: Request) {
     const subjects = await db.subject.findMany({
       where: whereClause,
       include: {
-        teacher: {
+        teachers: {
           select: {
             id: true,
             name: true,
@@ -42,7 +44,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      take: 50, // Limit results to 50
+      take: 50,
       orderBy: {
         code: 'asc',
       },
@@ -57,10 +59,12 @@ export async function GET(request: Request) {
         program: subject.program,
         semester: subject.semester,
         credits: subject.credits,
-        teacher: {
-          id: subject.teacher.id,
-          name: subject.teacher.name,
-        },
+        teacher: subject.teachers[0]
+          ? {
+              id: subject.teachers[0].id,
+              name: subject.teachers[0].name,
+            }
+          : null,
         studentCount: subject.studentIds.length,
       })),
     });

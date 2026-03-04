@@ -753,7 +753,7 @@ export async function generateAttendanceReportPDF(
     const subject = await db.subject.findUnique({
       where: { id: subjectId },
       include: {
-        teacher: {
+        teachers: {
           select: {
             name: true,
             signatureUrl: true,
@@ -768,7 +768,7 @@ export async function generateAttendanceReportPDF(
     });
 
     if (!subject) throw new Error('Asignatura no encontrada');
-    if (subject.teacherId !== teacherId) throw new Error('No autorizado');
+    if (!subject.teacherIds.includes(teacherId)) throw new Error('No autorizado');
 
     const startDate = new Date(year, period === 1 ? 0 : 6, 1);
     const endDate = new Date(year, period === 1 ? 5 : 11, 31);
@@ -797,10 +797,11 @@ export async function generateAttendanceReportPDF(
 
     // Procesar firma del docente
     let signatureDataUri: string | undefined;
-    if (subject.teacher?.signatureUrl) {
+    const teacher = subject.teachers[0];
+    if (teacher?.signatureUrl) {
       try {
-        if (subject.teacher.signatureUrl.startsWith('http')) {
-          const response = await fetch(subject.teacher.signatureUrl);
+        if (teacher.signatureUrl.startsWith('http')) {
+          const response = await fetch(teacher.signatureUrl);
           if (response.ok) {
             const imageBuffer = await response.arrayBuffer();
             const imageBase64 = Buffer.from(imageBuffer).toString('base64');
@@ -815,8 +816,8 @@ export async function generateAttendanceReportPDF(
 
     const reportData: TeacherReportData = {
       teacher: {
-        name: subject.teacher?.name || 'Sin nombre',
-        signatureUrl: subject.teacher?.signatureUrl || undefined,
+        name: teacher?.name || 'Sin nombre',
+        signatureUrl: teacher?.signatureUrl || undefined,
       },
       subject: {
         name: subject.name,

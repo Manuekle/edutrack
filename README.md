@@ -1,6 +1,6 @@
-# EduTrack
+# SIRA
 
-Sistema de gestión de asistencia inteligente para la Fundación Universitaria de la Popayán.
+Sistema Integral de Registro Académico para la Fundación Universitaria de la Popayán.
 
 ## 🚀 Características Principales
 
@@ -71,7 +71,7 @@ Sistema de gestión de asistencia inteligente para la Fundación Universitaria d
 1. Clonar el repositorio:
 ```bash
 git clone <repository-url>
-cd edutrack
+cd sira
 ```
 
 2. Instalar dependencias:
@@ -194,4 +194,4 @@ Este proyecto es privado y propiedad de la Fundación Universitaria de la Popay�
 
 ## 👥 Contribuidores
 
-- Equipo de desarrollo EduTrack
+- Equipo de desarrollo SIRA

@@ -84,7 +84,9 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Gestión de Clases</CardTitle>
+            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              Gestión de Clases
+            </CardTitle>
             <CardDescription className="text-xs">
               Gestiona las sesiones de clase para esta asignatura.
             </CardDescription>
@@ -101,10 +103,12 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
                 <TableHeader>
                   <TableRow className="bg-muted/60">
                     <TableHead className="text-xs font-normal px-4 py-2">Fecha y Hora</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Salón</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Tema</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2 text-center">Estado</TableHead>
-                  <TableHead className="text-xs font-normal text-right px-4 py-2 pr-6">
+                    <TableHead className="text-xs font-normal px-4 py-2">Salón</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2">Tema</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                      Estado
+                    </TableHead>
+                    <TableHead className="text-xs font-normal text-right px-4 py-2 pr-6">
                       Acciones
                     </TableHead>
                   </TableRow>

@@ -226,6 +226,20 @@ body {
   display: none;
 }
 
+/* Safe area utilities for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.p-safe {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
 /* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
   -ms-overflow-style: none;
@@ -244,7 +258,7 @@ body {
   scrollbar-width: none;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
   /* Firefox */
 }

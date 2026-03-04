@@ -59,11 +59,11 @@ export async function clearDashboardCachesForUsers(
 export async function clearSubjectCache(subjectId: string) {
   try {
     const { db } = await import('@/lib/prisma');
-    // Get the subject with teacher and students
+    // Get the subject with teachers and students
     const subject = await db.subject.findUnique({
       where: { id: subjectId },
       select: {
-        teacherId: true,
+        teacherIds: true,
         studentIds: true,
       },
     });
@@ -71,7 +71,9 @@ export async function clearSubjectCache(subjectId: string) {
     if (!subject) return;
 
     // Clear teacher dashboard cache
-    await clearDashboardCache(subject.teacherId, 'DOCENTE');
+    for (const teacherId of subject.teacherIds) {
+      await clearDashboardCache(teacherId, 'DOCENTE');
+    }
 
     // Clear all students' dashboard caches
     if (subject.studentIds.length > 0) {

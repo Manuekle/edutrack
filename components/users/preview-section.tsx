@@ -68,7 +68,9 @@ export function UsersPreviewSection({
             <div className="flex flex-col items-center justify-center py-8 space-y-4">
               <CheckCircle className="h-12 w-12 text-primary" />
               <div className="text-center space-y-1">
-                <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">Carga completada</h3>
+                <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">
+                  Carga completada
+                </h3>
                 <div className="space-y-1 text-xs text-muted-foreground">
                   <p>
                     <span className="font-semibold text-primary">
@@ -149,8 +151,9 @@ export function UsersPreviewSection({
                                   ? 'outline'
                                   : 'destructive'
                             }
-                            className={`text-xs ${item.status === 'warning' ? 'text-yellow-600 border-yellow-600' : ''
-                              }`}
+                            className={`text-xs ${
+                              item.status === 'warning' ? 'text-yellow-600 border-yellow-600' : ''
+                            }`}
                           >
                             {item.status === 'success'
                               ? 'Listo'
@@ -174,12 +177,13 @@ export function UsersPreviewSection({
                         </div>
                         {(item.message || item.status !== 'success') && (
                           <p
-                            className={`text-xs mt-1 ${item.status === 'error'
-                              ? 'text-destructive'
-                              : item.status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-muted-foreground'
-                              }`}
+                            className={`text-xs mt-1 ${
+                              item.status === 'error'
+                                ? 'text-destructive'
+                                : item.status === 'warning'
+                                  ? 'text-yellow-600'
+                                  : 'text-muted-foreground'
+                            }`}
                           >
                             {item.message}
                           </p>

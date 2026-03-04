@@ -99,12 +99,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const data = DocenteSubjectCreateSchema.parse(body);
     // Validar unicidad del código
-    const existingSubject = await db.subject.findUnique({
+    const existingSubject = await db.subject.findFirst({
       where: { code: data.code },
     });
     if (existingSubject) {
       return NextResponse.json(
-        { message: 'El código de la asignatura ya está en uso' },
+        { message: 'El código de la asignatura ya está en uso para este grupo' },
         { status: 409 }
       );
     }
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         ...data,
         semester: data.semester === undefined ? null : data.semester,
         credits: data.credits === undefined ? null : data.credits,
-        teacherId: session.user.id,
+        teacherIds: [session.user.id],
       },
     });
     const validado = DocenteSubjectSchema.safeParse(newSubject);
@@ -153,7 +153,7 @@ export async function PUT(request: Request) {
     const subjectToUpdate = await db.subject.findUnique({
       where: { id: data.id },
     });
-    if (!subjectToUpdate || subjectToUpdate.teacherId !== session.user.id) {
+    if (!subjectToUpdate || !subjectToUpdate.teacherIds.includes(session.user.id)) {
       return NextResponse.json(
         {
           message: 'Asignatura no encontrada o no tienes permiso para editarla',
@@ -207,7 +207,7 @@ export async function DELETE(request: Request) {
     const schema = z.object({ id: z.string() });
     const { id } = schema.parse(body);
     const subjectToDelete = await db.subject.findUnique({ where: { id } });
-    if (!subjectToDelete || subjectToDelete.teacherId !== session.user.id) {
+    if (!subjectToDelete || !subjectToDelete.teacherIds.includes(session.user.id)) {
       return NextResponse.json(
         {
           message: 'Asignatura no encontrada o no tienes permiso para eliminarla',

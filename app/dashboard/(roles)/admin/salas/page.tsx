@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,7 +27,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,7 +46,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
@@ -55,13 +57,18 @@ import {
   eachDayOfInterval,
   eachHourOfInterval,
   endOfMonth,
-  endOfWeek, format, isSameDay,
+  endOfWeek,
+  format,
+  isSameDay,
   isSameMonth,
-  isToday, startOfMonth, startOfWeek, subDays,
-  subMonths
+  isToday,
+  startOfMonth,
+  startOfWeek,
+  subDays,
+  subMonths,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   AlertCircle,
   Building2,
@@ -77,7 +84,7 @@ import {
   Search,
   Trash2,
   User,
-  Users
+  Users,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -104,8 +111,11 @@ const MonthView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =>
 
   return (
     <div className="grid grid-cols-7 border-t border-l rounded-3xl overflow-hidden bg-background">
-      {['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'].map((day) => (
-        <div key={day} className="py-4 text-center text-xs font-semibold uppercase tracking-card text-muted-foreground border-r border-b bg-muted/5">
+      {['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'].map(day => (
+        <div
+          key={day}
+          className="py-4 text-center text-xs font-semibold uppercase tracking-card text-muted-foreground border-r border-b bg-muted/5"
+        >
           {day}
         </div>
       ))}
@@ -113,15 +123,17 @@ const MonthView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =>
         <div
           key={day.toISOString()}
           className={cn(
-            "min-h-[120px] p-2 border-r border-b transition-colors relative",
-            !isSameMonth(day, monthStart) && "bg-muted/5 opacity-40",
-            isToday(day) && "bg-primary/5"
+            'min-h-[120px] p-2 border-r border-b transition-colors relative',
+            !isSameMonth(day, monthStart) && 'bg-muted/5 opacity-40',
+            isToday(day) && 'bg-primary/5'
           )}
         >
-          <span className={cn(
-            "text-xs font-semibold mb-2 w-7 h-7 flex items-center justify-center rounded-full",
-            isToday(day) ? "bg-primary text-primary-foreground" : "text-foreground/60"
-          )}>
+          <span
+            className={cn(
+              'text-xs font-semibold mb-2 w-7 h-7 flex items-center justify-center rounded-full',
+              isToday(day) ? 'bg-primary text-primary-foreground' : 'text-foreground/60'
+            )}
+          >
             {format(day, 'd')}
           </span>
           <div className="space-y-1">
@@ -153,7 +165,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const hours = eachHourOfInterval({
     start: new Date(2024, 0, 1, 7, 0),
-    end: new Date(2024, 0, 1, 22, 0)
+    end: new Date(2024, 0, 1, 22, 0),
   });
 
   return (
@@ -165,10 +177,12 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
             <p className="text-xs font-semibold uppercase tracking-card text-muted-foreground mb-1">
               {format(day, 'EEE', { locale: es })}
             </p>
-            <p className={cn(
-              "text-lg font-semibold h-9 w-9 mx-auto flex items-center justify-center rounded-full",
-              isToday(day) ? "bg-primary text-primary-foreground" : "text-foreground"
-            )}>
+            <p
+              className={cn(
+                'text-lg font-semibold h-9 w-9 mx-auto flex items-center justify-center rounded-full',
+                isToday(day) ? 'bg-primary text-primary-foreground' : 'text-foreground'
+              )}
+            >
               {format(day, 'd')}
             </p>
           </div>
@@ -182,15 +196,22 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                 {format(hour, 'hh:mm a')}
               </div>
               {weekDays.map(day => (
-                <div key={`${day.toISOString()}-${hour.toISOString()}`} className="h-16 border-r border-b last:border-r-0 relative group">
+                <div
+                  key={`${day.toISOString()}-${hour.toISOString()}`}
+                  className="h-16 border-r border-b last:border-r-0 relative group"
+                >
                   {events
-                    .filter(e => isSameDay(e.start, day) && format(e.start, 'H') === format(hour, 'H'))
+                    .filter(
+                      e => isSameDay(e.start, day) && format(e.start, 'H') === format(hour, 'H')
+                    )
                     .map((event, idx) => (
                       <div
                         key={event.id || `${day.toISOString()}-${hour.toISOString()}-${idx}`}
                         className="absolute inset-x-1 top-1 p-2 rounded-xl bg-primary/10 text-primary border border-primary/30 z-10 shadow-lg"
                       >
-                        <p className="text-xs font-semibold uppercase truncate leading-none mb-1">{event.room}</p>
+                        <p className="text-xs font-semibold uppercase truncate leading-none mb-1">
+                          {event.room}
+                        </p>
                         <p className="text-xs font-semibold opacity-70 truncate">{event.teacher}</p>
                       </div>
                     ))}
@@ -207,7 +228,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
 const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
   const hours = eachHourOfInterval({
     start: new Date(2024, 0, 1, 7, 0),
-    end: new Date(2024, 0, 1, 22, 0)
+    end: new Date(2024, 0, 1, 22, 0),
   });
 
   return (
@@ -283,7 +304,9 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
                   <h4 className="text-md font-semibold tracking-card">{event.room}</h4>
                   <div className="flex items-center gap-2">
                     <User className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs font-medium text-muted-foreground">{event.teacher}</span>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {event.teacher}
+                    </span>
                   </div>
                 </div>
                 <Badge className="rounded-full px-3 py-1 font-semibold text-xs uppercase tracking-card bg-primary/5 text-primary border-none shadow-none hover:bg-primary/10 hover:text-primary">
@@ -306,7 +329,7 @@ const CustomCalendar = ({
   view,
   events,
   onNavigate,
-  onView
+  onView,
 }: {
   date: Date;
   view: string;
@@ -314,6 +337,7 @@ const CustomCalendar = ({
   onNavigate: (action: 'PREV' | 'NEXT' | 'TODAY') => void;
   onView: (view: string) => void;
 }) => {
+  const shouldReduceMotion = useReducedMotion();
 
   const getLabel = () => {
     if (view === 'month') return format(date, 'MMMM yyyy', { locale: es });
@@ -360,17 +384,17 @@ const CustomCalendar = ({
             { id: 'month', label: 'Mes' },
             { id: 'week', label: 'Semana' },
             { id: 'day', label: 'Día' },
-            { id: 'agenda', label: 'Agenda' }
-          ].map((v) => (
+            { id: 'agenda', label: 'Agenda' },
+          ].map(v => (
             <Button
               key={v.id}
               variant="ghost"
               size="sm"
               className={cn(
-                "rounded-full px-7 text-xs font-normal transition-all shrink-0",
+                'rounded-full px-7 text-xs font-normal transition-all shrink-0',
                 view === v.id
-                  ? "bg-primary text-primary-foreground hover:bg-primary dark:hover:text-primary-foreground hover:text-white/90"
-                  : "text-muted-foreground/60 hover:bg-muted/20 hover:text-foreground"
+                  ? 'bg-primary text-primary-foreground hover:bg-primary dark:hover:text-primary-foreground hover:text-white/90'
+                  : 'text-muted-foreground/60 hover:bg-muted/20 hover:text-foreground'
               )}
               onClick={() => onView(v.id)}
             >
@@ -380,14 +404,14 @@ const CustomCalendar = ({
         </div>
       </div>
 
-      <div className="transition-all duration-300">
+      <div className="transition-colors duration-300">
         <AnimatePresence mode="wait">
           <motion.div
             key={view + date.toISOString()}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            initial={shouldReduceMotion ? undefined : { opacity: 0, y: 10 }}
+            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -10 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
           >
             {view === 'month' && <MonthView date={date} events={events} />}
             {view === 'week' && <WeekView date={date} events={events} />}
@@ -450,7 +474,7 @@ export default function AdminSalasPage() {
         end: new Date(b.endTime),
         room: b.room.name,
         teacher: b.teacher.name,
-        reason: b.reason
+        reason: b.reason,
       }));
       setCalendarEvents(formatted);
     } catch (error) {
@@ -553,25 +577,34 @@ export default function AdminSalasPage() {
 
   const getTypeIcon = (type: RoomType) => {
     switch (type) {
-      case 'SALA_COMPUTO': return <Computer className="h-4 w-4" />;
-      case 'SALON': return <Building2 className="h-4 w-4" />;
-      case 'AUDITORIO': return <Mic2 className="h-4 w-4" />;
-      default: return <Layout className="h-4 w-4" />;
+      case 'SALA_COMPUTO':
+        return <Computer className="h-4 w-4" />;
+      case 'SALON':
+        return <Building2 className="h-4 w-4" />;
+      case 'AUDITORIO':
+        return <Mic2 className="h-4 w-4" />;
+      default:
+        return <Layout className="h-4 w-4" />;
     }
   };
 
   const getTypeLabel = (type: RoomType) => {
     switch (type) {
-      case 'SALA_COMPUTO': return 'Sala de Cómputo';
-      case 'SALON': return 'Salón de Clase';
-      case 'AUDITORIO': return 'Auditorio';
-      default: return type;
+      case 'SALA_COMPUTO':
+        return 'Sala de Cómputo';
+      case 'SALON':
+        return 'Salón de Clase';
+      case 'AUDITORIO':
+        return 'Auditorio';
+      default:
+        return type;
     }
   };
 
-  const filteredRooms = rooms.filter(room =>
-    room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getTypeLabel(room.type).toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRooms = rooms.filter(
+    room =>
+      room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getTypeLabel(room.type).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -579,7 +612,9 @@ export default function AdminSalasPage() {
       {/* Header Consistent with Users Module but with cleaner spacing */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
         <div className="space-y-1.5">
-          <h1 className="text-3xl font-semibold tracking-card text-foreground/90">Gestión de Salas</h1>
+          <h1 className="text-3xl font-semibold tracking-card text-foreground/90">
+            Gestión de Salas
+          </h1>
           <p className="text-xs text-muted-foreground font-medium">
             Administración centralizada de espacios físicos y programación institucional.
           </p>
@@ -605,9 +640,7 @@ export default function AdminSalasPage() {
             >
               Solicitudes
               {bookings.filter(b => b.status === 'PENDIENTE').length > 0 && (
-                <span>
-                  {bookings.filter(b => b.status === 'PENDIENTE').length}
-                </span>
+                <span>{bookings.filter(b => b.status === 'PENDIENTE').length}</span>
               )}
             </TabsTrigger>
           </TabsList>
@@ -631,26 +664,34 @@ export default function AdminSalasPage() {
                     {editingRoomId ? 'Editar Sala' : 'Nueva Sala'}
                   </DialogTitle>
                   <DialogDescription>
-                    {editingRoomId ? 'Actualiza los detalles del espacio institucional.' : 'Configura los detalles del nuevo espacio institucional.'}
+                    {editingRoomId
+                      ? 'Actualiza los detalles del espacio institucional.'
+                      : 'Configura los detalles del nuevo espacio institucional.'}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-5">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">Identificación</Label>
+                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                      Identificación
+                    </Label>
                     <Input
                       className="rounded-xl bg-muted/30 border-none h-11"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Ej: Laboratorio 401"
                       required
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">Tipo</Label>
+                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                        Tipo
+                      </Label>
                       <Select
                         value={formData.type}
-                        onValueChange={(value: RoomType) => setFormData({ ...formData, type: value })}
+                        onValueChange={(value: RoomType) =>
+                          setFormData({ ...formData, type: value })
+                        }
                       >
                         <SelectTrigger className="rounded-xl bg-muted/30 border-none h-11">
                           <SelectValue placeholder="Seleccionar" />
@@ -663,22 +704,26 @@ export default function AdminSalasPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">Capacidad</Label>
+                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                        Capacidad
+                      </Label>
                       <Input
                         className="rounded-xl bg-muted/30 border-none h-11"
                         type="number"
                         value={formData.capacity}
-                        onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                        onChange={e => setFormData({ ...formData, capacity: e.target.value })}
                         placeholder="0"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">Descripción</Label>
+                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                      Descripción
+                    </Label>
                     <Textarea
                       className="rounded-xl bg-muted/30 border-none min-h-[100px] resize-none pt-4"
                       value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      onChange={e => setFormData({ ...formData, description: e.target.value })}
                       placeholder="Detalles adicionales..."
                     />
                   </div>
@@ -701,7 +746,7 @@ export default function AdminSalasPage() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="space-y-6"
           >
             <div className="flex items-center justify-between gap-4 px-1">
@@ -718,7 +763,9 @@ export default function AdminSalasPage() {
 
             {loading ? (
               <div className="space-y-4">
-                {[1, 2, 3].map(i => <Skeleton key={i} className="h-16 w-full rounded-2xl" />)}
+                {[1, 2, 3].map(i => (
+                  <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+                ))}
               </div>
             ) : filteredRooms.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32 text-center rounded-[3rem] border border-dashed">
@@ -733,11 +780,15 @@ export default function AdminSalasPage() {
                 <Table>
                   <TableHeader className="bg-muted/30">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="text-xs font-normal px-4 py-2">Nombre del Espacio</TableHead>
+                      <TableHead className="text-xs font-normal px-4 py-2">
+                        Nombre del Espacio
+                      </TableHead>
                       <TableHead className="text-xs font-normal px-4 py-2">Tipo</TableHead>
                       <TableHead className="text-xs font-normal px-4 py-2">Capacidad</TableHead>
                       <TableHead className="text-xs font-normal px-4 py-2">Descripción</TableHead>
-                      <TableHead className="text-xs font-normal text-right px-4 py-2">Acciones</TableHead>
+                      <TableHead className="text-xs font-normal text-right px-4 py-2">
+                        Acciones
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -745,12 +796,16 @@ export default function AdminSalasPage() {
                       <TableRow key={room.id || `room-${idx}`} className="hover:bg-muted/50 group">
                         <TableCell className="text-xs px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <div className={cn(
-                              "p-2 rounded-lg transition-colors",
-                              room.type === 'SALON' ? "bg-blue-500/10 text-blue-600 dark:text-blue-400" :
-                                room.type === 'SALA_COMPUTO' ? "bg-orange-500/10 text-orange-600 dark:text-orange-400" :
-                                  "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-                            )}>
+                            <div
+                              className={cn(
+                                'p-2 rounded-lg transition-colors',
+                                room.type === 'SALON'
+                                  ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                  : room.type === 'SALA_COMPUTO'
+                                    ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
+                                    : 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
+                              )}
+                            >
                               {getTypeIcon(room.type)}
                             </div>
                             <span className="font-normal text-foreground">{room.name}</span>
@@ -768,7 +823,10 @@ export default function AdminSalasPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-xs px-4 py-3">
-                          <span className="text-muted-foreground truncate max-w-[200px]" title={room.description || ''}>
+                          <span
+                            className="text-muted-foreground truncate max-w-[200px]"
+                            title={room.description || ''}
+                          >
                             {room.description || '—'}
                           </span>
                         </TableCell>
@@ -814,15 +872,13 @@ export default function AdminSalasPage() {
 
         {/* TAB: CRONOGRAMA (SIDEBAR + MAIN) */}
         <TabsContent value="schedule" className="m-0 focus-visible:outline-none h-full">
-
           {/* Panel Principal Full Width */}
           <div className="w-full h-full  flex flex-col">
-
             <CustomCalendar
               date={currentDate}
               view={currentView}
               events={calendarEvents}
-              onNavigate={(action) => {
+              onNavigate={action => {
                 if (action === 'PREV') {
                   if (currentView === 'month') setCurrentDate(subMonths(currentDate, 1));
                   else if (currentView === 'week') setCurrentDate(subDays(currentDate, 7));
@@ -835,11 +891,9 @@ export default function AdminSalasPage() {
                 }
                 if (action === 'TODAY') setCurrentDate(new Date());
               }}
-              onView={(v) => setCurrentView(v)}
+              onView={v => setCurrentView(v)}
             />
-
           </div>
-
         </TabsContent>
 
         {/* TAB: SOLICITUDES */}
@@ -857,8 +911,12 @@ export default function AdminSalasPage() {
                   <TableHead className="text-xs font-normal px-4 py-2">Solicitante</TableHead>
                   <TableHead className="text-xs font-normal px-4 py-2">Espacio</TableHead>
                   <TableHead className="text-xs font-normal px-4 py-2">Programación</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2 text-center">Estado</TableHead>
-                  <TableHead className="text-xs font-normal text-right px-4 py-2">Acciones</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                    Estado
+                  </TableHead>
+                  <TableHead className="text-xs font-normal text-right px-4 py-2">
+                    Acciones
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -866,13 +924,18 @@ export default function AdminSalasPage() {
                   <TableRow>
                     <TableCell colSpan={5} className="h-24 text-center">
                       <div className="flex flex-col items-center justify-center py-6">
-                        <p className="text-xs text-muted-foreground">No hay solicitudes registradas</p>
+                        <p className="text-xs text-muted-foreground">
+                          No hay solicitudes registradas
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   bookings.map((booking, idx) => (
-                    <TableRow key={booking.id || `booking-${idx}`} className="hover:bg-muted/50 group">
+                    <TableRow
+                      key={booking.id || `booking-${idx}`}
+                      className="hover:bg-muted/50 group"
+                    >
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center font-normal text-primary">
@@ -880,7 +943,9 @@ export default function AdminSalasPage() {
                           </div>
                           <div>
                             <p className="font-normal text-foreground">{booking.teacher.name}</p>
-                            <p className="text-[10px] text-muted-foreground">{booking.teacher.role || 'DOCENTE'}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {booking.teacher.role || 'DOCENTE'}
+                            </p>
                           </div>
                         </div>
                       </TableCell>
@@ -892,19 +957,29 @@ export default function AdminSalasPage() {
                       </TableCell>
                       <TableCell className="text-xs px-4 py-3">
                         <div className="space-y-0.5">
-                          <p className="font-normal">{format(new Date(booking.startTime), "d 'de' MMM", { locale: es })}</p>
-                          <p className="text-[10px] text-muted-foreground">{format(new Date(booking.startTime), 'hh:mm a')} - {format(new Date(booking.endTime), 'hh:mm a')}</p>
+                          <p className="font-normal">
+                            {format(new Date(booking.startTime), "d 'de' MMM", { locale: es })}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {format(new Date(booking.startTime), 'hh:mm a')} -{' '}
+                            {format(new Date(booking.endTime), 'hh:mm a')}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs px-4 py-3">
                         <div className="flex justify-center lowercase">
                           <Badge variant="outline" className="font-normal text-xs">
                             <span className="flex items-center gap-1.5">
-                              <span className={cn(
-                                "w-2 h-2 rounded-full",
-                                booking.status === 'APROBADO' ? "bg-green-500" :
-                                  booking.status === 'PENDIENTE' ? "bg-amber-500" : "bg-red-500"
-                              )}></span>
+                              <span
+                                className={cn(
+                                  'w-2 h-2 rounded-full',
+                                  booking.status === 'APROBADO'
+                                    ? 'bg-green-500'
+                                    : booking.status === 'PENDIENTE'
+                                      ? 'bg-amber-500'
+                                      : 'bg-red-500'
+                                )}
+                              ></span>
                               {booking.status.toLowerCase()}
                             </span>
                           </Badge>
@@ -916,6 +991,7 @@ export default function AdminSalasPage() {
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0"
+                            aria-label="Ver detalles de reserva"
                             onClick={() => {
                               setSelectedBooking(booking);
                               setIsReviewDialogOpen(true);
@@ -939,7 +1015,9 @@ export default function AdminSalasPage() {
         <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-4xl border-none bg-card">
           <DialogHeader className="sr-only">
             <DialogTitle>Detalle de Reserva</DialogTitle>
-            <DialogDescription>Revisa los detalles de la solicitud de espacio institucional.</DialogDescription>
+            <DialogDescription>
+              Revisa los detalles de la solicitud de espacio institucional.
+            </DialogDescription>
           </DialogHeader>
           {selectedBooking && (
             <div className="flex flex-col lg:flex-row min-h-[500px]">
@@ -951,34 +1029,57 @@ export default function AdminSalasPage() {
                       <Building2 className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="text-2xl sm:text-3xl font-semibold tracking-card">{selectedBooking.room.name}</h3>
-                      <p className="text-xs text-muted-foreground font-medium">Espacio Solicitado</p>
+                      <h3 className="text-2xl sm:text-3xl font-semibold tracking-card">
+                        {selectedBooking.room.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground font-medium">
+                        Espacio Solicitado
+                      </p>
                     </div>
                   </div>
 
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">Docente</p>
+                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
+                        Docente
+                      </p>
                       <p className="font-medium text-xs">{selectedBooking.teacher.name}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">Fecha</p>
-                      <p className="font-medium text-xs">{format(new Date(selectedBooking.startTime), "dd/MM/yyyy")}</p>
+                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
+                        Fecha
+                      </p>
+                      <p className="font-medium text-xs">
+                        {format(new Date(selectedBooking.startTime), 'dd/MM/yyyy')}
+                      </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">Horario</p>
-                      <p className="font-medium text-xs">{format(new Date(selectedBooking.startTime), "hh:mm a")} - {format(new Date(selectedBooking.endTime), "hh:mm a")}</p>
+                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
+                        Horario
+                      </p>
+                      <p className="font-medium text-xs">
+                        {format(new Date(selectedBooking.startTime), 'hh:mm a')} -{' '}
+                        {format(new Date(selectedBooking.endTime), 'hh:mm a')}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <Badge variant="outline" className="w-fit rounded-full px-4 py-1.5 font-normal text-xs tracking-card border">
+                <Badge
+                  variant="outline"
+                  className="w-fit rounded-full px-4 py-1.5 font-normal text-xs tracking-card border"
+                >
                   <span className="flex items-center gap-1.5">
-                    <span className={cn(
-                      "w-2 h-2 rounded-full",
-                      selectedBooking.status === 'APROBADO' ? "bg-green-500" :
-                        selectedBooking.status === 'PENDIENTE' ? "bg-amber-500" : "bg-red-500"
-                    )}></span>
+                    <span
+                      className={cn(
+                        'w-2 h-2 rounded-full',
+                        selectedBooking.status === 'APROBADO'
+                          ? 'bg-green-500'
+                          : selectedBooking.status === 'PENDIENTE'
+                            ? 'bg-amber-500'
+                            : 'bg-red-500'
+                      )}
+                    ></span>
                     {selectedBooking.status.toLowerCase()}
                   </span>
                 </Badge>
@@ -988,29 +1089,34 @@ export default function AdminSalasPage() {
               <div className="flex-1 py-10 px-4 flex flex-col">
                 <div className="flex-1 space-y-8">
                   <div className="space-y-3">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">Motivo Institucional</Label>
-                    <p className="text-xs text-foreground/80">
-                      "{selectedBooking.reason}"
-                    </p>
+                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
+                      Motivo Institucional
+                    </Label>
+                    <p className="text-xs text-foreground/80">"{selectedBooking.reason}"</p>
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">Firma del Responsable</Label>
+                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
+                      Firma del Responsable
+                    </Label>
                     <div className="bg-white dark:bg-muted/20 rounded-4xl p-4 border border-muted/50 flex items-center justify-center h-40 shadow-inner overflow-hidden">
-                      <img
+                      <Image
                         src={selectedBooking.signatureUrl}
                         alt="Firma Digital"
-                        className="max-h-full max-w-full object-contain mix-blend-multiply dark:mix-blend-normal dark:invert dark:opacity-80 transition-all duration-500"
+                        fill
+                        className="object-contain mix-blend-multiply dark:mix-blend-normal dark:invert dark:opacity-80 transition-all duration-500"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">Notas Administrativas</Label>
+                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
+                      Notas Administrativas
+                    </Label>
                     <Textarea
                       placeholder="Escribe comentarios internos sobre esta reserva..."
                       value={reviewComment}
-                      onChange={(e) => setReviewComment(e.target.value)}
+                      onChange={e => setReviewComment(e.target.value)}
                       className="bg-muted/10 border-none rounded-2xl min-h-[80px] focus-visible:ring-1 p-4"
                     />
                   </div>
@@ -1034,7 +1140,11 @@ export default function AdminSalasPage() {
                       </Button>
                     </>
                   ) : (
-                    <Button variant="default" onClick={() => setIsReviewDialogOpen(false)} className="w-full text-xs">
+                    <Button
+                      variant="default"
+                      onClick={() => setIsReviewDialogOpen(false)}
+                      className="w-full text-xs"
+                    >
                       Cerrar Detalle
                     </Button>
                   )}
@@ -1047,14 +1157,18 @@ export default function AdminSalasPage() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="rounded-4xl border-none shadow-2xl bg-card">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-semibold tracking-card">¿Estás completamente seguro?</AlertDialogTitle>
+            <AlertDialogTitle className="text-2xl font-semibold tracking-card">
+              ¿Estás completamente seguro?
+            </AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
               Esta acción eliminará permanentemente la sala <strong>{roomToDelete?.name}</strong>.
               Esto podría afectar a las solicitudes y programaciones asociadas.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-3">
-            <AlertDialogCancel className="rounded-xl h-11 text-xs font-semibold tracking-card">Cancelar</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl h-11 text-xs font-semibold tracking-card">
+              Cancelar
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteRoom}
               disabled={isDeleting}
@@ -1067,14 +1181,14 @@ export default function AdminSalasPage() {
       </AlertDialog>
 
       <style jsx global>{`
-         .no-scrollbar::-webkit-scrollbar {
-           display: none;
-         }
-         .no-scrollbar {
-           -ms-overflow-style: none;
-           scrollbar-width: none;
-         }
-       `}</style>
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </Tabs>
   );
 }

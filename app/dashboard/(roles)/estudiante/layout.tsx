@@ -1,7 +1,10 @@
-export const metadata = {
-  title: 'Estudiante - FUP',
-  description: 'Panel de control para gestionar tus datos',
-  keywords: 'estudiante, panel de control, FUP',
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Panel del Estudiante',
+  description:
+    'Consulta tu asistencia, scanear códigos QR, ver historial académico y estadísticas de tus asignaturas',
+  robots: { index: false, follow: false },
 };
 
 export default function EstudianteLayout({ children }: { children: React.ReactNode }) {

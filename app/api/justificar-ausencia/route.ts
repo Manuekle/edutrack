@@ -90,7 +90,7 @@ export async function POST(request: Request) {
           subject: {
             select: {
               name: true,
-              teacher: {
+              teachers: {
                 select: {
                   correoInstitucional: true,
                   name: true,
@@ -133,10 +133,11 @@ export async function POST(request: Request) {
     await clearSubjectCache(classInfo.subjectId);
 
     // Enviar correo al profesor
-    if (classWithSubject.subject.teacher?.correoInstitucional) {
+    const teacherEmail = classWithSubject.subject.teachers[0]?.correoInstitucional;
+    if (teacherEmail) {
       try {
         await sendEmail({
-          to: classWithSubject.subject.teacher.correoInstitucional,
+          to: teacherEmail,
           subject: `Justificación de ausencia - ${classWithSubject.subject.name}`,
           react: React.createElement(JustifyClassEmail, {
             studentName: student.name || 'Estudiante',

@@ -1,7 +1,9 @@
-export const metadata = {
-  title: 'Perfil - FUP',
-  description: 'Gestiona tus datos de perfil',
-  keywords: 'perfil, datos de perfil, FUP',
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Mi Perfil',
+  description: 'Gestiona tu información personal, seguridad y preferencias de cuenta',
+  robots: { index: false, follow: false },
 };
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {

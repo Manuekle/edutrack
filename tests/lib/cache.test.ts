@@ -184,7 +184,7 @@ describe('Cache Utilities', () => {
     it('debería limpiar el caché del docente y estudiantes cuando existe la asignatura', async () => {
       const subjectId = 'subject123';
       const mockSubject = {
-        teacherId: 'teacher123',
+        teacherIds: ['teacher123'],
         studentIds: ['student1', 'student2'],
       };
 
@@ -197,7 +197,7 @@ describe('Cache Utilities', () => {
       expect(db.subject.findUnique).toHaveBeenCalledWith({
         where: { id: subjectId },
         select: {
-          teacherId: true,
+          teacherIds: true,
           studentIds: true,
         },
       });
@@ -227,7 +227,7 @@ describe('Cache Utilities', () => {
     it('debería manejar asignaturas sin estudiantes', async () => {
       const subjectId = 'subject123';
       const mockSubject = {
-        teacherId: 'teacher123',
+        teacherIds: ['teacher123'],
         studentIds: [],
       };
 

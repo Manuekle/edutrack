@@ -22,7 +22,9 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mis Asignaturas</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            Mis Asignaturas
+          </CardTitle>
         </div>
       </CardHeader>
       <CardContent>
@@ -35,7 +37,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                   role="button"
                   tabIndex={0}
                   key={subject.id}
-                  className="group relative rounded-lg border transition-all duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="group relative rounded-lg border transition-colors duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   onClick={() => router.push(`/dashboard/docente/asignaturas/${subject.id}`)}
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -62,7 +64,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                         <div className="relative">
                           <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                              className="h-full bg-primary rounded-full transition-transform duration-500 ease-out"
                               style={{ width: `${progress}%` }}
                             />
                           </div>

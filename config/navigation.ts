@@ -1,17 +1,17 @@
 import type { NavLinkGroup } from '@/types/navigation';
 import {
-    BookMarked,
-    BookOpen,
-    Calendar,
-    GraduationCap,
-    Home,
-    Layout,
-    QrCode,
-    Settings,
-    TrendingUp,
-    User,
-    UserPlus,
-    Users
+  BookMarked,
+  BookOpen,
+  Calendar,
+  GraduationCap,
+  Home,
+  Layout,
+  QrCode,
+  Settings,
+  TrendingUp,
+  User,
+  UserPlus,
+  Users,
 } from 'lucide-react';
 
 export const navLinkGroups: NavLinkGroup[] = [

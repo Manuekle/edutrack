@@ -11,7 +11,7 @@ async function verifyTeacherOwnership(classId: string, teacherId: string) {
     where: { id: classId },
     include: { subject: true },
   });
-  return classWithSubject?.subject.teacherId === teacherId;
+  return classWithSubject?.subject.teacherIds.includes(teacherId) ?? false;
 }
 
 // GET: Obtener la lista de estudiantes de una clase con su estado de asistencia

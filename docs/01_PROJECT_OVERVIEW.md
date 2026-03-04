@@ -10,7 +10,7 @@
 
 | Campo           | Detalle                               |
 | --------------- | ------------------------------------- |
-| **Proyecto**    | Sistema de Gestión de Asistencias FUP |
+| **Proyecto**    | SIRA - Sistema Integral de Registro Académico |
 | **Versión**     | 1.1.0                                 |
 | **Fecha**       | Agosto 2025                           |
 | **Autor**       | Manuel Esteban Erazo Medina           |

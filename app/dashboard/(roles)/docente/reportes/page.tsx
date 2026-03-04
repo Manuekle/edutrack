@@ -184,8 +184,12 @@ export default function ReportsPage() {
                   <TableHead className="text-xs tracking-card font-normal px-4 py-2">
                     Asignatura
                   </TableHead>
-                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">Fecha</TableHead>
-                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">Estado</TableHead>
+                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                    Fecha
+                  </TableHead>
+                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                    Estado
+                  </TableHead>
                   <TableHead className="text-xs tracking-card font-normal px-4 py-2 text-right">
                     Acciones
                   </TableHead>

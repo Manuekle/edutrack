@@ -85,7 +85,7 @@ export async function GET() {
         },
       },
       include: {
-        teacher: {
+        teachers: {
           select: {
             id: true,
             name: true,
@@ -290,7 +290,7 @@ export async function GET() {
         id: subject.id,
         name: subject.name,
         code: subject.code,
-        teacher: subject.teacher?.name || 'Docente no asignado',
+        teacher: subject.teachers[0]?.name || 'Docente no asignado',
         nextClass: nextClass
           ? {
               name: `Clase de ${subject.name}`,
@@ -329,7 +329,7 @@ export async function GET() {
               id: true,
               name: true,
               code: true,
-              teacher: {
+              teachers: {
                 select: {
                   name: true,
                 },
@@ -374,7 +374,7 @@ export async function GET() {
             startTime,
             endTime,
             location: 'No especificada',
-            teacher: event.subject.teacher?.name || 'Docente no asignado',
+            teacher: event.subject.teachers[0]?.name || 'Docente no asignado',
             subjectName: event.subject.name,
             description: event.description || 'Sin descripción',
             isEvent: true,

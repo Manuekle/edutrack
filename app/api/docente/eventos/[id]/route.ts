@@ -17,7 +17,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const event = await db.subjectEvent.findFirst({
       where: {
         id: eventId,
-        subject: { teacherId: session.user.id },
+        subject: { teacherIds: { has: session.user.id } },
       },
     });
     if (!event) {
@@ -62,7 +62,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const existingEvent = await db.subjectEvent.findFirst({
       where: {
         id: eventId,
-        subject: { teacherId: session.user.id },
+        subject: { teacherIds: { has: session.user.id } },
       },
     });
     if (!existingEvent) {
@@ -121,7 +121,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const existingEvent = await db.subjectEvent.findFirst({
       where: {
         id: eventId,
-        subject: { teacherId: session.user.id },
+        subject: { teacherIds: { has: session.user.id } },
       },
     });
     if (!existingEvent) {

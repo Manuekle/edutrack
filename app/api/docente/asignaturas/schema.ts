@@ -4,6 +4,7 @@ export const DocenteSubjectSchema = z.object({
   id: z.string(),
   name: z.string(),
   code: z.string(),
+  group: z.string().nullable().optional(),
   program: z.string().nullable().optional(),
   semester: z.coerce.number().nullable().optional(),
   credits: z.coerce.number().nullable().optional(),

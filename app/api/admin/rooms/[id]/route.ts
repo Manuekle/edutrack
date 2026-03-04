@@ -4,10 +4,7 @@ import { RoomType } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== 'ADMIN') {
@@ -44,10 +41,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== 'ADMIN') {

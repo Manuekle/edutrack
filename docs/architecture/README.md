@@ -1,6 +1,6 @@
 # 2. Arquitectura del Sistema
 
-Esta sección contiene todos los diagramas y documentos que describen la arquitectura técnica del Sistema de Gestión de Asistencias.
+Esta sección contiene todos los diagramas y documentos que describen la arquitectura técnica del Sistema Integral de Registro Académico (SIRA).
 
 ## Diagramas
 

@@ -4,7 +4,14 @@ import { SubjectFileUpload } from '@/components/subject-file-upload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, CheckCircle, Download, FileSpreadsheet, Loader2, XCircle } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  Download,
+  FileSpreadsheet,
+  Loader2,
+  XCircle,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -121,7 +128,8 @@ export default function CargarAsignaturasPage() {
         codigoAsignatura: item.codigoAsignatura,
         nombreAsignatura: item.nombreAsignatura,
         status: item.status === 'new' ? 'created' : 'skipped',
-        message: item.status === 'new' ? 'Asignatura creada' : (item.error || 'Omitida por ya existir'),
+        message:
+          item.status === 'new' ? 'Asignatura creada' : item.error || 'Omitida por ya existir',
       }));
 
       setFinalResults(mappedResults);
@@ -149,7 +157,9 @@ export default function CargarAsignaturasPage() {
     <main className="space-y-4">
       {/* Header */}
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Cargar Asignaturas</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+          Cargar Asignaturas
+        </CardTitle>
         <CardDescription className="text-xs">
           Sube un archivo .csv para registrar masivamente asignaturas y sus horarios.
         </CardDescription>
@@ -193,7 +203,9 @@ export default function CargarAsignaturasPage() {
           {/* Subir Archivo */}
           <Card>
             <CardHeader>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Subir Archivo</CardTitle>
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                Subir Archivo
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
@@ -226,7 +238,8 @@ export default function CargarAsignaturasPage() {
                 Previsualización y Confirmación
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Revisa los datos antes de confirmar la carga. Solo se procesarán las nuevas asignaturas.
+                Revisa los datos antes de confirmar la carga. Solo se procesarán las nuevas
+                asignaturas.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -238,7 +251,9 @@ export default function CargarAsignaturasPage() {
                 <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
                   <CheckCircle className="h-16 w-16 text-primary" />
                   <div className="space-y-1">
-                    <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">Carga completada</h3>
+                    <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">
+                      Carga completada
+                    </h3>
                     <p className="text-xs text-muted-foreground">
                       Resumen del procesamiento masivo.
                     </p>
@@ -247,7 +262,10 @@ export default function CargarAsignaturasPage() {
                     <div className="bg-muted rounded-xl p-4 max-h-[40vh] overflow-y-auto text-left">
                       <ul className="space-y-2 text-xs">
                         {finalResults.map((res, i) => (
-                          <li key={i} className="flex items-start gap-2 border-b pb-2 last:border-0 last:pb-0">
+                          <li
+                            key={i}
+                            className="flex items-start gap-2 border-b pb-2 last:border-0 last:pb-0"
+                          >
                             {res.status === 'created' ? (
                               <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
                             ) : res.status === 'error' ? (
@@ -256,7 +274,9 @@ export default function CargarAsignaturasPage() {
                               <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
                             )}
                             <div>
-                              <p className="font-medium text-foreground">{res.nombreAsignatura} ({res.codigoAsignatura})</p>
+                              <p className="font-medium text-foreground">
+                                {res.nombreAsignatura} ({res.codigoAsignatura})
+                              </p>
                               <p className="text-muted-foreground">{res.message}</p>
                             </div>
                           </li>
@@ -264,26 +284,48 @@ export default function CargarAsignaturasPage() {
                       </ul>
                     </div>
                   </div>
-                  <Button onClick={() => router.push('/dashboard/admin/asignaturas')} className="mt-4">
+                  <Button
+                    onClick={() => router.push('/dashboard/admin/asignaturas')}
+                    className="mt-4"
+                  >
                     Volver a la lista
                   </Button>
                 </div>
               ) : isPreview && previewData.length > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 pb-2 border-b">
-                    {newCount > 0 && <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20">{newCount} nuevas</Badge>}
-                    {existingCount > 0 && <Badge variant="outline" className="text-xs text-amber-600 border-amber-600/20 bg-amber-500/10">{existingCount} existentes</Badge>}
-                    {errorCount > 0 && <Badge variant="destructive" className="text-xs">{errorCount} errores</Badge>}
+                    {newCount > 0 && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                      >
+                        {newCount} nuevas
+                      </Badge>
+                    )}
+                    {existingCount > 0 && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs text-amber-600 border-amber-600/20 bg-amber-500/10"
+                      >
+                        {existingCount} existentes
+                      </Badge>
+                    )}
+                    {errorCount > 0 && (
+                      <Badge variant="destructive" className="text-xs">
+                        {errorCount} errores
+                      </Badge>
+                    )}
                   </div>
 
                   <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
                     {previewData.map((item, index) => (
                       <div
                         key={index}
-                        className={`p-4 rounded-2xl border transition-all ${item.status === 'existing' || item.status === 'error'
-                          ? 'border-destructive/20 bg-destructive/5'
-                          : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
-                          }`}
+                        className={`p-4 rounded-2xl border transition-all ${
+                          item.status === 'existing' || item.status === 'error'
+                            ? 'border-destructive/20 bg-destructive/5'
+                            : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
+                        }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -291,8 +333,14 @@ export default function CargarAsignaturasPage() {
                               <h4 className="font-semibold text-xs text-foreground">
                                 {item.nombreAsignatura} ({item.codigoAsignatura})
                               </h4>
-                              {item.status === 'existing' && <Badge variant="destructive" className="text-[10px] h-5">Existe</Badge>}
-                              {item.status === 'new' && <Badge className="bg-emerald-500 text-[10px] h-5">Nuevo</Badge>}
+                              {item.status === 'existing' && (
+                                <Badge variant="destructive" className="text-[10px] h-5">
+                                  Existe
+                                </Badge>
+                              )}
+                              {item.status === 'new' && (
+                                <Badge className="bg-emerald-500 text-[10px] h-5">Nuevo</Badge>
+                              )}
                             </div>
 
                             <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-2">
@@ -302,7 +350,13 @@ export default function CargarAsignaturasPage() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground border-t pt-2 mt-2">
-                              <div className={!item.teacherFound && item.docente ? "text-destructive font-medium" : ""}>
+                              <div
+                                className={
+                                  !item.teacherFound && item.docente
+                                    ? 'text-destructive font-medium'
+                                    : ''
+                                }
+                              >
                                 Docente: {item.docente || 'Sin asignar'}
                               </div>
                               <div>Salón: {item.salon || 'Por definir'}</div>
@@ -331,9 +385,15 @@ export default function CargarAsignaturasPage() {
                       Información Importante
                     </div>
                     <ul className="space-y-1 ml-4 list-disc">
-                      <li>Solo se importarán las asignaturas marcadas como <span className="text-emerald-500 font-bold">Nuevas</span>.</li>
+                      <li>
+                        Solo se importarán las asignaturas marcadas como{' '}
+                        <span className="text-emerald-500 font-bold">Nuevas</span>.
+                      </li>
                       <li>Las asignaturas existentes se omiten para evitar duplicados.</li>
-                      <li>La importación incluye la creación automática de las clases y horarios detallados.</li>
+                      <li>
+                        La importación incluye la creación automática de las clases y horarios
+                        detallados.
+                      </li>
                     </ul>
                   </div>
 
@@ -361,7 +421,8 @@ export default function CargarAsignaturasPage() {
                 <div className="flex flex-col items-center justify-center min-h-[400px] py-12 text-center">
                   <FileSpreadsheet className="h-12 w-12 text-muted-foreground/30 mb-4" />
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    Sube un archivo CSV para previsualizar los datos y confirmar la importación masiva de asignaturas.
+                    Sube un archivo CSV para previsualizar los datos y confirmar la importación
+                    masiva de asignaturas.
                   </p>
                 </div>
               )}

@@ -22,7 +22,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ code
     }
 
     // Find the subject with the given code
-    const subject = await db.subject.findUnique({
+    const subject = await db.subject.findFirst({
       where: { code },
       select: {
         id: true,

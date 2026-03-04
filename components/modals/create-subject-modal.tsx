@@ -169,7 +169,9 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card sm:text-3xl text-2xl">Crear Nueva Asignatura</DialogTitle>
+          <DialogTitle className="tracking-card sm:text-3xl text-2xl">
+            Crear Nueva Asignatura
+          </DialogTitle>
           <DialogDescription className="text-xs">
             Completa los datos para crear una nueva asignatura en el sistema.
           </DialogDescription>

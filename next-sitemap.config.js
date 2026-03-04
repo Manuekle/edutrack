@@ -1,5 +1,5 @@
 export default {
-  siteUrl: process.env.SITE_URL || 'https://edutrack-fup.vercel.app',
+  siteUrl: process.env.SITE_URL || 'https://sira-fup.vercel.app',
   generateRobotsTxt: true,
   sitemapSize: 5000,
   exclude: ['/api/*', '/dashboard/*', '/_error', '/_next/*', '/404', '/500'],

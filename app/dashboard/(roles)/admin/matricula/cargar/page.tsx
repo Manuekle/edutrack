@@ -182,7 +182,8 @@ export default function UploadStudentsToSubjectsPage() {
           Cargar Estudiantes a Asignaturas
         </CardTitle>
         <CardDescription className="text-xs">
-          Sube un archivo .csv para inscribir masivamente estudiantes en sus respectivas asignaturas.
+          Sube un archivo .csv para inscribir masivamente estudiantes en sus respectivas
+          asignaturas.
         </CardDescription>
       </div>
 
@@ -222,7 +223,9 @@ export default function UploadStudentsToSubjectsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Subir Archivo</CardTitle>
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                Subir Archivo
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />

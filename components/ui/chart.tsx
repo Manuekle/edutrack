@@ -375,11 +375,10 @@ const getPayloadConfigFromPayload = (config: ChartConfig, payload: unknown, key:
 };
 
 export {
-    ChartContainer,
-    ChartLegend,
-    ChartLegendContent,
-    ChartStyle,
-    ChartTooltip,
-    ChartTooltipContent
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartStyle,
+  ChartTooltip,
+  ChartTooltipContent,
 };
-

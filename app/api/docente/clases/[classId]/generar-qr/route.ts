@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
     where: {
       id: classId,
       subject: {
-        teacherId: session.user.id,
+        teacherIds: { has: session.user.id },
       },
     },
     include: {
@@ -140,7 +140,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
     );
   }
 
-  let baseUrl = process.env.NEXTAUTH_URL || 'https://edutrack-fup.vercel.app';
+  let baseUrl = process.env.NEXTAUTH_URL || 'https://sira-fup.vercel.app';
   // Ensure the URL has a protocol
   if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
     baseUrl = `https://${baseUrl}`;

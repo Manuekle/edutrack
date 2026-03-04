@@ -8,7 +8,7 @@ Disallow: /404
 Disallow: /500
 
 # Host
-Host: https://edutrack-fup.vercel.app
+Host: https://sira-fup.vercel.app
 
 # Sitemaps
-Sitemap: https://edutrack-fup.vercel.app/sitemap.xml
+Sitemap: https://sira-fup.vercel.app/sitemap.xml

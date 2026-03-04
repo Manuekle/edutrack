@@ -27,13 +27,14 @@ import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
 import { Download, Search, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
 
 export default function GestionAsignaturasPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkEnrollModalOpen, setIsBulkEnrollModalOpen] = useState(false);
 
@@ -46,13 +47,28 @@ export default function GestionAsignaturasPage() {
   const [selectedProgram, setSelectedProgram] = useState<string>('');
   const [selectedSemester, setSelectedSemester] = useState<string>('all');
 
+  // Memoize debounced values
+  const debouncedFilters = useMemo(
+    () => ({
+      search: debouncedSearch,
+      program: selectedProgram || undefined,
+      semester:
+        selectedSemester !== 'all' && selectedSemester
+          ? isNaN(parseInt(selectedSemester))
+            ? undefined
+            : parseInt(selectedSemester)
+          : undefined,
+    }),
+    [debouncedSearch, selectedProgram, selectedSemester]
+  );
+
   // Usar React Query para obtener asignaturas
   const { subjects, pagination, isLoading, refetch } = useSubjects({
     page: currentPage,
     limit: itemsPerPage,
-    search: searchTerm,
-    program: selectedProgram || undefined,
-    semester: selectedSemester !== 'all' ? parseInt(selectedSemester) : undefined,
+    search: debouncedFilters.search,
+    program: debouncedFilters.program,
+    semester: debouncedFilters.semester,
     enabled: true,
   });
 
@@ -95,6 +111,14 @@ export default function GestionAsignaturasPage() {
     setCurrentPage(1);
   }, [searchTerm]);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Handle page change
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
@@ -118,7 +142,11 @@ export default function GestionAsignaturasPage() {
               <span>Cargar Asignaturas</span>
             </Button>
           </Link>
-          <Button variant="default" onClick={() => setIsCreateModalOpen(true)} className="gap-2 text-xs">
+          <Button
+            variant="default"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="gap-2 text-xs"
+          >
             <span>Nueva Asignatura</span>
           </Button>
         </div>
@@ -138,10 +166,15 @@ export default function GestionAsignaturasPage() {
               </CardDescription>
             </div>
             <div className="relative w-full md:w-auto">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
               <Input
-                placeholder="Buscar por nombre, código o docente..."
+                placeholder="Buscar por nombre, código o docente…"
                 className="pl-9 w-full md:w-[300px] text-xs"
+                name="search"
+                autoComplete="off"
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
@@ -152,8 +185,10 @@ export default function GestionAsignaturasPage() {
             <Input
               placeholder="Filtrar por Programa"
               className="w-[200px] text-xs"
+              name="program"
+              autoComplete="off"
               value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
+              onChange={e => setSelectedProgram(e.target.value)}
             />
             <Select value={selectedSemester} onValueChange={setSelectedSemester}>
               <SelectTrigger className="w-[150px] h-9 text-xs">
@@ -162,7 +197,9 @@ export default function GestionAsignaturasPage() {
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
                 {[...Array(10)].map((_, i) => (
-                  <SelectItem key={i + 1} value={String(i + 1)}>{i + 1}° Semestre</SelectItem>
+                  <SelectItem key={i + 1} value={String(i + 1)}>
+                    {i + 1}° Semestre
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

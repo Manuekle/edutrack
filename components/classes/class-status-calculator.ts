@@ -62,7 +62,11 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
     now < classStartTime
   );
 
-  const isScheduledForToday = !!(isToday && classStartTime && now < new Date(classStartTime.getTime() - tenMinutesInMs));
+  const isScheduledForToday = !!(
+    isToday &&
+    classStartTime &&
+    now < new Date(classStartTime.getTime() - tenMinutesInMs)
+  );
   const isTodayFinished = !!(isToday && classEndTime && now > classEndTime);
 
   let visualStatus: string = cls.status;

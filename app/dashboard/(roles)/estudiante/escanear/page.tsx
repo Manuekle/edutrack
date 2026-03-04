@@ -1,7 +1,18 @@
 'use client';
 
-import QRScanner from '@/components/qr-scanner';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const QRScanner = dynamic(() => import('@/components/qr-scanner'), {
+  loading: () => (
+    <div className="space-y-4">
+      <Skeleton className="h-64 w-full rounded-lg" />
+      <Skeleton className="h-8 w-3/4 mx-auto" />
+    </div>
+  ),
+  ssr: false,
+});
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';

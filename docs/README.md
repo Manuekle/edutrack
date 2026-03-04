@@ -1,8 +1,8 @@
-# 📚 Documentación del Sistema EduTrack
+# 📚 Documentación del Sistema SIRA
 
 <div align="center">
   <h2>Documentación Completa del Proyecto</h2>
-  <p>Sistema de Gestión de Asistencias para la FUP</p>
+  <p>Sistema Integral de Registro Académico para la FUP</p>
 </div>
 
 ---

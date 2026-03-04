@@ -88,7 +88,10 @@ const ATTENDANCE_RISK_THRESHOLD = 75; // Menos de 75% es riesgo
 const getRiskBadge = (percentage: number) => {
   if (percentage < ATTENDANCE_RISK_THRESHOLD) {
     return (
-      <Badge variant="destructive" className="ml-2 text-xs h-5 px-1.5 uppercase font-semibold animate-pulse">
+      <Badge
+        variant="destructive"
+        className="ml-2 text-xs h-5 px-1.5 uppercase font-semibold animate-pulse"
+      >
         RIESGO DE PÉRDIDA
       </Badge>
     );
@@ -99,10 +102,10 @@ const getRiskBadge = (percentage: number) => {
 // Paleta de colores más sutiles y contrastantes para el gráfico de pastel
 // Usando CHART_COLORS
 const PIE_COLORS = [
-  CHART_COLORS.attendance.present,    // Presente
-  CHART_COLORS.attendance.absent,     // Ausente
-  CHART_COLORS.attendance.late,       // Tarde
-  CHART_COLORS.attendance.justified,  // Justificado
+  CHART_COLORS.attendance.present, // Presente
+  CHART_COLORS.attendance.absent, // Ausente
+  CHART_COLORS.attendance.late, // Tarde
+  CHART_COLORS.attendance.justified, // Justificado
 ] as const;
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
@@ -201,7 +204,9 @@ function SubjectDetailsPanel({
       <CardHeader>
         <div className="flex items-center gap-2">
           <div>
-            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">{subject.name}</CardTitle>
+            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              {subject.name}
+            </CardTitle>
             <p className="text-xs text-muted-foreground">Código: {subject.code}</p>
           </div>
         </div>

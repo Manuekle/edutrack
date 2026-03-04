@@ -1,6 +1,6 @@
 'use client';
 
-import { QRViewer } from '@/components/qr-viewer';
+import dynamic from 'next/dynamic';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
@@ -16,6 +16,19 @@ import { Loader2, QrCode } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const QRViewer = dynamic(
+  () => import('@/components/qr-viewer').then(mod => ({ default: mod.QRViewer })),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center p-8">
+        <Skeleton className="h-64 w-64 rounded-lg" />
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 // Define los estados de asistencia como un mapa para la UI
 const AttendanceStatusMap = {
@@ -279,7 +292,9 @@ export default function AttendancePage() {
     <div className="space-y-4">
       <div className="flex justify-between items-start">
         <div>
-          <CardTitle className="font-semibold sm:text-3xl text-2xl tracking-card">Toma de Asistencia</CardTitle>
+          <CardTitle className="font-semibold sm:text-3xl text-2xl tracking-card">
+            Toma de Asistencia
+          </CardTitle>
           {classInfo && (
             <CardDescription className="mt-1">
               {classInfo.subject.name} -{' '}
@@ -345,11 +360,12 @@ export default function AttendancePage() {
                     </p>
                   </div>
                   <Select
-                    value={student.status} // e.g., 'PRESENTE'
+                    value={student.status}
                     onValueChange={(value: AttendanceStatusKey) =>
                       handleStatusChange(student.studentId, value)
                     }
                     disabled={isClassPast}
+                    name={`status-${student.studentId}`}
                   >
                     <SelectTrigger className="w-full md:w-[180px]">
                       <SelectValue placeholder="Seleccionar estado" />

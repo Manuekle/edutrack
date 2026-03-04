@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       isPreview = url.searchParams.get('preview') === 'true';
     } catch {
       // If that fails, try with a base URL (server-side)
-      let baseUrl = process.env.NEXTAUTH_URL || 'https://edutrack-fup.vercel.app';
+      let baseUrl = process.env.NEXTAUTH_URL || 'https://sira-fup.vercel.app';
       // Ensure the URL has a protocol
       if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
         baseUrl = `https://${baseUrl}`;
@@ -117,7 +117,10 @@ export async function POST(request: Request) {
     const lines = text.split(/\r?\n/).filter(line => line.trim());
 
     if (lines.length === 0) {
-      return NextResponse.json({ success: false, message: 'El archivo CSV está vacío' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: 'El archivo CSV está vacío' },
+        { status: 400 }
+      );
     }
 
     const parseCSVLine = (line: string): string[] => {
@@ -127,13 +130,17 @@ export async function POST(request: Request) {
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
         if (char === '"') {
-             if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
-             else { inQuotes = !inQuotes; }
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
         } else if (char === ',' && !inQuotes) {
-             values.push(current.trim());
-             current = '';
+          values.push(current.trim());
+          current = '';
         } else {
-             current += char;
+          current += char;
         }
       }
       values.push(current.trim());
@@ -144,7 +151,9 @@ export async function POST(request: Request) {
     const rows = lines.slice(1).map(line => {
       const values = parseCSVLine(line);
       const row: any = {};
-      headers.forEach((h, i) => { row[h] = values[i] || ''; });
+      headers.forEach((h, i) => {
+        row[h] = values[i] || '';
+      });
       return row;
     });
 
@@ -194,7 +203,7 @@ export async function POST(request: Request) {
           continue;
         }
 
-        const subject = await db.subject.findUnique({ where: { code: codigoAsignatura } });
+        const subject = await db.subject.findFirst({ where: { code: codigoAsignatura } });
         if (!subject) {
           previewResults.push({
             codigoAsignatura,
@@ -254,7 +263,7 @@ export async function POST(request: Request) {
           }
 
           // Find the subject using the transaction
-          const subject = await tx.subject.findUnique({
+          const subject = await tx.subject.findFirst({
             where: { code: codigoAsignatura },
           });
 
@@ -325,14 +334,14 @@ export async function POST(request: Request) {
             data: { studentIds: { set: finalStudentIds } },
           });
 
-          // Sync: Update each added student's enrolledSubjectIds
-          for (const studentToAdd of addedStudents) {
-              await tx.user.update({
-                  where: { id: studentToAdd.id },
-                  data: {
-                      enrolledSubjectIds: { push: subject.id }
-                  }
-              });
+          // Bulk update all students at once instead of one by one
+          if (studentsToAdd.length > 0) {
+            await tx.user.updateMany({
+              where: { id: { in: studentsToAdd } },
+              data: {
+                enrolledSubjectIds: { push: subject.id },
+              },
+            });
           }
 
           resultados.push({

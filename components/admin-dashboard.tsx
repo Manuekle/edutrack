@@ -1,21 +1,23 @@
+'use client';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { CHART_COLORS } from '@/lib/chart-colors';
 import { AlertCircle, BookOpen, TrendingUp, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
-    Area,
-    AreaChart,
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Cell,
-    Legend,
-    Pie,
-    PieChart,
-    Tooltip,
-    XAxis,
-    YAxis,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -144,7 +146,9 @@ const AdminDashboardComponent = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mi Panel</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            Mi Panel
+          </CardTitle>
           <CardDescription className="text-xs">Resumen y gestión académica</CardDescription>
         </CardHeader>
         <div className="flex items-center gap-2 w-full justify-start sm:justify-end">
@@ -244,7 +248,9 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Clases por Mes</CardTitle>
+              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                Clases por Mes
+              </CardTitle>
             </div>
           </CardHeader>
           <CardContent className="flex-1 pb-0">
@@ -309,10 +315,7 @@ const AdminDashboardComponent = () => {
                   <Tooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="asistencia" fill={CHART_COLORS.primary[0]} radius={[4, 4, 0, 0]}>
                     {data.charts.attendanceDistribution.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={BAR_COLORS[index % BAR_COLORS.length]}
-                      />
+                      <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -347,14 +350,17 @@ const AdminDashboardComponent = () => {
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} style={gridStyle} />
                   <XAxis type="number" tick={axisStyle} tickLine={false} />
-                  <YAxis dataKey="name" type="category" tick={axisStyle} tickLine={false} width={80} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    tick={axisStyle}
+                    tickLine={false}
+                    width={80}
+                  />
                   <Tooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="value" fill={CHART_COLORS.primary[0]} radius={[0, 4, 4, 0]}>
                     {data.charts.classroomOccupancy.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={BAR_COLORS[index % BAR_COLORS.length]}
-                      />
+                      <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
                     ))}
                   </Bar>
                 </BarChart>

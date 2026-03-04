@@ -441,7 +441,9 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto space-y-8">
       <CardHeader className="p-0 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mi Perfil</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+          Mi Perfil
+        </CardTitle>
         <CardDescription className="text-xs">
           Gestiona tu información personal y preferencias de cuenta.
         </CardDescription>
@@ -723,7 +725,9 @@ export default function ProfilePage() {
           <TabsContent value="signature" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Firma Digital</CardTitle>
+                <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                  Firma Digital
+                </CardTitle>
                 <CardDescription className="text-xs">
                   Sube tu firma digital para usarla en documentos oficiales.
                 </CardDescription>

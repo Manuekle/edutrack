@@ -54,9 +54,7 @@ export function SubjectFileUpload({ onFileSelect, file }: SubjectFileUploadProps
     if (files.length > 0) {
       const fileName = files[0].name;
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      toast.error(
-        `Tipo de archivo no válido: ${fileName}. Solo se permiten archivos .csv.`
-      );
+      toast.error(`Tipo de archivo no válido: ${fileName}. Solo se permiten archivos .csv.`);
     }
   };
 

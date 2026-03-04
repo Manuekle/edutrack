@@ -1,5 +1,3 @@
-'use client';
-
 import AdminDashboardComponent from '@/components/admin-dashboard';
 
 export default function AdminDashboard() {

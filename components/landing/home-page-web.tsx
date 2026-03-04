@@ -4,18 +4,18 @@ import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import { motion } from 'framer-motion';
 import {
-    BarChart2,
-    BellRing,
-    CheckCircle2,
-    Clock,
-    QrCode,
-    ScanLine,
-    Settings,
-    Shield,
-    ShieldCheck,
-    Smartphone,
-    Users,
-    Zap,
+  BarChart2,
+  BellRing,
+  CheckCircle2,
+  Clock,
+  QrCode,
+  ScanLine,
+  Settings,
+  Shield,
+  ShieldCheck,
+  Smartphone,
+  Users,
+  Zap,
 } from 'lucide-react';
 
 export default function HomePageWeb() {

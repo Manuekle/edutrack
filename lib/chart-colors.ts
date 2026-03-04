@@ -29,5 +29,5 @@ export const CHART_COLORS = {
     emerald: ['#10b981', '#d1fae5'],
     violet: ['#8b5cf6', '#ede9fe'],
     rose: ['#f43f5e', '#ffe4e6'],
-  }
+  },
 };

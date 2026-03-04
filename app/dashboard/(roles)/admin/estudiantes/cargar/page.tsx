@@ -121,7 +121,9 @@ export default function CargarEstudiantesPage() {
     <>
       {/* Header */}
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Cargar Estudiantes</CardTitle>
+        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+          Cargar Estudiantes
+        </CardTitle>
         <CardDescription className="text-xs">
           Sube un archivo .xlsx o .csv para cargar masivamente estudiantes.
         </CardDescription>

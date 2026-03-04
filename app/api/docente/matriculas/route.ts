@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   }
   // Verificar que el usuario autenticado es el propietario de la asignatura
   const subject = await db.subject.findFirst({
-    where: { id: subjectId, teacherId: session.user.id },
+    where: { id: subjectId, teacherIds: { has: session.user.id } },
     select: { studentIds: true },
   });
   if (!subject) {
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
   // Verificar que el docente es el propietario de la asignatura
   const subject = await db.subject.findFirst({
-    where: { id: subjectId, teacherId: session.user.id },
+    where: { id: subjectId, teacherIds: { has: session.user.id } },
     select: { studentIds: true },
   });
 
@@ -151,7 +151,7 @@ export async function DELETE(request: Request) {
 
   // Verificar que el docente es el propietario de la asignatura
   const subject = await db.subject.findFirst({
-    where: { id: subjectId, teacherId: session.user.id },
+    where: { id: subjectId, teacherIds: { has: session.user.id } },
     select: { studentIds: true },
   });
 

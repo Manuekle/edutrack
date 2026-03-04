@@ -57,7 +57,7 @@ export default async function PreviewPage({ params }: PageProps) {
   const subject = await db.subject.findUnique({
     where: { id },
     include: {
-      teacher: {
+      teachers: {
         select: {
           id: true,
           name: true,
@@ -80,16 +80,18 @@ export default async function PreviewPage({ params }: PageProps) {
     );
   }
 
-  if (subject.teacherId !== session.user.id) {
+  if (!subject.teacherIds.includes(session.user.id)) {
     return (
       <div className="p-6">
-        <h1 className="sm:text-3xl text-2xl font-semibold text-red-600 dark:text-red-400">No autorizado</h1>
+        <h1 className="sm:text-3xl text-2xl font-semibold text-red-600 dark:text-red-400">
+          No autorizado
+        </h1>
       </div>
     );
   }
 
-  const teacherName = subject.teacher?.name ?? 'Docente';
-  const signatureUrl = subject.teacher?.signatureUrl ?? null;
+  const teacherName = subject.teachers[0]?.name ?? 'Docente';
+  const signatureUrl = subject.teachers[0]?.signatureUrl ?? null;
 
   const today = new Date();
   const metaMonthYear = today.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });

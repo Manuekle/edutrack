@@ -24,7 +24,9 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Próximas Clases</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            Próximas Clases
+          </CardTitle>
         </div>
       </CardHeader>
       <CardContent>
@@ -33,7 +35,7 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
             {classes.map(cls => (
               <div
                 key={cls.id}
-                className="group relative rounded-lg border transition-all duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4"
+                className="group relative rounded-lg border transition-colors duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4"
                 onClick={() => router.push(`/dashboard/docente/asignaturas/${cls.subjectId}`)}
               >
                 <div className="flex items-start justify-between">

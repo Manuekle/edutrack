@@ -49,7 +49,7 @@ export async function GET() {
         subject: {
           select: {
             name: true,
-            teacher: {
+            teachers: {
               select: {
                 name: true,
               },
@@ -114,7 +114,7 @@ export async function GET() {
     const response = {
       id: currentClass.id,
       subjectName: currentClass.subject.name,
-      teacherName: currentClass.subject.teacher.name,
+      teacherName: currentClass.subject.teachers[0]?.name || 'Sin docente',
       topic: currentClass.topic || 'Clase en curso',
       date: currentClass.date,
       startTime: currentClass.startTime,

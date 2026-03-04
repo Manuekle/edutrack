@@ -1,8 +1,8 @@
 {
-  "name": "edutrack",
+  "name": "sira",
   "version": "1.0.0",
   "type": "module",
-  "description": "Software para la gestión automatizada de asistencias estudiantiles mediante códigos QR",
+  "description": "Sistema Integral de Registro Académico (SIRA) - Gestión automatizada de asistencias mediante códigos QR",
   "packageManager": "pnpm@10.28.1",
   "engines": {
     "node": ">=24.0.0",
@@ -42,15 +42,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Manuekle/edutrack"
+    "url": "git+https://github.com/Manuekle/sira"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Manuekle/edutrack/issues"
+    "url": "https://github.com/Manuekle/sira/issues"
   },
-  "homepage": "https://github.com/Manuekle/edutrack#readme",
+  "homepage": "https://github.com/Manuekle/sira#readme",
   "resolutions": {
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1"
@@ -123,6 +123,7 @@
     "nodemailer": "^7.0.12",
     "papaparse": "^5.5.3",
     "pdfkit": "^0.17.2",
+    "prisma": "6.19.1",
     "qr-scanner": "^1.4.2",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.3",
@@ -144,8 +145,7 @@
     "uuid": "^13.0.0",
     "xlsx": "^0.18.5",
     "zod": "^4.3.5",
-    "zustand": "^5.0.10",
-    "prisma": "6.19.1"
+    "zustand": "^5.0.10"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",
@@ -172,6 +172,7 @@
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
     "autoprefixer": "^10.4.23",
+    "baseline-browser-mapping": "^2.10.0",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.4",
@@ -186,6 +187,7 @@
     "playwright": "^1.57.0",
     "postcss": "^8.5.6",
     "prettier": "^3.8.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.18",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",

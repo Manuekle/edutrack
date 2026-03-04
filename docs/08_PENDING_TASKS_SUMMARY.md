@@ -1,4 +1,4 @@
-# 📋 Resumen de Tareas Pendientes - EduTrack
+# 📋 Resumen de Tareas Pendientes - SIRA
 
 ## 🎯 Estado General del Proyecto
 

@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     // Si se está actualizando el código o el grupo, verificar que no exista la combinación
     if (code || group !== undefined) {
       const newCode = code || existingSubject.code;
-      const newGroup = group !== undefined ? (group || null) : existingSubject.group;
+      const newGroup = group !== undefined ? group || null : existingSubject.group;
 
       // Check if another subject exists with this combination
       const subjectWithCode = await db.subject.findUnique({
@@ -49,7 +49,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     // Si se está actualizando el docente, verificar que exista y tenga el rol correcto
-    if (teacherId && (!existingSubject.teacherIds.includes(teacherId))) {
+    if (teacherId && !existingSubject.teacherIds.includes(teacherId)) {
       const teacher = await db.user.findUnique({
         where: { id: teacherId },
       });

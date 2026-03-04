@@ -1,4 +1,4 @@
-# 📋 Tareas Pendientes del Proyecto EduTrack
+# 📋 Tareas Pendientes del Proyecto SIRA
 
 Este documento resume todas las tareas pendientes para completar el proyecto al 100%.
 

@@ -109,9 +109,7 @@ export function ClassTableRow({
           )}
         </div>
       </TableCell>
-      <TableCell className="text-xs px-4 py-2 font-sans">
-        {cls.classroom || 'N/A'}
-      </TableCell>
+      <TableCell className="text-xs px-4 py-2 font-sans">{cls.classroom || 'N/A'}</TableCell>
       <TableCell className="text-xs px-4 py-2">
         <TooltipProvider>
           <Tooltip>

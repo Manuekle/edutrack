@@ -20,7 +20,7 @@ NEXTAUTH_URL="http://localhost:3000"
 ```
 - **Descripción**: URL base de la aplicación (sin trailing slash)
 - **Requerido**: Sí
-- **Ejemplo**: `https://edutrack-fup.vercel.app`
+- **Ejemplo**: `https://sira-fup.vercel.app`
 
 ```env
 NEXTAUTH_SECRET="your-secret-key-here"

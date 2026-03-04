@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     const subject = await db.subject.findFirst({
       where: {
         id: subjectId,
-        teacherId: session.user.id,
+        teacherIds: { has: session.user.id },
       },
       include: {
         classes: {

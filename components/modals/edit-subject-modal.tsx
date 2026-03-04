@@ -187,7 +187,9 @@ export function EditSubjectModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card sm:text-3xl text-2xl">Editar Asignatura</DialogTitle>
+          <DialogTitle className="tracking-card sm:text-3xl text-2xl">
+            Editar Asignatura
+          </DialogTitle>
           <DialogDescription className="text-xs">
             Modifica los datos de la asignatura {subject.name}.
           </DialogDescription>

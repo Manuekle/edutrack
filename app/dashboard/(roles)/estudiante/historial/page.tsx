@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -141,7 +141,7 @@ export default function HistorialAsistenciasPage() {
 
                       fetchAttendances();
                     }}
-                    className="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-3 py-2 text-xs font-normal text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                    className="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-3 py-2 text-xs font-normal text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Reintentar

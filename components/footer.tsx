@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="text-center md:text-left mb-4 md:mb-0">
             <Link href="/" className="flex items-center justify-center md:justify-start space-x-2">
               <span className="sm:text-3xl text-2xl font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                edu<span className="text-amber-500">Track</span>
+                SIRA
               </span>
             </Link>
             <p className="text-muted-foreground text-xs mt-2">
@@ -23,18 +23,18 @@ export default function Footer() {
           {/* Contact Info */}
           <div className="flex items-center">
             <a
-              href="mailto:contacto@edutrack.com"
+              href="mailto:contacto@sira.edu.co"
               className="flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               <Mail className="h-4 w-4 mr-2" />
-              contacto@edutrack.com
+              contacto@sira.edu.co
             </a>
           </div>
         </div>
 
         <div className="border-t border-border pt-6 mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            &copy; {currentYear} EduTrack. Todos los derechos reservados.
+            &copy; {currentYear} SIRA. Todos los derechos reservados.
           </p>
         </div>
       </div>

@@ -15,10 +15,16 @@ export default function Providers({ children }: Props) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 60 * 1000, // 5 minutos (alineado con TTL de caché Redis)
+            staleTime: 5 * 60 * 1000,
             refetchOnWindowFocus: false,
             retry: 1,
-            gcTime: 10 * 60 * 1000, // 10 minutos (antes cacheTime)
+            gcTime: 10 * 60 * 1000,
+            refetchOnMount: false,
+            refetchOnReconnect: true,
+            retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+          },
+          mutations: {
+            retry: 1,
           },
         },
       })

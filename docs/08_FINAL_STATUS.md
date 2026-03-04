@@ -2,7 +2,7 @@
 
 ## Resumen Ejecutivo
 
-El proyecto **EduTrack** está aproximadamente al **90% de completitud**. Las funcionalidades core están implementadas y funcionando, y se han realizado optimizaciones significativas de rendimiento que permiten soportar 200+ usuarios simultáneos.
+El proyecto **SIRA** está aproximadamente al **90% de completitud**. Las funcionalidades core están implementadas y funcionando, y se han realizado optimizaciones significativas de rendimiento que permiten soportar 200+ usuarios simultáneos.
 
 ## ✅ Tareas Completadas (90%)
 

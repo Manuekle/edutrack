@@ -87,7 +87,7 @@ export async function GET(
     const classes = await db.class.findMany({
       where: {
         subject: {
-          teacherId: docenteId,
+          teacherIds: { has: docenteId },
           ...(subjectFilter ? { id: subjectFilter } : {}),
         },
         ...(dateRange

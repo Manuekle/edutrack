@@ -1,6 +1,6 @@
-# Requisitos Funcionales y No Funcionales - Sistema EduTrack
+# Requisitos Funcionales y No Funcionales - Sistema SIRA
 
-Este documento especifica los requisitos funcionales (RF) y no funcionales (RNF) del Sistema de Gestión de Asistencias para la FUP.
+Este documento especifica los requisitos funcionales (RF) y no funcionales (RNF) del Sistema Integral de Registro Académico (SIRA) para la FUP.
 
 ---
 

@@ -6,28 +6,28 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import type { User } from '@/types';
 import { Role } from '@prisma/client';
@@ -132,7 +132,9 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card sm:text-3xl text-2xl">Crear Nuevo Usuario</DialogTitle>
+          <DialogTitle className="tracking-card sm:text-3xl text-2xl">
+            Crear Nuevo Usuario
+          </DialogTitle>
           <DialogDescription className="text-xs">
             Completa los datos para crear un nuevo usuario. Al menos un correo es requerido.
           </DialogDescription>
@@ -146,7 +148,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                 <FormItem>
                   <FormLabel>Nombre Completo</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nombre completo" {...field} />
+                    <Input placeholder="Nombre completo" autoComplete="name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -163,8 +165,9 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="correo@personal.com"
+                        placeholder="correo@personal.com…"
                         className="text-xs"
+                        autoComplete="email"
                         {...field}
                       />
                     </FormControl>
@@ -181,8 +184,9 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="correo@institucional.com"
+                        placeholder="correo@institucional.com…"
                         className="text-xs"
+                        autoComplete="email"
                         {...field}
                       />
                     </FormControl>
@@ -199,7 +203,12 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                 <FormItem>
                   <FormLabel>Contraseña</FormLabel>
                   <FormControl>
-                    <Input type="password" className="text-xs" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="Mínimo 6 caracteres…"
+                      autoComplete="new-password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -214,7 +223,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                   <FormItem>
                     <FormLabel>Documento</FormLabel>
                     <FormControl>
-                      <Input className="text-xs" {...field} />
+                      <Input className="text-xs" autoComplete="off" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -227,7 +236,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                   <FormItem>
                     <FormLabel>Teléfono</FormLabel>
                     <FormControl>
-                      <Input className="text-xs" {...field} />
+                      <Input className="text-xs" autoComplete="tel" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -267,7 +276,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                   <FormItem>
                     <FormLabel>Código de Estudiante</FormLabel>
                     <FormControl>
-                      <Input className="text-xs" {...field} />
+                      <Input className="text-xs" autoComplete="off" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -283,7 +292,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                   <FormItem>
                     <FormLabel>Código de Docente</FormLabel>
                     <FormControl>
-                      <Input className="text-xs" {...field} />
+                      <Input className="text-xs" autoComplete="off" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

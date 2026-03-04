@@ -50,12 +50,14 @@ export default function HomePageMobile() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center mb-12"
         >
-          <div className="w-20 h-20 bg-linear-to-tr from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-primary/10 border border-primary/10 backdrop-blur-sm">
-            <QrCode className="w-10 h-10 text-primary" />
+          {/* Logo Icon */}
+          <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25 mb-4 bg-background">
+            <img src="/icon-light.jpeg" alt="SIRA Logo" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-3xl font-semibold tracking-card text-center">
-            edu<span className="text-primary">Track</span>
-          </h1>
+          <h1 className="text-3xl font-bold tracking-card text-center">SIRA</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sistema Integral de Registro Académico
+          </p>
         </motion.div>
 
         {/* Feature Carousel (App-like Onboarding) */}
@@ -87,8 +89,9 @@ export default function HomePageMobile() {
           {features.map((_, idx) => (
             <div
               key={idx}
-              className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
-                }`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
+              }`}
             />
           ))}
         </div>

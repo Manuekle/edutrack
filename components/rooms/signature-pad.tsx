@@ -27,7 +27,9 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-card text-muted-foreground">Firma Digital</span>
+        <span className="text-xs font-semibold uppercase tracking-card text-muted-foreground">
+          Firma Digital
+        </span>
         <Button
           variant="ghost"
           size="sm"
@@ -46,13 +48,15 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
             penColor="currentColor"
             onEnd={save}
             canvasProps={{
-              className: "signature-canvas w-full h-full cursor-crosshair text-foreground",
-              style: { width: '100%', height: '100%' }
+              className: 'signature-canvas w-full h-full cursor-crosshair text-foreground',
+              style: { width: '100%', height: '100%' },
             }}
           />
         </div>
       </div>
-      <p className="text-xs text-muted-foreground text-center italic">La firma digital es obligatoria para la auditoría de la reserva</p>
+      <p className="text-xs text-muted-foreground text-center italic">
+        La firma digital es obligatoria para la auditoría de la reserva
+      </p>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     // Use transaction to ensure data consistency
     const result = await db.$transaction(async tx => {
       // Find the subject
-      const subject = await tx.subject.findUnique({
+      const subject = await tx.subject.findFirst({
         where: { code: codigoAsignatura },
       });
 
@@ -124,7 +124,7 @@ export async function DELETE(request: Request) {
     // Use transaction to ensure data consistency
     const result = await db.$transaction(async tx => {
       // Find the subject
-      const subject = await tx.subject.findUnique({
+      const subject = await tx.subject.findFirst({
         where: { code: codigoAsignatura },
       });
 

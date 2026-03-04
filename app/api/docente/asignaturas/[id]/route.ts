@@ -14,10 +14,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 
   try {
-    const subject = await db.subject.findUnique({
+    const subject = await db.subject.findFirst({
       where: {
         id,
-        teacherId: session.user.id, // Asegurarse de que el docente sea el dueño de la asignatura
+        teacherIds: { has: session.user.id },
       },
     });
 

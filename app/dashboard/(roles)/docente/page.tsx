@@ -64,12 +64,12 @@ export default function DocenteDashboard() {
             const transformedSubjects = dashboardRes.data.subjects.map(subject => ({
               ...subject,
               nextClass: subject.nextClass
-                  ? {
-                      ...subject.nextClass,
-                      date: new Date(subject.nextClass.date),
-                      classroom: subject.nextClass.classroom,
-                    }
-                  : undefined,
+                ? {
+                    ...subject.nextClass,
+                    date: new Date(subject.nextClass.date),
+                    classroom: subject.nextClass.classroom,
+                  }
+                : undefined,
             }));
             setSubjects(transformedSubjects);
 
@@ -125,14 +125,20 @@ export default function DocenteDashboard() {
     <div className="mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">Mi Panel</CardTitle>
+          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            Mi Panel
+          </CardTitle>
           <CardDescription className="text-xs">
             Gestiona tus asignaturas y clases en vivo.
           </CardDescription>
         </CardHeader>
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
-            <Button type="button" variant="outline" onClick={() => router.push('/dashboard/docente/asignaturas')}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/docente/asignaturas')}
+            >
               Ver todas las asignaturas
             </Button>
           </div>

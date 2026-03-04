@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const classWithSubject = await db.class.findFirst({
       where: {
         id: classId,
-        subject: { teacherId: session.user.id },
+        subject: { teacherIds: { has: session.user.id } },
       },
       include: { subject: true },
     });
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
     // Verificar que el docente es dueño de la clase
     const classWithSubject = await db.class.findFirst({
-      where: { id: classId, subject: { teacherId: session.user.id } },
+      where: { id: classId, subject: { teacherIds: { has: session.user.id } } },
     });
 
     if (!classWithSubject) {
@@ -139,7 +139,7 @@ export async function PUT(request: Request) {
     const classWithSubject = await db.class.findFirst({
       where: {
         id: classId,
-        subject: { teacherId: session.user.id },
+        subject: { teacherIds: { has: session.user.id } },
       },
     });
 

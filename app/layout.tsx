@@ -4,24 +4,25 @@ import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './providers';
+import { PWAInstaller } from '@/components/pwa-installer';
 
-const siteUrl = 'https://edutrack-fup.vercel.app';
+const siteUrl = 'https://sira-fup.vercel.app';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Sistema de Asistencias FUP',
-    template: `%s | Asistencias FUP`,
+    default: 'SIRA - Sistema Integral de Registro Académico',
+    template: `%s | SIRA`,
   },
   description:
-    'Optimiza la gestión de asistencias en la FUP con códigos QR. Eficiencia para docentes y estudiantes.',
+    'Sistema Integral de Registro Académico para la gestión automatizada de asistencias.',
   robots: { index: true, follow: true },
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Sistema de Asistencias FUP',
-    description: 'Gestión de asistencias con códigos QR.',
+    title: 'SIRA - Sistema Integral de Registro Académico',
+    description: 'Sistema Integral de Registro Académico para la FUP.',
     url: siteUrl,
     siteName: 'Asistencias FUP',
     images: [
@@ -64,14 +65,21 @@ export const metadata: Metadata = {
       },
     ],
   },
-  manifest: '/icons/manifest.json',
+  manifest: '/manifest.json',
   other: {
     'msapplication-config': '/icons/browserconfig.xml',
-    'msapplication-TileColor': '#ffffff',
+    'msapplication-TileColor': '#6366F1',
     'msapplication-TileImage': '/icons/mstile-144x144.png',
-    'theme-color': '#ffffff',
+    'theme-color': '#6366F1',
   },
 };
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+} as const;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -79,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning
+      style={{ colorScheme: 'dark' }}
     >
       <head>
         <script
@@ -95,13 +104,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('ServiceWorker registered: ', registration.scope);
+                    })
+                    .catch(function(err) {
+                      console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className="min-h-screen bg-background font-sans text-foreground"
         suppressHydrationWarning
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          Saltar al contenido principal
+        </a>
         <Providers>
           {children}
+          <PWAInstaller />
           <Toaster position="top-center" duration={5000} />
         </Providers>
       </body>

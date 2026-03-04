@@ -64,7 +64,7 @@ export async function GET() {
     // Obtener las asignaturas del docente
     const subjects = (await db.subject.findMany({
       where: {
-        teacherId: session.user.id,
+        teacherIds: { has: session.user.id },
       },
       include: {
         classes: {
