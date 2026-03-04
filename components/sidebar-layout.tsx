@@ -149,12 +149,8 @@ function AppSidebar({ homePath }: { homePath: string }) {
             <SidebarMenuButton size="sm" asChild className="h-auto py-3">
               <Link href={homePath}>
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-lg overflow-hidden shadow-sm bg-background">
-                    <img
-                      src="/icon-light.jpeg"
-                      alt="SIRA Logo"
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-primary text-primary-foreground">
+                    <BookOpen className="h-5 w-5" />
                   </div>
                   <div className="grid flex-1 text-left">
                     <span className="truncate font-semibold text-sm">SIRA</span>
