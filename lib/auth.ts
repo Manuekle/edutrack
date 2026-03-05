@@ -74,6 +74,8 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) return null;
 
+        if (!user.isActive) return null;
+
         const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
         if (!isPasswordCorrect) return null;
 
@@ -183,6 +185,9 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (dbUser) {
+          if (!dbUser.isActive) {
+            return null;
+          }
           try {
             await redis.set(`user:${token.id}`, JSON.stringify(dbUser), {
               ex: CACHE_TTL.USER_SESSION,

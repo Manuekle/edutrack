@@ -51,7 +51,7 @@ export function BulkEnrollModal({
     formData.append('subjectIds', JSON.stringify(Array.from(selectedSubjectIds)));
 
     try {
-      const response = await fetch('/api/admin/enrollment/batch', {
+      const response = await fetch('/api/admin/cargar-estudiantes-asignaturas', {
         method: 'POST',
         body: formData,
       });

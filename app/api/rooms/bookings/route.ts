@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const overlap = await db.roomBooking.findFirst({
       where: {
         roomId,
-        status: BookingStatus.APROBADO,
+        status: { in: [BookingStatus.APROBADO, BookingStatus.PENDIENTE] },
         OR: [
           {
             startTime: { lt: new Date(endTime) },

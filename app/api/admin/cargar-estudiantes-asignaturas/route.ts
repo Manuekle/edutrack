@@ -331,7 +331,7 @@ export async function POST(request: Request) {
 
           await tx.subject.update({
             where: { id: subject.id },
-            data: { studentIds: { set: finalStudentIds } },
+            data: { studentIds: { push: studentsToAdd } },
           });
 
           // Bulk update all students at once instead of one by one

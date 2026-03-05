@@ -265,6 +265,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   <span>Perfil</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
+                  aria-label="Cambiar entre modo oscuro y modo claro"
                   onClick={e => {
                     e.preventDefault();
                     // Determinar el tema actual efectivo (si es 'system', detectar el modo del sistema)

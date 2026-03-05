@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Camera, CameraOff } from 'lucide-react';
-import QrScanner from 'qr-scanner';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -15,17 +14,30 @@ interface QRScannerProps {
 
 export default function QRScanner({ onScan, onError, isLoading = false }: QRScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const qrScannerRef = useRef<QrScanner | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const qrScannerRef = useRef<any>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string>('');
   const [hasCamera, setHasCamera] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [QrScannerLib, setQrScannerLib] = useState<any>(null);
 
   useEffect(() => {
+    import('qr-scanner')
+      .then(mod => setQrScannerLib(mod.default))
+      .catch(() => {
+        setError('Error al cargar la librería del escáner');
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!QrScannerLib || !videoRef.current) return;
+
     const initScanner = async () => {
       if (!videoRef.current) return;
 
       try {
-        const hasCamera = await QrScanner.hasCamera();
+        const hasCamera = await QrScannerLib.hasCamera();
         setHasCamera(hasCamera);
 
         if (!hasCamera) {
@@ -33,9 +45,9 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
           return;
         }
 
-        const qrScanner = new QrScanner(
+        const qrScanner = new QrScannerLib(
           videoRef.current,
-          result => {
+          (result: { data: string }) => {
             try {
               onScan(result.data);
               setError('');
@@ -69,7 +81,7 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
         qrScannerRef.current.destroy();
       }
     };
-  }, [onScan, onError]);
+  }, [QrScannerLib, onScan, onError]);
 
   const startScanning = async () => {
     if (!qrScannerRef.current) return;
