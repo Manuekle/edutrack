@@ -65,7 +65,12 @@ export async function GET(request: Request) {
               name: subject.teachers[0].name,
             }
           : null,
-        studentCount: subject.studentIds.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        studentCount:
+          (subject as any).groups?.reduce(
+            (sum: number, g: any) => sum + (g.studentIds?.length || 0),
+            0
+          ) || 0,
       })),
     });
   } catch (error) {

@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || '';
+    const includeGroups = searchParams.get('includeGroups') === 'true';
 
     // Validar parámetros de paginación
     const pageNumber = Math.max(1, page);
@@ -45,24 +46,38 @@ export async function GET(req: NextRequest) {
     }
 
     // Obtener asignaturas con paginación
+    const includeObj: Record<string, unknown> = {
+      teachers: {
+        select: {
+          id: true,
+          name: true,
+          correoInstitucional: true,
+          codigoDocente: true,
+        },
+      },
+      _count: {
+        select: {
+          classes: true,
+        },
+      },
+    };
+
+    if (includeGroups) {
+      includeObj.groups = {
+        select: {
+          id: true,
+          groupNumber: true,
+          jornada: true,
+          maxCapacity: true,
+          studentIds: true,
+        },
+      };
+    }
+
     const [subjects, total] = await Promise.all([
       db.subject.findMany({
         where: Object.keys(whereClause).length > 0 ? whereClause : {},
-        include: {
-          teachers: {
-            select: {
-              id: true,
-              name: true,
-              correoInstitucional: true,
-              codigoDocente: true,
-            },
-          },
-          _count: {
-            select: {
-              classes: true,
-            },
-          },
-        },
+        include: includeObj,
         orderBy: {
           createdAt: 'desc',
         },
@@ -74,11 +89,14 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Transform the data to include student count
-    const subjectsWithCounts = subjects.map(subject => ({
+    // Transform the data to include student count from groups
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subjectsWithCounts = subjects.map((subject: any) => ({
       ...subject,
-      studentCount: subject.studentIds.length,
-      classCount: subject._count.classes,
+      studentCount:
+        subject.groups?.reduce((sum: number, g: any) => sum + (g.studentIds?.length || 0), 0) || 0,
+      classCount:
+        subject.groups?.reduce((sum: number, g: any) => sum + (g._count?.classes || 0), 0) || 0,
     }));
 
     const totalPages = Math.ceil(total / pageSize);
@@ -108,62 +126,57 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, code, program, semester, credits, teacherId, group } = body;
+    const { name, code, program, semester, credits, teacherId } = body;
 
-    if (!name || !code || !teacherId) {
+    if (!name || !code) {
       return NextResponse.json(
-        { message: 'Faltan campos requeridos: nombre, código y docente.' },
+        { message: 'Faltan campos requeridos: nombre y código.' },
         { status: 400 }
       );
     }
 
-    // Verificar que el código no exista
-    // Verificar que el código + grupo no exista
-    // Note: Assuming 'group' defaults to null if undefined.
-    // Use findFirst because findUnique requires exact composite match which might be tricky with nulls in some prisma versions?
-    // Actually findUnique with composite unique works fine.
-    const existingSubject = await db.subject.findUnique({
+    // Verificar que el código no exista (ahora solo código es único)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existingSubject = await (db as any).subject.findUnique({
       where: {
-        code_group: {
-          code,
-          group: group || null, // Ensure explicit null if falsy/undefined
-        },
+        code,
       },
     });
 
     if (existingSubject) {
       return NextResponse.json(
-        { message: 'Ya existe una asignatura con este código y grupo.' },
+        { message: 'Ya existe una asignatura con este código.' },
         { status: 409 }
       );
     }
 
-    // Verificar que el docente exista y tenga el rol correcto
-    const teacher = await db.user.findUnique({
-      where: { id: teacherId },
-    });
+    // Verificar que el docente exista y tenga el rol correcto (si se proporciona)
+    if (teacherId) {
+      const teacher = await db.user.findUnique({
+        where: { id: teacherId },
+      });
 
-    if (!teacher) {
-      return NextResponse.json({ message: 'El docente no existe.' }, { status: 404 });
+      if (!teacher) {
+        return NextResponse.json({ message: 'El docente no existe.' }, { status: 404 });
+      }
+
+      if (teacher.role !== Role.DOCENTE && teacher.role !== Role.ADMIN) {
+        return NextResponse.json(
+          { message: 'El usuario seleccionado no es un docente.' },
+          { status: 400 }
+        );
+      }
     }
 
-    if (teacher.role !== Role.DOCENTE && teacher.role !== Role.ADMIN) {
-      return NextResponse.json(
-        { message: 'El usuario seleccionado no es un docente.' },
-        { status: 400 }
-      );
-    }
-
-    const newSubject = await db.subject.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newSubject = await (db as any).subject.create({
       data: {
         name,
         code,
         program,
         semester: semester ? parseInt(semester) : null,
         credits: credits ? parseInt(credits) : null,
-        teacherIds: [teacherId],
-        studentIds: [],
-        group: group || null,
+        teacherIds: teacherId ? [teacherId] : [],
       },
       include: {
         teachers: {

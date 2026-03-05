@@ -13,6 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Jornada {
+  DIURNO
+  NOCTURNO
+}
+
 enum Role {
   ADMIN
   DOCENTE
@@ -94,6 +99,7 @@ model Subject {
   name             String
   code             String
   group            String?           // Seccion o Grupo (A, B, 1, 2)
+  jornada          Jornada?          // DIURNO o NOCTURNO
   program          String?
   semester         Int?
   credits          Int?
@@ -124,6 +130,7 @@ model Class {
   subject            Subject      @relation(fields: [subjectId], references: [id])
   subjectId          String       @db.ObjectId
   classroom          String? // Aula o ubicación física
+  jornada            Jornada?      // DIURNO o NOCTURNO
   attendances        Attendance[]
   qrToken            String? // Token QR para la clase
   qrTokenExpiresAt   DateTime? // Fecha de expiración del token QR
@@ -142,6 +149,7 @@ model Class {
   @@index([subjectId, date])
   @@index([status, date])
   @@index([qrToken])
+  @@index([classroom, date])
 }
 
 enum ClassStatus {

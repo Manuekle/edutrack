@@ -20,13 +20,22 @@ export async function GET(request: Request) {
   }
 
   try {
-    // 1. Verificar que el docente es dueño de la clase
-    const classWithSubject = await db.class.findFirst({
+    // 1. Verificar que el docente es dueño de la clase (a través del grupo)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const classWithSubject = await (db as any).class.findFirst({
       where: {
         id: classId,
-        subject: { teacherIds: { has: session.user.id } },
+        group: {
+          subject: { teacherIds: { has: session.user.id } },
+        },
       },
-      include: { subject: true },
+      include: {
+        group: {
+          include: {
+            subject: { select: { id: true, name: true, studentIds: true } },
+          },
+        },
+      },
     });
 
     if (!classWithSubject) {
@@ -36,8 +45,8 @@ export async function GET(request: Request) {
       );
     }
 
-    // 2. Obtener los IDs de los estudiantes inscritos en la asignatura
-    const studentIds = classWithSubject.subject.studentIds;
+    // 2. Obtener los IDs de los estudiantes inscritos en el grupo
+    const studentIds = classWithSubject.group?.subject?.studentIds || [];
 
     if (studentIds.length === 0) {
       return NextResponse.json([]);
@@ -86,8 +95,14 @@ export async function POST(request: Request) {
     }
 
     // Verificar que el docente es dueño de la clase
-    const classWithSubject = await db.class.findFirst({
-      where: { id: classId, subject: { teacherIds: { has: session.user.id } } },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const classWithSubject = await (db as any).class.findFirst({
+      where: {
+        id: classId,
+        group: {
+          subject: { teacherIds: { has: session.user.id } },
+        },
+      },
     });
 
     if (!classWithSubject) {
@@ -136,10 +151,13 @@ export async function PUT(request: Request) {
     }
 
     // 1. Verificar que el docente es dueño de la clase
-    const classWithSubject = await db.class.findFirst({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const classWithSubject = await (db as any).class.findFirst({
       where: {
         id: classId,
-        subject: { teacherIds: { has: session.user.id } },
+        group: {
+          subject: { teacherIds: { has: session.user.id } },
+        },
       },
     });
 

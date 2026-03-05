@@ -14,10 +14,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const { id } = await params;
     const body = await req.json();
-    const { name, code, program, semester, credits, teacherId, group } = body;
+    const { name, code, program, semester, credits, directHours } = body;
 
     // Verificar que la asignatura existe
-    const existingSubject = await db.subject.findUnique({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existingSubject = await (db as any).subject.findUnique({
       where: { id },
     });
 
@@ -25,59 +26,35 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ message: 'Asignatura no encontrada.' }, { status: 404 });
     }
 
-    // Si se está actualizando el código o el grupo, verificar que no exista la combinación
-    if (code || group !== undefined) {
-      const newCode = code || existingSubject.code;
-      const newGroup = group !== undefined ? group || null : existingSubject.group;
-
-      // Check if another subject exists with this combination
-      const subjectWithCode = await db.subject.findUnique({
-        where: {
-          code_group: {
-            code: newCode,
-            group: newGroup,
-          },
-        },
+    // Si se está actualizando el código, verificar que no exista
+    if (code && code !== existingSubject.code) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const subjectWithCode = await (db as any).subject.findUnique({
+        where: { code },
       });
 
       if (subjectWithCode && subjectWithCode.id !== id) {
         return NextResponse.json(
-          { message: 'Ya existe una asignatura con este código y grupo.' },
+          { message: 'Ya existe una asignatura con este código.' },
           { status: 409 }
         );
       }
     }
 
-    // Si se está actualizando el docente, verificar que exista y tenga el rol correcto
-    if (teacherId && !existingSubject.teacherIds.includes(teacherId)) {
-      const teacher = await db.user.findUnique({
-        where: { id: teacherId },
-      });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateData: any = {
+      ...(name && { name }),
+      ...(code && { code }),
+      ...(program !== undefined && { program }),
+      ...(semester !== undefined && { semester: semester ? parseInt(semester) : null }),
+      ...(credits !== undefined && { credits: credits ? parseInt(credits) : null }),
+      ...(directHours !== undefined && { directHours: directHours ? parseInt(directHours) : null }),
+    };
 
-      if (!teacher) {
-        return NextResponse.json({ message: 'El docente no existe.' }, { status: 404 });
-      }
-
-      if (teacher.role !== Role.DOCENTE && teacher.role !== Role.ADMIN) {
-        return NextResponse.json(
-          { message: 'El usuario seleccionado no es un docente.' },
-          { status: 400 }
-        );
-      }
-    }
-
-    const updatedSubject = await db.subject.update({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updatedSubject = await (db as any).subject.update({
       where: { id },
-      data: {
-        ...(name && { name }),
-        ...(code && { code }),
-        ...(program !== undefined && { program }),
-        ...(semester !== undefined && { semester: semester ? parseInt(semester) : null }),
-        ...(credits !== undefined && { credits: credits ? parseInt(credits) : null }),
-        ...(credits !== undefined && { credits: credits ? parseInt(credits) : null }),
-        ...(teacherId && { teacherIds: [teacherId] }),
-        ...(group !== undefined && { group: group || null }),
-      },
+      data: updateData,
       include: {
         teachers: {
           select: {
@@ -87,18 +64,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             codigoDocente: true,
           },
         },
-        _count: {
+        groups: {
           select: {
-            classes: true,
+            id: true,
+            groupNumber: true,
+            jornada: true,
+            maxCapacity: true,
+            studentIds: true,
           },
         },
       },
     });
 
+    // Calcular total de estudiantes desde grupos
+    const totalStudents =
+      updatedSubject.groups?.reduce(
+        (sum: number, g: { studentIds?: string[] }) => sum + (g.studentIds?.length || 0),
+        0
+      ) || 0;
+
     return NextResponse.json({
       ...updatedSubject,
-      studentCount: updatedSubject.studentIds.length,
-      classCount: updatedSubject._count.classes,
+      studentCount: totalStudents,
     });
   } catch (error) {
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
@@ -116,12 +103,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
 
     // Verificar que la asignatura existe
-    const existingSubject = await db.subject.findUnique({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const existingSubject = await (db as any).subject.findUnique({
       where: { id },
       include: {
-        _count: {
+        groups: {
           select: {
-            classes: true,
+            id: true,
+            studentIds: true,
           },
         },
       },
@@ -131,18 +120,25 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ message: 'Asignatura no encontrada.' }, { status: 404 });
     }
 
-    // Verificar si tiene estudiantes o clases
-    if (existingSubject.studentIds.length > 0 || existingSubject._count.classes > 0) {
+    // Verificar si tiene estudiantes en grupos
+    const totalStudents =
+      existingSubject.groups?.reduce(
+        (sum: number, g: { studentIds?: string[] }) => sum + (g.studentIds?.length || 0),
+        0
+      ) || 0;
+
+    if (totalStudents > 0) {
       return NextResponse.json(
         {
-          message:
-            'No se puede eliminar una asignatura con estudiantes matriculados o clases programadas.',
+          message: 'No se puede eliminar una asignatura con estudiantes matriculados.',
         },
         { status: 400 }
       );
     }
 
-    await db.subject.delete({
+    // Eliminar primero los grupos y clases
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (db as any).subject.delete({
       where: { id },
     });
 

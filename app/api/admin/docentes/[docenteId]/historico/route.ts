@@ -83,13 +83,26 @@ export async function GET(
 
     const dateRange = periodToDateRange(periodParam);
 
-    // Recuperar clases impartidas por el docente (y opcionalmente filtrar por periodo)
-    const classes = await db.class.findMany({
+    // Recuperar clases impartidas por el docente a través de SubjectGroup
+    // Obtener primero los grupos del docente
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const teacherGroups = await (db as any).subjectGroup.findMany({
       where: {
         subject: {
           teacherIds: { has: docenteId },
-          ...(subjectFilter ? { id: subjectFilter } : {}),
         },
+      },
+      select: { id: true },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupIds = teacherGroups.map((g: any) => g.id);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const classes = await (db as any).class.findMany({
+      where: {
+        groupId: { in: groupIds },
+        ...(subjectFilter ? { subjectId: subjectFilter } : {}),
         ...(dateRange
           ? {
               date: {
@@ -99,20 +112,8 @@ export async function GET(
             }
           : {}),
       },
-      include: {
-        subject: {
-          select: {
-            id: true,
-            name: true,
-            code: true,
-          },
-        },
-        attendances: {
-          select: {
-            status: true,
-          },
-        },
-      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      include: (db as any).class.include,
       orderBy: {
         date: 'asc',
       },
@@ -137,12 +138,17 @@ export async function GET(
     >();
 
     for (const cls of classes) {
-      const subjId = cls.subject.id;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const groupData = (cls as any).group;
+      const subjectData = groupData?.subject;
+      if (!subjectData) continue;
+
+      const subjId = subjectData.id;
       if (!subjectsMap.has(subjId)) {
         subjectsMap.set(subjId, {
           id: subjId,
-          name: cls.subject.name,
-          code: cls.subject.code,
+          name: subjectData.name,
+          code: subjectData.code,
           totalClasses: 0,
           attendanceTotals: {
             present: 0,
@@ -162,28 +168,16 @@ export async function GET(
         number
       >;
 
-      cls.attendances.forEach(att => {
-        switch (att.status) {
-          case AttendanceStatus.PRESENTE:
-            stats.present += 1;
-            subjectEntry.attendanceTotals.present += 1;
-            break;
-          case AttendanceStatus.AUSENTE:
-            stats.absent += 1;
-            subjectEntry.attendanceTotals.absent += 1;
-            break;
-          case AttendanceStatus.TARDANZA:
-            stats.late += 1;
-            subjectEntry.attendanceTotals.late += 1;
-            break;
-          case AttendanceStatus.JUSTIFICADO:
-            stats.justified += 1;
-            subjectEntry.attendanceTotals.justified += 1;
-            break;
-          default:
-            break;
-        }
-      });
+      // attendance stats from class metrics
+      stats.present = cls.presentCount;
+      stats.absent = cls.absentCount;
+      stats.late = cls.lateCount;
+      stats.justified = cls.justifiedCount;
+
+      subjectEntry.attendanceTotals.present += cls.presentCount;
+      subjectEntry.attendanceTotals.absent += cls.absentCount;
+      subjectEntry.attendanceTotals.late += cls.lateCount;
+      subjectEntry.attendanceTotals.justified += cls.justifiedCount;
 
       subjectEntry.classes.push({
         id: cls.id,

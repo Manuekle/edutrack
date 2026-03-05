@@ -5,71 +5,38 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { CheckCircle, Download, FileSpreadsheet, Loader2, Users } from 'lucide-react';
-import { useState, useEffect } from 'react';
+  CheckCircle,
+  Download,
+  FileSpreadsheet,
+  Loader2,
+  AlertCircle,
+  XCircle,
+} from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
-interface Subject {
-  id: string;
-  code: string;
-  name: string;
-  groups: {
-    id: string;
-    groupNumber: number;
-    jornada: string;
-    maxCapacity: number;
-    studentIds: string[];
-  }[];
-}
-
 interface PreviewItem {
-  documentoEstudiante: string;
   codigoAsignatura: string;
-  grupo: number;
-  jornada: string;
-  estudianteNombre: string;
-  status: 'success' | 'error' | 'full' | 'existing';
+  nombreAsignatura: string;
+  programa: string;
+  semestre: number;
+  creditos: number;
+  directHours: number;
+  status: 'success' | 'error' | 'existing';
   message: string;
 }
 
-export default function MatriculaPage() {
+export default function MicrocurriculoPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [selectedSubject, setSelectedSubject] = useState<string>('');
-  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [isPreview, setIsPreview] = useState(false);
   const [previewData, setPreviewData] = useState<PreviewItem[]>([]);
   const [finalResults, setFinalResults] = useState<{
-    enrolled: number;
+    created: number;
     existing: number;
-    full: number;
     errors: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
-  const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
-
-  useEffect(() => {
-    const loadSubjects = async () => {
-      try {
-        const res = await fetch('/api/admin/subjects?includeGroups=true');
-        const data = await res.json();
-        setSubjects(data.subjects || []);
-      } catch (error) {
-        console.error('Error loading subjects:', error);
-      } finally {
-        setIsLoadingSubjects(false);
-      }
-    };
-    loadSubjects();
-  }, []);
-
-  const selectedSubjectData = subjects.find(s => s.id === selectedSubject);
 
   const handleFileSelect = (selectedFile: File | null) => {
     setFile(selectedFile);
@@ -95,7 +62,7 @@ export default function MatriculaPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch('/api/admin/matricula?preview=true', {
+      const res = await fetch('/api/admin/microcurriculo?preview=true', {
         method: 'POST',
         body: formData,
       });
@@ -123,7 +90,7 @@ export default function MatriculaPage() {
 
     const successCount = previewData.filter(item => item.status === 'success').length;
     if (successCount === 0) {
-      toast.error('No hay matrículas válidas para procesar.');
+      toast.error('No hay asignaturas válidas para crear.');
       return;
     }
 
@@ -132,7 +99,7 @@ export default function MatriculaPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/admin/matricula', {
+      const response = await fetch('/api/admin/microcurriculo', {
         method: 'POST',
         body: formData,
       });
@@ -140,16 +107,13 @@ export default function MatriculaPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Error al confirmar la matrícula.');
+        throw new Error(result.error || 'Error al confirmar la carga.');
       }
 
-      toast.success(
-        `Matrícula completada. ${result.summary?.enrolled || 0} estudiantes matriculados.`
-      );
+      toast.success(`Proceso finalizado. Se crearon ${result.summary?.created || 0} asignaturas.`);
       setFinalResults({
-        enrolled: result.summary?.enrolled || 0,
+        created: result.summary?.created || 0,
         existing: result.summary?.existing || 0,
-        full: result.summary?.full || 0,
         errors: result.summary?.errors || 0,
       });
       setPreviewData([]);
@@ -177,17 +141,16 @@ export default function MatriculaPage() {
 
   const successCount = previewData.filter(item => item.status === 'success').length;
   const existingCount = previewData.filter(item => item.status === 'existing').length;
-  const fullCount = previewData.filter(item => item.status === 'full').length;
   const errorCount = previewData.filter(item => item.status === 'error').length;
 
   return (
     <main className="space-y-4">
       <div className="pb-4 col-span-1 w-full">
         <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
-          Matrícula de Estudiantes
+          Microcurrículo
         </CardTitle>
         <CardDescription className="text-xs">
-          Matricula estudiantes en los grupos de las asignaturas.
+          Sube un archivo .csv para registrar asignaturas con su información de microcurrículo.
         </CardDescription>
       </div>
 
@@ -199,11 +162,11 @@ export default function MatriculaPage() {
                 Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Descarga la plantilla oficial para el formato correcto.
+                Descarga la plantilla oficial para asegurar el formato correcto.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <a href="/formatos/plantilla_matricula.csv" download>
+              <a href="/formatos/plantilla_microcurriculo.csv" download>
                 <Button variant="outline" className="w-full justify-start">
                   <Download className="mr-2 h-4 w-4" />
                   Descargar Plantilla
@@ -212,28 +175,18 @@ export default function MatriculaPage() {
 
               <div className="space-y-2 mt-4">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Users className="h-4 w-4" />
+                  <Download className="h-4 w-4" />
                   <span className="font-medium">Columnas requeridas:</span>
                 </div>
                 <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                  <li>Documento Estudiante</li>
-                  <li>Código Asignatura</li>
-                  <li>Grupo (número)</li>
-                  <li>Jornada (DIURNO/NOCTURNO)</li>
+                  <li>Código Asignatura (ej: 718.004)</li>
+                  <li>Nombre Asignatura</li>
+                  <li>Programa (opcional)</li>
+                  <li>Semestre (opcional)</li>
+                  <li>Créditos (opcional)</li>
+                  <li>Horas Acompañamiento (opcional)</li>
                 </ul>
               </div>
-
-              {selectedSubjectData && (
-                <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <div className="text-xs font-medium mb-2">Grupos disponibles:</div>
-                  {selectedSubjectData.groups.map(group => (
-                    <div key={group.id} className="text-xs text-muted-foreground">
-                      Grupo {group.groupNumber} - {group.jornada}({group.studentIds?.length || 0}/
-                      {group.maxCapacity})
-                    </div>
-                  ))}
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -273,8 +226,8 @@ export default function MatriculaPage() {
                 Previsualización y Confirmación
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                Revisa las matrículas antes de confirmar. Si un grupo está lleno, se asignará al
-                siguiente.
+                Revisa los datos antes de confirmar la carga. Solo se procesarán las nuevas
+                asignaturas.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -287,29 +240,32 @@ export default function MatriculaPage() {
                   <CheckCircle className="h-16 w-16 text-primary" />
                   <div className="space-y-1">
                     <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">
-                      Matrícula completada
+                      Carga completada
                     </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Resumen del procesamiento masivo.
+                    </p>
                   </div>
                   <div className="flex gap-4 mt-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {finalResults.enrolled}
+                        {finalResults.created}
                       </div>
-                      <div className="text-xs text-muted-foreground">Matriculados</div>
+                      <div className="text-xs text-muted-foreground">Creadas</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-amber-600">
                         {finalResults.existing}
                       </div>
-                      <div className="text-xs text-muted-foreground">Ya inscritos</div>
+                      <div className="text-xs text-muted-foreground">Existentes</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">{finalResults.full}</div>
-                      <div className="text-xs text-muted-foreground">Grupos llenos</div>
+                      <div className="text-2xl font-bold text-red-600">{finalResults.errors}</div>
+                      <div className="text-xs text-muted-foreground">Errores</div>
                     </div>
                   </div>
                   <Button onClick={handleNewUpload} className="mt-4">
-                    Matricular más estudiantes
+                    Cargar otro archivo
                   </Button>
                 </div>
               ) : isPreview && previewData.length > 0 ? (
@@ -320,7 +276,7 @@ export default function MatriculaPage() {
                         variant="outline"
                         className="text-xs bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                       >
-                        {successCount} por matricular
+                        {successCount} nuevas
                       </Badge>
                     )}
                     {existingCount > 0 && (
@@ -328,15 +284,7 @@ export default function MatriculaPage() {
                         variant="outline"
                         className="text-xs text-amber-600 border-amber-600/20 bg-amber-500/10"
                       >
-                        {existingCount} ya inscritos
-                      </Badge>
-                    )}
-                    {fullCount > 0 && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs text-red-600 border-red-600/20 bg-red-500/10"
-                      >
-                        {fullCount} grupos llenos
+                        {existingCount} existentes
                       </Badge>
                     )}
                     {errorCount > 0 && (
@@ -351,50 +299,39 @@ export default function MatriculaPage() {
                       <div
                         key={index}
                         className={`p-4 rounded-2xl border transition-all ${
-                          item.status === 'error' || item.status === 'full'
+                          item.status === 'error' || item.status === 'existing'
                             ? 'border-destructive/20 bg-destructive/5'
-                            : item.status === 'existing'
-                              ? 'border-amber-500/20 bg-amber-500/5'
-                              : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
+                            : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-2">
                               <h4 className="font-semibold text-xs text-foreground">
-                                {item.estudianteNombre || item.documentoEstudiante}
+                                {item.nombreAsignatura} ({item.codigoAsignatura})
                               </h4>
-                              {item.status === 'success' && (
-                                <Badge className="bg-emerald-500 text-[10px] h-5">Listo</Badge>
-                              )}
                               {item.status === 'existing' && (
-                                <Badge variant="outline" className="text-[10px] h-5 text-amber-600">
-                                  Ya inscrito
+                                <Badge variant="destructive" className="text-[10px] h-5">
+                                  Existe
                                 </Badge>
                               )}
-                              {item.status === 'full' && (
-                                <Badge variant="destructive" className="text-[10px] h-5">
-                                  Grupo lleno
-                                </Badge>
+                              {item.status === 'success' && (
+                                <Badge className="bg-emerald-500 text-[10px] h-5">Nuevo</Badge>
                               )}
                               {item.status === 'error' && (
-                                <Badge variant="destructive" className="text-[10px] h-5">
-                                  Error
-                                </Badge>
+                                <XCircle className="h-4 w-4 text-red-500" />
                               )}
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {item.codigoAsignatura} - Grupo {item.grupo} ({item.jornada})
+
+                            <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground mb-2">
+                              <div>Programa: {item.programa || 'N/A'}</div>
+                              <div>Semestre: {item.semestre || 1}</div>
+                              <div>Créditos: {item.creditos || 0}</div>
                             </div>
-                            {item.message && (
-                              <div
-                                className={`text-xs mt-1 ${
-                                  item.status === 'error' || item.status === 'full'
-                                    ? 'text-destructive'
-                                    : 'text-muted-foreground'
-                                }`}
-                              >
-                                {item.message}
+
+                            {item.status === 'error' && (
+                              <div className="text-[10px] text-destructive mt-2 font-medium">
+                                Error: {item.message}
                               </div>
                             )}
                           </div>
@@ -405,7 +342,7 @@ export default function MatriculaPage() {
 
                   <div className="flex items-center justify-between pt-4 border-t">
                     <p className="text-xs text-muted-foreground">
-                      {successCount} estudiante{successCount !== 1 ? 's' : ''} por matricular
+                      Listo para procesar {successCount} asignatura{successCount !== 1 ? 's' : ''}
                     </p>
                     <Button
                       onClick={handleConfirmUpload}
@@ -418,7 +355,7 @@ export default function MatriculaPage() {
                           Procesando...
                         </>
                       ) : (
-                        'Confirmar Matrícula'
+                        'Confirmar e Importar'
                       )}
                     </Button>
                   </div>
@@ -427,7 +364,8 @@ export default function MatriculaPage() {
                 <div className="flex flex-col items-center justify-center min-h-[400px] py-12 text-center">
                   <FileSpreadsheet className="h-12 w-12 text-muted-foreground/30 mb-4" />
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    Sube un archivo CSV con los estudiantes a matricular.
+                    Sube un archivo CSV para previsualizar los datos y confirmar la importación
+                    masiva de asignaturas.
                   </p>
                 </div>
               )}

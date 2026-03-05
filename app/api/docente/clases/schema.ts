@@ -49,6 +49,7 @@ export const DocenteClaseCreateSchema = z.object({
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   topic: z.string().nullable().optional(),
+  classroom: z.string().nullable().optional(),
 });
 
 export const DocenteEventoCreateSchema = z.object({

@@ -1,0 +1,7 @@
+codigoAsignatura,grupo,jornada,cupoMaximo,dia,horaInicio,horaFin,salon
+718.001,1,DIURNO,30,Lunes,07:00,09:00,Sala 101
+718.001,1,DIURNO,30,Miércoles,07:00,09:00,Sala 101
+718.001,2,DIURNO,30,Martes,09:00,11:00,Laboratorio 1
+718.001,2,DIURNO,30,Jueves,09:00,11:00,Laboratorio 1
+718.001,3,NOCTURNO,25,Lunes,18:00,20:00,Sala 201
+718.001,3,NOCTURNO,25,Miércoles,18:00,20:00,Sala 201

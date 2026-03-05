@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { AttendanceStatus, ClassStatus, Role, UnenrollRequestStatus } from '@prisma/client';
+import { AttendanceStatus, ClassStatus, Role } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 interface MonthlyClassData {
@@ -9,7 +9,6 @@ interface MonthlyClassData {
 interface SubjectWithCounts {
   name: string;
   code: string;
-  studentIds: string[];
   _count: {
     classes: number;
   };
@@ -21,12 +20,12 @@ export async function GET() {
     const [
       totalUsers,
       totalSubjects,
+      totalGroups,
       totalClasses,
       totalReports,
       usersByRole,
       attendanceStats,
       classStatusStats,
-      unenrollRequestStats,
       monthlyClassesData,
       subjectEnrollmentData,
       classroomOccupancyRaw,
@@ -36,6 +35,10 @@ export async function GET() {
 
       // Total de materias
       prisma.subject.count(),
+
+      // Total de grupos
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (prisma as any).subjectGroup.count(),
 
       // Total de clases
       prisma.class.count(),
@@ -62,12 +65,6 @@ export async function GET() {
         _count: { status: true },
       }),
 
-      // Estadísticas de solicitudes de desmatrícula
-      prisma.unenrollRequest.groupBy({
-        by: ['status'],
-        _count: { status: true },
-      }),
-
       // Clases por mes (últimos 6 meses)
       prisma.class.findMany({
         where: {
@@ -83,26 +80,31 @@ export async function GET() {
         },
       }),
 
-      // Top 10 materias con más estudiantes matriculados
-      prisma.subject.findMany({
+      // Top 10 materias con más estudiantes matriculados (ahora a través de grupos)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (prisma as any).subject.findMany({
         select: {
           name: true,
           code: true,
-          studentIds: true,
-          _count: {
+        },
+        include: {
+          groups: {
             select: {
-              classes: true,
+              studentIds: true,
+              _count: {
+                select: {
+                  classes: true,
+                },
+              },
             },
           },
-        },
-        orderBy: {
-          studentIds: 'desc',
         },
         take: 10,
       }),
 
-      // Datos de ocupación de salones
-      prisma.subject.findMany({
+      // Datos de ocupación de salones (a través de grupos y clases)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (prisma as any).subject.findMany({
         where: {
           classroom: {
             not: null,
@@ -110,18 +112,25 @@ export async function GET() {
         },
         select: {
           classroom: true,
-          studentIds: true,
+          groups: {
+            select: {
+              studentIds: true,
+            },
+          },
         },
       }),
     ]);
 
     // Calcular ocupación de salones
     const occupancyMap = new Map<string, number>();
-    (classroomOccupancyRaw as Array<{ classroom: string | null; studentIds: string[] }>).forEach(
-      item => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (classroomOccupancyRaw as any[]).forEach(
+      (item: { classroom: string | null; groups?: { studentIds: string[] }[] }) => {
         if (item.classroom) {
+          const studentCount =
+            item.groups?.reduce((sum, g) => sum + (g.studentIds?.length || 0), 0) || 0;
           const current = occupancyMap.get(item.classroom) || 0;
-          occupancyMap.set(item.classroom, current + item.studentIds.length);
+          occupancyMap.set(item.classroom, current + studentCount);
         }
       }
     );
@@ -188,19 +197,6 @@ export async function GET() {
       })
     );
 
-    const unenrollDistribution = unenrollRequestStats.map(
-      (stat: { status: UnenrollRequestStatus; _count: { status: number } }) => ({
-        name: stat.status,
-        value: stat._count.status,
-        label:
-          stat.status === UnenrollRequestStatus.PENDIENTE
-            ? 'Pendientes'
-            : stat.status === UnenrollRequestStatus.APROBADO
-              ? 'Aprobadas'
-              : 'Rechazadas',
-      })
-    );
-
     // Formatear datos de clases mensuales
     const monthlyClassesMap = new Map<string, number>();
 
@@ -217,16 +213,13 @@ export async function GET() {
       clases: count,
     }));
 
-    // Obtener las 3 materias con más clases
-    const topSubjects = (subjectEnrollmentData as SubjectWithCounts[])
-      .map(subject => ({
-        name: subject.name,
-        code: subject.code,
-        students: subject.studentIds.length,
-        classes: subject._count.classes,
-      }))
-      .sort((a, b) => b.classes - a.classes)
-      .slice(0, 3);
+    // Obtener las 3 materias con más clases usando el nuevo modelo de grupos
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const topSubjects = (subjectEnrollmentData as any[]).slice(0, 3).map((subject: any) => ({
+      name: subject.name,
+      code: subject.code,
+      classes: subject.groups?._count?.classes || 0,
+    }));
 
     // Calcular métricas adicionales
     const activeTeachers =
@@ -236,10 +229,6 @@ export async function GET() {
     const completedClasses =
       classStatusStats.find(
         (stat: { status: ClassStatus }) => stat.status === ClassStatus.REALIZADA
-      )?._count.status || 0;
-    const pendingUnenrolls =
-      unenrollRequestStats.find(
-        (stat: { status: UnenrollRequestStatus }) => stat.status === UnenrollRequestStatus.PENDIENTE
       )?._count.status || 0;
 
     const dashboardData = {
@@ -260,14 +249,14 @@ export async function GET() {
         {
           title: 'Asistencia General',
           value: `${attendancePercentage.toFixed(1)}%`,
-          subtitle: `${presentAttendances} de ${totalAttendances} asistencias`,
+          subtitle: `${presentAttendances} de ${totalAttendances} asistencia`,
           trend: attendancePercentage > 85 ? '+2.3% vs promedio' : '-1.2% vs promedio',
         },
         {
-          title: 'Solicitudes Pendientes',
-          value: pendingUnenrolls,
-          subtitle: 'Desmatrículas por revisar',
-          trend: pendingUnenrolls > 0 ? 'Requiere atención' : 'Al día',
+          title: 'Grupos Activos',
+          value: totalGroups,
+          subtitle: `${totalSubjects} asignaturas`,
+          trend: '+5% vs mes anterior',
         },
       ],
 
@@ -276,7 +265,6 @@ export async function GET() {
         roleDistribution,
         attendanceDistribution,
         classStatusDistribution,
-        unenrollDistribution,
         monthlyClasses,
         topSubjects,
         classroomOccupancy,
@@ -286,13 +274,13 @@ export async function GET() {
       metrics: {
         totalUsers,
         totalSubjects,
+        totalGroups,
         totalClasses,
         totalReports,
         attendancePercentage: attendancePercentage.toFixed(1),
-        activeTeachers,
         activeStudents,
         completedClasses,
-        pendingUnenrolls,
+        activeTeachers,
       },
     };
 

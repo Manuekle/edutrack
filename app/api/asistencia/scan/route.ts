@@ -108,7 +108,8 @@ export async function POST(request: Request) {
       });
     }
     // 5. Buscar la clase asociada al token QR
-    const classRecord = await db.class.findFirst({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const classRecord = await (db as any).class.findFirst({
       where: {
         qrToken: qrToken,
         qrTokenExpiresAt: { gt: new Date() },
@@ -117,16 +118,23 @@ export async function POST(request: Request) {
     if (!classRecord) {
       return createErrorResponse('INVALID_TOKEN');
     }
-    // 5b. Buscar la asignatura para obtener los IDs de los estudiantes
-    const subject = await db.subject.findUnique({
-      where: { id: classRecord.subjectId },
-      select: { id: true, name: true, studentIds: true },
+
+    // 5b. Buscar el grupo y la asignatura para obtener los IDs de los estudiantes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const group = await (db as any).subjectGroup.findUnique({
+      where: { id: classRecord.groupId },
+      include: {
+        subject: { select: { id: true, name: true } },
+      },
     });
-    if (!subject) {
+    if (!group) {
       return createErrorResponse('INVALID_TOKEN', {
-        details: 'La asignatura asociada a la clase no fue encontrada.',
+        details: 'El grupo asociado a la clase no fue encontrado.',
       });
     }
+
+    const subject = group.subject;
+    const studentIds = group.studentIds || [];
     // 6. Validar horario de la clase
     const now = new Date();
     const classStart = classRecord.startTime || classRecord.date;
@@ -143,8 +151,8 @@ export async function POST(request: Request) {
         classEndedAt: classEnd.toISOString(),
       });
     }
-    // 7. Verificar si el estudiante está matriculado en la asignatura
-    const isEnrolled = subject.studentIds.includes(session.user.id);
+    // 7. Verificar si el estudiante está matriculado en el grupo
+    const isEnrolled = studentIds.includes(session.user.id);
     if (!isEnrolled) {
       return createErrorResponse('NOT_ENROLLED');
     }

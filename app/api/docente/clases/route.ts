@@ -210,7 +210,6 @@ export async function POST(request: Request) {
       );
     } else {
       const data = DocenteClaseCreateSchema.parse(body);
-      // Security check
       const subject = await db.subject.findFirst({
         where: { id: data.subjectId, teacherIds: { has: session.user.id } },
       });
@@ -226,6 +225,71 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
+
+      const classDate = new Date(data.date);
+      const dayStart = new Date(classDate);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(classDate);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const existingClasses = await db.class.findMany({
+        where: {
+          date: { gte: dayStart, lte: dayEnd },
+          status: 'PROGRAMADA',
+          OR: [
+            {
+              startTime: { lte: data.startTime },
+              endTime: { gt: data.startTime },
+            },
+            {
+              startTime: { lt: data.endTime },
+              endTime: { gte: data.endTime },
+            },
+            {
+              startTime: { gte: data.startTime },
+              endTime: { lte: data.endTime },
+            },
+          ],
+        },
+        select: {
+          subjectId: true,
+          classroom: true,
+          subject: {
+            select: { teacherIds: true },
+          },
+        },
+      });
+
+      const teacherCollision = (existingClasses as any[]).find(cls =>
+        cls.subject?.teacherIds?.includes(session.user.id)
+      );
+      if (teacherCollision) {
+        return NextResponse.json(
+          { message: 'El docente ya tiene otra clase programada en este horario' },
+          { status: 400 }
+        );
+      }
+
+      const classroomCollision = (existingClasses as any[]).find(
+        cls => cls.classroom && data.classroom && cls.classroom === data.classroom
+      );
+      if (classroomCollision) {
+        return NextResponse.json(
+          { message: 'El salón ya está ocupado en este horario' },
+          { status: 400 }
+        );
+      }
+
+      const subjectCollision = (existingClasses as any[]).find(
+        cls => cls.subjectId === data.subjectId
+      );
+      if (subjectCollision) {
+        return NextResponse.json(
+          { message: 'La asignatura ya tiene otra clase programada en este horario' },
+          { status: 400 }
+        );
+      }
+
       const newClass = await db.class.create({
         data: {
           subjectId: data.subjectId,
@@ -233,6 +297,7 @@ export async function POST(request: Request) {
           startTime: data.startTime,
           endTime: data.endTime,
           topic: data.topic || null,
+          classroom: data.classroom || null,
         },
       });
       const validado = DocenteClaseSchema.safeParse({
