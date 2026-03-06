@@ -29,7 +29,7 @@ import { Label } from '@/components/ui/label';
 import { LoadingPage } from '@/components/ui/loading';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { uploadSignature } from '@/lib/actions/user.actions';
-import { AlertCircle, Loader2, Lock, PenLine, User } from 'lucide-react';
+import { Loader2, Lock, PenLine, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
@@ -439,284 +439,194 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto space-y-10 pb-10">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-          Mi Perfil
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-2xl">
-          Gestiona tu información personal, seguridad de la cuenta y preferencias de firma digital.
-        </p>
+    <div className="space-y-6">
+      <div>
+        <CardHeader className="p-0">
+          <CardTitle className="sm:text-2xl text-xl font-semibold tracking-card">Mi Perfil</CardTitle>
+          <CardDescription className="text-xs">Gestiona tu información personal, seguridad y firma digital.</CardDescription>
+        </CardHeader>
       </div>
 
-      <Tabs
-        defaultValue="profile"
-        className="space-y-6"
-        onValueChange={setActiveTab}
-        value={activeTab}
-      >
+      <Tabs defaultValue="profile" className="space-y-6" onValueChange={setActiveTab} value={activeTab}>
         <TabsList
-          className="inline-flex h-10 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground w-full max-w-md shadow-sm border border-border/50"
+          className="inline-flex h-9 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground shadow-sm border border-border/50"
           style={{
             display: 'grid',
             gridTemplateColumns: session?.user?.role === 'DOCENTE' ? '1fr 1fr 1fr' : '1fr 1fr',
+            width: 'fit-content',
           }}
         >
-          <TabsTrigger
-            value="profile"
-            className="rounded-full data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-          >
-            <User className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Perfil</span>
-            <span className="sm:hidden">Perfil</span>
+          <TabsTrigger value="profile" className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
+            <User className="h-3.5 w-3.5 mr-1.5" />
+            Perfil
           </TabsTrigger>
-          <TabsTrigger
-            value="security"
-            className="rounded-full data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-          >
-            <Lock className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Seguridad</span>
-            <span className="sm:hidden">Seg.</span>
+          <TabsTrigger value="security" className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
+            <Lock className="h-3.5 w-3.5 mr-1.5" />
+            Seguridad
           </TabsTrigger>
           {session?.user?.role === 'DOCENTE' && (
-            <TabsTrigger
-              value="signature"
-              className="rounded-full data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-            >
-              <PenLine className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Firma</span>
-              <span className="sm:hidden">Firma</span>
+            <TabsTrigger value="signature" className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
+              <PenLine className="h-3.5 w-3.5 mr-1.5" />
+              Firma
             </TabsTrigger>
           )}
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-8 animate-in fade-in-50 duration-500">
-          <Card className="border shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
-            <div className="h-24 w-full bg-gradient-to-r from-primary/20 via-primary/10 to-transparent border-b border-border/50" />
-            <CardHeader className="relative -mt-12 pt-0 pb-6 px-4 sm:px-8">
-              <div className="flex flex-col sm:flex-row items-end gap-6">
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-primary/50 to-primary-foreground/50 rounded-full blur opacity-40 group-hover:opacity-60 transition duration-500" />
-                  <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-background bg-background shadow-xl relative z-10 transition-transform duration-500 hover:scale-105">
-                    <AvatarFallback className="text-3xl font-bold bg-muted text-primary">
-                      {session?.user?.name?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div className="flex-1 pb-2 text-center sm:text-left">
-                  <h2 className="text-xl sm:text-2xl font-bold text-foreground truncate">
-                    {session?.user?.name}
-                  </h2>
-                  <p className="text-sm text-muted-foreground font-medium tracking-wider bg-muted/50 inline-block px-2 py-0.5 rounded-md mt-1 border border-border/50">
-                    {session?.user?.role}
-                  </p>
-                </div>
+        <TabsContent value="profile" className="space-y-4">
+          {/* Resumen del usuario */}
+          <Card>
+            <CardContent className="py-4 px-5 flex items-center gap-4">
+              <Avatar className="h-12 w-12 border border-border bg-muted shrink-0">
+                <AvatarFallback className="text-lg font-bold text-primary">
+                  {session?.user?.name?.charAt(0) || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-semibold">{session?.user?.name}</p>
+                <p className="text-xs text-muted-foreground">{session?.user?.role}</p>
               </div>
-            </CardHeader>
-
-            <Form {...profileForm}>
-              <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-                <CardContent className="px-4 sm:px-8 space-y-8 pt-6">
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-2 mb-2 pb-1 border-b border-border/50">
-                      <User className="h-4 w-4 text-primary" />
-                      <h3 className="text-sm font-semibold text-foreground tracking-tight">Información de Cuenta</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                      <FormField
-                        control={profileForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel className="text-xs font-bold text-muted-foreground/70 tracking-widest">Nombre completo</FormLabel>
-                            <FormControl>
-                              <Input
-                                disabled
-                                placeholder="Tu nombre completo"
-                                className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage className="text-[10px]" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={profileForm.control}
-                        name="correoInstitucional"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel className="text-xs font-bold text-muted-foreground/70 tracking-widest">Correo Institucional</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="email"
-                                placeholder="correo@institucion.edu"
-                                className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage className="text-[10px]" />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-2 mb-2 pb-1 border-b border-border/50">
-                      <AlertCircle className="h-4 w-4 text-primary" />
-                      <h3 className="text-sm font-semibold text-foreground tracking-tight">Información de Contacto y Académica</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                      <FormField
-                        control={profileForm.control}
-                        name="correoPersonal"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel className="text-xs font-bold text-muted-foreground/70 tracking-widest">Correo Personal (Opcional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="email"
-                                placeholder="correo@personal.com"
-                                className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage className="text-[10px]" />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={profileForm.control}
-                        name="telefono"
-                        render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel className="text-xs font-bold text-muted-foreground/70 tracking-widest">Teléfono/WhatsApp</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="tel"
-                                placeholder="+57 312 312 312"
-                                className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage className="text-[10px]" />
-                          </FormItem>
-                        )}
-                      />
-
-                      {session?.user?.role === 'ESTUDIANTE' && (
-                        <FormField
-                          control={profileForm.control}
-                          name="codigoEstudiantil"
-                          render={({ field }) => (
-                            <FormItem className="space-y-2">
-                              <FormLabel className="text-xs font-bold text-muted-foreground/70 tracking-widest">Código Estudiantil</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Ingrese su código"
-                                  className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage className="text-[10px]" />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      {session?.user?.role === 'DOCENTE' && (
-                        <FormField
-                          control={profileForm.control}
-                          name="codigoDocente"
-                          render={({ field }) => (
-                            <FormItem className="space-y-2">
-                              <FormLabel className="text-xs font-bold text-muted-foreground/70 tracking-widest">Código Docente</FormLabel>
-                              <FormControl>
-                                <Input
-                                  disabled
-                                  placeholder="Su código docente"
-                                  className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage className="text-[10px]" />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="px-4 sm:px-8 py-6 bg-muted/30 border-t border-border/50">
-                  <Button type="submit" disabled={isProfileLoading} className="w-full sm:w-auto px-10 shadow-lg shadow-primary/20">
-                    {isProfileLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Guardando cambios...
-                      </>
-                    ) : (
-                      'Actualizar Información'
-                    )}
-                  </Button>
-                </CardFooter>
-              </form>
-            </Form>
+            </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="security" className="space-y-6 animate-in fade-in-50 slide-in-from-bottom-5 duration-500">
-          <Card className="border shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
-            <CardHeader className="px-4 sm:px-8 pt-8 pb-6 border-b border-border/50">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-600 border border-orange-500/20">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg sm:text-xl font-bold">Cambiar Contraseña</CardTitle>
-                  <CardDescription className="text-sm">
-                    Recomendamos cambiar tu contraseña periódicamente para mantener tu cuenta segura.
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <Form {...passwordForm}>
-              <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-                <CardContent className="px-4 sm:px-8 py-8 space-y-6">
-                  <div className="max-w-md space-y-6">
+          <Form {...profileForm}>
+            <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+              <Card>
+                <CardHeader className="border-b px-5 py-4">
+                  <CardTitle className="text-sm font-semibold">Información de Perfil</CardTitle>
+                  <CardDescription className="text-xs">Actualiza los datos de tu cuenta.</CardDescription>
+                </CardHeader>
+                <CardContent className="px-5 py-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <FormField
-                      control={passwordForm.control}
-                      name="currentPassword"
+                      control={profileForm.control}
+                      name="name"
                       render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-[10px] font-bold text-muted-foreground/70 tracking-widest">Contraseña actual</FormLabel>
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">Nombre completo</FormLabel>
                           <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                              {...field}
-                            />
+                            <Input disabled placeholder="Tu nombre completo" {...field} />
                           </FormControl>
                           <FormMessage className="text-[10px]" />
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <FormField
+                      control={profileForm.control}
+                      name="correoInstitucional"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">Correo Institucional</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="correo@institucion.edu" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-[10px]" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="correoPersonal"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">Correo Personal</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="correo@personal.com" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-[10px]" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="telefono"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">Teléfono / WhatsApp</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="+57 312 312 312" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-[10px]" />
+                        </FormItem>
+                      )}
+                    />
+                    {session?.user?.role === 'ESTUDIANTE' && (
+                      <FormField
+                        control={profileForm.control}
+                        name="codigoEstudiantil"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs text-muted-foreground">Código Estudiantil</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ingrese su código" {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[10px]" />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                    {session?.user?.role === 'DOCENTE' && (
+                      <FormField
+                        control={profileForm.control}
+                        name="codigoDocente"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs text-muted-foreground">Código Docente</FormLabel>
+                            <FormControl>
+                              <Input disabled placeholder="Su código docente" {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[10px]" />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+                </CardContent>
+                <CardFooter className="px-5 py-4 border-t bg-muted/30">
+                  <Button type="submit" disabled={isProfileLoading} className="w-full sm:w-auto">
+                    {isProfileLoading ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Guardando...</>
+                    ) : (
+                      'Guardar Cambios'
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form>
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-4">
+          <Form {...passwordForm}>
+            <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
+              <Card>
+                <CardHeader className="border-b px-5 py-4">
+                  <CardTitle className="text-sm font-semibold">Cambiar Contraseña</CardTitle>
+                  <CardDescription className="text-xs">Recomendamos cambiar tu contraseña periódicamente.</CardDescription>
+                </CardHeader>
+                <CardContent className="px-5 py-5">
+                  <div className="max-w-md space-y-5">
+                    <FormField
+                      control={passwordForm.control}
+                      name="currentPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-muted-foreground">Contraseña actual</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="••••••••" {...field} />
+                          </FormControl>
+                          <FormMessage className="text-[10px]" />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <FormField
                         control={passwordForm.control}
                         name="newPassword"
                         render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel className="text-[10px] font-bold text-muted-foreground/70 tracking-widest">Nueva contraseña</FormLabel>
+                          <FormItem>
+                            <FormLabel className="text-xs text-muted-foreground">Nueva contraseña</FormLabel>
                             <FormControl>
-                              <Input
-                                type="password"
-                                placeholder="••••••••"
-                                className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                {...field}
-                              />
+                              <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
                             <FormMessage className="text-[10px]" />
                           </FormItem>
@@ -726,196 +636,122 @@ export default function ProfilePage() {
                         control={passwordForm.control}
                         name="confirmPassword"
                         render={({ field }) => (
-                          <FormItem className="space-y-2">
-                            <FormLabel className="text-[10px] font-bold text-muted-foreground/70 tracking-widest">Confirmar contraseña</FormLabel>
+                          <FormItem>
+                            <FormLabel className="text-xs text-muted-foreground">Confirmar contraseña</FormLabel>
                             <FormControl>
-                              <Input
-                                type="password"
-                                placeholder="••••••••"
-                                className="h-11 bg-background/50 border-muted-foreground/20 text-sm focus-visible:ring-primary/30"
-                                {...field}
-                              />
+                              <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
                             <FormMessage className="text-[10px]" />
                           </FormItem>
                         )}
                       />
                     </div>
-
-                    <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-xs text-muted-foreground flex items-start gap-3 shadow-sm">
-                      <AlertCircle className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-                      <div className="space-y-1">
-                        <p className="font-semibold text-foreground">Requisitos de seguridad:</p>
-                        <ul className="list-disc list-inside space-y-0.5 pl-1 opacity-80">
-                          <li>Mínimo 6 caracteres</li>
-                          <li>Combina letras y números</li>
-                          <li>No compartas tu contraseña con nadie</li>
-                        </ul>
-                      </div>
-                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Mínimo 6 caracteres. Combina letras y números.
+                    </p>
                   </div>
                 </CardContent>
-                <CardFooter className="px-4 sm:px-8 py-6 bg-muted/30 border-t border-border/50">
-                  <Button type="submit" disabled={isPasswordLoading} className="w-full sm:w-auto px-10 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90">
+                <CardFooter className="px-5 py-4 border-t bg-muted/30">
+                  <Button type="submit" disabled={isPasswordLoading} className="w-full sm:w-auto">
                     {isPasswordLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Actualizando contraseña...
-                      </>
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Actualizando...</>
                     ) : (
                       'Actualizar Contraseña'
                     )}
                   </Button>
                 </CardFooter>
-              </form>
-            </Form>
-          </Card>
+              </Card>
+            </form>
+          </Form>
         </TabsContent>
 
         {session?.user?.role === 'DOCENTE' && (
-          <TabsContent value="signature" className="space-y-6 animate-in fade-in-50 slide-in-from-bottom-5 duration-500">
-            <Card className="border shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
-              <CardHeader className="px-4 sm:px-8 pt-8 pb-6 border-b border-border/50">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/20">
-                    <PenLine className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg sm:text-xl font-bold">Firma Digital</CardTitle>
-                    <CardDescription className="text-sm">
-                      Gestiona tu firma oficial para certificados y documentos académicos.
-                    </CardDescription>
-                  </div>
-                </div>
+          <TabsContent value="signature" className="space-y-4">
+            <Card>
+              <CardHeader className="border-b px-5 py-4">
+                <CardTitle className="text-sm font-semibold">Firma Digital</CardTitle>
+                <CardDescription className="text-xs">Gestiona tu firma oficial para certificados y documentos.</CardDescription>
               </CardHeader>
-
-              <CardContent className="px-4 sm:px-8 py-8 space-y-10">
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground/70 tracking-widest">
-                        Opción 1: Subir Imagen
-                      </Label>
-                    </div>
-                    <div className="min-h-[220px] rounded-2xl overflow-hidden shadow-inner border border-dashed border-border group hover:border-primary/50 transition-colors">
+              <CardContent className="px-5 py-5 space-y-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                  {/* Subir imagen */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Subir imagen de firma</Label>
+                    <div className="rounded-xl overflow-hidden border border-dashed border-border">
                       <SignatureFileUpload onFileSelect={handleFileSelect} file={signatureFile} />
                     </div>
-                    <p className="text-[11px] text-muted-foreground text-center italic">
-                      Formatos recomendados: PNG con fondo transparente o fondo blanco limpio.
-                    </p>
+                    <p className="text-[11px] text-muted-foreground">PNG con fondo transparente o blanco. Máximo 2 MB.</p>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="text-[10px] font-bold text-muted-foreground/70 tracking-widest">
-                        Opción 2: Dibujar a Mano
-                      </Label>
+                  {/* Dibujar */}
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Dibujar firma a mano</Label>
+                    <div
+                      ref={canvasWrapperRef}
+                      className="w-full h-[180px] border border-border rounded-xl bg-muted/10 relative overflow-hidden touch-none"
+                    >
+                      <SignatureCanvas
+                        ref={sigCanvas}
+                        penColor="hsl(var(--primary))"
+                        canvasProps={{
+                          className: 'w-full h-full rounded-xl touch-none cursor-crosshair',
+                          style: { touchAction: 'none' }
+                        }}
+                        velocityFilterWeight={0.7}
+                        minWidth={2}
+                        maxWidth={4}
+                        throttle={16}
+                      />
                     </div>
-                    <div className="flex flex-col space-y-4">
-                      <div
-                        ref={canvasWrapperRef}
-                        className="w-full h-[220px] items-center justify-center border border-muted-foreground/20 rounded-2xl bg-muted/20 relative shadow-inner overflow-hidden group touch-none"
-                      >
-                        <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="text-[10px] bg-background/80 backdrop-blur px-2 py-1 rounded-full border border-border/50 text-muted-foreground">
-                            Área de dibujo
-                          </span>
-                        </div>
-                        <SignatureCanvas
-                          ref={sigCanvas}
-                          penColor="hsl(var(--primary))"
-                          canvasProps={{
-                            className: 'w-full h-full rounded-2xl touch-none cursor-crosshair',
-                            style: { touchAction: 'none' }
-                          }}
-                          velocityFilterWeight={0.7}
-                          minWidth={2}
-                          maxWidth={4}
-                          throttle={16}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={clearCanvas}
-                          className="flex-1 rounded-lg h-10 font-medium"
-                        >
-                          Limpiar
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={saveCanvas} className="flex-1 rounded-lg h-10 border-primary/30 text-primary hover:bg-primary/5">
-                          Capturar Trazo
-                        </Button>
-                      </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={clearCanvas} className="flex-1 text-xs">Limpiar</Button>
+                      <Button variant="secondary" size="sm" onClick={saveCanvas} className="flex-1 text-xs">Capturar trazo</Button>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-border/50">
-                  <Label className="text-[10px] font-bold text-muted-foreground/70 tracking-widest mb-4 block">
-                    Firma Actual / Vista Previa
-                  </Label>
-                  <div className="flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-full md:w-[320px] h-[180px] border border-muted-foreground/10 rounded-2xl p-4 flex items-center justify-center bg-white shadow-lg shadow-black/5 dark:bg-zinc-950/50 backdrop-blur-sm relative overflow-hidden group">
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
+                {/* Vista previa */}
+                <div className="border-t pt-5 space-y-3">
+                  <Label className="text-xs text-muted-foreground">Vista previa / Firma actual</Label>
+                  <div className="flex flex-col md:flex-row items-start gap-5">
+                    <div className="w-full md:w-64 h-36 border border-border rounded-xl flex items-center justify-center bg-white dark:bg-zinc-950/50 overflow-hidden shrink-0">
                       {signaturePreview ? (
-                        <div className="relative w-full h-full p-2">
+                        <div className="relative w-full h-full p-3">
                           <Image
                             src={signaturePreview}
                             alt="Firma"
                             fill
                             style={{ objectFit: 'contain' }}
-                            className="rounded-lg dark:invert transition-transform duration-500 group-hover:scale-105"
+                            className="rounded-lg dark:invert"
                           />
                         </div>
                       ) : (
-                        <div className="text-center text-muted-foreground/40 space-y-2">
-                          <PenLine className="h-8 w-8 mx-auto opacity-20" />
-                          <p className="text-xs font-medium">No se ha registrado una firma</p>
+                        <div className="text-center text-muted-foreground space-y-1">
+                          <PenLine className="h-6 w-6 mx-auto opacity-20" />
+                          <p className="text-xs">Sin firma registrada</p>
                         </div>
                       )}
                     </div>
-
-                    <div className="flex-1 space-y-6 w-full">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-semibold">Estado de la Firma</h4>
-                        <div className="flex items-center gap-3">
-                          {signatureFile ? (
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-600 border border-orange-500/20 text-xs font-medium animate-pulse">
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                              Firma pendiente de guardar
-                            </div>
-                          ) : signaturePreview ? (
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 border border-green-500/20 text-xs font-medium">
-                              <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                              Firma oficial registrada
-                            </div>
-                          ) : (
-                            <div className="text-xs text-muted-foreground italic">
-                              Carga una imagen o dibuja tu firma para comenzar.
-                            </div>
-                          )}
-                        </div>
+                    <div className="space-y-3 flex-1">
+                      <div className="text-xs">
+                        {signatureFile ? (
+                          <span className="text-orange-600 font-medium">● Pendiente de guardar</span>
+                        ) : signaturePreview ? (
+                          <span className="text-green-600 font-medium">● Firma registrada</span>
+                        ) : (
+                          <span className="text-muted-foreground">Sin firma. Sube o dibuja tu firma.</span>
+                        )}
                       </div>
-
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <Button
-                          onClick={handleUploadSignature}
-                          disabled={!signatureFile || isSignatureLoading}
-                          className="px-8 shadow-lg shadow-primary/20"
-                        >
+                      <div className="flex gap-2 flex-wrap">
+                        <Button onClick={handleUploadSignature} disabled={!signatureFile || isSignatureLoading} size="sm" className="text-xs">
                           {isSignatureLoading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...
-                            </>
+                            <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Guardando...</>
                           ) : (
-                            'Guardar como Firma Oficial'
+                            'Guardar Firma'
                           )}
                         </Button>
                         {signatureFile && (
-                          <Button onClick={handleCancelSignature} variant="ghost" className="text-muted-foreground hover:text-foreground">
-                            Cancelar cambios
-                          </Button>
+                          <Button onClick={handleCancelSignature} variant="ghost" size="sm" className="text-xs text-muted-foreground">Cancelar</Button>
                         )}
                       </div>
                     </div>
