@@ -562,7 +562,7 @@ export function TeacherReport() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-background">
       {/* Sidebar - Only sticky on desktop */}
-      <Card className="p-0 w-full md:w-96 shadow-sm rounded-xl flex flex-col self-start md:sticky md:top-0 h-auto md:h-[53dvh] z-10 overflow-y-auto">
+      <Card className="p-0 w-full md:w-96 shadow-sm rounded-xl flex flex-col self-start md:sticky md:top-0 h-auto md:h-[53dvh] z-10 overflow-y-auto" id="tour-reportes-list">
         <CardHeader className="p-0">
           <div className="relative p-0 px-3 pt-4">
             <Input
@@ -673,7 +673,7 @@ export function TeacherReport() {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full md:w-auto">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full md:w-auto" id="tour-reportes-filters">
                     <div className="flex items-center gap-2 font-sans w-full sm:w-auto">
                       <Select value={period} onValueChange={setPeriod}>
                         <SelectTrigger className="w-full sm:w-40">
@@ -715,7 +715,7 @@ export function TeacherReport() {
             </Card>
 
             {/* Chart */}
-            <Card>
+            <Card id="tour-reportes-chart">
               <CardContent>
                 <div className="relative h-72 md:h-80">
                   {loadingData && (
@@ -792,10 +792,12 @@ export function TeacherReport() {
 
             {/* Subject Details */}
             {selectedSubjectId !== 'all' && subjects.find(s => s.id === selectedSubjectId) && (
-              <SubjectDetailsPanel
-                subject={subjects.find(s => s.id === selectedSubjectId)!}
-                apiResponse={historicData}
-              />
+              <div id="tour-reportes-details">
+                <SubjectDetailsPanel
+                  subject={subjects.find(s => s.id === selectedSubjectId)!}
+                  apiResponse={historicData}
+                />
+              </div>
             )}
           </div>
         ) : (

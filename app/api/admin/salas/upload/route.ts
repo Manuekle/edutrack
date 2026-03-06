@@ -109,8 +109,7 @@ export async function POST(request: Request) {
                 capacity: r.capacity,
                 description: r.description,
                 isActive: true
-            })),
-            skipDuplicates: true
+            }))
         });
     }
 

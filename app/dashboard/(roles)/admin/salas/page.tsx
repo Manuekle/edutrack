@@ -741,7 +741,7 @@ export default function AdminSalasPage() {
     <Tabs defaultValue="list" className="flex flex-col gap-8 h-full">
       {/* Header Consistent with Users Module but with cleaner spacing */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5">
+        <div className="space-y-1.5" id="tour-salas-title">
           <h1 className="sm:text-2xl text-xs font-semibold tracking-card text-foreground/90">
             Gestión de Salas
           </h1>
@@ -751,7 +751,7 @@ export default function AdminSalasPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <TabsList className="flex items-center p-1 gap-2 bg-muted/20 rounded-full border border-muted/50 overflow-x-auto no-scrollbar h-auto backdrop-blur-sm">
+          <TabsList className="flex items-center p-1 gap-2 bg-muted/20 rounded-full border border-muted/50 overflow-x-auto no-scrollbar h-auto backdrop-blur-sm" id="tour-salas-tabs">
             <TabsTrigger
               value="list"
               className="rounded-full px-7 text-xs font-normal transition-all shrink-0 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30 data-[state=active]:hover:bg-primary text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground border-none"
@@ -775,7 +775,7 @@ export default function AdminSalasPage() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2" id="tour-salas-actions">
             <Button
               variant="outline"
               className="rounded-full px-6 shadow-sm gap-2 bg-background border-primary/20 hidden md:flex"

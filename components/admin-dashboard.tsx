@@ -145,7 +145,7 @@ const AdminDashboardComponent = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-        <CardHeader className="p-0 w-full">
+        <CardHeader className="p-0 w-full" id="tour-admin-title">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Mi Panel
           </CardTitle>
@@ -163,7 +163,7 @@ const AdminDashboardComponent = () => {
         </div>
       </div>
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="tour-admin-metrics">
         {data.cards.map((card, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -186,7 +186,7 @@ const AdminDashboardComponent = () => {
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Distribución por Roles */}
-        <Card>
+        <Card id="tour-admin-users-chart">
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
@@ -245,7 +245,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Clases por Mes */}
-        <Card>
+        <Card id="tour-admin-classes-chart">
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">

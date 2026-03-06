@@ -1,4 +1,4 @@
-import { EnrollmentStatus, Jornada, PrismaClient, Role, RoomType } from '@prisma/client';
+import { BookingStatus, ClassStatus, EnrollmentStatus, EventType, Jornada, PrismaClient, Role, RoomType } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -6,9 +6,9 @@ const prisma = new PrismaClient();
 const hashPassword = async (password: string) => hash(password, 12);
 
 async function main() {
-  console.log('🗑️  Limpiando base de datos...');
+  console.log('🗑️  Deep cleaning database...');
   
-  // Limpieza en orden de dependencias
+  // order matters for cascade and relations
   await prisma.attendance.deleteMany();
   await prisma.enrollment.deleteMany();
   await prisma.groupAssignment.deleteMany();
@@ -20,117 +20,271 @@ async function main() {
   await prisma.subject.deleteMany();
   await prisma.roomBooking.deleteMany();
   await prisma.room.deleteMany();
-  
-  // Limpiar usuarios excepto el admin principal si se desea conservar, 
-  // pero aquí recreamos todo para un entorno límpio.
   await prisma.user.deleteMany();
 
-  console.log('👤 Creando usuarios...');
+  console.log('👤 Creating specialized users...');
   const commonPassword = await hashPassword('password123');
 
-  // 1 Admin
+  // Admins
   const admin = await prisma.user.create({
     data: {
-      name: 'Admin Sistema',
+      name: 'Jorge Admin',
       document: '1000',
       correoInstitucional: 'admin@fup.edu.co',
-      correoPersonal: 'admin@test.com',
+      correoPersonal: 'jorge.admin@test.com',
       password: commonPassword,
       role: Role.ADMIN,
       isActive: true,
     },
   });
 
-  // 1 Docente
-  const teacher = await prisma.user.create({
+  // Coordinators
+  const admin2 = await prisma.user.create({
+    data: {
+      name: 'Patricia Coordinadora',
+      document: '1500',
+      correoInstitucional: 'coordinacion@fup.edu.co',
+      correoPersonal: 'patricia@test.com',
+      password: commonPassword,
+      role: Role.COORDINADOR,
+      isActive: true,
+    },
+  });
+
+  // Teachers
+  const t1 = await prisma.user.create({
     data: {
       name: 'Dr. Ramiro García',
       document: '2000',
-      correoInstitucional: 'docente@fup.edu.co',
-      correoPersonal: 'docente_p@test.com',
+      correoInstitucional: 'r.garcia@fup.edu.co',
+      correoPersonal: 'ramiro@test.com',
+      password: commonPassword,
+      role: Role.DOCENTE,
+      isActive: true,
+      signatureUrl: 'https://placehold.co/400x200?text=Firma+Resguardo',
+    },
+  });
+
+  const t2 = await prisma.user.create({
+    data: {
+      name: 'Ing. Sandra Restrepo',
+      document: '2001',
+      correoInstitucional: 's.restrepo@fup.edu.co',
+      correoPersonal: 'sandra@test.com',
       password: commonPassword,
       role: Role.DOCENTE,
       isActive: true,
     },
   });
 
-  // 2 Estudiantes
-  const student1 = await prisma.user.create({
-    data: {
-      name: 'Juan Pérez',
-      document: '3001',
-      correoInstitucional: 'estudiante1@fup.edu.co',
-      correoPersonal: 'estudiante1_p@test.com',
-      password: commonPassword,
-      role: Role.ESTUDIANTE,
-      isActive: true,
-    },
-  });
+  // Students - Batch 1 (Group 10A)
+  const studentsA = [];
+  for (let i = 1; i <= 5; i++) {
+    const s = await prisma.user.create({
+      data: {
+        name: `Estudiante A${i}`,
+        document: `300${i}`,
+        correoInstitucional: `student.a${i}@fup.edu.co`,
+        correoPersonal: `personal.a${i}@test.com`,
+        password: commonPassword,
+        role: Role.ESTUDIANTE,
+        isActive: true,
+        codigoEstudiantil: `COD-10A-${i}`,
+      },
+    });
+    studentsA.push(s);
+  }
 
-  const student2 = await prisma.user.create({
-    data: {
-      name: 'María López',
-      document: '3002',
-      correoInstitucional: 'estudiante2@fup.edu.co',
-      correoPersonal: 'estudiante2_p@test.com',
-      password: commonPassword,
-      role: Role.ESTUDIANTE,
-      isActive: true,
-    },
-  });
+  // Students - Batch 2 (Group 10B)
+  const studentsB = [];
+  for (let i = 1; i <= 3; i++) {
+    const s = await prisma.user.create({
+      data: {
+        name: `Estudiante B${i}`,
+        document: `400${i}`,
+        correoInstitucional: `student.b${i}@fup.edu.co`,
+        correoPersonal: `personal.b${i}@test.com`,
+        password: commonPassword,
+        role: Role.ESTUDIANTE,
+        isActive: true,
+        codigoEstudiantil: `COD-10B-${i}`,
+      },
+    });
+    studentsB.push(s);
+  }
 
-  console.log('🏫 Creando sala...');
-  const room = await prisma.room.create({
-    data: {
-      name: 'Laboratorio 301',
-      type: RoomType.SALA_COMPUTO,
-      capacity: 25,
-      description: 'Sala de cómputo con 25 PCs de alto rendimiento',
-    },
-  });
+  console.log('🏫 Creating institutional spaces...');
+  const rooms = await Promise.all([
+    prisma.room.create({ data: { name: 'Laboratorio 301', type: RoomType.SALA_COMPUTO, capacity: 30 } }),
+    prisma.room.create({ data: { name: 'Laboratorio 302', type: RoomType.SALA_COMPUTO, capacity: 20 } }),
+    prisma.room.create({ data: { name: 'Salón 101', type: RoomType.SALON, capacity: 40 } }),
+    prisma.room.create({ data: { name: 'Auditorio Central', type: RoomType.AUDITORIO, capacity: 150 } }),
+  ]);
 
-  console.log('📚 Creando materia y grupo...');
-  const subject = await prisma.subject.create({
+  console.log('📚 Creating curriculum structure...');
+  const sub1 = await prisma.subject.create({
     data: {
-      name: 'Algoritmos y Estructura de Datos',
-      code: 'AED-101',
+      name: 'Programación de Sistemas',
+      code: 'SYS-101',
       group: '10A',
-      jornada: Jornada.DIURNO,
-      credits: 4,
       periodoAcademico: '2025-1',
-      teacherIds: [teacher.id],
-      classroom: room.name,
-      studentIds: [student1.id, student2.id],
+      credits: 4,
+      jornada: Jornada.DIURNO,
+      teacherIds: [t1.id],
+      classroom: rooms[0].name,
+      studentIds: studentsA.map(s => s.id),
+      description: 'Fundamentos de bajo nivel y arquitectura de software.',
     },
   });
 
-  console.log('🔗 Creando asignaciones de grupo y matrículas...');
-  // Asignación organizacional (Paso 6)
+  const sub2 = await prisma.subject.create({
+    data: {
+      name: 'Inteligencia Artificial',
+      code: 'AI-202',
+      group: '10B',
+      periodoAcademico: '2025-1',
+      credits: 3,
+      jornada: Jornada.NOCTURNO,
+      teacherIds: [t2.id],
+      classroom: rooms[1].name,
+      studentIds: studentsB.map(s => s.id),
+    },
+  });
+
+  console.log('🔗 Connecting Administrative Flow (Steps 6 & 7)...');
+  // Step 6: Assignments
   await prisma.groupAssignment.createMany({
     data: [
-      { studentId: student1.id, grupoNombre: '10A', periodoAcademico: '2025-1' },
-      { studentId: student2.id, grupoNombre: '10A', periodoAcademico: '2025-1' },
-    ],
+      ...studentsA.map(s => ({ studentId: s.id, grupoNombre: '10A', periodoAcademico: '2025-1' })),
+      ...studentsB.map(s => ({ studentId: s.id, grupoNombre: '10B', periodoAcademico: '2025-1' })),
+    ]
   });
 
-  // Matrícula formal (Paso 7)
+  // Step 7: Formal Enrollments
   await prisma.enrollment.createMany({
     data: [
-      { studentId: student1.id, subjectId: subject.id, periodoAcademico: '2025-1', status: EnrollmentStatus.ACTIVA },
-      { studentId: student2.id, subjectId: subject.id, periodoAcademico: '2025-1', status: EnrollmentStatus.ACTIVA },
-    ],
+      ...studentsA.map(s => ({ studentId: s.id, subjectId: sub1.id, periodoAcademico: '2025-1', status: EnrollmentStatus.ACTIVA })),
+      ...studentsB.map(s => ({ studentId: s.id, subjectId: sub2.id, periodoAcademico: '2025-1', status: EnrollmentStatus.ACTIVA })),
+    ]
   });
 
-  console.log('\n✅ Seed completado exitosamente!');
-  console.log('---------------------------------');
-  console.log('CREDENCIALES (Password: password123)');
-  console.log(`Admin   : ${admin.correoInstitucional}`);
-  console.log(`Docente : ${teacher.correoInstitucional}`);
-  console.log(`Estud 1 : ${student1.correoInstitucional}`);
-  console.log(`Estud 2 : ${student2.correoInstitucional}`);
-  console.log('---------------------------------');
-  console.log(`Materia : ${subject.name} [Grupo ${subject.group}]`);
-  console.log(`Sala    : ${room.name}`);
+  console.log('🗓️ Generating classes and attendance...');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // Generate 5 past classes for tracking
+  for (let i = 5; i > 0; i--) {
+    const classDate = new Date(today);
+    classDate.setDate(today.getDate() - i);
+    
+    // Start at 8 AM
+    const startTime = new Date(classDate);
+    startTime.setHours(8, 0, 0, 0);
+    
+    // End at 10 AM
+    const endTime = new Date(classDate);
+    endTime.setHours(10, 0, 0, 0);
+    
+    const cls = await prisma.class.create({
+      data: {
+        subjectId: sub1.id,
+        date: classDate,
+        startTime: startTime,
+        endTime: endTime,
+        status: ClassStatus.REALIZADA,
+        topic: `Semana ${6-i}: Principios de Ingeniería`,
+        classroom: rooms[0].name,
+        totalStudents: studentsA.length,
+      }
+    });
+
+    // Random attendance
+    await prisma.attendance.createMany({
+      data: studentsA.map(s => ({
+        studentId: s.id,
+        classId: cls.id,
+        status: Math.random() > 0.2 ? 'PRESENTE' : 'AUSENTE',
+      }))
+    });
+  }
+
+  // Next week classes
+  for (let i = 1; i < 4; i++) {
+    const nextDate = new Date(today);
+    nextDate.setDate(today.getDate() + i);
+    
+    const startTime = new Date(nextDate);
+    startTime.setHours(8, 0, 0, 0);
+    
+    const endTime = new Date(nextDate);
+    endTime.setHours(10, 0, 0, 0);
+
+    await prisma.class.create({
+      data: {
+        subjectId: sub1.id,
+        date: nextDate,
+        startTime: startTime,
+        endTime: endTime,
+        status: ClassStatus.PROGRAMADA,
+        classroom: rooms[0].name,
+        totalStudents: studentsA.length,
+      }
+    });
+  }
+
+  console.log('📝 Creating Administrative Requests & Bookings...');
+  // Room Booking
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const bStartTime = new Date(tomorrow);
+  bStartTime.setHours(14, 0, 0, 0);
+  const bEndTime = new Date(tomorrow);
+  bEndTime.setHours(16, 0, 0, 0);
+
+  await prisma.roomBooking.create({
+    data: {
+      roomId: rooms[3].id, // Auditorio
+      teacherId: t2.id,
+      startTime: bStartTime,
+      endTime: bEndTime,
+      reason: 'Conferencia sobre Ética en IA',
+      status: BookingStatus.PENDIENTE,
+    }
+  });
+
+  // Unenroll Request
+  await prisma.unenrollRequest.create({
+    data: {
+      studentId: studentsB[0].id,
+      subjectId: sub2.id,
+      reason: 'Cruce de horario con trabajo nuevo',
+      status: 'PENDIENTE',
+      requestedById: studentsB[0].id,
+    }
+  });
+
+  // Subject Events
+  const examDate = new Date(today);
+  examDate.setDate(today.getDate() + 2);
+  await prisma.subjectEvent.create({
+    data: {
+      title: 'Parcial primer corte',
+      date: examDate,
+      type: EventType.EXAMEN,
+      subjectId: sub1.id,
+      createdById: t1.id,
+    }
+  });
+
+  console.log('\n🚀 FULL SEED COMPLETE!');
+  console.log('-----------------------------------------');
+  console.log('Admin (Jorge)         : admin@fup.edu.co');
+  console.log('Coord (Patricia)      : coordinacion@fup.edu.co');
+  console.log('Docente (Ramiro)      : r.garcia@fup.edu.co');
+  console.log('Docente (Sandra)      : s.restrepo@fup.edu.co');
+  console.log('Estudiantes (A1-A5)   : student.aX@fup.edu.co');
+  console.log('Estudiantes (B1-B3)   : student.bX@fup.edu.co');
+  console.log('-----------------------------------------');
 }
 
 main()

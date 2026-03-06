@@ -6,7 +6,7 @@ import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 export default function AdminReportesPage() {
   return (
     <div className="space-y-6">
-      <CardHeader className="p-0 w-full">
+      <CardHeader className="p-0 w-full" id="tour-reportes-title">
         <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Reportes Docentes
         </CardTitle>

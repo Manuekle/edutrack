@@ -323,72 +323,116 @@ input[type='number'] {
   --scroll-thumb: #4a4a4a;
 }
 
-/* Driver.js Custom Styling - SIRA Theme */
+/* Driver.js Custom Styling - SIRA Minimalist UI (Strictly No Glass/Gradients) */
 .sira-theme-driver {
-  border-radius: 1rem !important;
-  padding: 1.25rem !important;
+  border-radius: 0.5rem !important;
+  padding: 1.5rem !important;
   border: 1px solid var(--border) !important;
-  box-shadow: var(--shadow-xl) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
   font-family: var(--font-sans) !important;
+  animation: none !important;
+  max-width: 360px !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .sira-theme-driver .driver-popover-title {
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
   color: var(--foreground) !important;
-  letter-spacing: -0.025em !important;
   margin-bottom: 0.5rem !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  display: block !important;
 }
 
 .sira-theme-driver .driver-popover-description {
-  font-size: 0.75rem !important;
+  font-size: 0.875rem !important;
   line-height: 1.4 !important;
-  color: var(--muted-foreground) !important;
+  color: var(--foreground) !important;
+  font-weight: 400 !important;
 }
 
 .sira-theme-driver .driver-popover-footer {
-  margin-top: 1rem !important;
+  margin-top: 1.25rem !important;
   display: flex !important;
   justify-content: flex-end !important;
+  align-items: center !important;
   gap: 0.5rem !important;
 }
 
 .sira-theme-driver button {
-  font-size: 0.625rem !important;
-  padding: 0.4rem 0.75rem !important;
-  border-radius: 0.5rem !important;
+  font-size: 0.75rem !important;
+  padding: 0.5rem 0.875rem !important;
+  border-radius: 0.375rem !important;
   text-shadow: none !important;
-  transition: all 0.2s ease !important;
-  font-weight: 500 !important;
+  transition: opacity 0.2s ease !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--border) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.025em !important;
 }
 
 .sira-theme-driver .driver-popover-next-btn {
-  background-color: var(--primary) !important;
-  color: var(--primary-foreground) !important;
+  background: #000 !important; /* Force solid black for light mode / wait, use var */
+  color: #fff !important;
   border: none !important;
 }
 
+.dark .sira-theme-driver .driver-popover-next-btn {
+  background: #fff !important;
+  color: #000 !important;
+}
+
 .sira-theme-driver .driver-popover-prev-btn {
-  background-color: var(--secondary) !important;
-  color: var(--secondary-foreground) !important;
-  border: 1px solid var(--border) !important;
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+.dark .sira-theme-driver .driver-popover-prev-btn {
+  background: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+.sira-theme-driver .driver-popover-next-btn:hover,
+.sira-theme-driver .driver-popover-prev-btn:hover {
+  opacity: 0.85 !important;
 }
 
 .sira-theme-driver .driver-popover-close-btn {
-  color: var(--muted-foreground) !important;
+  color: #6b7280 !important;
 }
 
 .sira-theme-driver .driver-popover-progress-text {
-  font-size: 0.625rem !important;
-  color: var(--muted-foreground) !important;
+  font-size: 0.75rem !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+  margin-right: auto !important;
 }
 
-/* Dark/Light specialized pops */
 .sira-driver-light {
-  background-color: white !important;
+  background: #ffffff !important;
 }
 
 .sira-driver-dark {
-  background-color: oklch(0.2385 0.0264 248.9871) !important; /* matching --card in dark mode */
+  background: #111827 !important;
+  border-color: #374151 !important;
+}
+
+/* Custom Highlight style */
+.driver-active-element {
+  border-radius: 0.375rem !important;
+  box-shadow: 0 0 0 4px #000 !important;
+  z-index: 1000 !important;
+}
+
+.dark .driver-active-element {
+  box-shadow: 0 0 0 4px #fff !important;
+}
+
+.driver-popover-arrow {
+  display: block !important;
+  border-color: var(--border) !important;
 }
 

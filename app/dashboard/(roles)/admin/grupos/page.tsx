@@ -427,7 +427,7 @@ export default function GruposHorariosPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-        <CardHeader className="p-0 w-full">
+        <CardHeader className="p-0 w-full" id="tour-grupos-title">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Grupos y Horarios
           </CardTitle>
@@ -435,7 +435,7 @@ export default function GruposHorariosPage() {
             Crea grupos y horarios para las asignaturas de forma manual o masiva.
           </CardDescription>
         </CardHeader>
-        <div className="flex gap-2">
+        <div className="flex gap-2" id="tour-grupos-mode">
           <Button
             variant={mode === 'csv' ? 'default' : 'outline'}
             onClick={() => {
@@ -461,7 +461,7 @@ export default function GruposHorariosPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           {/* Config común: Asignatura + Docente + Periodo */}
-          <Card className="overflow-hidden border shadow-xs">
+          <Card className="overflow-hidden border shadow-xs" id="tour-grupos-config">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                 Configuración del Grupo
@@ -528,7 +528,7 @@ export default function GruposHorariosPage() {
 
           {mode === 'csv' ? (
             <>
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="overflow-hidden border shadow-xs" id="tour-grupos-instructions">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     1. Instrucciones del Formato
@@ -563,7 +563,7 @@ export default function GruposHorariosPage() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="overflow-hidden border shadow-xs" id="tour-grupos-upload">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     2. Subir Archivo
@@ -596,7 +596,7 @@ export default function GruposHorariosPage() {
               </Card>
             </>
           ) : (
-            <Card className="overflow-hidden border shadow-xs">
+            <Card className="overflow-hidden border shadow-xs" id="tour-grupos-manual">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
                 <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Grupo' : 'Nuevo Grupo Manual'}
@@ -742,7 +742,7 @@ export default function GruposHorariosPage() {
             </Card>
           )}
 
-          <Card className="overflow-hidden border shadow-xs">
+          <Card className="overflow-hidden border shadow-xs" id="tour-grupos-preview">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <div className="flex items-center justify-between">
                 <div>

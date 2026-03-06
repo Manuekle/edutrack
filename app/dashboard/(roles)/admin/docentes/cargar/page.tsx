@@ -243,7 +243,7 @@ export default function CargarDocentesPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-        <CardHeader className="p-0 w-full">
+        <CardHeader className="p-0 w-full" id="tour-cargar-docentes-title">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Carga de Docentes
           </CardTitle>
@@ -251,7 +251,7 @@ export default function CargarDocentesPage() {
             Agrega docentes de forma manual o masiva al sistema.
           </CardDescription>
         </CardHeader>
-        <div className="flex gap-2">
+        <div className="flex gap-2" id="tour-cargar-docentes-mode">
           <Button
             variant={mode === 'csv' ? 'default' : 'outline'}
             onClick={() => {
@@ -278,7 +278,7 @@ export default function CargarDocentesPage() {
         <div className="lg:col-span-4 space-y-4">
           {mode === 'csv' ? (
             <>
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="overflow-hidden border shadow-xs" id="tour-cargar-docentes-instructions">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     1. Instrucciones del Formato
@@ -314,7 +314,7 @@ export default function CargarDocentesPage() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="overflow-hidden border shadow-xs" id="tour-cargar-docentes-upload">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     2. Subir Archivo
@@ -355,7 +355,7 @@ export default function CargarDocentesPage() {
               </Card>
             </>
           ) : (
-            <Card className="overflow-hidden border shadow-xs">
+            <Card className="overflow-hidden border shadow-xs" id="tour-cargar-docentes-manual">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
                 <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Docente' : 'Nuevo Docente'}
@@ -452,7 +452,7 @@ export default function CargarDocentesPage() {
         </div>
 
         <div className="lg:col-span-8">
-          <Card className="overflow-hidden border shadow-xs">
+          <Card className="overflow-hidden border shadow-xs" id="tour-cargar-docentes-preview">
             <CardHeader className="border-b px-5 py-4 bg-muted/10 flex flex-row items-center justify-between">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                 Vista Previa de Docentes ({previewData.length})

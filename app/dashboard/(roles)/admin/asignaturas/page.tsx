@@ -132,7 +132,7 @@ export default function GestionAsignaturasPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-        <CardHeader className="p-0 w-full">
+        <CardHeader className="p-0 w-full" id="tour-asignaturas-title">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Gestión de Asignaturas
           </CardTitle>
@@ -170,7 +170,7 @@ export default function GestionAsignaturasPage() {
                 </CardDescription>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2" id="tour-asignaturas-filters">
                 <div className="relative w-full md:w-[250px]">
                   <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -210,7 +210,7 @@ export default function GestionAsignaturasPage() {
             </div>
 
             {selectedSubjects.size > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2 border-t mt-2">
+              <div className="flex flex-wrap gap-2 pt-2 border-t mt-2" id="tour-asignaturas-selection">
                 <Button variant="secondary" size="sm" onClick={handleBulkEnroll} className="text-xs h-8">
                   Matricular en {selectedSubjects.size} asignatura(s)
                 </Button>
@@ -229,7 +229,7 @@ export default function GestionAsignaturasPage() {
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
+        <CardContent className="p-0" id="tour-asignaturas-table">
           <div className="relative overflow-x-auto">
             <Table>
               <TableHeader className="bg-background">

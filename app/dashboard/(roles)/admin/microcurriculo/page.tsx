@@ -365,7 +365,7 @@ export default function MicrocurriculoPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-        <CardHeader className="p-0 w-full">
+        <CardHeader className="p-0 w-full" id="tour-microcurriculo-title">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Carga de Microcurrículos
           </CardTitle>
@@ -373,7 +373,7 @@ export default function MicrocurriculoPage() {
             Carga las asignaturas con sus temas de forma manual o masiva.
           </CardDescription>
         </CardHeader>
-        <div className="flex gap-2">
+        <div className="flex gap-2" id="tour-microcurriculo-mode">
           <Button
             variant={mode === 'csv' ? 'default' : 'outline'}
             onClick={() => {
@@ -400,7 +400,7 @@ export default function MicrocurriculoPage() {
         <div className="lg:col-span-1 space-y-6">
           {mode === 'csv' ? (
             <>
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-instructions">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Instrucciones
@@ -437,7 +437,7 @@ export default function MicrocurriculoPage() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-upload">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Subir Archivo
@@ -470,7 +470,7 @@ export default function MicrocurriculoPage() {
               </Card>
             </>
           ) : (
-            <Card className="overflow-hidden border shadow-xs">
+            <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-manual">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
                 <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Asignatura' : 'Nueva Asignatura'}
@@ -633,7 +633,7 @@ export default function MicrocurriculoPage() {
         </div>
 
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden border shadow-xs">
+          <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-preview">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <div className="flex items-center justify-between">
                 <div>
