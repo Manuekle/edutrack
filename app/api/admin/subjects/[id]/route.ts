@@ -103,31 +103,18 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
 
     // Verificar que la asignatura existe
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const existingSubject = await (db as any).subject.findUnique({
+    const existingSubject = await db.subject.findUnique({
       where: { id },
-      include: {
-        groups: {
-          select: {
-            id: true,
-            studentIds: true,
-          },
-        },
-      },
     });
 
     if (!existingSubject) {
       return NextResponse.json({ message: 'Asignatura no encontrada.' }, { status: 404 });
     }
 
-    // Verificar si tiene estudiantes en grupos
-    const totalStudents =
-      existingSubject.groups?.reduce(
-        (sum: number, g: { studentIds?: string[] }) => sum + (g.studentIds?.length || 0),
-        0
-      ) || 0;
+    // Verificar si tiene estudiantes matriculados
+    const studentCount = existingSubject.studentIds?.length || 0;
 
-    if (totalStudents > 0) {
+    if (studentCount > 0) {
       return NextResponse.json(
         {
           message: 'No se puede eliminar una asignatura con estudiantes matriculados.',
@@ -136,9 +123,18 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       );
     }
 
-    // Eliminar primero los grupos y clases
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (db as any).subject.delete({
+    // Eliminar primero las clases asociadas
+    await db.class.deleteMany({
+      where: { subjectId: id },
+    });
+
+    // Eliminar los contenidos/temas
+    await db.subjectContent.deleteMany({
+      where: { subjectId: id },
+    });
+
+    // Eliminar la asignatura
+    await db.subject.delete({
       where: { id },
     });
 
