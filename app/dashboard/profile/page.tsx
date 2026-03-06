@@ -441,7 +441,7 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto space-y-8">
       <CardHeader className="p-0 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Mi Perfil
         </CardTitle>
         <CardDescription className="text-xs">
@@ -480,7 +480,7 @@ export default function ProfilePage() {
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                 Información Personal
               </CardTitle>
               <CardDescription className="text-xs">
@@ -493,7 +493,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col sm:flex-row items-center gap-6">
                     <div className="relative">
                       <Avatar className="h-24 w-24 bg-primary/10 border border-zinc-200 dark:border-zinc-700">
-                        <AvatarFallback className="sm:text-3xl text-2xl">
+                        <AvatarFallback className="sm:text-2xl text-xs">
                           {session?.user?.name?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
@@ -633,7 +633,7 @@ export default function ProfilePage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                 Cambiar Contraseña
               </CardTitle>
               <CardDescription className="text-xs">
@@ -725,7 +725,7 @@ export default function ProfilePage() {
           <TabsContent value="signature" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                   Firma Digital
                 </CardTitle>
                 <CardDescription className="text-xs">

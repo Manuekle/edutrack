@@ -1,6 +1,5 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
@@ -12,11 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, QrCode } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const QRViewer = dynamic(
   () => import('@/components/qr-viewer').then(mod => ({ default: mod.QRViewer })),
@@ -270,7 +270,7 @@ export default function AttendancePage() {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
-          <h2 className="sm:text-3xl text-2xl text-white text-center font-semibold tracking-card pb-2">
+          <h2 className="sm:text-2xl text-xs text-white text-center font-semibold tracking-card pb-2">
             No disponible
           </h2>
           <p className="text-white text-center mb-4 text-xs">
@@ -292,7 +292,7 @@ export default function AttendancePage() {
     <div className="space-y-4">
       <div className="flex justify-between items-start">
         <div>
-          <CardTitle className="font-semibold sm:text-3xl text-2xl tracking-card">
+          <CardTitle className="font-semibold sm:text-2xl text-xs tracking-card">
             Toma de Asistencia
           </CardTitle>
           {classInfo && (

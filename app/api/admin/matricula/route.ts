@@ -175,6 +175,7 @@ export async function POST(request: Request) {
 
     if (isPreview) {
       return NextResponse.json({
+        success: true,
         preview: results,
         summary: {
           total: results.length,

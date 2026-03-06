@@ -11,7 +11,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
               Clase en curso
             </CardTitle>
             <p className="text-xs text-muted-foreground">

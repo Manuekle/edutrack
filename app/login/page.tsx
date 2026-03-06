@@ -90,7 +90,7 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-sm mx-auto my-auto">
       <CardHeader>
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card text-center">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
           Iniciar Sesión
         </CardTitle>
         <CardDescription className="text-center">

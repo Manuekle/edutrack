@@ -100,7 +100,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('sm:text-3xl text-2xl font-semibold leading-none tracking-card', className)}
+    className={cn('sm:text-2xl text-xs font-semibold leading-none tracking-card', className)}
     {...props}
   />
 ));
@@ -128,5 +128,6 @@ export {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 };
+

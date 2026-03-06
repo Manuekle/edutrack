@@ -52,7 +52,7 @@ export default function SubjectsPage() {
         <CardHeader className="px-0 pt-0">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
             <div className="pb-4 col-span-1 w-full">
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                 Mis Asignaturas
               </CardTitle>
               <CardDescription className="text-xs">

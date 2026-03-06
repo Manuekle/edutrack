@@ -35,7 +35,7 @@ export function UnenrollDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
+          <DialogTitle className="font-sans sm:text-2xl text-xs font-semibold tracking-card">
             Solicitar desmatrícula
           </DialogTitle>
           <DialogDescription className="space-y-4 font-sans">

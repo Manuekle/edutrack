@@ -27,7 +27,7 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Próximas Fechas
         </CardTitle>
       </CardHeader>

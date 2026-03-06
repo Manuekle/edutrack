@@ -132,7 +132,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card sm:text-3xl text-2xl">
+          <DialogTitle className="tracking-card sm:text-2xl text-xs">
             Crear Nuevo Usuario
           </DialogTitle>
           <DialogDescription className="text-xs">

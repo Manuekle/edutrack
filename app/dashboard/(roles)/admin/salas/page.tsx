@@ -615,7 +615,7 @@ export default function AdminSalasPage() {
           <h1 className="text-3xl font-semibold tracking-card text-foreground/90">
             Gestión de Salas
           </h1>
-          <p className="text-xs text-muted-foreground font-medium">
+          <p className="text-xs text-muted-foreground">
             Administración centralizada de espacios físicos y programación institucional.
           </p>
         </div>

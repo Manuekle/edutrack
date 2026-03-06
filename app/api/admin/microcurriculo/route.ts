@@ -27,83 +27,82 @@ export async function POST(request: Request) {
     const url = new URL(request.url, `https://${request.headers.get('host')}`);
     const isPreview = url.searchParams.get('preview') === 'true';
 
+    const contentType = request.headers.get('content-type') || '';
+
+    // Handle bulk JSON creation (non-preview mode, sent from Confirmar button)
+    if (contentType.includes('application/json') && !isPreview) {
+      const body = await request.json();
+      const subjects: PreviewResult[] = body.subjects;
+
+      if (!Array.isArray(subjects) || subjects.length === 0) {
+        return NextResponse.json({ error: 'No se encontraron asignaturas para crear' }, { status: 400 });
+      }
+
+      const existingCodes = new Set(
+        (await db.subject.findMany({ select: { code: true } })).map(s => s.code)
+      );
+
+      const created: string[] = [];
+      const errors: string[] = [];
+
+      for (const item of subjects) {
+        try {
+          if (existingCodes.has(item.codigoAsignatura)) {
+            errors.push(`La asignatura ${item.codigoAsignatura} ya existe`);
+            continue;
+          }
+
+          const subject = await db.subject.create({
+            data: {
+              code: item.codigoAsignatura,
+              name: item.nombreAsignatura,
+              program: item.programa || null,
+              semester: item.semestre,
+              credits: item.creditos,
+              directHours: item.horas,
+            },
+          });
+
+          if (item.temas && item.temas.length > 0) {
+            const contentData = item.temas.map((tema, index) => ({
+              subjectId: subject.id,
+              type: 'TEMA',
+              title: tema.trim(),
+              order: index + 1,
+            }));
+
+            await db.subjectContent.createMany({
+              data: contentData,
+            });
+          }
+
+          created.push(item.codigoAsignatura);
+        } catch (e) {
+          errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        summary: {
+          total: subjects.length,
+          created: created.length,
+          existing: subjects.length - created.length - errors.length,
+          errors: errors.length,
+        },
+        createdSubjects: created,
+        errors,
+      });
+    }
+
     let formData: FormData | null = null;
     try {
       formData = await request.formData();
     } catch {
-      // Not form data
+      return NextResponse.json({ error: 'Error al leer los datos del formulario' }, { status: 400 });
     }
 
-    // Handle bulk JSON creation (non-preview mode, sent from Confirmar button)
-    if (!formData && !isPreview) {
-      const contentType = request.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        const body = await request.json();
-        const subjects: PreviewResult[] = body.subjects;
-
-        if (!Array.isArray(subjects) || subjects.length === 0) {
-          return NextResponse.json({ error: 'No se encontraron asignaturas para crear' }, { status: 400 });
-        }
-
-        const existingCodes = new Set(
-          (await db.subject.findMany({ select: { code: true } })).map(s => s.code)
-        );
-
-        const created: string[] = [];
-        const errors: string[] = [];
-
-        for (const item of subjects) {
-          try {
-            if (existingCodes.has(item.codigoAsignatura)) {
-              errors.push(`La asignatura ${item.codigoAsignatura} ya existe`);
-              continue;
-            }
-
-            const subject = await db.subject.create({
-              data: {
-                code: item.codigoAsignatura,
-                name: item.nombreAsignatura,
-                program: item.programa || null,
-                semester: item.semestre,
-                credits: item.creditos,
-                directHours: item.horas,
-              },
-            });
-
-            if (item.temas && item.temas.length > 0) {
-              const contentData = item.temas.map((tema, index) => ({
-                subjectId: subject.id,
-                type: 'TEMA',
-                title: tema.trim(),
-                order: index + 1,
-              }));
-
-              await db.subjectContent.createMany({
-                data: contentData,
-              });
-            }
-
-            created.push(item.codigoAsignatura);
-          } catch (e) {
-            errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
-          }
-        }
-
-        return NextResponse.json({
-          success: true,
-          summary: {
-            total: subjects.length,
-            created: created.length,
-            existing: subjects.length - created.length - errors.length,
-            errors: errors.length,
-          },
-          createdSubjects: created,
-          errors,
-        });
-      }
-    }
-
-    const file = formData ? (formData.get('file') as File | null) : null;
+    const file = formData.get('file') as File | null;
     if (!file) {
       return NextResponse.json({ error: 'No se encontró el archivo' }, { status: 400 });
     }

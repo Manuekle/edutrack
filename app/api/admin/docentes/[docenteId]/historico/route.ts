@@ -1,6 +1,5 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { AttendanceStatus } from '@prisma/client';
 import { Role } from '@/lib/roles';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
@@ -83,26 +82,13 @@ export async function GET(
 
     const dateRange = periodToDateRange(periodParam);
 
-    // Recuperar clases impartidas por el docente a través de SubjectGroup
-    // Obtener primero los grupos del docente
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const teacherGroups = await (db as any).subjectGroup.findMany({
+    // Recuperar clases impartidas por el docente
+    const classes = await db.class.findMany({
       where: {
         subject: {
           teacherIds: { has: docenteId },
+          ...(subjectFilter ? { id: subjectFilter } : {}),
         },
-      },
-      select: { id: true },
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groupIds = teacherGroups.map((g: any) => g.id);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const classes = await (db as any).class.findMany({
-      where: {
-        groupId: { in: groupIds },
-        ...(subjectFilter ? { subjectId: subjectFilter } : {}),
         ...(dateRange
           ? {
               date: {
@@ -112,8 +98,9 @@ export async function GET(
             }
           : {}),
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      include: (db as any).class.include,
+      include: {
+        subject: true,
+      },
       orderBy: {
         date: 'asc',
       },
@@ -138,9 +125,7 @@ export async function GET(
     >();
 
     for (const cls of classes) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const groupData = (cls as any).group;
-      const subjectData = groupData?.subject;
+      const subjectData = cls.subject;
       if (!subjectData) continue;
 
       const subjId = subjectData.id;

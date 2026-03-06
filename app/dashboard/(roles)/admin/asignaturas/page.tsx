@@ -1,12 +1,12 @@
 'use client';
 
 import { BulkEnrollModal } from '@/components/modals/bulk-enroll-modal';
-import { Checkbox } from '@/components/ui/checkbox';
 import { CreateSubjectModal } from '@/components/modals/create-subject-modal';
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -28,7 +28,7 @@ import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
 import { Download, Search, Trash2, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
 
@@ -140,7 +140,7 @@ export default function GestionAsignaturasPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Gestión de Asignaturas
           </CardTitle>
           <CardDescription className="text-xs">
@@ -164,61 +164,61 @@ export default function GestionAsignaturasPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader className="border-b px-4 pb-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
-                Lista de Asignaturas
-              </CardTitle>
-              <CardDescription className="text-xs">
-                {pagination?.total || 0} asignatura
-                {pagination?.total !== 1 ? 's' : ''} encontrada
-                {pagination?.total !== 1 ? 's' : ''}
-              </CardDescription>
-            </div>
-            <div className="relative w-full md:w-auto">
-              <Search
-                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <Input
-                placeholder="Buscar por nombre, código o docente…"
-                className="pl-9 w-full md:w-[300px] text-xs"
-                name="search"
-                autoComplete="off"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+      <Card className="overflow-hidden border shadow-xs">
+        <CardHeader className="border-b px-5 py-4 bg-muted/10">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  Lista de Asignaturas
+                </CardTitle>
+                <CardDescription className="text-xs mt-1">
+                  {pagination?.total || 0} asignatura{pagination?.total !== 1 ? 's' : ''} encontrada{pagination?.total !== 1 ? 's' : ''}
+                </CardDescription>
+              </div>
 
-          <div className="flex gap-4 mt-4">
-            <Input
-              placeholder="Filtrar por Programa"
-              className="w-[200px] text-xs"
-              name="program"
-              autoComplete="off"
-              value={selectedProgram}
-              onChange={e => setSelectedProgram(e.target.value)}
-            />
-            <Select value={selectedSemester} onValueChange={setSelectedSemester}>
-              <SelectTrigger className="w-[150px] h-9 text-xs">
-                <SelectValue placeholder="Semestre" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                {[...Array(10)].map((_, i) => (
-                  <SelectItem key={i + 1} value={String(i + 1)}>
-                    {i + 1}° Semestre
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative w-full md:w-[250px]">
+                  <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar..."
+                    className="pl-9 h-9 text-xs bg-background"
+                    name="search"
+                    autoComplete="off"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                  <Input
+                    placeholder="Programa..."
+                    className="w-full md:w-[150px] h-9 text-xs bg-background"
+                    name="program"
+                    autoComplete="off"
+                    value={selectedProgram}
+                    onChange={e => setSelectedProgram(e.target.value)}
+                  />
+                  <Select value={selectedSemester} onValueChange={setSelectedSemester}>
+                    <SelectTrigger className="w-full md:w-[130px] h-9 text-xs bg-background">
+                      <SelectValue placeholder="Semestre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      {[...Array(10)].map((_, i) => (
+                        <SelectItem key={i + 1} value={String(i + 1)} className="text-xs">
+                          {i + 1}° Semestre
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
 
             {selectedSubjects.size > 0 && (
-              <div className="flex gap-2">
-                <Button variant="secondary" size="sm" onClick={handleBulkEnroll}>
+              <div className="flex flex-wrap gap-2 pt-2 border-t mt-2">
+                <Button variant="secondary" size="sm" onClick={handleBulkEnroll} className="text-xs h-8">
                   Matricular en {selectedSubjects.size} asignatura(s)
                 </Button>
                 <Button
@@ -226,9 +226,9 @@ export default function GestionAsignaturasPage() {
                   size="sm"
                   onClick={handleDeleteSelected}
                   disabled={isDeleting}
-                  className="gap-1"
+                  className="gap-1.5 text-xs h-8"
                 >
-                  <Trash2 className="h-3 w-3" />
+                  <Trash2 className="h-3.5 w-3.5" />
                   <span>Eliminar</span>
                 </Button>
               </div>
@@ -237,70 +237,35 @@ export default function GestionAsignaturasPage() {
         </CardHeader>
 
         <CardContent className="p-0">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 pb-5 border-b">
-            <div className="flex items-center gap-2 p-0">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Mostrar</p>
-              <Select
-                value={itemsPerPage.toString()}
-                onValueChange={value => {
-                  setItemsPerPage(Number(value));
-                  setCurrentPage(1);
-                }}
-              >
-                <SelectTrigger className="h-8 w-[80px]">
-                  <SelectValue placeholder={itemsPerPage} />
-                </SelectTrigger>
-                <SelectContent>
-                  {ITEMS_PER_PAGE.map(pageSize => (
-                    <SelectItem
-                      key={pageSize}
-                      value={pageSize.toString()}
-                      className="text-xs font-semibold text-muted-foreground font-sans"
-                    >
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground whitespace-nowrap">por página</p>
-            </div>
-            <div className="text-xs text-muted-foreground bg-muted/50 px-4 py-1.5 rounded-md hidden sm:block">
-              Página <span className="font-normal">{currentPage}</span> de{' '}
-              <span className="font-normal">{pagination?.totalPages || 1}</span>
-            </div>
-          </div>
-
           <div className="relative overflow-x-auto">
             <Table>
-              <TableHeader className="bg-muted/30">
-                <TableRow className="hover:bg-transparent transition-colors">
-                  <TableHead className="w-[50px] px-2 py-3">
+              <TableHeader className="bg-background">
+                <TableRow className="hover:bg-transparent border-b">
+                  <TableHead className="w-[40px] px-4 py-3">
                     <div className="flex items-center justify-center">
                       <Checkbox
                         checked={subjects.length > 0 && selectedSubjects.size === subjects.length}
                         onCheckedChange={toggleAll}
+                        className="rounded-[4px]"
                       />
                     </div>
                   </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider">
                     Asignatura
                   </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground hidden sm:table-cell">
-                    Código
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
+                    Código & Grupo
                   </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground hidden md:table-cell">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider hidden md:table-cell">
                     Docente(s)
                   </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground hidden lg:table-cell">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
                     Programa
                   </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground text-center hidden sm:table-cell">
-                    Semestre
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center uppercase tracking-wider hidden sm:table-cell">
+                    Semestre / Créditos
                   </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground text-center hidden sm:table-cell">
-                    Créditos
-                  </TableHead>
-                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground text-center">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center uppercase tracking-wider">
                     Estudiantes
                   </TableHead>
                 </TableRow>
@@ -308,30 +273,38 @@ export default function GestionAsignaturasPage() {
               <TableBody>
                 {isLoading ? (
                   Array.from({ length: itemsPerPage }).map((_, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="text-xs px-4 py-3">
-                        <div className="flex items-center space-x-3">
-                          <Skeleton className="h-10 w-10 rounded-full" />
-                          <Skeleton className="h-4 w-32" />
+                    <TableRow key={index} className="border-b">
+                      <TableCell className="px-4 py-3">
+                        <div className="flex items-center justify-center">
+                          <Skeleton className="h-4 w-4 rounded-[4px]" />
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <Skeleton className="h-4 w-20" />
+                      <TableCell className="px-4 py-3">
+                        <div className="flex flex-col gap-1.5 justify-center">
+                          <Skeleton className="h-4 w-[120px]" />
+                          <Skeleton className="h-3 w-[60px]" />
+                        </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <Skeleton className="h-4 w-32" />
+                      <TableCell className="px-4 py-3 hidden sm:table-cell">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-5 w-[60px] rounded-md" />
+                          <Skeleton className="h-5 w-[40px] rounded-md" />
+                        </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <Skeleton className="h-4 w-24" />
+                      <TableCell className="px-4 py-3 hidden md:table-cell">
+                        <Skeleton className="h-4 w-[140px]" />
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <Skeleton className="h-4 w-12" />
+                      <TableCell className="px-4 py-3 hidden lg:table-cell">
+                        <Skeleton className="h-4 w-[100px]" />
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <Skeleton className="h-4 w-12" />
+                      <TableCell className="px-4 py-3 hidden sm:table-cell">
+                        <div className="flex flex-col items-center gap-1.5 justify-center">
+                          <Skeleton className="h-3 w-[50px]" />
+                          <Skeleton className="h-3 w-[60px]" />
+                        </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <Skeleton className="h-4 w-12" />
+                      <TableCell className="px-4 py-3">
+                        <Skeleton className="h-6 w-[40px] rounded-md mx-auto" />
                       </TableCell>
                     </TableRow>
                   ))
@@ -360,65 +333,62 @@ export default function GestionAsignaturasPage() {
                       key={subject.id}
                       className="hover:bg-muted/50 group transition-colors"
                     >
-                      <TableCell className="px-2">
+                      <TableCell className="px-4">
                         <div className="flex items-center justify-center">
                           <Checkbox
                             checked={selectedSubjects.has(subject.id)}
                             onCheckedChange={() => toggleSelection(subject.id)}
+                            className="rounded-[4px]"
                           />
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-3 py-3">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <div className="font-normal text-foreground text-sm">
-                              {subject.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {subject.classCount} clase{subject.classCount !== 1 ? 's' : ''}
-                            </div>
-                          </div>
+                      <TableCell className="px-4 py-3">
+                        <div className="flex flex-col justify-center">
+                          <span className="font-medium text-foreground text-xs">
+                            {subject.name}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground mt-0.5">
+                            {subject.classCount} clase{subject.classCount !== 1 ? 's' : ''}
+                          </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-3 py-3 hidden sm:table-cell">
-                        <div className="flex flex-col gap-1">
-                          <Badge variant="outline" className="font-mono text-xs w-fit">
+                      <TableCell className="px-4 py-3 hidden sm:table-cell">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0.5 font-normal rounded-md bg-muted/60 text-muted-foreground">
                             {subject.code}
                           </Badge>
                           {subject.group && (
-                            <Badge variant="secondary" className="text-[10px] w-fit">
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 font-normal rounded-md border-muted/50 text-muted-foreground">
                               Gr. {subject.group}
                             </Badge>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-3 py-3 hidden md:table-cell">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="truncate max-w-[150px]"
-                            title={subject.teachers?.map(t => t.name).join(', ') || ''}
-                          >
-                            {subject.teachers && subject.teachers.length > 0
-                              ? subject.teachers.map(t => t.name || 'Sin nombre').join(', ')
-                              : 'Sin docente'}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs px-3 py-3 hidden lg:table-cell">
-                        <span className="text-muted-foreground">
-                          {subject.program || 'No especificado'}
+                      <TableCell className="px-4 py-3 hidden md:table-cell">
+                        <span
+                          className="text-xs text-muted-foreground truncate max-w-[150px] inline-block"
+                          title={subject.teachers?.map(t => t.name).join(', ') || ''}
+                        >
+                          {subject.teachers && subject.teachers.length > 0
+                            ? subject.teachers.map(t => t.name || 'Sin nombre').join(', ')
+                            : '—'}
                         </span>
                       </TableCell>
-                      <TableCell className="text-xs px-3 py-3 text-center hidden sm:table-cell">
-                        {subject.semester || '-'}
+                      <TableCell className="px-4 py-3 hidden lg:table-cell">
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {subject.program || '—'}
+                        </span>
                       </TableCell>
-                      <TableCell className="text-xs px-3 py-3 text-center hidden sm:table-cell">
-                        {subject.credits || '-'}
+                      <TableCell className="px-4 py-3 text-center hidden sm:table-cell">
+                        <div className="flex flex-col items-center justify-center text-[11px]">
+                          <span className="text-foreground">{subject.semester ? `${subject.semester}° Sem` : '—'}</span>
+                          <span className="text-muted-foreground">{subject.credits ? `${subject.credits} Créditos` : '—'}</span>
+                        </div>
                       </TableCell>
-                      <TableCell className="text-xs px-3 py-3">
-                        <div className="flex items-center justify-center gap-1">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span>{subject.studentCount}</span>
+                      <TableCell className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-1.5 bg-muted/30 w-fit mx-auto px-2 py-1 rounded-md">
+                          <Users className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-[11px] font-medium text-foreground">{subject.studentCount}</span>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -428,7 +398,32 @@ export default function GestionAsignaturasPage() {
             </Table>
           </div>
 
-          <div className="border-t">
+          <div className="border-t px-4 py-3 bg-muted/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-muted-foreground">Mostrar</span>
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={value => {
+                  setItemsPerPage(Number(value));
+                  setCurrentPage(1);
+                }}
+              >
+                <SelectTrigger className="h-7 w-[65px] text-[11px]">
+                  <SelectValue placeholder={itemsPerPage} />
+                </SelectTrigger>
+                <SelectContent>
+                  {ITEMS_PER_PAGE.map(pageSize => (
+                    <SelectItem
+                      key={pageSize}
+                      value={pageSize.toString()}
+                      className="text-[11px]"
+                    >
+                      {pageSize}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <TablePagination
               currentPage={currentPage}
               totalItems={pagination?.total || 0}

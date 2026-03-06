@@ -98,18 +98,17 @@ export default function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 pt-[env(safe-area-inset-top)] ${
-        scrolled
+      className={`sticky top-0 z-50 w-full transition-all duration-300 pt-[env(safe-area-inset-top)] ${scrolled
           ? 'bg-background/90 backdrop-blur-md border-b border-border/40 shadow-sm'
           : 'bg-background/80 backdrop-blur-sm border-b border-transparent'
-      }`}
+        }`}
     >
       <div className="container px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="sm:text-3xl text-2xl font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
+              <span className="sm:text-2xl text-xs font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
                 edu<span className="text-amber-500">Track</span>
               </span>
             </Link>
@@ -122,11 +121,10 @@ export default function Navbar() {
                 key={item.name}
                 asChild
                 variant="ghost"
-                className={`px-4 py-2 text-xs font-normal transition-colors ${
-                  item.sectionId === activeSection || (!activeSection && item.sectionId === 'home')
+                className={`px-4 py-2 text-xs font-normal transition-colors ${item.sectionId === activeSection || (!activeSection && item.sectionId === 'home')
                     ? 'text-foreground bg-muted/50'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                }`}
+                  }`}
               >
                 <Link href={item.href}>
                   <item.icon className="mr-2 h-4 w-4" />

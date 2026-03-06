@@ -52,7 +52,7 @@ const WelcomeUserEmail = ({
           <Container className="mx-auto max-w-[580px] bg-white border border-[#7AAACE] rounded-[12px] overflow-hidden">
             {/* Header */}
             <Section className="bg-[#355872] px-[32px] py-[24px]">
-              <Heading className="sm:text-3xl text-2xl font-semibold text-white m-0 leading-[28px]">
+              <Heading className="sm:text-2xl text-xs font-semibold text-white m-0 leading-[28px]">
                 ¡Bienvenido/a!
               </Heading>
               <Text className="text-[#9CD5FF] text-xs m-0 mt-[4px] leading-[20px]">
@@ -65,9 +65,9 @@ const WelcomeUserEmail = ({
               {/* Welcome Message */}
               <Section className="mb-[32px] text-center">
                 <div className="inline-flex items-center justify-center w-[64px] h-[64px] rounded-full bg-[#F7F8F0] mb-[16px]">
-                  <Text className="sm:text-3xl text-2xl text-[#355872] m-0">👋</Text>
+                  <Text className="sm:text-2xl text-xs text-[#355872] m-0">👋</Text>
                 </div>
-                <Heading className="sm:text-3xl text-2xl font-semibold text-[#355872] m-0 mb-[8px] leading-[32px]">
+                <Heading className="sm:text-2xl text-xs font-semibold text-[#355872] m-0 mb-[8px] leading-[32px]">
                   Hola, {name}
                 </Heading>
                 <Text className="text-[#7AAACE] text-xs leading-[24px] m-0">

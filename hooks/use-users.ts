@@ -2,9 +2,9 @@
  * Hook personalizado para gestionar usuarios con React Query
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import type { User } from '@/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 interface UsersResponse {
   data: User[];
@@ -23,15 +23,16 @@ interface UseUsersOptions {
   limit?: number;
   search?: string;
   role?: string;
+  isActive?: string;
   enabled?: boolean;
 }
 
 export function useUsers(options: UseUsersOptions = {}) {
-  const { page = 1, limit = 10, search = '', role, enabled = true } = options;
+  const { page = 1, limit = 10, search = '', role, isActive, enabled = true } = options;
   const queryClient = useQueryClient();
 
   const query = useQuery<UsersResponse>({
-    queryKey: ['users', page, limit, search, role],
+    queryKey: ['users', page, limit, search, role, isActive],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: page.toString(),
@@ -42,8 +43,12 @@ export function useUsers(options: UseUsersOptions = {}) {
         params.append('search', search);
       }
 
-      if (role) {
+      if (role && role !== 'all') {
         params.append('role', role);
+      }
+      
+      if (isActive && isActive !== 'all') {
+        params.append('isActive', isActive);
       }
 
       const response = await fetch(`/api/admin/users?${params.toString()}`);

@@ -112,10 +112,10 @@ export default function ScanPage() {
 
       const attendanceRecord = data.attendance
         ? {
-            ...data.attendance,
-            subjectName: data.subjectName,
-            className: data.className,
-          }
+          ...data.attendance,
+          subjectName: data.subjectName,
+          className: data.className,
+        }
         : undefined;
 
       let status: ScanStatus = 'error';
@@ -245,7 +245,7 @@ export default function ScanPage() {
       <div className="w-full max-w-md">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="sm:text-3xl text-2xl tracking-card">
+            <CardTitle className="sm:text-2xl text-xs tracking-card">
               Registro de Asistencia
             </CardTitle>
             <CardDescription>

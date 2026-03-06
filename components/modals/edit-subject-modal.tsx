@@ -187,7 +187,7 @@ export function EditSubjectModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
-          <DialogTitle className="tracking-card sm:text-3xl text-2xl">
+          <DialogTitle className="tracking-card sm:text-2xl text-xs">
             Editar Asignatura
           </DialogTitle>
           <DialogDescription className="text-xs">

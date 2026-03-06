@@ -65,10 +65,10 @@ export default function DocenteDashboard() {
               ...subject,
               nextClass: subject.nextClass
                 ? {
-                    ...subject.nextClass,
-                    date: new Date(subject.nextClass.date),
-                    classroom: subject.nextClass.classroom,
-                  }
+                  ...subject.nextClass,
+                  date: new Date(subject.nextClass.date),
+                  classroom: subject.nextClass.classroom,
+                }
                 : undefined,
             }));
             setSubjects(transformedSubjects);
@@ -113,19 +113,19 @@ export default function DocenteDashboard() {
   const nextClass =
     upcomingClasses.length > 0
       ? {
-          id: upcomingClasses[0].id,
-          subjectName: upcomingClasses[0].subjectName,
-          date: upcomingClasses[0].date,
-          topic: upcomingClasses[0].topic || 'Sin tema',
-          classroom: upcomingClasses[0].classroom || '',
-        }
+        id: upcomingClasses[0].id,
+        subjectName: upcomingClasses[0].subjectName,
+        date: upcomingClasses[0].date,
+        topic: upcomingClasses[0].topic || 'Sin tema',
+        classroom: upcomingClasses[0].classroom || '',
+      }
       : undefined;
 
   return (
     <div className="mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <CardHeader className="p-0 w-full">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Mi Panel
           </CardTitle>
           <CardDescription className="text-xs">

@@ -97,7 +97,7 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg font-sans" onInteractOutside={e => e.preventDefault()}>
         <DialogHeader>
-          <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
+          <DialogTitle className="font-sans sm:text-2xl text-xs font-semibold tracking-card">
             Editar Rol de {user.name}
           </DialogTitle>
           <DialogDescription>

@@ -24,7 +24,7 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Próximas Clases
           </CardTitle>
         </div>
@@ -60,13 +60,13 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                         <span>
                           {cls.date
                             ? new Date(cls.date)
-                                .toLocaleTimeString('es-ES', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: true,
-                                })
-                                .replace(/a\.\s*m\./i, 'AM')
-                                .replace(/p\.\s*m\./i, 'PM')
+                              .toLocaleTimeString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                              })
+                              .replace(/a\.\s*m\./i, 'AM')
+                              .replace(/p\.\s*m\./i, 'PM')
                             : 'Sin hora definida'}
                         </span>
                         {cls.classroom ? (

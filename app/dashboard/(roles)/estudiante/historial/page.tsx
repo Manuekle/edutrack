@@ -91,7 +91,7 @@ export default function HistorialAsistenciasPage() {
   return (
     <div>
       <div className="pb-4">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Historial de Asistencias
         </CardTitle>
         <CardDescription className="text-xs">Listado de tus asistencias</CardDescription>

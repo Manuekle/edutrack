@@ -1,9 +1,9 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -16,14 +16,14 @@ import {
 import {
   CheckCircle,
   Download,
+  Edit2,
   FileSpreadsheet,
   Loader2,
-  Users,
   Plus,
   Trash2,
-  Edit2,
+  Users
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface Subject {
@@ -75,6 +75,7 @@ export default function MatriculaPage() {
   const [manualForm, setManualForm] = useState({
     documento: '',
     nombre: '',
+    subjectId: '',
   });
 
   useEffect(() => {
@@ -144,7 +145,7 @@ export default function MatriculaPage() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        const dataWithIds = (result.previewData || []).map((item: PreviewItem, index: number) => ({
+        const dataWithIds = (result.preview || []).map((item: PreviewItem, index: number) => ({
           ...item,
           id: `csv-${index}-${Date.now()}`,
         }));
@@ -164,16 +165,18 @@ export default function MatriculaPage() {
   };
 
   const handleAddManual = () => {
-    if (!manualForm.documento || !manualForm.nombre) {
-      toast.error('El documento y nombre son obligatorios.');
+    if (!manualForm.documento || !manualForm.nombre || !manualForm.subjectId) {
+      toast.error('El documento, nombre y asignatura son obligatorios.');
       return;
     }
+
+    const sub = subjects.find(s => s.id === manualForm.subjectId);
 
     const newItem: PreviewItem = {
       id: `manual-${Date.now()}`,
       documentoEstudiante: manualForm.documento,
       nombreEstudiante: manualForm.nombre,
-      codigoAsignatura: selectedSubjectData?.code || '',
+      codigoAsignatura: sub?.code || '',
       grupo: 'A',
       jornada: 'DIURNO',
       status: 'manual',
@@ -182,37 +185,40 @@ export default function MatriculaPage() {
 
     setPreviewData([...previewData, newItem]);
     setIsPreview(true);
-    setManualForm({ documento: '', nombre: '' });
+    setManualForm({ ...manualForm, documento: '', nombre: '' });
     toast.success('Estudiante agregado');
   };
 
   const handleEditItem = (id: string) => {
     const item = previewData.find(i => i.id === id);
     if (item) {
+      const sub = subjects.find(s => s.code === item.codigoAsignatura);
       setManualForm({
         documento: item.documentoEstudiante,
         nombre: item.nombreEstudiante,
+        subjectId: sub?.id || '',
       });
       setEditingId(id);
     }
   };
 
   const handleUpdateItem = () => {
-    if (!editingId) return;
+    const sub = subjects.find(s => s.id === manualForm.subjectId);
 
     setPreviewData(
       previewData.map(item =>
         item.id === editingId
           ? {
-              ...item,
-              documentoEstudiante: manualForm.documento,
-              nombreEstudiante: manualForm.nombre,
-            }
+            ...item,
+            documentoEstudiante: manualForm.documento,
+            nombreEstudiante: manualForm.nombre,
+            codigoAsignatura: sub?.code || item.codigoAsignatura,
+          }
           : item
       )
     );
     setEditingId(null);
-    setManualForm({ documento: '', nombre: '' });
+    setManualForm({ documento: '', nombre: '', subjectId: manualForm.subjectId });
     toast.success('Estudiante actualizado');
   };
 
@@ -270,7 +276,7 @@ export default function MatriculaPage() {
     setPreviewData([]);
     setFinalResults(null);
     setEditingId(null);
-    setManualForm({ documento: '', nombre: '' });
+    setManualForm({ documento: '', nombre: '', subjectId: manualForm.subjectId });
   };
 
   const handleNewUpload = () => {
@@ -288,7 +294,7 @@ export default function MatriculaPage() {
   return (
     <main className="space-y-4">
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Matrícula
         </CardTitle>
         <CardDescription className="text-xs">
@@ -327,7 +333,7 @@ export default function MatriculaPage() {
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle className="sm:text-xl text-lg font-semibold">Carga Masiva</CardTitle>
+                  <CardTitle className="sm:text-md text-xs font-semibold">Carga Masiva</CardTitle>
                   <CardDescription className="text-xs text-muted-foreground">
                     Sube un archivo CSV con los estudiantes.
                   </CardDescription>
@@ -355,7 +361,7 @@ export default function MatriculaPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="sm:text-xl text-lg font-semibold">Subir Archivo</CardTitle>
+                  <CardTitle className="sm:text-md text-xs font-semibold">Subir Archivo</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
@@ -386,11 +392,33 @@ export default function MatriculaPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle className="sm:text-xl text-lg font-semibold">
+                <CardTitle className="sm:text-md text-xs font-semibold">
                   {editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Asignatura *</Label>
+                  {isLoadingSubjects ? (
+                    <div className="h-10 w-full animate-pulse bg-muted rounded-md" />
+                  ) : (
+                    <Select
+                      value={manualForm.subjectId}
+                      onValueChange={val => setManualForm({ ...manualForm, subjectId: val })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona una asignatura" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map(sub => (
+                          <SelectItem key={sub.id} value={sub.id}>
+                            {sub.code} - {sub.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
                 <div className="space-y-2">
                   <Label>Documento *</Label>
                   <Input
@@ -438,7 +466,7 @@ export default function MatriculaPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="sm:text-2xl text-xl font-semibold">
+              <CardTitle className="sm:text-md text-xs font-semibold">
                 Estudiantes ({previewData.length})
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -454,7 +482,7 @@ export default function MatriculaPage() {
                 <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
                   <CheckCircle className="h-16 w-16 text-primary" />
                   <div className="space-y-1">
-                    <h3 className="sm:text-2xl text-xl tracking-card font-semibold">
+                    <h3 className="sm:text-md text-xs tracking-card font-semibold">
                       Matrícula completada
                     </h3>
                     <p className="text-xs text-muted-foreground">

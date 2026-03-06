@@ -167,7 +167,7 @@ export default function ReportsPage() {
       <Card className="border-none shadow-none bg-transparent">
         <CardHeader className="p-0 pb-6 w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="w-full">
-            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
               Reportes de Asistencia
             </CardTitle>
             <CardDescription className="text-xs">

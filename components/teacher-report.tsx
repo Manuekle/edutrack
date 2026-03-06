@@ -204,7 +204,7 @@ function SubjectDetailsPanel({
       <CardHeader>
         <div className="flex items-center gap-2">
           <div>
-            <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
               {subject.name}
             </CardTitle>
             <p className="text-xs text-muted-foreground">Código: {subject.code}</p>
@@ -247,7 +247,7 @@ function SubjectDetailsPanel({
                           <span className="text-xs font-normal text-muted-foreground">
                             {dayName}
                           </span>
-                          <span className="sm:text-3xl text-2xl font-semibold">{day}</span>
+                          <span className="sm:text-2xl text-xs font-semibold">{day}</span>
                           <span className="text-xs text-muted-foreground uppercase">{month}</span>
                         </div>
                         <div>
@@ -353,7 +353,7 @@ function SubjectDetailsPanel({
                       <span className="text-xs font-normal text-foreground">{item.name}</span>
                     </div>
                     <div className="flex flex-col items-baseline gap-1.5">
-                      <span className="sm:text-3xl text-2xl font-semibold">{item.percentage}%</span>
+                      <span className="sm:text-2xl text-xs font-semibold">{item.percentage}%</span>
                       {item.name === 'Presente' && getRiskBadge(item.percentage)}
                       <span className="text-xs text-muted-foreground">
                         ({item.value} {item.value === 1 ? 'estudiante' : 'estudiantes'})
@@ -663,7 +663,7 @@ export function TeacherReport() {
                         .toUpperCase()}
                     </div>
                     <div>
-                      <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+                      <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                         {selectedTeacher.name}
                       </CardTitle>
                       {selectedTeacher.codigoDocente && (

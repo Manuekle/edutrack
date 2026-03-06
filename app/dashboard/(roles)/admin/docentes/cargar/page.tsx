@@ -1,12 +1,12 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Download, Loader2, Plus, Trash2, Edit2, UserCheck } from 'lucide-react';
+import { Download, Edit2, Loader2, Plus, Trash2, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -131,12 +131,12 @@ export default function CargarDocentesPage() {
       previewData.map(item =>
         item.id === editingId
           ? {
-              ...item,
-              document: manualForm.documento,
-              name: manualForm.nombre,
-              email: manualForm.correo || `${manualForm.documento}@correo.edu.co`,
-              phone: manualForm.telefono,
-            }
+            ...item,
+            document: manualForm.documento,
+            name: manualForm.nombre,
+            email: manualForm.correo || `${manualForm.documento}@correo.edu.co`,
+            phone: manualForm.telefono,
+          }
           : item
       )
     );
@@ -205,7 +205,7 @@ export default function CargarDocentesPage() {
   return (
     <>
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Cargar Docentes
         </CardTitle>
         <CardDescription className="text-xs">
@@ -244,7 +244,7 @@ export default function CargarDocentesPage() {
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle className="sm:text-xl text-lg font-semibold">Carga Masiva</CardTitle>
+                  <CardTitle className="sm:text-md text-xs font-semibold">Carga Masiva</CardTitle>
                   <CardDescription className="text-xs text-muted-foreground">
                     Sube un archivo CSV con los docentes.
                   </CardDescription>
@@ -274,7 +274,7 @@ export default function CargarDocentesPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="sm:text-xl text-lg font-semibold">Subir Archivo</CardTitle>
+                  <CardTitle className="sm:text-md text-xs font-semibold">Subir Archivo</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
@@ -305,7 +305,7 @@ export default function CargarDocentesPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle className="sm:text-xl text-lg font-semibold">
+                <CardTitle className="sm:text-md text-xs font-semibold">
                   {editingId ? 'Editar Docente' : 'Nuevo Docente'}
                 </CardTitle>
               </CardHeader>
@@ -373,7 +373,7 @@ export default function CargarDocentesPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="sm:text-2xl text-xl font-semibold">
+              <CardTitle className="sm:text-md text-xs font-semibold">
                 Docentes ({previewData.length})
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -389,7 +389,7 @@ export default function CargarDocentesPage() {
                 <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
                   <UserCheck className="h-16 w-16 text-primary" />
                   <div className="space-y-1">
-                    <h3 className="sm:text-2xl text-xl tracking-card font-semibold">
+                    <h3 className="sm:text-md text-xs tracking-card font-semibold">
                       Carga completada
                     </h3>
                     <p className="text-xs text-muted-foreground">

@@ -1,8 +1,13 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CheckCircle2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const QRScanner = dynamic(() => import('@/components/qr-scanner'), {
   loading: () => (
@@ -13,11 +18,6 @@ const QRScanner = dynamic(() => import('@/components/qr-scanner'), {
   ),
   ssr: false,
 });
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { toast } from 'sonner';
 
 export default function ScannerPage() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -86,7 +86,7 @@ export default function ScannerPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="sm:text-3xl text-2xl font-semibold tracking-card">Registrar Asistencia</h1>
+          <h1 className="sm:text-2xl text-xs font-semibold tracking-card">Registrar Asistencia</h1>
           <p className="text-muted-foreground text-xs mt-2">
             Escanea el código QR mostrado por tu docente para registrar tu asistencia
           </p>

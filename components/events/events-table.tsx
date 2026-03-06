@@ -187,7 +187,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         <CardHeader>
           <div className="flex justify-between items-center flex-wrap gap-2">
             <div>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card font-sans">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card font-sans">
                 Gestión de Eventos Especiales
               </CardTitle>
               <CardDescription className="text-xs font-sans">
@@ -202,7 +202,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="font-sans font-semibold sm:text-3xl text-2xl tracking-card">
+                  <DialogTitle className="font-sans font-semibold sm:text-2xl text-xs tracking-card">
                     Crear Nuevo Evento
                   </DialogTitle>
                   <DialogDescription className="text-xs font-sans text-muted-foreground">
@@ -269,7 +269,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
+                              <AlertDialogTitle className="font-sans sm:text-2xl text-xs font-semibold tracking-card">
                                 ¿Estás seguro?
                               </AlertDialogTitle>
                               <AlertDialogDescription className="font-sans text-xs text-muted-foreground">
@@ -312,7 +312,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="font-sans sm:text-3xl text-2xl font-semibold tracking-card">
+              <DialogTitle className="font-sans sm:text-2xl text-xs font-semibold tracking-card">
                 Editar Evento
               </DialogTitle>
               <DialogDescription className="font-sans text-xs text-muted-foreground">

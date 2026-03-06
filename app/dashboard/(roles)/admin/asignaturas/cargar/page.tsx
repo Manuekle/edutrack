@@ -157,7 +157,7 @@ export default function CargarAsignaturasPage() {
     <main className="space-y-4">
       {/* Header */}
       <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
           Cargar Asignaturas
         </CardTitle>
         <CardDescription className="text-xs">
@@ -170,7 +170,7 @@ export default function CargarAsignaturasPage() {
           {/* Opciones de Carga */}
           <Card>
             <CardHeader>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                 Opciones de Carga
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -203,7 +203,7 @@ export default function CargarAsignaturasPage() {
           {/* Subir Archivo */}
           <Card>
             <CardHeader>
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                 Subir Archivo
               </CardTitle>
             </CardHeader>
@@ -234,7 +234,7 @@ export default function CargarAsignaturasPage() {
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="sm:text-3xl text-2xl font-semibold tracking-card">
+              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
                 Previsualización y Confirmación
               </CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
@@ -251,7 +251,7 @@ export default function CargarAsignaturasPage() {
                 <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
                   <CheckCircle className="h-16 w-16 text-primary" />
                   <div className="space-y-1">
-                    <h3 className="sm:text-3xl text-2xl tracking-card font-semibold">
+                    <h3 className="sm:text-2xl text-xs tracking-card font-semibold">
                       Carga completada
                     </h3>
                     <p className="text-xs text-muted-foreground">
@@ -322,8 +322,8 @@ export default function CargarAsignaturasPage() {
                       <div
                         key={index}
                         className={`p-4 rounded-2xl border transition-all ${item.status === 'existing' || item.status === 'error'
-                            ? 'border-destructive/20 bg-destructive/5'
-                            : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
+                          ? 'border-destructive/20 bg-destructive/5'
+                          : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
                           }`}
                       >
                         <div className="flex items-start justify-between">
