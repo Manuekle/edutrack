@@ -5,7 +5,7 @@
   "description": "Sistema Integral de Registro Académico (SIRA) - Gestión automatizada de asistencias mediante códigos QR",
   "packageManager": "pnpm@10.28.1",
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=18.0.0",
     "pnpm": ">=10.0.0"
   },
   "scripts": {

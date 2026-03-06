@@ -31,6 +31,7 @@ import {
   Loader2,
   Plus,
   Trash2,
+  Users,
   X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
