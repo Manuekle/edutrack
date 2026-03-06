@@ -338,7 +338,7 @@ export default function HomePageWeb() {
                         </span>
                         <div className="h-px w-4 bg-gradient-to-r from-muted/50 to-muted/20" />
                       </div>
-                      <h3 className="text-xs font-medium tracking-card mb-1 text-foreground">
+                      <h3 className="text-xs font-semibold tracking-card mb-1 text-foreground">
                         {step.title}
                       </h3>
                       <p className="text-xs text-muted-foreground">{step.description}</p>
@@ -363,7 +363,7 @@ export default function HomePageWeb() {
                         </div>
                       </div>
                       <div className="mt-8 text-center">
-                        <h3 className="sm:text-2xl text-xs font-medium tracking-card mb-2 text-foreground">
+                        <h3 className="sm:text-2xl text-xs font-semibold tracking-card mb-2 text-foreground">
                           Confirmar Asistencia
                         </h3>
                         <p className="text-muted-foreground mb-6 max-w-md text-xs">
@@ -463,7 +463,7 @@ export default function HomePageWeb() {
                               {feature.icon}
                             </div>
                             <div>
-                              <h4 className="font-medium tracking-card text-foreground text-xs">
+                              <h4 className="font-semibold tracking-card text-foreground text-xs">
                                 {feature.title}
                               </h4>
                               <p className="text-xs text-muted-foreground">{feature.description}</p>

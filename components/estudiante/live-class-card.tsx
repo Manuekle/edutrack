@@ -41,14 +41,14 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
           </div>
           <div className="flex items-center md:space-x-2 md:bg-foreground/5 px-2 md:px-3 py-1 rounded-full">
             <div className="w-2 h-2 rounded-full bg-foreground animate-pulse"></div>
-            <span className="text-xs font-medium hidden md:block">En curso</span>
+            <span className="text-xs font-semibold hidden md:block">En curso</span>
           </div>
         </div>
       </CardHeader>
       <CardContent className="mt-0">
         <div className="flex flex-col md:flex-row justify-between gap-6">
           <div className="space-y-1">
-            <h3 className="text-xs font-medium">Detalles de la Clase</h3>
+            <h3 className="text-xs font-semibold">Detalles de la Clase</h3>
             <div className="flex gap-3">
               <div className="flex items-center space-x-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -68,7 +68,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
             </div>
             {liveClass.myStatus === 'PRESENTE' && (
               <div className="flex items-center gap-2 mt-3">
-                <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+                <span className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
                   ¡Estás presente en esta clase!
                 </span>
               </div>

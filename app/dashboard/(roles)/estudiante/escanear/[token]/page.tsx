@@ -265,7 +265,7 @@ export default function ScanPage() {
             {scanState.status === 'error' && scanState.error?.error === 'CLASS_NOT_STARTED' && (
               <div className="pt-4 border-t">
                 <p className="text-xs text-muted-foreground">Clase inicia a las:</p>
-                <p className="font-medium">{formatTime(scanState.error.classStartsAt)}</p>
+                <p className="font-semibold">{formatTime(scanState.error.classStartsAt)}</p>
               </div>
             )}
 
@@ -274,11 +274,11 @@ export default function ScanPage() {
                 <div className="pt-4 border-t space-y-2 text-xs">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Asignatura:</span>
-                    <span className="font-medium">{scanState.attendance.subjectName}</span>
+                    <span className="font-semibold">{scanState.attendance.subjectName}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Fecha:</span>
-                    <span className="font-medium">
+                    <span className="font-semibold">
                       {new Date(scanState.attendance.recordedAt).toLocaleDateString('es-ES')}
                     </span>
                   </div>

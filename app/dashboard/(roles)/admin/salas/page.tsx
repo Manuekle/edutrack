@@ -278,7 +278,7 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
     <div className="space-y-8 p-4">
       {sortedEvents.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-xs font-medium tracking-card text-foreground/60">Sin programaciones</p>
+          <p className="text-xs font-semibold tracking-card text-foreground/60">Sin programaciones</p>
         </div>
       ) : (
         sortedEvents.map((event, idx) => (
@@ -304,7 +304,7 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
                   <h4 className="text-md font-semibold tracking-card">{event.room}</h4>
                   <div className="flex items-center gap-2">
                     <User className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs font-medium text-muted-foreground">
+                    <span className="text-xs font-semibold text-muted-foreground">
                       {event.teacher}
                     </span>
                   </div>
@@ -374,7 +374,7 @@ const CustomCalendar = ({
             <ChevronRight className="h-5 w-5" />
           </Button>
 
-          <h2 className="text-xs md:text-md tracking-card font-medium ml-6 text-foreground/90 truncate capitalize">
+          <h2 className="text-xs md:text-md tracking-card font-semibold ml-6 text-foreground/90 truncate capitalize">
             {getLabel()}
           </h2>
         </div>
@@ -770,7 +770,7 @@ export default function AdminSalasPage() {
             ) : filteredRooms.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32 text-center rounded-[3rem] border border-dashed">
                 <AlertCircle className="h-14 w-14 text-muted-foreground/20 mb-6" />
-                <h3 className="text-xs font-medium text-foreground/80">Sin resultados</h3>
+                <h3 className="text-xs font-semibold text-foreground/80">Sin resultados</h3>
                 <p className="text-muted-foreground text-xs mt-2 max-w-xs mx-auto">
                   No encontramos salas que coincidan con tu búsqueda actual.
                 </p>
@@ -1032,7 +1032,7 @@ export default function AdminSalasPage() {
                       <h3 className="text-2xl sm:text-3xl font-semibold tracking-card">
                         {selectedBooking.room.name}
                       </h3>
-                      <p className="text-xs text-muted-foreground font-medium">
+                      <p className="text-xs text-muted-foreground font-semibold">
                         Espacio Solicitado
                       </p>
                     </div>
@@ -1043,13 +1043,13 @@ export default function AdminSalasPage() {
                       <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
                         Docente
                       </p>
-                      <p className="font-medium text-xs">{selectedBooking.teacher.name}</p>
+                      <p className="font-semibold text-xs">{selectedBooking.teacher.name}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
                         Fecha
                       </p>
-                      <p className="font-medium text-xs">
+                      <p className="font-semibold text-xs">
                         {format(new Date(selectedBooking.startTime), 'dd/MM/yyyy')}
                       </p>
                     </div>
@@ -1057,7 +1057,7 @@ export default function AdminSalasPage() {
                       <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
                         Horario
                       </p>
-                      <p className="font-medium text-xs">
+                      <p className="font-semibold text-xs">
                         {format(new Date(selectedBooking.startTime), 'hh:mm a')} -{' '}
                         {format(new Date(selectedBooking.endTime), 'hh:mm a')}
                       </p>

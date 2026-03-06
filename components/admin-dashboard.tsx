@@ -167,7 +167,7 @@ const AdminDashboardComponent = () => {
         {data.cards.map((card, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-medium">{card.title}</CardTitle>
+              <CardTitle className="text-xs font-semibold">{card.title}</CardTitle>
               <div className="text-muted-foreground">{getCardIcon(index)}</div>
             </CardHeader>
             <CardContent>
@@ -386,11 +386,11 @@ const AdminDashboardComponent = () => {
                   className="flex items-center justify-between py-2 border-b border-border last:border-b-0"
                 >
                   <div className="flex-1">
-                    <p className="text-xs font-medium">{subject.code}</p>
+                    <p className="text-xs font-semibold">{subject.code}</p>
                     <p className="text-xs text-muted-foreground truncate">{subject.name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium">{subject.students}</p>
+                    <p className="text-xs font-semibold">{subject.students}</p>
                     <p className="text-xs text-muted-foreground">estudiantes</p>
                   </div>
                 </div>

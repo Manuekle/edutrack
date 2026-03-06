@@ -41,7 +41,7 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-xs font-medium truncate">{cls.subjectName}</h4>
+                      <h4 className="text-xs font-semibold truncate">{cls.subjectName}</h4>
                     </div>
                     <span className="flex flex-col">
                       <p className="text-xs text-muted-foreground line-clamp-1">

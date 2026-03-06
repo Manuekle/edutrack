@@ -354,7 +354,7 @@ export default function AttendancePage() {
                   className="flex flex-col md:flex-row items-start md:items-center justify-between p-3 border rounded-lg gap-4 md:gap-2"
                 >
                   <div className="w-full md:w-auto">
-                    <p className="font-medium tracking-card text-xs">{student.name}</p>
+                    <p className="font-semibold tracking-card text-xs">{student.name}</p>
                     <p className="text-xs text-muted-foreground truncate md:overflow-visible md:whitespace-normal md:max-w-full max-w-[220px]">
                       {student.email}
                     </p>

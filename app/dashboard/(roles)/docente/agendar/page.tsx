@@ -231,7 +231,7 @@ export default function DocenteAgendarPage() {
                       <TableCell colSpan={3} className="text-center py-20">
                         <div className="flex flex-col items-center gap-3">
                           <CalendarIcon className="h-10 w-10 text-muted-foreground/20" />
-                          <p className="text-muted-foreground text-xs font-medium">
+                          <p className="text-muted-foreground text-xs font-semibold">
                             No hay ocupación programada
                           </p>
                         </div>
@@ -241,7 +241,7 @@ export default function DocenteAgendarPage() {
                     roomBookings.map(booking => (
                       <TableRow
                         key={booking.id}
-                        className="text-xs font-medium border-b border-muted/30 last:border-0"
+                        className="text-xs font-semibold border-b border-muted/30 last:border-0"
                       >
                         <TableCell className="px-6 py-4">
                           <div className="flex flex-col gap-0.5">

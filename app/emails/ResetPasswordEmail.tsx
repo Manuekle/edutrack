@@ -61,7 +61,7 @@ const ResetPasswordEmail = ({ resetUrl, userEmail, supportEmail }: ResetPassword
               {/* Email Display */}
               <Section className="mb-[32px]">
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[12px] inline-block">
-                  <Text className="text-xs font-medium text-[#355872] m-0">{userEmail}</Text>
+                  <Text className="text-xs font-semibold text-[#355872] m-0">{userEmail}</Text>
                 </div>
               </Section>
 
@@ -69,7 +69,7 @@ const ResetPasswordEmail = ({ resetUrl, userEmail, supportEmail }: ResetPassword
               <Section className="mb-[32px]">
                 <Button
                   href={resetUrl}
-                  className="bg-[#355872] text-white text-xs font-medium py-[12px] px-[24px] rounded-[8px] box-border no-underline inline-block"
+                  className="bg-[#355872] text-white text-xs font-semibold py-[12px] px-[24px] rounded-[8px] box-border no-underline inline-block"
                 >
                   Restablecer Contraseña
                 </Button>

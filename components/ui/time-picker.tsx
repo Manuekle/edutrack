@@ -60,7 +60,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
             ))}
           </SelectContent>
         </Select>
-        <span className="text-muted-foreground font-medium">:</span>
+        <span className="text-muted-foreground font-semibold">:</span>
         <Select value={minute} onValueChange={handleMinuteChange}>
           <SelectTrigger className="w-full text-center h-9 px-2">
             <SelectValue placeholder="MM" />

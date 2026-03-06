@@ -68,19 +68,19 @@ const UnenrollRequestEmail = ({
 
               {/* Student Details Card */}
               <Section className="mb-[24px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles del estudiante
                 </Text>
                 <div className="space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Nombre completo
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">{studentName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Correo electrónico
                     </Text>
                     <Text className="text-xs text-[#7AAACE] m-0 leading-[20px]">
@@ -89,7 +89,7 @@ const UnenrollRequestEmail = ({
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Asignatura
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">{subjectName}</Text>
@@ -101,12 +101,12 @@ const UnenrollRequestEmail = ({
 
               {/* Request Details */}
               <Section className="mb-[24px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles de la solicitud
                 </Text>
                 <div className="space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha de solicitud
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">
@@ -125,7 +125,7 @@ const UnenrollRequestEmail = ({
 
               {/* Reason */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[8px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[8px]">
                   Motivo de la solicitud
                 </Text>
                 <div className="bg-[#F7F8F0] border-l-[4px] border-[#7AAACE] px-[16px] py-[12px]">

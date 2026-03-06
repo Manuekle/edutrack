@@ -401,7 +401,7 @@ export default function MicrocurriculoPage() {
             <>
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Instrucciones
                   </CardTitle>
                   <CardDescription className="text-[11px] mt-0.5">
@@ -410,7 +410,7 @@ export default function MicrocurriculoPage() {
                 </CardHeader>
                 <CardContent className="space-y-4 p-5">
                   <div className="space-y-2">
-                    <p className="text-xs font-medium">1. Descarga la plantilla</p>
+                    <p className="text-xs font-semibold">1. Descarga la plantilla</p>
                     <a href="/formatos/plantilla_microcurriculo.csv" download>
                       <Button variant="outline" className="w-full justify-start h-9 text-xs">
                         <Download className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -420,7 +420,7 @@ export default function MicrocurriculoPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-xs font-medium">2. Completa los datos</p>
+                    <p className="text-xs font-semibold">2. Completa los datos</p>
                     <div className="rounded-md bg-muted/30 p-3 space-y-2 text-[11px] text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <BookOpen className="h-3 w-3" />
@@ -438,7 +438,7 @@ export default function MicrocurriculoPage() {
 
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Subir Archivo
                   </CardTitle>
                 </CardHeader>
@@ -471,7 +471,7 @@ export default function MicrocurriculoPage() {
           ) : (
             <Card className="overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Asignatura' : 'Nueva Asignatura'}
                 </CardTitle>
                 <CardDescription className="text-[11px] mt-0.5">
@@ -481,7 +481,7 @@ export default function MicrocurriculoPage() {
               <CardContent className="space-y-4 p-5">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="codigo" className="text-xs font-medium">Código</Label>
+                    <Label htmlFor="codigo" className="text-xs font-semibold">Código</Label>
                     <Input
                       id="codigo"
                       className="h-9 text-xs"
@@ -491,7 +491,7 @@ export default function MicrocurriculoPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="semestre" className="text-xs font-medium">Semestre</Label>
+                    <Label htmlFor="semestre" className="text-xs font-semibold">Semestre</Label>
                     <Input
                       id="semestre"
                       type="number"
@@ -503,7 +503,7 @@ export default function MicrocurriculoPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="nombre" className="text-xs font-medium">Nombre de la Asignatura</Label>
+                  <Label htmlFor="nombre" className="text-xs font-semibold">Nombre de la Asignatura</Label>
                   <Input
                     id="nombre"
                     className="h-9 text-xs"
@@ -514,7 +514,7 @@ export default function MicrocurriculoPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="programa" className="text-xs font-medium">Programa Académico</Label>
+                  <Label htmlFor="programa" className="text-xs font-semibold">Programa Académico</Label>
                   <Select
                     value={manualForm.programa}
                     onValueChange={value => setManualForm({ ...manualForm, programa: value })}
@@ -534,7 +534,7 @@ export default function MicrocurriculoPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="creditos" className="text-xs font-medium">Créditos</Label>
+                    <Label htmlFor="creditos" className="text-xs font-semibold">Créditos</Label>
                     <Input
                       id="creditos"
                       type="number"
@@ -544,7 +544,7 @@ export default function MicrocurriculoPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="horas" className="text-xs font-medium">Horas Semanales</Label>
+                    <Label htmlFor="horas" className="text-xs font-semibold">Horas Semanales</Label>
                     <Input
                       id="horas"
                       type="number"
@@ -556,7 +556,7 @@ export default function MicrocurriculoPage() {
                 </div>
 
                 <div className="space-y-2 pt-2 border-t">
-                  <Label className="text-xs font-medium text-foreground">Gestión de Temas</Label>
+                  <Label className="text-xs font-semibold text-foreground">Gestión de Temas</Label>
                   <div className="flex gap-2">
                     <Input
                       placeholder="Agrega un tema y pulsa Enter..."
@@ -636,7 +636,7 @@ export default function MicrocurriculoPage() {
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Asignaturas para Cargar ({previewData.length})
                   </CardTitle>
                 </div>
@@ -655,7 +655,7 @@ export default function MicrocurriculoPage() {
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-xl text-lg tracking-tight font-semibold">
+                    <h3 className="sm:text-xl text-lg tracking-heading font-semibold">
                       ¡Carga Exitosa!
                     </h3>
                     <p className="text-xs text-muted-foreground max-w-xs mx-auto">
@@ -671,16 +671,16 @@ export default function MicrocurriculoPage() {
                   <Table>
                     <TableHeader className="bg-muted/5 sticky top-0 z-10">
                       <TableRow className="hover:bg-transparent border-b">
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Asignatura
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest hidden sm:table-cell">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  hidden sm:table-cell">
                           Información
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Temas
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-right">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-right">
                           Acciones
                         </TableHead>
                       </TableRow>
@@ -709,12 +709,12 @@ export default function MicrocurriculoPage() {
                           <TableCell className="px-4 py-3 hidden sm:table-cell">
                             <div className="flex flex-col gap-1">
                               <span className="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
-                                <span className="font-medium text-foreground">Sem:</span> {item.semestre}°
+                                <span className="font-semibold text-foreground">Sem:</span> {item.semestre}°
                               </span>
                               <span className="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
-                                <span className="font-medium text-foreground">Cred:</span> {item.creditos}
+                                <span className="font-semibold text-foreground">Cred:</span> {item.creditos}
                                 <span className="w-1 h-1 rounded-full bg-muted-foreground/30 mx-0.5"></span>
-                                <span className="font-medium text-foreground">Horas:</span> {item.horas}
+                                <span className="font-semibold text-foreground">Horas:</span> {item.horas}
                               </span>
                             </div>
                           </TableCell>

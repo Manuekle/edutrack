@@ -96,7 +96,7 @@ export function UsersPreviewSection({
               </div>
               {finalResults.filter(r => r.status === 'error').length > 0 && (
                 <div className="w-full max-w-md space-y-2">
-                  <p className="text-xs font-medium text-destructive">Errores:</p>
+                  <p className="text-xs font-semibold text-destructive">Errores:</p>
                   <div className="bg-muted rounded-md p-3 max-h-32 overflow-y-auto">
                     <ul className="space-y-1 text-xs text-muted-foreground">
                       {finalResults
@@ -142,7 +142,7 @@ export function UsersPreviewSection({
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-medium">{item.data.name}</span>
+                          <span className="text-xs font-semibold">{item.data.name}</span>
                           <Badge
                             variant={
                               item.status === 'success'
@@ -177,10 +177,10 @@ export function UsersPreviewSection({
                         {(item.message || item.status !== 'success') && (
                           <p
                             className={`text-xs mt-1 ${item.status === 'error'
-                                ? 'text-destructive'
-                                : item.status === 'warning'
-                                  ? 'text-yellow-600'
-                                  : 'text-muted-foreground'
+                              ? 'text-destructive'
+                              : item.status === 'warning'
+                                ? 'text-yellow-600'
+                                : 'text-muted-foreground'
                               }`}
                           >
                             {item.message}

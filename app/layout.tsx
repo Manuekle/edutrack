@@ -143,7 +143,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               fill: "#171717",
               roundness: 16,
               styles: {
-                title: "text-white font-medium!",
+                title: "text-white font-semibold!",
                 description: "text-white/70!",
                 badge: "bg-white/10!",
                 button: "bg-white/10! hover:bg-white/20! transition-colors",

@@ -42,11 +42,11 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
                 <CardContent className="px-4">
                   <div className="flex justify-between items-start gap-2">
                     <div className="space-y-1">
-                      <h3 className="font-medium text-xs tracking-card">{subject.name}</h3>
+                      <h3 className="font-semibold text-xs tracking-card">{subject.name}</h3>
                       <p className="text-xs text-muted-foreground">{subject.teacher}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs font-medium text-primary">
+                      <div className="text-xs font-semibold text-primary">
                         {subject.attendancePercentage}%
                       </div>
                       <div className="text-xs text-muted-foreground">
@@ -60,7 +60,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
                       <div className="flex items-start gap-2">
                         <div className="flex items-center gap-2 justify-center">
                           <div className="flex items-center gap-2 text-xs">
-                            <Badge variant="outline" className="text-xs font-medium lowercase">
+                            <Badge variant="outline" className="text-xs font-semibold lowercase">
                               {subject.nextClass.timeUntil}
                             </Badge>
                           </div>

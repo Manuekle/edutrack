@@ -208,7 +208,7 @@ export default function ReportsPage() {
                 reports.map(report => (
                   <TableRow key={report.id} className="group">
                     <TableCell className="px-4 py-2 text-xs">
-                      <div className="font-medium">
+                      <div className="font-semibold">
                         {report.subject?.name || 'Asignatura no disponible'}
                       </div>
                       <div className="text-xs text-muted-foreground font-mono">

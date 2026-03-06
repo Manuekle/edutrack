@@ -169,7 +169,7 @@ export default function GestionAsignaturasPage() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   Lista de Asignaturas
                 </CardTitle>
                 <CardDescription className="text-xs mt-1">
@@ -250,22 +250,22 @@ export default function GestionAsignaturasPage() {
                       />
                     </div>
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground ">
                     Asignatura
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider hidden sm:table-cell">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground  hidden sm:table-cell">
                     Código & Grupo
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider hidden md:table-cell">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground  hidden md:table-cell">
                     Docente(s)
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider hidden lg:table-cell">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground  hidden lg:table-cell">
                     Programa
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center tracking-wider hidden sm:table-cell">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground text-center  hidden sm:table-cell">
                     Semestre / Créditos
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center tracking-wider">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground text-center ">
                     Estudiantes
                   </TableHead>
                 </TableRow>
@@ -344,7 +344,7 @@ export default function GestionAsignaturasPage() {
                       </TableCell>
                       <TableCell className="px-4 py-3">
                         <div className="flex flex-col justify-center">
-                          <span className="font-medium text-foreground text-xs">
+                          <span className="font-semibold text-foreground text-xs">
                             {subject.name}
                           </span>
                           <span className="text-[11px] text-muted-foreground mt-0.5">
@@ -375,7 +375,7 @@ export default function GestionAsignaturasPage() {
                         </span>
                       </TableCell>
                       <TableCell className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-muted-foreground font-medium">
+                        <span className="text-xs text-muted-foreground font-semibold">
                           {subject.program || '—'}
                         </span>
                       </TableCell>
@@ -388,7 +388,7 @@ export default function GestionAsignaturasPage() {
                       <TableCell className="px-4 py-3">
                         <div className="flex items-center justify-center gap-1.5 bg-muted/30 w-fit mx-auto px-2 py-1 rounded-md">
                           <Users className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-[11px] font-medium text-foreground">{subject.studentCount}</span>
+                          <span className="text-[11px] font-semibold text-foreground">{subject.studentCount}</span>
                         </div>
                       </TableCell>
                     </TableRow>

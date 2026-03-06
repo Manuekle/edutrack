@@ -31,15 +31,14 @@ export function SignatureFileUpload({ onFileSelect }: SignatureFileUploadProps) 
   return (
     <div
       {...getRootProps()}
-      className={`flex flex-col h-full min-h-[150px] w-full items-center justify-center border border-dashed rounded-lg p-4 sm:p-6 space-y-2 cursor-pointer transition-colors ${
-        isDragActive ? 'bg-muted/50 border' : 'hover:bg-muted/30'
-      }`}
+      className={`flex flex-col h-full min-h-[150px] w-full items-center justify-center border border-dashed rounded-lg p-4 sm:p-6 space-y-2 cursor-pointer transition-colors ${isDragActive ? 'bg-muted/50 border' : 'hover:bg-muted/30'
+        }`}
     >
       <input {...getInputProps()} />
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
         <UploadCloud className="h-6 w-6 text-muted-foreground" />
       </div>
-      <p className="text-xs font-medium text-center">
+      <p className="text-xs font-semibold text-center">
         {isDragActive ? 'Suelta la imagen aquí' : 'Seleccionar archivo'}
       </p>
       <p className="text-xs text-muted-foreground text-center">

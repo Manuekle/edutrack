@@ -138,7 +138,7 @@ export function MultiStudentCombobox({
                         )}
                       />
                       <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                        <div className="font-medium truncate">
+                        <div className="font-semibold truncate">
                           {st.name || 'Sin nombre'} {st.document ? `(${st.document})` : ''}
                         </div>
                         <div className="text-muted-foreground text-xs truncate">

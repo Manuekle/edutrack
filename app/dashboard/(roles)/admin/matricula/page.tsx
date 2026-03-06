@@ -331,7 +331,7 @@ export default function MatriculaPage() {
             <>
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     1. Instrucciones del Formato
                   </CardTitle>
                   <CardDescription className="text-[11px] mt-0.5">
@@ -341,7 +341,7 @@ export default function MatriculaPage() {
                 <CardContent className="space-y-4 p-5">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-foreground">Plantilla base</p>
+                      <p className="text-xs font-semibold text-foreground">Plantilla base</p>
                       <a href="/formatos/plantilla_matricula.csv" download className="block">
                         <Button variant="outline" className="w-full justify-start h-9 text-xs">
                           <Download className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -351,12 +351,12 @@ export default function MatriculaPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-foreground">Requisitos del archivo</p>
+                      <p className="text-xs font-semibold text-foreground">Requisitos del archivo</p>
                       <div className="rounded-md bg-muted/30 p-3">
                         <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                          <li><span className="font-medium text-foreground">Estudiante</span>: Documento o ID</li>
-                          <li><span className="font-medium text-foreground">Asignatura</span>: Código oficial</li>
-                          <li><span className="font-medium text-foreground">Grupo</span>: Sección asignada</li>
+                          <li><span className="font-semibold text-foreground">Estudiante</span>: Documento o ID</li>
+                          <li><span className="font-semibold text-foreground">Asignatura</span>: Código oficial</li>
+                          <li><span className="font-semibold text-foreground">Grupo</span>: Sección asignada</li>
                         </ul>
                       </div>
                     </div>
@@ -366,7 +366,7 @@ export default function MatriculaPage() {
 
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     2. Subir Archivo
                   </CardTitle>
                 </CardHeader>
@@ -399,7 +399,7 @@ export default function MatriculaPage() {
           ) : (
             <Card className="overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Matrícula' : 'Matrícula Manual'}
                 </CardTitle>
                 <CardDescription className="text-[11px] mt-0.5">
@@ -408,7 +408,7 @@ export default function MatriculaPage() {
               </CardHeader>
               <CardContent className="space-y-4 p-5">
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Grupo (Asignatura) *</Label>
+                  <Label className="text-xs font-semibold">Grupo (Asignatura) *</Label>
                   {isLoadingSubjects ? (
                     <div className="h-9 w-full animate-pulse bg-muted rounded-md" />
                   ) : (
@@ -431,7 +431,7 @@ export default function MatriculaPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium">Estudiantes *</Label>
+                  <Label className="text-xs font-semibold">Estudiantes *</Label>
                   <MultiStudentCombobox
                     selectedStudents={manualForm.selectedStudents}
                     onStudentsChange={students => setManualForm({ ...manualForm, selectedStudents: students })}
@@ -454,7 +454,7 @@ export default function MatriculaPage() {
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Estudiantes para Matricular ({previewData.length})
                   </CardTitle>
                 </div>
@@ -473,7 +473,7 @@ export default function MatriculaPage() {
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-xl text-lg tracking-tight font-semibold">
+                    <h3 className="sm:text-xl text-lg tracking-heading font-semibold">
                       ¡Matrícula Exitosa!
                     </h3>
                     <p className="text-xs text-muted-foreground">
@@ -489,16 +489,16 @@ export default function MatriculaPage() {
                   <Table>
                     <TableHeader className="bg-muted/5 sticky top-0 z-10">
                       <TableRow className="hover:bg-transparent border-b">
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Estudiante
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Asignatura / Grupo
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Estado
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-right">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-right">
                           Acciones
                         </TableHead>
                       </TableRow>
@@ -521,7 +521,7 @@ export default function MatriculaPage() {
                           </TableCell>
                           <TableCell className="px-4 py-3">
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-xs font-medium text-foreground">
+                              <span className="text-xs font-semibold text-foreground">
                                 {item.codigoAsignatura}
                               </span>
                               <Badge variant="secondary" className="w-fit text-[9px] px-1 py-0 h-4 bg-muted/50">
@@ -586,9 +586,9 @@ export default function MatriculaPage() {
                   <div className="flex flex-col whitespace-nowrap">
                     <span className="text-xs font-semibold text-foreground">Matrículas pendientes</span>
                     <div className="flex gap-2 mt-0.5">
-                      <span className="text-[10px] text-emerald-600 font-medium">{successCount} listos</span>
-                      {existingCount > 0 && <span className="text-[10px] text-amber-600 font-medium">{existingCount} existentes</span>}
-                      {errorCount > 0 && <span className="text-[10px] text-red-600 font-medium">{errorCount} errores</span>}
+                      <span className="text-[10px] text-emerald-600 font-semibold">{successCount} listos</span>
+                      {existingCount > 0 && <span className="text-[10px] text-amber-600 font-semibold">{existingCount} existentes</span>}
+                      {errorCount > 0 && <span className="text-[10px] text-red-600 font-semibold">{errorCount} errores</span>}
                     </div>
                   </div>
                   <Button

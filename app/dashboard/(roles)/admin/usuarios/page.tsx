@@ -140,7 +140,7 @@ export default function GestionUsuariosPage() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   Lista de Usuarios
                 </CardTitle>
                 <CardDescription className="text-xs mt-1">
@@ -195,12 +195,12 @@ export default function GestionUsuariosPage() {
             <Table>
               <TableHeader className="bg-background">
                 <TableRow className="hover:bg-transparent border-b">
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Usuario</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Correo</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Rol</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Código</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider text-center">Estado</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider text-right">
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground ">Usuario</TableHead>
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground ">Correo</TableHead>
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground ">Rol</TableHead>
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground ">Código</TableHead>
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground  text-center">Estado</TableHead>
+                  <TableHead className="text-[11px] font-semibold px-4 py-3 text-muted-foreground  text-right">
                     Acciones
                   </TableHead>
                 </TableRow>
@@ -263,7 +263,7 @@ export default function GestionUsuariosPage() {
                     <TableRow key={user.id} className="hover:bg-muted/50 group transition-colors">
                       <TableCell className="px-4 py-3">
                         <div className="flex flex-col justify-center">
-                          <span className="font-medium text-foreground text-xs">
+                          <span className="font-semibold text-foreground text-xs">
                             {user.name || 'Usuario sin nombre'}
                           </span>
                           <span className="text-[11px] text-muted-foreground mt-0.5">
@@ -285,7 +285,7 @@ export default function GestionUsuariosPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="px-4 py-3">
-                        <span className="text-xs text-muted-foreground font-medium">
+                        <span className="text-xs text-muted-foreground font-semibold">
                           {user.role === 'ESTUDIANTE' ? user.codigoEstudiantil || '—' : '—'}
                         </span>
                       </TableCell>

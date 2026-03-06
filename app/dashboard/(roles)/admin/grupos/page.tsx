@@ -414,7 +414,7 @@ export default function GruposHorariosPage() {
           {/* Select Subject - Standard Card */}
           <Card className="overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
-              <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                 Asignatura Destino
               </CardTitle>
               <CardDescription className="text-[11px] mt-0.5">
@@ -445,7 +445,7 @@ export default function GruposHorariosPage() {
             <>
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     1. Instrucciones del Formato
                   </CardTitle>
                   <CardDescription className="text-[11px] mt-0.5">
@@ -455,7 +455,7 @@ export default function GruposHorariosPage() {
                 <CardContent className="space-y-4 p-5">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-foreground">Plantilla base</p>
+                      <p className="text-xs font-semibold text-foreground">Plantilla base</p>
                       <a href="/formatos/plantilla_grupos_horarios.csv" download className="block">
                         <Button variant="outline" className="w-full justify-start h-9 text-xs">
                           <Download className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -465,12 +465,12 @@ export default function GruposHorariosPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-foreground">Requisitos del archivo</p>
+                      <p className="text-xs font-semibold text-foreground">Requisitos del archivo</p>
                       <div className="rounded-md bg-muted/30 p-3">
                         <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                          <li><span className="font-medium text-foreground">Estructura</span>: Grupo, Jornada</li>
-                          <li><span className="font-medium text-foreground">Horario</span>: Día, Inicio, Fin</li>
-                          <li><span className="font-medium text-foreground">Ubicación</span>: Salón asignado</li>
+                          <li><span className="font-semibold text-foreground">Estructura</span>: Grupo, Jornada</li>
+                          <li><span className="font-semibold text-foreground">Horario</span>: Día, Inicio, Fin</li>
+                          <li><span className="font-semibold text-foreground">Ubicación</span>: Salón asignado</li>
                         </ul>
                       </div>
                     </div>
@@ -480,7 +480,7 @@ export default function GruposHorariosPage() {
 
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     2. Subir Archivo
                   </CardTitle>
                 </CardHeader>
@@ -513,7 +513,7 @@ export default function GruposHorariosPage() {
           ) : (
             <Card className="overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Grupo' : 'Nuevo Grupo Manual'}
                 </CardTitle>
                 <CardDescription className="text-[11px] mt-0.5">
@@ -523,7 +523,7 @@ export default function GruposHorariosPage() {
               <CardContent className="space-y-4 p-5">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">Grupo</Label>
+                    <Label className="text-xs font-semibold">Grupo</Label>
                     <Input
                       className="h-9 text-xs"
                       value={manualForm.grupo}
@@ -532,7 +532,7 @@ export default function GruposHorariosPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">Capacidad</Label>
+                    <Label className="text-xs font-semibold">Capacidad</Label>
                     <Input
                       type="number"
                       className="h-9 text-xs"
@@ -543,7 +543,7 @@ export default function GruposHorariosPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Jornada</Label>
+                  <Label className="text-xs font-semibold">Jornada</Label>
                   <Select
                     value={manualForm.jornada}
                     onValueChange={v => setManualForm({ ...manualForm, jornada: v })}
@@ -562,7 +562,7 @@ export default function GruposHorariosPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Salón</Label>
+                  <Label className="text-xs font-semibold">Salón</Label>
                   <Input
                     className="h-9 text-xs"
                     value={manualForm.salon}
@@ -572,7 +572,7 @@ export default function GruposHorariosPage() {
                 </div>
 
                 <div className="space-y-1.5 pt-2 border-t">
-                  <Label className="text-xs font-medium">Horario Primera Franja</Label>
+                  <Label className="text-xs font-semibold">Horario Primera Franja</Label>
                   <div className="grid grid-cols-2 gap-3 mb-2">
                     <div className="col-span-2">
                       <Select
@@ -642,7 +642,7 @@ export default function GruposHorariosPage() {
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Grupos para Cargar ({previewData.length})
                   </CardTitle>
                   <CardDescription className="text-[11px] mt-0.5">
@@ -666,7 +666,7 @@ export default function GruposHorariosPage() {
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-xl text-lg tracking-tight font-semibold">
+                    <h3 className="sm:text-xl text-lg tracking-heading font-semibold">
                       ¡Carga Exitosa!
                     </h3>
                     <p className="text-xs text-muted-foreground">
@@ -682,16 +682,16 @@ export default function GruposHorariosPage() {
                   <Table>
                     <TableHeader className="bg-muted/5 sticky top-0 z-10">
                       <TableRow className="hover:bg-transparent border-b">
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Grupo
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Jornada / Cupo
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                           Horario Principal
                         </TableHead>
-                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-right">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-right">
                           Acciones
                         </TableHead>
                       </TableRow>
@@ -704,7 +704,7 @@ export default function GruposHorariosPage() {
                         >
                           <TableCell className="px-4 py-3">
                             <div className="flex items-center gap-2">
-                              <div className="h-8 w-8 rounded-md bg-muted/60 flex items-center justify-center font-bold text-xs">
+                              <div className="h-8 w-8 rounded-md bg-muted/60 flex items-center justify-center font-semibold text-xs">
                                 {item.grupo}
                               </div>
                               <Badge variant="outline" className="text-[9px] h-5 bg-background">
@@ -726,7 +726,7 @@ export default function GruposHorariosPage() {
                           <TableCell className="px-4 py-3">
                             {item.schedule && item.schedule.length > 0 ? (
                               <div className="flex flex-col gap-0.5">
-                                <span className="text-xs font-medium text-foreground">
+                                <span className="text-xs font-semibold text-foreground">
                                   {item.schedule[0].dia}
                                 </span>
                                 <span className="text-[10px] text-muted-foreground">

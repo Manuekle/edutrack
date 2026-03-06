@@ -265,7 +265,7 @@ export default function CargarEstudiantesPage() {
               setMode('csv');
               handleCancel();
             }}
-            className="text-xs h-9 px-4 font-medium"
+            className="text-xs h-9 px-4 font-semibold"
           >
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             Carga Masiva (CSV)
@@ -273,7 +273,7 @@ export default function CargarEstudiantesPage() {
           <Button
             variant={mode === 'manual' ? 'default' : 'outline'}
             onClick={() => setMode('manual')}
-            className="text-xs h-9 px-4 font-medium"
+            className="text-xs h-9 px-4 font-semibold"
           >
             <Plus className="mr-2 h-4 w-4" />
             Crear Manual
@@ -288,7 +288,7 @@ export default function CargarEstudiantesPage() {
             <>
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     1. Instrucciones del Formato
                   </CardTitle>
                   <CardDescription className="text-[11px] mt-0.5">
@@ -298,7 +298,7 @@ export default function CargarEstudiantesPage() {
                 <CardContent className="p-5 space-y-4">
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-foreground">Plantilla base</p>
+                      <p className="text-xs font-semibold text-foreground">Plantilla base</p>
                       <a href="/formatos/plantilla_estudiantes.csv" download className="block">
                         <Button variant="outline" className="w-full justify-start h-9 text-xs">
                           <Download className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -308,13 +308,13 @@ export default function CargarEstudiantesPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <p className="text-xs font-medium text-foreground">Columnas requeridas</p>
+                      <p className="text-xs font-semibold text-foreground">Columnas requeridas</p>
                       <div className="rounded-md bg-muted/30 p-3">
                         <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
-                          <li><span className="font-medium text-foreground">Documento</span> / <span className="font-medium text-foreground">Código</span></li>
-                          <li><span className="font-medium text-foreground">Nombre</span> y <span className="font-medium text-foreground">Apellido</span></li>
-                          <li><span className="font-medium text-foreground">Correo</span> institucional</li>
-                          <li><span className="font-medium text-foreground">Teléfono</span> de contacto</li>
+                          <li><span className="font-semibold text-foreground">Documento</span> / <span className="font-semibold text-foreground">Código</span></li>
+                          <li><span className="font-semibold text-foreground">Nombre</span> y <span className="font-semibold text-foreground">Apellido</span></li>
+                          <li><span className="font-semibold text-foreground">Correo</span> institucional</li>
+                          <li><span className="font-semibold text-foreground">Teléfono</span> de contacto</li>
                         </ul>
                       </div>
                     </div>
@@ -324,14 +324,14 @@ export default function CargarEstudiantesPage() {
 
               <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     2. Subir Archivo
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 space-y-4">
                   <div className="space-y-3">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium mb-2 block text-foreground">
+                      <Label className="text-xs font-semibold mb-2 block text-foreground">
                         Seleccionar Archivo .CSV
                       </Label>
                       <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
@@ -365,7 +365,7 @@ export default function CargarEstudiantesPage() {
           ) : (
             <Card className="overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
-                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}
                 </CardTitle>
                 <CardDescription className="text-[11px] mt-0.5">
@@ -375,7 +375,7 @@ export default function CargarEstudiantesPage() {
               <CardContent className="p-5 space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="documento" className="text-xs font-medium text-foreground">
+                    <Label htmlFor="documento" className="text-xs font-semibold text-foreground">
                       Documento *
                     </Label>
                     <Input
@@ -387,7 +387,7 @@ export default function CargarEstudiantesPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="codigo" className="text-xs font-medium text-foreground">
+                    <Label htmlFor="codigo" className="text-xs font-semibold text-foreground">
                       Código
                     </Label>
                     <Input
@@ -401,7 +401,7 @@ export default function CargarEstudiantesPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="nombre" className="text-xs font-medium text-foreground">
+                  <Label htmlFor="nombre" className="text-xs font-semibold text-foreground">
                     Nombre Completo *
                   </Label>
                   <Input
@@ -414,7 +414,7 @@ export default function CargarEstudiantesPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="correo" className="text-xs font-medium text-foreground">
+                  <Label htmlFor="correo" className="text-xs font-semibold text-foreground">
                     Correo Electrónico
                   </Label>
                   <Input
@@ -427,7 +427,7 @@ export default function CargarEstudiantesPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="telefono" className="text-xs font-medium text-foreground">
+                  <Label htmlFor="telefono" className="text-xs font-semibold text-foreground">
                     Teléfono
                   </Label>
                   <Input
@@ -478,7 +478,7 @@ export default function CargarEstudiantesPage() {
         <div className="lg:col-span-8">
           <Card className="overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10 flex flex-row items-center justify-between">
-              <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                 Vista Previa de Estudiantes ({previewData.length})
               </CardTitle>
               <div className="flex gap-2">
@@ -498,7 +498,7 @@ export default function CargarEstudiantesPage() {
               {isLoading && !isPreview && !finalResults ? (
                 <div className="flex flex-col items-center justify-center h-64 gap-3">
                   <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
-                  <p className="text-[10px] font-bold text-muted-foreground/60 tracking-widest">
+                  <p className="text-[10px] font-semibold text-muted-foreground/60 ">
                     Procesando Archivo...
                   </p>
                 </div>
@@ -508,7 +508,7 @@ export default function CargarEstudiantesPage() {
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-xl text-lg tracking-tight font-semibold">
+                    <h3 className="sm:text-xl text-lg tracking-heading font-semibold">
                       ¡Carga Exitosa!
                     </h3>
                     <p className="text-xs text-muted-foreground max-w-xs mx-auto">
@@ -525,16 +525,16 @@ export default function CargarEstudiantesPage() {
                     <Table>
                       <TableHeader className="bg-muted/5 sticky top-0 z-10">
                         <TableRow className="hover:bg-transparent border-b">
-                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                             Estudiante
                           </TableHead>
-                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
                             Documento / Código
                           </TableHead>
-                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-center">
+                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-center">
                             Estado
                           </TableHead>
-                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-right">
+                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-right">
                             Acciones
                           </TableHead>
                         </TableRow>
@@ -555,7 +555,7 @@ export default function CargarEstudiantesPage() {
                             </TableCell>
                             <TableCell className="py-2.5">
                               <div className="flex flex-col">
-                                <span className="text-xs font-medium">{item.document}</span>
+                                <span className="text-xs font-semibold">{item.document}</span>
                                 <span className="text-[10px] text-muted-foreground">
                                   {item.code || '-'}
                                 </span>
@@ -606,13 +606,13 @@ export default function CargarEstudiantesPage() {
                     </Table>
                   </div>
                   <div className="p-4 bg-muted/20 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                    <p className="text-[10px] font-medium text-muted-foreground italic">
+                    <p className="text-[10px] font-semibold text-muted-foreground italic">
                       * Verifica que los datos coincidan con la base de datos oficial.
                     </p>
                     <Button
                       onClick={handleConfirmUpload}
                       disabled={isConfirming || successCount === 0}
-                      className="h-9 px-8 text-xs font-bold shadow-sm"
+                      className="h-9 px-8 text-xs font-semibold shadow-sm"
                     >
                       {isConfirming ? (
                         <>
@@ -631,7 +631,7 @@ export default function CargarEstudiantesPage() {
                     <UserCheck className="h-8 w-8 text-muted-foreground/20" />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider">
+                    <p className="text-[10px] font-semibold text-muted-foreground ">
                       Sin datos para mostrar
                     </p>
                     <p className="text-[10px] text-muted-foreground/60 max-w-[200px]">

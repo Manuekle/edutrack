@@ -122,16 +122,16 @@ export function QRViewer({
                 >
                   <div
                     className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
-                        ? 'translate-y-0 opacity-100'
-                        : '-translate-y-2 opacity-0 pointer-events-none'
+                      ? 'translate-y-0 opacity-100'
+                      : '-translate-y-2 opacity-0 pointer-events-none'
                       }`}
                   >
                     <Check className="h-3 w-3 text-green-500" />
                   </div>
                   <div
                     className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
-                        ? 'translate-y-2 opacity-0 pointer-events-none'
-                        : 'translate-y-0 opacity-100'
+                      ? 'translate-y-2 opacity-0 pointer-events-none'
+                      : 'translate-y-0 opacity-100'
                       }`}
                   >
                     <Copy className="h-3 w-3" />
@@ -159,7 +159,7 @@ export function QRViewer({
               )}
             </div>
 
-            <Button onClick={onClose} className="w-full font-medium">
+            <Button onClick={onClose} className="w-full font-semibold">
               Finalizar
             </Button>
           </div>

@@ -105,11 +105,11 @@ const JustifyClassEmail = ({
 
               {/* Student Info */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Información del estudiante
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px]">
-                  <Text className="text-xs font-medium text-[#355872] m-0 leading-[20px]">
+                  <Text className="text-xs font-semibold text-[#355872] m-0 leading-[20px]">
                     {studentName}
                   </Text>
                 </div>
@@ -117,26 +117,26 @@ const JustifyClassEmail = ({
 
               {/* Class Details */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles de la clase
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px] space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Asignatura
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{subjectName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Clase
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{className}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha de la clase
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">
@@ -145,7 +145,7 @@ const JustifyClassEmail = ({
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Horario
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{classTime}</Text>
@@ -155,7 +155,7 @@ const JustifyClassEmail = ({
 
               {/* Justification */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Motivo de la justificación
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px]">
@@ -167,12 +167,12 @@ const JustifyClassEmail = ({
 
               {/* Submission Details */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles de la solicitud
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px] space-y-[8px]">
                   <div className="flex items-center">
-                    <Text className="text-xs font-medium text-[#355872] m-0">
+                    <Text className="text-xs font-semibold text-[#355872] m-0">
                       Justificación enviada exitosamente
                     </Text>
                   </div>

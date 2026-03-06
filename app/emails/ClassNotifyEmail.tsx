@@ -88,26 +88,26 @@ const ClassNotifyEmail = ({
 
               {/* Class Details */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles de la clase
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px] space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Clase
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{className}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Asignatura
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{subjectName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">
@@ -116,7 +116,7 @@ const ClassNotifyEmail = ({
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Horario
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">
@@ -130,7 +130,7 @@ const ClassNotifyEmail = ({
               <Section className="mb-[32px]">
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[12px] flex items-center">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] m-0 mb-[4px]">
                       Clase activa
                     </Text>
                     <Text className="text-xs text-[#7AAACE] m-0 leading-[16px]">
@@ -142,7 +142,7 @@ const ClassNotifyEmail = ({
 
               {/* Action Section */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[16px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[16px]">
                   ¿No puedes asistir?
                 </Text>
                 <Text className="text-xs text-[#7AAACE] leading-[20px] m-0 mb-[16px]">
@@ -153,7 +153,7 @@ const ClassNotifyEmail = ({
                 <div className="text-center">
                   <Button
                     href={justificationLink}
-                    className="bg-[#355872] text-white text-xs font-medium px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
+                    className="bg-[#355872] text-white text-xs font-semibold px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
                   >
                     Justificar Ausencia
                   </Button>
@@ -163,7 +163,7 @@ const ClassNotifyEmail = ({
               {/* Alternative Link */}
               <Section className="mb-[32px]">
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[12px]">
-                  <Text className="text-xs font-medium text-[#355872] m-0 mb-[8px]">
+                  <Text className="text-xs font-semibold text-[#355872] m-0 mb-[8px]">
                     Enlace alternativo
                   </Text>
                   <Text className="text-xs text-[#7AAACE] m-0 mb-[8px] leading-[16px]">

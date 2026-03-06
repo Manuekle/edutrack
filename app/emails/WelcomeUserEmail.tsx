@@ -78,19 +78,19 @@ const WelcomeUserEmail = ({
 
               {/* Credentials */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Credenciales de acceso
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px] space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Correo electrónico
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{email}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Contraseña temporal
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{password}</Text>
@@ -112,7 +112,7 @@ const WelcomeUserEmail = ({
               <Section className="mb-[32px] text-center">
                 <Button
                   href={loginUrl}
-                  className="bg-[#355872] text-white text-xs font-medium px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
+                  className="bg-[#355872] text-white text-xs font-semibold px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
                 >
                   Iniciar sesión ahora
                 </Button>
@@ -122,7 +122,7 @@ const WelcomeUserEmail = ({
 
               {/* Next Steps */}
               <Section className="mb-[24px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Próximos pasos
                 </Text>
                 <div className="space-y-[8px]">

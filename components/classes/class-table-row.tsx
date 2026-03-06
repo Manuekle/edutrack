@@ -150,7 +150,7 @@ export function ClassTableRow({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-[180px]">
-            <DropdownMenuLabel className="font-sans font-medium">Acciones</DropdownMenuLabel>
+            <DropdownMenuLabel className="font-sans font-semibold">Acciones</DropdownMenuLabel>
             <DropdownMenuItem
               asChild
               disabled={!canTakeAttendance}

@@ -477,7 +477,7 @@ export default function ProfilePage() {
           <Card>
             <CardContent className="py-4 px-5 flex items-center gap-4">
               <Avatar className="h-12 w-12 border border-border bg-muted shrink-0">
-                <AvatarFallback className="text-lg font-bold text-primary">
+                <AvatarFallback className="text-lg font-semibold text-primary">
                   {session?.user?.name?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -735,9 +735,9 @@ export default function ProfilePage() {
                     <div className="space-y-3 flex-1">
                       <div className="text-xs">
                         {signatureFile ? (
-                          <span className="text-orange-600 font-medium">● Pendiente de guardar</span>
+                          <span className="text-orange-600 font-semibold">● Pendiente de guardar</span>
                         ) : signaturePreview ? (
-                          <span className="text-green-600 font-medium">● Firma registrada</span>
+                          <span className="text-green-600 font-semibold">● Firma registrada</span>
                         ) : (
                           <span className="text-muted-foreground">Sin firma. Sube o dibuja tu firma.</span>
                         )}

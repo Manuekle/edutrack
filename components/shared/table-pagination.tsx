@@ -73,10 +73,10 @@ export function TablePagination({
     >
       <div className="text-xs text-muted-foreground w-full">
         Mostrando{' '}
-        <span className="font-medium">
+        <span className="font-semibold">
           {startItem}-{endItem}
         </span>{' '}
-        de <span className="font-medium">{totalItems}</span> registros
+        de <span className="font-semibold">{totalItems}</span> registros
       </div>
 
       <Pagination className="w-full flex justify-end">

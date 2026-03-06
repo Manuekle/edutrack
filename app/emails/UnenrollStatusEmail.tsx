@@ -92,26 +92,26 @@ const UnenrollStatusEmail = ({
 
               {/* Request Details */}
               <Section className="mb-[24px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles de la solicitud
                 </Text>
                 <div className="space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Estudiante
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">{studentName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Asignatura
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">{subjectName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha de solicitud
                     </Text>
                     <Text className="text-xs text-[#7AAACE] m-0 leading-[20px]">
@@ -120,7 +120,7 @@ const UnenrollStatusEmail = ({
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha de decisión
                     </Text>
                     <Text className="text-xs text-[#7AAACE] m-0 leading-[20px]">
@@ -133,7 +133,7 @@ const UnenrollStatusEmail = ({
               {/* Rejection Reason */}
               {!isApproved && reason && (
                 <Section className="mb-[24px]">
-                  <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[8px]">
+                  <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[8px]">
                     Motivo del rechazo
                   </Text>
                   <div className="bg-[#F7F8F0] border-l-[4px] border-[#7AAACE] px-[16px] py-[12px]">

@@ -69,21 +69,21 @@ const ClassCancellationEmail = ({
               <Section className="mb-[24px]">
                 <div className="space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Asignatura
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">{subjectName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Docente
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">{teacherName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[24px]">
@@ -100,7 +100,7 @@ const ClassCancellationEmail = ({
 
               {/* Reason */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[8px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[8px]">
                   Motivo de la cancelación
                 </Text>
                 <Text className="text-xs text-[#355872] leading-[24px] m-0 py-[12px] italic bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[12px]">

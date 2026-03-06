@@ -181,7 +181,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
           <SidebarMenu>
             {accessibleNavGroups.map(group => (
               <SidebarGroup key={group.title}>
-                <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold tracking-wider text-muted-foreground/70">
+                <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold  text-muted-foreground/70">
                   {group.title}
                 </SidebarGroupLabel>
                 <SidebarGroupContent className="flex flex-col gap-1 px-2">
@@ -194,8 +194,8 @@ function AppSidebar({ homePath }: { homePath: string }) {
                           asChild
                           isActive={isActive}
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] ${isActive
-                              ? 'bg-primary/10 text-primary font-medium shadow-sm'
-                              : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+                            ? 'bg-primary/10 text-primary font-semibold shadow-sm'
+                            : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
                             }`}
                         >
                           <Link href={link.href} className="flex items-center gap-3 w-full">
@@ -224,13 +224,13 @@ function AppSidebar({ homePath }: { homePath: string }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-[44px] sm:min-h-[52px]">
-                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-medium">
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold">
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {session?.user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-2 sm:ml-3 text-left overflow-hidden">
-                    <p className="text-sm font-medium truncate font-sans">
+                    <p className="text-sm font-semibold truncate font-sans">
                       {session?.user?.name?.split(' ')[0] || 'Usuario'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
@@ -249,7 +249,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                 collisionPadding={16}
               >
                 <div className="px-4 py-1 my-1">
-                  <p className="text-xs font-medium truncate">{session?.user?.name || 'Usuario'}</p>
+                  <p className="text-xs font-semibold truncate">{session?.user?.name || 'Usuario'}</p>
                   <p className="text-xs text-muted-foreground truncate">
                     {session?.user?.correoInstitucional || getRoleDisplayName(userRole as Role)}
                   </p>

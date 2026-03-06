@@ -50,7 +50,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                   <div className="flex items-end justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h4 className="text-xs font-medium truncate">{subject.name}</h4>
+                        <h4 className="text-xs font-semibold truncate">{subject.name}</h4>
                       </div>
                       <p className="text-xs text-muted-foreground font-mono">{subject.code}</p>
 

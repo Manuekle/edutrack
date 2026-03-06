@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -110,7 +110,7 @@ export function PWAInstaller() {
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="font-medium text-sm">Instalar SIRA</h3>
+            <h3 className="font-semibold text-sm">Instalar SIRA</h3>
             <p className="text-xs text-muted-foreground mt-1">
               Añade esta app a tu pantalla de inicio para un acceso rápido
             </p>
@@ -133,13 +133,13 @@ export function PWAInstaller() {
         <div className="mt-3 flex gap-2">
           <button
             onClick={handleInstall}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium py-2 px-4 rounded-md transition-colors"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold py-2 px-4 rounded-md transition-colors"
           >
             Instalar
           </button>
           <button
             onClick={handleDismiss}
-            className="flex-1 bg-muted hover:bg-muted/80 text-xs font-medium py-2 px-4 rounded-md transition-colors"
+            className="flex-1 bg-muted hover:bg-muted/80 text-xs font-semibold py-2 px-4 rounded-md transition-colors"
           >
             Ahora no
           </button>

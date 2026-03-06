@@ -73,7 +73,7 @@ export default function HomePageMobile() {
               <div className="mb-4 p-4 bg-muted/30 rounded-full border border-border/50">
                 {features[currentFeature].icon}
               </div>
-              <h2 className="text-md tracking-card font-medium mb-2">
+              <h2 className="text-md tracking-card font-semibold mb-2">
                 {features[currentFeature].title}
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -100,7 +100,7 @@ export default function HomePageMobile() {
         <div className="flex flex-col gap-3">
           <Button
             size="lg"
-            className="w-full text-sm font-medium"
+            className="w-full text-sm font-semibold"
             onClick={() => router.push('/login')}
           >
             Iniciar Sesión

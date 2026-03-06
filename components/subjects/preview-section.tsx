@@ -191,7 +191,7 @@ export function PreviewSection({
               </div>
               {uploadResult.errors && uploadResult.errors.length > 0 && (
                 <div className="w-full max-w-md space-y-2">
-                  <p className="text-xs font-medium text-destructive">Errores:</p>
+                  <p className="text-xs font-semibold text-destructive">Errores:</p>
                   <div className="bg-muted rounded-md p-3 max-h-32 overflow-y-auto">
                     <ul className="space-y-1 text-xs text-muted-foreground">
                       {uploadResult.errors.map((error, index) => (
@@ -215,7 +215,7 @@ export function PreviewSection({
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium">{subject.nombreAsignatura}</span>
+                        <span className="text-xs font-semibold">{subject.nombreAsignatura}</span>
                         <Badge
                           variant={subject.status === 'success' ? 'outline' : 'destructive'}
                           className="text-xs"
@@ -279,7 +279,7 @@ export function PreviewSection({
                                     />
                                   </div>
                                 ) : (
-                                  <p className="font-medium min-h-[2.25rem] flex items-center">
+                                  <p className="font-semibold min-h-[2.25rem] flex items-center">
                                     {(() => {
                                       const date = parseDateString(cls.fechaClase);
                                       if (!date) return cls.fechaClase;
@@ -310,7 +310,7 @@ export function PreviewSection({
                                     />
                                   </div>
                                 ) : (
-                                  <p className="font-medium min-h-[2.25rem] flex items-center">
+                                  <p className="font-semibold min-h-[2.25rem] flex items-center">
                                     {formatTimeWithAmPm(cls.horaInicio)}
                                   </p>
                                 )}
@@ -333,7 +333,7 @@ export function PreviewSection({
                                     />
                                   </div>
                                 ) : (
-                                  <p className="font-medium min-h-[2.25rem] flex items-center">
+                                  <p className="font-semibold min-h-[2.25rem] flex items-center">
                                     {formatTimeWithAmPm(cls.horaFin)}
                                   </p>
                                 )}
@@ -355,7 +355,7 @@ export function PreviewSection({
                                     className="w-full text-xs h-9"
                                   />
                                 ) : (
-                                  <p className="font-medium truncate min-h-[2.25rem] flex items-center">
+                                  <p className="font-semibold truncate min-h-[2.25rem] flex items-center">
                                     {cls.temaClase || '-'}
                                   </p>
                                 )}

@@ -43,7 +43,7 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
                 <CardContent className="p-4 flex flex-col h-full justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-xs tracking-card text-foreground">
+                      <span className="font-semibold text-xs tracking-card text-foreground">
                         {item.title}
                       </span>
                       <Badge variant="outline" className="text-xs font-normal lowercase">

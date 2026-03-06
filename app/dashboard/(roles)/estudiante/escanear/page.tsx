@@ -111,15 +111,15 @@ export default function ScannerPage() {
               <div className="bg-muted rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Asignatura:</span>
-                  <span className="font-medium">{attendanceData.subject}</span>
+                  <span className="font-semibold">{attendanceData.subject}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Clase:</span>
-                  <span className="font-medium">{attendanceData.class}</span>
+                  <span className="font-semibold">{attendanceData.class}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Hora de registro:</span>
-                  <span className="font-medium">{attendanceData.recordedAt}</span>
+                  <span className="font-semibold">{attendanceData.recordedAt}</span>
                 </div>
               </div>
               <div className="flex gap-2 pt-2">
@@ -141,7 +141,7 @@ export default function ScannerPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-3 text-xs text-muted-foreground">
-                  <p className="font-medium text-foreground">Instrucciones:</p>
+                  <p className="font-semibold text-foreground">Instrucciones:</p>
                   <ul className="space-y-2 list-disc list-inside">
                     <li>Asegúrate de estar en la clase correspondiente</li>
                     <li>Solicita al docente que muestre el código QR</li>

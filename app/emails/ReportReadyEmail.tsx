@@ -75,26 +75,26 @@ const ReportReadyEmail = ({
 
               {/* Report Details */}
               <Section className="mb-[32px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   Detalles del reporte
                 </Text>
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[16px] space-y-[12px]">
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Asignatura
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{subjectName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Nombre del archivo
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">{reportName}</Text>
                   </div>
 
                   <div>
-                    <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[4px]">
+                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
                       Fecha de generación
                     </Text>
                     <Text className="text-xs text-[#355872] m-0 leading-[20px]">
@@ -113,7 +113,7 @@ const ReportReadyEmail = ({
               <Section className="mb-[32px] text-center">
                 <Button
                   href={downloadUrl}
-                  className="bg-[#355872] text-white text-xs font-medium px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
+                  className="bg-[#355872] text-white text-xs font-semibold px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
                 >
                   Descargar Reporte
                 </Button>
@@ -122,7 +122,7 @@ const ReportReadyEmail = ({
               {/* Alternative Download */}
               <Section className="mb-[32px]">
                 <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[12px]">
-                  <Text className="text-xs font-medium text-[#355872] m-0 mb-[8px]">
+                  <Text className="text-xs font-semibold text-[#355872] m-0 mb-[8px]">
                     Enlace alternativo
                   </Text>
                   <Text className="text-xs text-[#7AAACE] m-0 mb-[8px] leading-[16px]">
@@ -148,7 +148,7 @@ const ReportReadyEmail = ({
 
               {/* Next Steps */}
               <Section className="mb-[24px]">
-                <Text className="text-xs font-medium text-[#355872] tracking-normal m-0 mb-[12px]">
+                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
                   ¿Necesitas ayuda?
                 </Text>
                 <div className="space-y-[8px]">

@@ -138,7 +138,7 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
             <Button
               onClick={toggleScanning}
               variant={isScanning ? 'destructive' : 'default'}
-              className="w-full font-medium"
+              className="w-full font-semibold"
               disabled={isLoading}
             >
               {isScanning ? (
