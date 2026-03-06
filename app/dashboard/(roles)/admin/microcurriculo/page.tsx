@@ -1,22 +1,28 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { TagsInput } from '@/components/ui/tags-input';
+import {
+  BookOpen,
   CheckCircle,
   Download,
+  Edit2,
   FileSpreadsheet,
   Loader2,
-  XCircle,
-  BookOpen,
   Plus,
-  Trash2,
-  Edit2,
+  Trash2
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -29,7 +35,7 @@ interface PreviewItem {
   semestre: number;
   creditos: number;
   horas: number;
-  temas: string;
+  temas: string[];
   temasCount: number;
   status: 'success' | 'error' | 'existing' | 'manual';
   message: string;
@@ -60,14 +66,22 @@ export default function MicrocurriculoPage() {
   const [isConfirming, setIsConfirming] = useState(false);
 
   // Manual form state
-  const [manualForm, setManualForm] = useState({
+  const [manualForm, setManualForm] = useState<{
+    codigo: string;
+    nombre: string;
+    programa: string;
+    semestre: string;
+    creditos: string;
+    horas: string;
+    temas: string[];
+  }>({
     codigo: '',
     nombre: '',
     programa: PROGRAMAS[0],
     semestre: '1',
     creditos: '3',
     horas: '4',
-    temas: '',
+    temas: [],
   });
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -106,7 +120,7 @@ export default function MicrocurriculoPage() {
         const dataWithIds = (result.previewData || []).map((item: PreviewItem, index: number) => ({
           ...item,
           id: `csv-${index}-${Date.now()}`,
-          temas: '',
+          temas: item.temas || [], // keep temas from backend
         }));
         setPreviewData(dataWithIds);
         setIsPreview(true);
@@ -138,7 +152,7 @@ export default function MicrocurriculoPage() {
       creditos: parseInt(manualForm.creditos) || 3,
       horas: parseInt(manualForm.horas) || 4,
       temas: manualForm.temas,
-      temasCount: manualForm.temas ? manualForm.temas.split(';').filter(t => t.trim()).length : 0,
+      temasCount: manualForm.temas.length,
       status: 'manual',
       message: 'Nuevo',
     };
@@ -152,7 +166,7 @@ export default function MicrocurriculoPage() {
       semestre: '1',
       creditos: '3',
       horas: '4',
-      temas: '',
+      temas: [],
     });
     toast.success('Asignatura agregada');
   };
@@ -167,9 +181,10 @@ export default function MicrocurriculoPage() {
         semestre: item.semestre.toString(),
         creditos: item.creditos.toString(),
         horas: item.horas.toString(),
-        temas: item.temas,
+        temas: item.temas || [],
       });
       setEditingId(id);
+      setMode('manual');
     }
   };
 
@@ -184,22 +199,21 @@ export default function MicrocurriculoPage() {
       previewData.map(item =>
         item.id === editingId
           ? {
-              ...item,
-              codigoAsignatura: manualForm.codigo,
-              nombreAsignatura: manualForm.nombre,
-              programa: manualForm.programa,
-              semestre: parseInt(manualForm.semestre) || 1,
-              creditos: parseInt(manualForm.creditos) || 3,
-              horas: parseInt(manualForm.horas) || 4,
-              temas: manualForm.temas,
-              temasCount: manualForm.temas
-                ? manualForm.temas.split(';').filter(t => t.trim()).length
-                : 0,
-            }
+            ...item,
+            codigoAsignatura: manualForm.codigo,
+            nombreAsignatura: manualForm.nombre,
+            programa: manualForm.programa,
+            semestre: parseInt(manualForm.semestre) || 1,
+            creditos: parseInt(manualForm.creditos) || 3,
+            horas: parseInt(manualForm.horas) || 4,
+            temas: manualForm.temas,
+            temasCount: manualForm.temas.length,
+          }
           : item
       )
     );
     setEditingId(null);
+    setMode('csv');
     setManualForm({
       codigo: '',
       nombre: '',
@@ -207,7 +221,7 @@ export default function MicrocurriculoPage() {
       semestre: '1',
       creditos: '3',
       horas: '4',
-      temas: '',
+      temas: [],
     });
     toast.success('Asignatura actualizada');
   };
@@ -225,31 +239,28 @@ export default function MicrocurriculoPage() {
 
     setIsConfirming(true);
     try {
-      // Enviar cada asignatura manualmente
-      let created = 0;
-      let errors = 0;
+      const validItems = previewData.filter(item => item.status !== 'error');
 
-      for (const item of previewData) {
-        const formData = new FormData();
-        const csvContent = `${item.codigoAsignatura},${item.nombreAsignatura},${item.programa},${item.semestre},${item.creditos},${item.horas},${item.temas}`;
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        formData.append('file', blob, 'temp.csv');
+      const res = await fetch('/api/admin/microcurriculo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ subjects: validItems }),
+      });
 
-        const res = await fetch('/api/admin/microcurriculo', {
-          method: 'POST',
-          body: formData,
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        toast.success(`Proceso finalizado. Se crearon ${result.summary?.created || 0} asignaturas.`);
+        setFinalResults({
+          created: result.summary?.created || 0,
+          errors: result.summary?.errors || 0,
         });
-
-        if (res.ok) {
-          created++;
-        } else {
-          errors++;
-        }
+        setPreviewData([]);
+      } else {
+        toast.error(result.error || 'Ocurrió un error en la carga.');
       }
-
-      toast.success(`Proceso finalizado. Se crearon ${created} asignaturas.`);
-      setFinalResults({ created, errors });
-      setPreviewData([]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
       toast.error(errorMessage);
@@ -271,7 +282,7 @@ export default function MicrocurriculoPage() {
       semestre: '1',
       creditos: '3',
       horas: '4',
-      temas: '',
+      temas: [],
     });
   };
 
@@ -424,18 +435,21 @@ export default function MicrocurriculoPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="programa">Programa</Label>
-                  <select
-                    id="programa"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs"
+                  <Select
                     value={manualForm.programa}
-                    onChange={e => setManualForm({ ...manualForm, programa: e.target.value })}
+                    onValueChange={value => setManualForm({ ...manualForm, programa: value })}
                   >
-                    {PROGRAMAS.map(p => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="programa" className="w-full h-10">
+                      <SelectValue placeholder="Selecciona un programa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROGRAMAS.map(p => (
+                        <SelectItem key={p} value={p}>
+                          {p}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="space-y-2">
@@ -467,13 +481,12 @@ export default function MicrocurriculoPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="temas">Temas (separados por ;)</Label>
-                  <Textarea
+                  <Label htmlFor="temas">Temas</Label>
+                  <TagsInput
                     id="temas"
                     value={manualForm.temas}
-                    onChange={e => setManualForm({ ...manualForm, temas: e.target.value })}
-                    placeholder="Tema 1; Tema 2; Tema 3"
-                    rows={3}
+                    onValueChange={(val) => setManualForm({ ...manualForm, temas: val })}
+                    placeholder="Escribe un tema y presiona Enter"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -486,6 +499,7 @@ export default function MicrocurriculoPage() {
                         variant="outline"
                         onClick={() => {
                           setEditingId(null);
+                          setMode('csv');
                           handleCancel();
                         }}
                       >

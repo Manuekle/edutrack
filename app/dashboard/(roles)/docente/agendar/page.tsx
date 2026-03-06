@@ -4,6 +4,7 @@ import { SignaturePad } from '@/components/rooms/signature-pad';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Table,
@@ -47,8 +47,8 @@ export default function DocenteAgendarPage() {
   const [loading, setLoading] = useState(true);
 
   const [bookingForm, setBookingForm] = useState({
-    startTime: format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm"),
-    endTime: format(addHours(startOfHour(new Date()), 1), "yyyy-MM-dd'T'HH:mm"),
+    startTime: startOfHour(new Date()),
+    endTime: addHours(startOfHour(new Date()), 1),
     reason: '',
     signature: '',
   });
@@ -100,8 +100,8 @@ export default function DocenteAgendarPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           roomId: selectedRoom,
-          startTime: bookingForm.startTime,
-          endTime: bookingForm.endTime,
+          startTime: bookingForm.startTime.toISOString(),
+          endTime: bookingForm.endTime.toISOString(),
           reason: bookingForm.reason,
           signatureData: bookingForm.signature,
         }),
@@ -317,28 +317,18 @@ export default function DocenteAgendarPage() {
                 <Label htmlFor="startTime" className="text-xs">
                   Hora de Inicio
                 </Label>
-                <Input
-                  id="startTime"
-                  name="startTime"
-                  type="datetime-local"
-                  autoComplete="off"
+                <DateTimePicker
                   value={bookingForm.startTime}
-                  onChange={e => setBookingForm({ ...bookingForm, startTime: e.target.value })}
-                  className="bg-muted/30 focus-visible:ring-1"
+                  onChange={date => setBookingForm({ ...bookingForm, startTime: date || new Date() })}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="endTime" className="text-xs">
                   Hora de Finalización
                 </Label>
-                <Input
-                  id="endTime"
-                  name="endTime"
-                  type="datetime-local"
-                  autoComplete="off"
+                <DateTimePicker
                   value={bookingForm.endTime}
-                  onChange={e => setBookingForm({ ...bookingForm, endTime: e.target.value })}
-                  className="bg-muted/30 focus-visible:ring-1"
+                  onChange={date => setBookingForm({ ...bookingForm, endTime: date || new Date() })}
                 />
               </div>
             </div>

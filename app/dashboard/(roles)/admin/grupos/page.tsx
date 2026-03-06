@@ -1,9 +1,9 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -13,18 +13,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { TimePicker } from '@/components/ui/time-picker';
 import {
+  Calendar,
   CheckCircle,
   Download,
+  Edit2,
   FileSpreadsheet,
   Loader2,
-  XCircle,
-  Calendar,
   Plus,
-  Trash2,
-  Edit2,
+  Trash2
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface Subject {
@@ -169,13 +169,13 @@ export default function GruposHorariosPage() {
       maxCapacity: parseInt(manualForm.capacidad) || 30,
       schedule: manualForm.dia
         ? [
-            {
-              dia: manualForm.dia,
-              horaInicio: manualForm.horaInicio,
-              horaFin: manualForm.horaFin,
-              salon: manualForm.salon || 'Por asignar',
-            },
-          ]
+          {
+            dia: manualForm.dia,
+            horaInicio: manualForm.horaInicio,
+            horaFin: manualForm.horaFin,
+            salon: manualForm.salon || 'Por asignar',
+          },
+        ]
         : undefined,
     };
 
@@ -208,21 +208,21 @@ export default function GruposHorariosPage() {
       previewData.map(item =>
         item.id === editingId
           ? {
-              ...item,
-              grupo: manualForm.grupo,
-              jornada: manualForm.jornada,
-              maxCapacity: parseInt(manualForm.capacidad) || 30,
-              schedule: manualForm.dia
-                ? [
-                    {
-                      dia: manualForm.dia,
-                      horaInicio: manualForm.horaInicio,
-                      horaFin: manualForm.horaFin,
-                      salon: manualForm.salon || 'Por asignar',
-                    },
-                  ]
-                : undefined,
-            }
+            ...item,
+            grupo: manualForm.grupo,
+            jornada: manualForm.jornada,
+            maxCapacity: parseInt(manualForm.capacidad) || 30,
+            schedule: manualForm.dia
+              ? [
+                {
+                  dia: manualForm.dia,
+                  horaInicio: manualForm.horaInicio,
+                  horaFin: manualForm.horaFin,
+                  salon: manualForm.salon || 'Por asignar',
+                },
+              ]
+              : undefined,
+          }
           : item
       )
     );
@@ -517,18 +517,16 @@ export default function GruposHorariosPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-2">
                     <Label>Hora Inicio</Label>
-                    <Input
-                      type="time"
+                    <TimePicker
                       value={manualForm.horaInicio}
-                      onChange={e => setManualForm({ ...manualForm, horaInicio: e.target.value })}
+                      onChange={v => setManualForm({ ...manualForm, horaInicio: v })}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Hora Fin</Label>
-                    <Input
-                      type="time"
+                    <TimePicker
                       value={manualForm.horaFin}
-                      onChange={e => setManualForm({ ...manualForm, horaFin: e.target.value })}
+                      onChange={v => setManualForm({ ...manualForm, horaFin: v })}
                     />
                   </div>
                 </div>

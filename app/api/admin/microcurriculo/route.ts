@@ -2,6 +2,7 @@ import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
+import Papa from 'papaparse';
 
 interface PreviewResult {
   codigoAsignatura: string;
@@ -10,6 +11,7 @@ interface PreviewResult {
   semestre: number;
   creditos: number;
   horas: number;
+  temas: string[];
   temasCount: number;
   status: 'success' | 'error' | 'existing';
   message: string;
@@ -25,25 +27,106 @@ export async function POST(request: Request) {
     const url = new URL(request.url, `https://${request.headers.get('host')}`);
     const isPreview = url.searchParams.get('preview') === 'true';
 
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    let formData: FormData | null = null;
+    try {
+      formData = await request.formData();
+    } catch {
+      // Not form data
+    }
 
+    // Handle bulk JSON creation (non-preview mode, sent from Confirmar button)
+    if (!formData && !isPreview) {
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const body = await request.json();
+        const subjects: PreviewResult[] = body.subjects;
+
+        if (!Array.isArray(subjects) || subjects.length === 0) {
+          return NextResponse.json({ error: 'No se encontraron asignaturas para crear' }, { status: 400 });
+        }
+
+        const existingCodes = new Set(
+          (await db.subject.findMany({ select: { code: true } })).map(s => s.code)
+        );
+
+        const created: string[] = [];
+        const errors: string[] = [];
+
+        for (const item of subjects) {
+          try {
+            if (existingCodes.has(item.codigoAsignatura)) {
+              errors.push(`La asignatura ${item.codigoAsignatura} ya existe`);
+              continue;
+            }
+
+            const subject = await db.subject.create({
+              data: {
+                code: item.codigoAsignatura,
+                name: item.nombreAsignatura,
+                program: item.programa || null,
+                semester: item.semestre,
+                credits: item.creditos,
+                directHours: item.horas,
+              },
+            });
+
+            if (item.temas && item.temas.length > 0) {
+              const contentData = item.temas.map((tema, index) => ({
+                subjectId: subject.id,
+                type: 'TEMA',
+                title: tema.trim(),
+                order: index + 1,
+              }));
+
+              await db.subjectContent.createMany({
+                data: contentData,
+              });
+            }
+
+            created.push(item.codigoAsignatura);
+          } catch (e) {
+            errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
+          }
+        }
+
+        return NextResponse.json({
+          success: true,
+          summary: {
+            total: subjects.length,
+            created: created.length,
+            existing: subjects.length - created.length - errors.length,
+            errors: errors.length,
+          },
+          createdSubjects: created,
+          errors,
+        });
+      }
+    }
+
+    const file = formData ? (formData.get('file') as File | null) : null;
     if (!file) {
       return NextResponse.json({ error: 'No se encontró el archivo' }, { status: 400 });
     }
 
     const buffer = await file.arrayBuffer();
     const text = new TextDecoder('utf-8').decode(buffer);
-    const lines = text.split(/\r?\n/).filter(line => line.trim());
 
-    if (lines.length === 0) {
+    // Using PapaParse for reliable CSV parsing (handles quoted strings, specific delimiters)
+    const parseResult = Papa.parse<Record<string, string>>(text, {
+      header: true,
+      skipEmptyLines: true,
+    });
+
+    if (parseResult.errors.length > 0 && parseResult.data.length === 0) {
+       return NextResponse.json({ error: 'El archivo CSV tiene un formato inválido' }, { status: 400 });
+    }
+
+    const dataRows = parseResult.data;
+    if (dataRows.length === 0) {
       return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
     }
 
-    const headers = lines[0]
-      .toLowerCase()
-      .split(/[,;]/)
-      .map(h => h.trim());
+    const headers = parseResult.meta.fields || [];
 
     const headerMap: Record<string, string[]> = {
       codigo: ['codigo_asignatura', 'codigo', 'code'],
@@ -58,16 +141,15 @@ export async function POST(request: Request) {
     const findHeader = (variants: string[]): string | undefined => {
       for (const variant of variants) {
         const normalized = variant.toLowerCase().replace(/\s+/g, '');
-        const found = headers.find(h => h.toLowerCase().replace(/\s+/g, '') === normalized);
+        const found = headers.find((h: string) => h.toLowerCase().replace(/\s+/g, '') === normalized);
         if (found) return found;
       }
       return undefined;
     };
 
-    const getValue = (row: string[], header: string | undefined): string => {
+    const getValue = (row: Record<string, string>, header: string | undefined): string => {
       if (!header) return '';
-      const headerIndex = headers.indexOf(header);
-      return headerIndex >= 0 ? row[headerIndex] || '' : '';
+      return row[header] || '';
     };
 
     const results: PreviewResult[] = [];
@@ -75,17 +157,15 @@ export async function POST(request: Request) {
       (await db.subject.findMany({ select: { code: true } })).map(s => s.code)
     );
 
-    for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(/[,;]/).map(c => c.trim());
-      if (!cols.some(v => v)) continue;
-
-      const codigo = getValue(cols, findHeader(headerMap.codigo)).trim();
-      const nombre = getValue(cols, findHeader(headerMap.nombre)).trim();
-      const programa = getValue(cols, findHeader(headerMap.programa)).trim();
-      const semestreStr = getValue(cols, findHeader(headerMap.semestre)).trim();
-      const creditosStr = getValue(cols, findHeader(headerMap.creditos)).trim();
-      const horasStr = getValue(cols, findHeader(headerMap.horas)).trim();
-      const temasStr = getValue(cols, findHeader(headerMap.temas)).trim();
+    for (let i = 0; i < dataRows.length; i++) {
+      const row = dataRows[i];
+      const codigo = getValue(row, findHeader(headerMap.codigo)).trim();
+      const nombre = getValue(row, findHeader(headerMap.nombre)).trim();
+      const programa = getValue(row, findHeader(headerMap.programa)).trim();
+      const semestreStr = getValue(row, findHeader(headerMap.semestre)).trim();
+      const creditosStr = getValue(row, findHeader(headerMap.creditos)).trim();
+      const horasStr = getValue(row, findHeader(headerMap.horas)).trim();
+      const temasStr = getValue(row, findHeader(headerMap.temas)).trim();
 
       const semestre = parseInt(semestreStr) || 1;
       const creditos = parseInt(creditosStr) || 0;
@@ -93,7 +173,7 @@ export async function POST(request: Request) {
 
       const temas = temasStr
         ? temasStr
-            .split(/[|;]/)
+            .split(/[|;\n]/)
             .map(t => t.trim())
             .filter(t => t)
         : [];
@@ -106,6 +186,7 @@ export async function POST(request: Request) {
           semestre: 1,
           creditos: 0,
           horas: 0,
+          temas,
           temasCount: 0,
           status: 'error',
           message: 'Faltan datos requeridos (código o nombre)',
@@ -121,6 +202,7 @@ export async function POST(request: Request) {
           semestre,
           creditos,
           horas,
+          temas,
           temasCount: temas.length,
           status: 'existing',
           message: 'La asignatura ya existe',
@@ -135,6 +217,7 @@ export async function POST(request: Request) {
         semestre,
         creditos,
         horas,
+        temas,
         temasCount: temas.length,
         status: 'success',
         message: 'Datos válidos',
@@ -145,68 +228,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, previewData: results });
     }
 
-    const toCreate = results.filter(r => r.status === 'success');
-    const created: string[] = [];
-    const errors: string[] = [];
+    return NextResponse.json({ error: 'Ruta no esperada' }, { status: 400 });
 
-    for (const item of toCreate) {
-      try {
-        const temasStr = getValue(
-          lines
-            .slice(1)
-            .find(l => l.includes(item.codigoAsignatura))
-            ?.split(/[,;]/) || [],
-          findHeader(headerMap.temas)
-        );
-        const temas = temasStr
-          ? temasStr
-              .split(/[|;]/)
-              .map(t => t.trim())
-              .filter(t => t)
-          : [];
-
-        const subject = await db.subject.create({
-          data: {
-            code: item.codigoAsignatura,
-            name: item.nombreAsignatura,
-            program: item.programa || null,
-            semester: item.semestre,
-            credits: item.creditos,
-            directHours: item.horas,
-          },
-        });
-
-        if (temas.length > 0) {
-          const contentData = temas.map((tema, index) => ({
-            subjectId: subject.id,
-            type: 'TEMA',
-            title: tema.trim(),
-            order: index + 1,
-          }));
-
-          await db.subjectContent.createMany({
-            data: contentData,
-          });
-        }
-
-        created.push(item.codigoAsignatura);
-      } catch (e) {
-        errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      summary: {
-        total: results.length,
-        created: created.length,
-        existing: results.filter(r => r.status === 'existing').length,
-        errors: results.filter(r => r.status === 'error').length,
-      },
-      createdSubjects: created,
-      errors,
-    });
   } catch (error) {
+    console.error('API Error microcurriculos: ', error);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

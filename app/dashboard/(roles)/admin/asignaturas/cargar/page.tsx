@@ -321,11 +321,10 @@ export default function CargarAsignaturasPage() {
                     {previewData.map((item, index) => (
                       <div
                         key={index}
-                        className={`p-4 rounded-2xl border transition-all ${
-                          item.status === 'existing' || item.status === 'error'
+                        className={`p-4 rounded-2xl border transition-all ${item.status === 'existing' || item.status === 'error'
                             ? 'border-destructive/20 bg-destructive/5'
                             : 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -387,7 +386,7 @@ export default function CargarAsignaturasPage() {
                     <ul className="space-y-1 ml-4 list-disc">
                       <li>
                         Solo se importarán las asignaturas marcadas como{' '}
-                        <span className="text-emerald-500 font-bold">Nuevas</span>.
+                        <span className="text-emerald-500 font-semibold">Nuevas</span>.
                       </li>
                       <li>Las asignaturas existentes se omiten para evitar duplicados.</li>
                       <li>
