@@ -7,7 +7,7 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card"
       className={cn(
-        'bg-card text-card-foreground flex flex-col rounded-2xl py-4 shadow-sm transition-all duration-200',
+        'bg-card text-card-foreground flex flex-col rounded-lg border border-border/40 py-4 shadow-sm transition-colors duration-200',
         className
       )}
       {...props}
@@ -72,4 +72,5 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
+

@@ -38,9 +38,8 @@ export default function HomePageMobile() {
 
   return (
     <div className="flex flex-col h-dvh bg-background text-foreground font-sans overflow-hidden relative">
-      {/* Background Elements */}
-      <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-primary/5 blur-3xl rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[40%] bg-blue-500/5 blur-3xl rounded-full" />
+      {/* Subtle Background Pattern (Optional, but using primary/5 or just empty) */}
+      <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom" style={{ maskImage: 'linear-gradient(to bottom, transparent, black)' }} />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-md mx-auto">
@@ -65,13 +64,13 @@ export default function HomePageMobile() {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentFeature}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
               className="absolute inset-0 flex flex-col items-center text-center px-4"
             >
-              <div className="mb-4 p-4 bg-card/50 rounded-full border border-border/50 backdrop-blur-sm">
+              <div className="mb-4 p-4 bg-muted/30 rounded-full border border-border/50">
                 {features[currentFeature].icon}
               </div>
               <h2 className="text-md tracking-card font-medium mb-2">
@@ -89,9 +88,8 @@ export default function HomePageMobile() {
           {features.map((_, idx) => (
             <div
               key={idx}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
-              }`}
+              className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
+                }`}
             />
           ))}
         </div>
@@ -101,8 +99,8 @@ export default function HomePageMobile() {
       <footer className="p-6 pb-10 w-full max-w-md mx-auto relative z-10">
         <div className="flex flex-col gap-3">
           <Button
-            size="sm"
-            className="w-full text-xs font-semibold rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98]"
+            size="lg"
+            className="w-full text-sm font-medium"
             onClick={() => router.push('/login')}
           >
             Iniciar Sesión
