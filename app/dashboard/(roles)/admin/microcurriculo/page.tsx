@@ -426,7 +426,7 @@ export default function MicrocurriculoPage() {
                   <Label htmlFor="programa">Programa</Label>
                   <select
                     id="programa"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-xs"
                     value={manualForm.programa}
                     onChange={e => setManualForm({ ...manualForm, programa: e.target.value })}
                   >
