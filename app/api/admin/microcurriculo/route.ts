@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     }
 
     const headers = parseCSVLine(lines[0], delimiter);
-    const requiredHeaders = ['codigoAsignatura', 'nombreAsignatura'];
+    const requiredHeaders = ['codigo_asignatura', 'nombre_asignatura'];
     const validation = validateCSVHeaders(headers, requiredHeaders);
 
     if (!validation.valid) {
@@ -62,12 +62,12 @@ export async function POST(request: Request) {
     }
 
     const headerMap: Record<string, string[]> = {
-      codigoAsignatura: ['codigoAsignatura', 'codigo', 'code'],
-      nombreAsignatura: ['nombreAsignatura', 'nombre', 'name', 'asignatura'],
+      codigoAsignatura: ['codigo_asignatura', 'codigoAsignatura', 'codigo', 'code'],
+      nombreAsignatura: ['nombre_asignatura', 'nombreAsignatura', 'nombre', 'name', 'asignatura'],
       programa: ['programa', 'program', 'carrera'],
       semestre: ['semestre', 'semester'],
       creditos: ['creditos', 'credits', 'créditos'],
-      horasAcompanamiento: ['horasAcompanamiento', 'horas', 'hours'],
+      horasAcompanamiento: ['horas', 'hours', 'horasAcompanamiento'],
     };
 
     const findHeader = (variants: string[]): string | undefined => {

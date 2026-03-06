@@ -1,4 +1,4 @@
-codigo_asignatura,nombre_asignatura,programa,semestre,creditos,tema,subtema
-MAT001,Matemáticas I,Ingeniería de Sistemas,1,4,Álgebra,Operaciones básicas
-MAT001,Matemáticas I,Ingeniería de Sistemas,1,4,Álgebra,Ecuaciones lineales
-FIS001,Física I,Ingeniería de Sistemas,1,3,Cinemática,Movimiento rectilíneo
+codigo_asignatura,nombre_asignatura,programa,semestre,creditos,horas
+MAT001,Matematicas I,Ingenieria de Sistemas,1,4,4
+FIS001,Fisica I,Ingenieria de Sistemas,1,3,3
+PRO001,Programacion I,Ingenieria de Sistemas,1,4,4

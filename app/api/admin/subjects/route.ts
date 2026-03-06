@@ -62,18 +62,6 @@ export async function GET(req: NextRequest) {
       },
     };
 
-    if (includeGroups) {
-      includeObj.groups = {
-        select: {
-          id: true,
-          groupNumber: true,
-          jornada: true,
-          maxCapacity: true,
-          studentIds: true,
-        },
-      };
-    }
-
     const [subjects, total] = await Promise.all([
       db.subject.findMany({
         where: Object.keys(whereClause).length > 0 ? whereClause : {},
@@ -89,14 +77,12 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Transform the data to include student count from groups
+    // Transform the data to include student count
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subjectsWithCounts = subjects.map((subject: any) => ({
       ...subject,
-      studentCount:
-        subject.groups?.reduce((sum: number, g: any) => sum + (g.studentIds?.length || 0), 0) || 0,
-      classCount:
-        subject.groups?.reduce((sum: number, g: any) => sum + (g._count?.classes || 0), 0) || 0,
+      studentCount: subject.studentIds?.length || 0,
+      classCount: subject._count?.classes || 0,
     }));
 
     const totalPages = Math.ceil(total / pageSize);

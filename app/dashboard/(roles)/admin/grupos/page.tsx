@@ -54,9 +54,9 @@ export default function GruposHorariosPage() {
   useEffect(() => {
     const loadSubjects = async () => {
       try {
-        const res = await fetch('/api/admin/subjects?includeGroups=false');
+        const res = await fetch('/api/admin/subjects');
         const data = await res.json();
-        setSubjects(data.subjects || []);
+        setSubjects(data.data || []);
       } catch (error) {
         console.error('Error loading subjects:', error);
       } finally {

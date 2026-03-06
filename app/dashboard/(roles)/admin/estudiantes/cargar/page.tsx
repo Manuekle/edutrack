@@ -143,7 +143,7 @@ export default function CargarEstudiantesPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid grid-cols-1 gap-2">
-                <a href="/formatos/plantilla_usuarios.csv" download>
+                <a href="/formatos/plantilla_estudiantes.csv" download>
                   <Button variant="outline" className="w-full justify-start">
                     <Download className="mr-2 h-4 w-4" />
                     Descargar Plantilla

@@ -57,9 +57,9 @@ export default function MatriculaPage() {
   useEffect(() => {
     const loadSubjects = async () => {
       try {
-        const res = await fetch('/api/admin/subjects?includeGroups=true');
+        const res = await fetch('/api/admin/subjects');
         const data = await res.json();
-        setSubjects(data.subjects || []);
+        setSubjects(data.data || []);
       } catch (error) {
         console.error('Error loading subjects:', error);
       } finally {
