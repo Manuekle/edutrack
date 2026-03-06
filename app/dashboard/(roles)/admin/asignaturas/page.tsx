@@ -1,7 +1,6 @@
 'use client';
 
 import { BulkEnrollModal } from '@/components/modals/bulk-enroll-modal';
-import { CreateSubjectModal } from '@/components/modals/create-subject-modal';
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,8 +25,7 @@ import {
 } from '@/components/ui/table';
 import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
-import { Download, Search, Trash2, Users } from 'lucide-react';
-import Link from 'next/link';
+import { Search, Trash2, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
@@ -36,7 +34,6 @@ export default function GestionAsignaturasPage() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkEnrollModalOpen, setIsBulkEnrollModalOpen] = useState(false);
 
   // Paginación
@@ -112,11 +109,7 @@ export default function GestionAsignaturasPage() {
     queryClient.invalidateQueries({ queryKey: ['subjects'] });
   };
 
-  const handleSubjectCreated = () => {
-    // Invalidar la query para refrescar los datos
-    queryClient.invalidateQueries({ queryKey: ['subjects'] });
-    setCurrentPage(1);
-  };
+
 
   // Resetear a la primera página cuando cambia el término de búsqueda
   useEffect(() => {
@@ -148,19 +141,19 @@ export default function GestionAsignaturasPage() {
           </CardDescription>
         </CardHeader>
         <div className="flex gap-2">
-          <Link href="/dashboard/admin/asignaturas/cargar">
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              <span>Cargar Asignaturas</span>
-            </Button>
-          </Link>
-          <Button
-            variant="default"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="gap-2 text-xs"
-          >
-            <span>Nueva Asignatura</span>
-          </Button>
+          {selectedSubjects.size > 0 && (
+            <div className="flex bg-destructive/10 rounded-md border border-destructive/20 overflow-hidden">
+              <Button
+                variant="ghost"
+                className="rounded-none h-9 text-xs text-destructive hover:bg-destructive hover:text-white"
+                onClick={handleDeleteSelected}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-3.5 w-3.5 mr-2" />
+                Eliminar {selectedSubjects.size} asignaturas
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -434,11 +427,7 @@ export default function GestionAsignaturasPage() {
         </CardContent>
       </Card>
 
-      <CreateSubjectModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubjectCreated={handleSubjectCreated}
-      />
+
 
       <BulkEnrollModal
         isOpen={isBulkEnrollModalOpen}

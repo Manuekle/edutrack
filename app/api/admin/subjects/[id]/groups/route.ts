@@ -44,11 +44,11 @@ const normalizeJornada = (value: string): Jornada | null => {
 const DAY_MAP: Record<string, string> = {
   lunes: 'LUNES',
   martes: 'MARTES',
-  miércoles: 'MIERCOLES',
+  'miércoles': 'MIERCOLES',
   miercoles: 'MIERCOLES',
   jueves: 'JUEVES',
   viernes: 'VIERNES',
-  sábado: 'SABADO',
+  'sábado': 'SABADO',
   sabado: 'SABADO',
   domingo: 'DOMINGO',
 };
@@ -57,6 +57,16 @@ const normalizeDay = (value: string): string => {
   const normalized = value.toLowerCase().trim();
   return DAY_MAP[normalized] || normalized.toUpperCase();
 };
+
+/** Convierte "HH:MM" a minutos desde medianoche */
+const timeToMinutes = (time: string): number => {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + (m || 0);
+};
+
+/** True si los rangos [s1,e1) y [s2,e2) se solapan */
+const rangesOverlap = (s1: number, e1: number, s2: number, e2: number): boolean =>
+  s1 < e2 && s2 < e1;
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -80,6 +90,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    // Campos adicionales del formulario manual
+    const docenteId = formData.get('docenteId') as string | null;
+    const periodoAcademico = formData.get('periodoAcademico') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No se encontró el archivo' }, { status: 400 });
@@ -154,8 +167,111 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       }
     }
 
+    // ──────────────────────────────────────────────
+    // VALIDACIONES DE CHOQUE (antes del preview/confirm)
+    // ──────────────────────────────────────────────
+    const conflictErrors: string[] = [];
+
+    for (const [, data] of groupsMap.entries()) {
+      for (const slot of data.schedule) {
+        const newStart = timeToMinutes(slot.horaInicio);
+        const newEnd = timeToMinutes(slot.horaFin);
+        const dia = slot.dia;
+
+        // Buscar clases existentes el mismo día (por classroom o por docente)
+        const existingClasses = await db.class.findMany({
+          where: {
+            ...(slot.salon && slot.salon !== 'Por asignar'
+              ? { classroom: slot.salon }
+              : {}),
+            startTime: { not: null },
+          },
+          select: {
+            id: true,
+            startTime: true,
+            endTime: true,
+            classroom: true,
+            subjectId: true,
+            subject: {
+              select: {
+                group: true,
+                teacherIds: true,
+                name: true,
+                code: true,
+              },
+            },
+          },
+        });
+
+        for (const cls of existingClasses) {
+          if (!cls.startTime || !cls.endTime) continue;
+
+          // Verificar que sea el mismo día de la semana
+          const clsDayOfWeek = cls.startTime.toLocaleDateString('es-CO', { weekday: 'long' }).toUpperCase();
+          const clsDayNormalized = normalizeDay(clsDayOfWeek);
+          if (clsDayNormalized !== dia) continue;
+
+          const clsStart = cls.startTime.getHours() * 60 + cls.startTime.getMinutes();
+          const clsEnd = cls.endTime.getHours() * 60 + cls.endTime.getMinutes();
+
+          if (!rangesOverlap(newStart, newEnd, clsStart, clsEnd)) continue;
+
+          // Choque de salón
+          if (slot.salon && slot.salon !== 'Por asignar' && cls.classroom === slot.salon) {
+            conflictErrors.push(
+              `⚠️ Choque de salón: "${slot.salon}" ya está ocupado el ${dia} de ${slot.horaInicio} a ${slot.horaFin} por "${cls.subject.code}".`
+            );
+          }
+
+          // Choque de docente
+          if (docenteId && cls.subject.teacherIds.includes(docenteId) && cls.subjectId !== subjectId) {
+            conflictErrors.push(
+              `⚠️ Choque de docente: el docente ya tiene clase el ${dia} de ${slot.horaInicio} a ${slot.horaFin} en "${cls.subject.code} - ${cls.subject.name}".`
+            );
+          }
+
+          // Choque de grupo
+          if (cls.subject.group === data.group && cls.subjectId !== subjectId) {
+            conflictErrors.push(
+              `⚠️ Choque de grupo: el grupo "${data.group}" ya tiene clase el ${dia} de ${slot.horaInicio} a ${slot.horaFin} en "${cls.subject.code}".`
+            );
+          }
+        }
+
+        // Buscar reservas eventuales (RoomBooking) aprobadas para el salón asignado
+        if (slot.salon && slot.salon !== 'Por asignar') {
+          const existingBookings = await db.roomBooking.findMany({
+            where: {
+               status: 'APROBADO',
+               room: { name: slot.salon }
+            },
+            include: {
+               room: true,
+               teacher: { select: { name: true } }
+            }
+          });
+
+          for (const booking of existingBookings) {
+            const bDayOfWeek = booking.startTime.toLocaleDateString('es-CO', { weekday: 'long' }).toUpperCase();
+            const bDayNormalized = normalizeDay(bDayOfWeek);
+            if (bDayNormalized !== dia) continue;
+
+            const bStart = booking.startTime.getHours() * 60 + booking.startTime.getMinutes();
+            const bEnd = booking.endTime.getHours() * 60 + booking.endTime.getMinutes();
+
+            if (!rangesOverlap(newStart, newEnd, bStart, bEnd)) continue;
+
+            conflictErrors.push(
+              `⚠️ Choque con reserva puntual: El salón "${slot.salon}" ya tiene una reserva el ${booking.startTime.toLocaleDateString('es-CO')} de ${booking.startTime.toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'})} a ${booking.endTime.toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'})} por ${booking.teacher.name}.`
+            );
+          }
+        }
+      }
+    }
+
+    // Si hay conflictos graves, abortamos (en preview los mostramos como advertencia)
     const results: PreviewResult[] = [];
-    for (const [key, data] of groupsMap.entries()) {
+    for (const [, data] of groupsMap.entries()) {
       results.push({
         grupo: data.group,
         jornada: data.jornada,
@@ -173,7 +289,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         previewData: results,
         subjectName: subject.name,
         subjectCode: subject.code,
+        conflicts: conflictErrors,
       });
+    }
+
+    // En confirmación, si hay conflictos, rechazamos
+    if (conflictErrors.length > 0) {
+      return NextResponse.json(
+        {
+          error: 'Se detectaron conflictos de horario. Corrígelos antes de confirmar.',
+          conflicts: conflictErrors,
+        },
+        { status: 422 }
+      );
     }
 
     const created: string[] = [];
@@ -183,14 +311,26 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       for (const [key, data] of groupsMap.entries()) {
         const existingGroup = subject.group === data.group;
 
+        // Actualizar asignatura con grupo, jornada, periodo y docente
+        const updateData: Record<string, unknown> = {
+          group: data.group,
+          jornada: data.jornada,
+          ...(periodoAcademico ? { periodoAcademico } : {}),
+        };
+
+        if (docenteId) {
+          const currentTeacherIds: string[] = subject.teacherIds || [];
+          if (!currentTeacherIds.includes(docenteId)) {
+            updateData.teacherIds = { push: docenteId };
+          }
+        }
+
+        await tx.subject.update({
+          where: { id: subjectId },
+          data: updateData,
+        });
+
         if (!existingGroup) {
-          await tx.subject.update({
-            where: { id: subjectId },
-            data: {
-              group: data.group,
-              jornada: data.jornada,
-            },
-          });
           created.push(`Grupo ${data.group} - ${data.jornada}`);
         }
 

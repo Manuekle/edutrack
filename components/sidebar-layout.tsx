@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { TutorialButton } from '@/components/tutorial-button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Breadcrumb,
@@ -439,33 +440,38 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <SidebarProvider>
         <AppSidebar homePath={homePath} />
         <SidebarInset>
-          <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2 px-3 sm:px-4 font-sans pt-[env(safe-area-inset-top)] transition-all duration-200">
-            <SidebarTrigger className="-ml-1 hover:bg-accent hover:scale-105 active:scale-95 transition-transform" />
-            <Breadcrumb className="hidden xs:block">
-              <BreadcrumbList>
-                {breadcrumbLinks.map((link, index) => (
-                  <React.Fragment key={link.href}>
-                    <BreadcrumbItem>
-                      {index === breadcrumbLinks.length - 1 ? (
-                        <BreadcrumbPage className="text-sm sm:text-base">
-                          {link.label}
-                        </BreadcrumbPage>
-                      ) : (
-                        <BreadcrumbLink asChild>
-                          <Link
-                            href={link.href}
-                            className="text-sm sm:text-base hover:text-primary transition-colors"
-                          >
+          <header className="flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 px-3 sm:px-4 font-sans pt-[env(safe-area-inset-top)] transition-all duration-200">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <SidebarTrigger className="-ml-1 hover:bg-accent hover:scale-105 active:scale-95 transition-transform" />
+              <Breadcrumb className="flex-1 mt-0.5 truncate">
+                <BreadcrumbList className="flex-nowrap">
+                  {breadcrumbLinks.map((link, index) => (
+                    <React.Fragment key={link.href}>
+                      <BreadcrumbItem>
+                        {index === breadcrumbLinks.length - 1 ? (
+                          <BreadcrumbPage className="text-sm sm:text-base font-semibold">
                             {link.label}
-                          </Link>
-                        </BreadcrumbLink>
-                      )}
-                    </BreadcrumbItem>
-                    {index < breadcrumbLinks.length - 1 && <BreadcrumbSeparator />}
-                  </React.Fragment>
-                ))}
-              </BreadcrumbList>
-            </Breadcrumb>
+                          </BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink asChild>
+                            <Link
+                              href={link.href}
+                              className="text-sm sm:text-base hover:text-primary transition-colors"
+                            >
+                              {link.label}
+                            </Link>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {index < breadcrumbLinks.length - 1 && <BreadcrumbSeparator />}
+                    </React.Fragment>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <TutorialButton />
+            </div>
           </header>
           <main className="flex-1 p-3 sm:p-4 md:p-6 font-sans pb-safe">{children}</main>
         </SidebarInset>

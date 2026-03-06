@@ -288,12 +288,13 @@ export default function MicrocurriculoPage() {
       const result = await res.json();
 
       if (res.ok && result.success) {
+        const totalProcessed = (result.summary?.created || 0) + (result.summary?.updatedCount || 0);
         sileo.success({
           title: 'Carga completada',
-          description: `Proceso finalizado. Se crearon ${result.summary?.created || 0} asignaturas.`,
+          description: `Proceso finalizado. Se procesaron ${totalProcessed} asignaturas.`,
         });
         setFinalResults({
-          created: result.summary?.created || 0,
+          created: totalProcessed,
           errors: result.summary?.errors || 0,
         });
         setPreviewData([]);
@@ -693,9 +694,21 @@ export default function MicrocurriculoPage() {
                         >
                           <TableCell className="px-4 py-3">
                             <div className="flex flex-col">
-                              <span className="font-semibold text-xs text-foreground">
-                                {item.nombreAsignatura}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-xs text-foreground">
+                                  {item.nombreAsignatura}
+                                </span>
+                                {item.status === 'existing' && (
+                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">
+                                    Actualización
+                                  </Badge>
+                                )}
+                                {item.status === 'error' && (
+                                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 font-normal">
+                                    Error
+                                  </Badge>
+                                )}
+                              </div>
                               <div className="flex items-center gap-2 mt-1">
                                 <Badge variant="secondary" className="font-mono text-[9px] px-1.5 py-0 rounded bg-muted/50 text-muted-foreground">
                                   {item.codigoAsignatura}
@@ -780,7 +793,7 @@ export default function MicrocurriculoPage() {
                   <div className="flex flex-col">
                     <span className="text-xs font-semibold text-foreground">Resumen de carga</span>
                     <span className="text-[11px] text-muted-foreground">
-                      {successCount} asignatura{successCount !== 1 ? 's' : ''} lista{successCount !== 1 ? 's' : ''} para importar
+                      {successCount} asignatura{successCount !== 1 ? 's' : ''} lista{successCount !== 1 ? 's' : ''} para importar/actualizar
                     </span>
                   </div>
                   <Button

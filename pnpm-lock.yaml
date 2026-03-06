@@ -156,6 +156,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      driver.js:
+        specifier: ^1.4.0
+        version: 1.4.0
       framer-motion:
         specifier: ^12.28.1
         version: 12.28.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -3771,6 +3774,9 @@ packages:
   dotenv@17.2.3:
     resolution: {integrity: sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w==}
     engines: {node: '>=12'}
+
+  driver.js@1.4.0:
+    resolution: {integrity: sha512-Gm64jm6PmcU+si21sQhBrTAM1JvUrR0QhNmjkprNLxohOBzul9+pNHXgQaT9lW84gwg9GMLB3NZGuGolsz5uew==}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -10540,6 +10546,8 @@ snapshots:
   dotenv@16.6.1: {}
 
   dotenv@17.2.3: {}
+
+  driver.js@1.4.0: {}
 
   dunder-proto@1.0.1:
     dependencies:

@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table';
 import { TimePicker } from '@/components/ui/time-picker';
 import {
+  AlertTriangle,
   Calendar,
   CheckCircle,
   Download,
@@ -32,7 +33,7 @@ import {
   Plus,
   Trash2,
   Users,
-  X
+  X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -41,6 +42,12 @@ interface Subject {
   id: string;
   code: string;
   name: string;
+}
+
+interface Docente {
+  id: string;
+  name: string | null;
+  document: string | null;
 }
 
 interface ScheduleEntry {
@@ -69,15 +76,20 @@ export default function GruposHorariosPage() {
   const [mode, setMode] = useState<'csv' | 'manual'>('csv');
   const [file, setFile] = useState<File | null>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [selectedDocente, setSelectedDocente] = useState<string>('');
+  const [periodo, setPeriodo] = useState<string>('');
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [docentes, setDocentes] = useState<Docente[]>([]);
   const [isPreview, setIsPreview] = useState(false);
   const [previewData, setPreviewData] = useState<PreviewItem[]>([]);
+  const [conflicts, setConflicts] = useState<string[]>([]);
   const [finalResults, setFinalResults] = useState<{ created: number; errors: number } | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
+  const [isLoadingDocentes, setIsLoadingDocentes] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   // Manual form state
@@ -103,7 +115,21 @@ export default function GruposHorariosPage() {
         setIsLoadingSubjects(false);
       }
     };
+
+    const loadDocentes = async () => {
+      try {
+        const res = await fetch('/api/admin/users?role=DOCENTE&limit=200');
+        const data = await res.json();
+        setDocentes(data.data || []);
+      } catch (error) {
+        console.error('Error loading docentes:', error);
+      } finally {
+        setIsLoadingDocentes(false);
+      }
+    };
+
     loadSubjects();
+    loadDocentes();
   }, []);
 
   const handleFileSelect = (selectedFile: File | null) => {
@@ -112,11 +138,21 @@ export default function GruposHorariosPage() {
       setIsPreview(false);
       setPreviewData([]);
       setFinalResults(null);
+      setConflicts([]);
     } else {
       setFinalResults(null);
       setIsPreview(false);
       setPreviewData([]);
+      setConflicts([]);
     }
+  };
+
+  const buildFormData = (csvFile: Blob, filename = 'temp.csv') => {
+    const formData = new FormData();
+    formData.append('file', csvFile, filename);
+    if (selectedDocente) formData.append('docenteId', selectedDocente);
+    if (periodo) formData.append('periodoAcademico', periodo);
+    return formData;
   };
 
   const handlePreview = async () => {
@@ -137,8 +173,7 @@ export default function GruposHorariosPage() {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const formData = buildFormData(file, file.name);
 
       const res = await fetch(`/api/admin/subjects/${selectedSubject}/groups?preview=true`, {
         method: 'POST',
@@ -153,11 +188,19 @@ export default function GruposHorariosPage() {
           id: `csv-${index}-${Date.now()}`,
         }));
         setPreviewData(dataWithIds);
+        setConflicts(result.conflicts || []);
         setIsPreview(true);
-        sileo.success({
-          title: 'Vista previa',
-          description: 'Vista previa generada con éxito',
-        });
+        if ((result.conflicts || []).length > 0) {
+          sileo.warning({
+            title: 'Vista previa con conflictos',
+            description: `Se detectaron ${result.conflicts.length} conflicto(s) de horario. Revísalos antes de confirmar.`,
+          });
+        } else {
+          sileo.success({
+            title: 'Vista previa',
+            description: 'Vista previa generada con éxito',
+          });
+        }
       } else {
         sileo.error({
           title: 'Error',
@@ -228,14 +271,12 @@ export default function GruposHorariosPage() {
         salon: item.schedule?.[0]?.salon || '',
       });
       setEditingId(id);
-      // Switch to manual mode so the edit form is visible
       setMode('manual');
     }
   };
 
   const handleUpdateItem = () => {
     if (!editingId) return;
-    const subject = subjects.find(s => s.id === selectedSubject);
 
     setPreviewData(
       previewData.map(item =>
@@ -299,16 +340,15 @@ export default function GruposHorariosPage() {
 
     setIsConfirming(true);
     try {
-      const formData = new FormData();
       const csvContent = previewData
         .map(
           item =>
-            `${item.grupo},${item.jornada},${item.dia || ''},${item.schedule?.[0]?.horaInicio || ''},${item.schedule?.[0]?.horaFin || ''},${item.schedule?.[0]?.salon || ''}`
+            `${item.grupo},${item.jornada},${item.schedule?.[0]?.dia || ''},${item.schedule?.[0]?.horaInicio || ''},${item.schedule?.[0]?.horaFin || ''},${item.schedule?.[0]?.salon || ''}`
         )
         .join('\n');
 
       const blob = new Blob([csvContent], { type: 'text/csv' });
-      formData.append('file', blob, 'temp.csv');
+      const formData = buildFormData(blob);
 
       const response = await fetch(`/api/admin/subjects/${selectedSubject}/groups`, {
         method: 'POST',
@@ -318,7 +358,16 @@ export default function GruposHorariosPage() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Error al confirmar la carga.');
+        if (result.conflicts && result.conflicts.length > 0) {
+          setConflicts(result.conflicts);
+          sileo.error({
+            title: 'Conflictos de horario',
+            description: result.error,
+          });
+        } else {
+          throw new Error(result.error || 'Error al confirmar la carga.');
+        }
+        return;
       }
 
       sileo.success({
@@ -330,6 +379,7 @@ export default function GruposHorariosPage() {
         errors: result.summary?.errors || 0,
       });
       setPreviewData([]);
+      setConflicts([]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
       sileo.error({
@@ -346,6 +396,7 @@ export default function GruposHorariosPage() {
     setIsPreview(false);
     setPreviewData([]);
     setFinalResults(null);
+    setConflicts([]);
     setEditingId(null);
     setManualForm({
       grupo: 'A',
@@ -363,14 +414,15 @@ export default function GruposHorariosPage() {
     setIsPreview(false);
     setPreviewData([]);
     setFinalResults(null);
+    setConflicts([]);
     setEditingId(null);
   };
 
   const successCount = previewData.filter(item => item.status !== 'error').length;
-  const existingCount = previewData.filter(item => item.status === 'existing').length;
   const errorCount = previewData.filter(item => item.status === 'error').length;
 
   const selectedSubjectData = subjects.find(s => s.id === selectedSubject);
+  const selectedDocenteData = docentes.find(d => d.id === selectedDocente);
 
   return (
     <div className="flex flex-col gap-6">
@@ -408,33 +460,69 @@ export default function GruposHorariosPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          {/* Select Subject - Standard Card */}
+          {/* Config común: Asignatura + Docente + Periodo */}
           <Card className="overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
-                Asignatura Destino
+                Configuración del Grupo
               </CardTitle>
               <CardDescription className="text-[11px] mt-0.5">
-                Selecciona la asignatura a la que se cargarán los grupos.
+                Asignatura, docente y periodo académico.
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-5">
-              <Select
-                value={selectedSubject}
-                onValueChange={setSelectedSubject}
-                disabled={isLoadingSubjects}
-              >
-                <SelectTrigger className="h-9 text-xs">
-                  <SelectValue placeholder="Selecciona una asignatura" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subjects.map(subject => (
-                    <SelectItem key={subject.id} value={subject.id} className="text-xs">
-                      {subject.code} - {subject.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <CardContent className="p-5 space-y-4">
+              {/* Asignatura */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold">Asignatura *</Label>
+                <Select
+                  value={selectedSubject}
+                  onValueChange={setSelectedSubject}
+                  disabled={isLoadingSubjects}
+                >
+                  <SelectTrigger className="h-9 text-xs">
+                    <SelectValue placeholder="Selecciona una asignatura" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subjects.map(subject => (
+                      <SelectItem key={subject.id} value={subject.id} className="text-xs">
+                        {subject.code} - {subject.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Docente */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold">Docente</Label>
+                <Select
+                  value={selectedDocente}
+                  onValueChange={setSelectedDocente}
+                  disabled={isLoadingDocentes}
+                >
+                  <SelectTrigger className="h-9 text-xs">
+                    <SelectValue placeholder="Selecciona un docente (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {docentes.map(d => (
+                      <SelectItem key={d.id} value={d.id} className="text-xs">
+                        {d.name || 'Sin nombre'}{d.document ? ` · ${d.document}` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Periodo */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold">Periodo Académico</Label>
+                <Input
+                  className="h-9 text-xs"
+                  value={periodo}
+                  onChange={e => setPeriodo(e.target.value)}
+                  placeholder="Ej: 2025-1"
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -634,7 +722,26 @@ export default function GruposHorariosPage() {
           )}
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-4">
+          {/* Panel de conflictos */}
+          {conflicts.length > 0 && (
+            <Card className="overflow-hidden border border-amber-200 shadow-xs bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
+              <CardHeader className="border-b border-amber-200 dark:border-amber-800 px-5 py-3 bg-amber-100/50 dark:bg-amber-900/20">
+                <CardTitle className="text-xs font-semibold text-amber-800 dark:text-amber-400 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Conflictos de Horario Detectados ({conflicts.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <ul className="space-y-1.5">
+                  {conflicts.map((c, i) => (
+                    <li key={i} className="text-[11px] text-amber-800 dark:text-amber-300">{c}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <div className="flex items-center justify-between">
@@ -644,8 +751,14 @@ export default function GruposHorariosPage() {
                   </CardTitle>
                   <CardDescription className="text-[11px] mt-0.5">
                     {selectedSubjectData
-                      ? `Destino: ${selectedSubjectData.code} - ${selectedSubjectData.name}`
+                      ? `${selectedSubjectData.code} - ${selectedSubjectData.name}`
                       : 'Selecciona una asignatura para continuar'}
+                    {selectedDocenteData && (
+                      <span className="ml-2 text-primary font-medium">· {selectedDocenteData.name}</span>
+                    )}
+                    {periodo && (
+                      <span className="ml-2 text-muted-foreground">· Periodo {periodo}</span>
+                    )}
                   </CardDescription>
                 </div>
               </div>
@@ -679,16 +792,16 @@ export default function GruposHorariosPage() {
                   <Table>
                     <TableHeader className="bg-muted/5 sticky top-0 z-10">
                       <TableRow className="hover:bg-transparent border-b">
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">
                           Grupo
                         </TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">
                           Jornada / Cupo
                         </TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">
                           Horario Principal
                         </TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-right">
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground text-right">
                           Acciones
                         </TableHead>
                       </TableRow>
@@ -779,13 +892,15 @@ export default function GruposHorariosPage() {
                 <div className="border-t px-5 py-4 bg-muted/5 flex items-center justify-between gap-4">
                   <div className="flex flex-col whitespace-nowrap">
                     <span className="text-xs font-semibold text-foreground">Resumen</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {successCount} grupo{successCount !== 1 ? 's' : ''} listo{successCount !== 1 ? 's' : ''} para crear
-                    </span>
+                    <div className="flex gap-3 mt-0.5">
+                      <span className="text-[10px] text-emerald-600 font-semibold">{successCount} listos</span>
+                      {errorCount > 0 && <span className="text-[10px] text-red-600 font-semibold">{errorCount} errores</span>}
+                      {conflicts.length > 0 && <span className="text-[10px] text-amber-600 font-semibold">{conflicts.length} conflictos</span>}
+                    </div>
                   </div>
                   <Button
                     onClick={handleConfirmUpload}
-                    disabled={isConfirming || successCount === 0 || !selectedSubject}
+                    disabled={isConfirming || successCount === 0 || !selectedSubject || conflicts.length > 0}
                     className="h-9 px-6 text-xs min-w-[150px]"
                   >
                     {isConfirming ? (
@@ -793,6 +908,8 @@ export default function GruposHorariosPage() {
                         <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                         Procesando...
                       </>
+                    ) : conflicts.length > 0 ? (
+                      'Resuelve los conflictos'
                     ) : (
                       'Confirmar y Crear'
                     )}

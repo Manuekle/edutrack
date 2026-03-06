@@ -258,7 +258,7 @@ export default function CargarDocentesPage() {
               setMode('csv');
               handleCancel();
             }}
-            className="text-xs h-9 px-4 font-semibold"
+            className="text-xs h-9 px-4"
           >
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             Carga Masiva (CSV)
@@ -266,7 +266,7 @@ export default function CargarDocentesPage() {
           <Button
             variant={mode === 'manual' ? 'default' : 'outline'}
             onClick={() => setMode('manual')}
-            className="text-xs h-9 px-4 font-semibold"
+            className="text-xs h-9 px-4"
           >
             <Plus className="mr-2 h-4 w-4" />
             Crear Manual
@@ -602,10 +602,10 @@ export default function CargarDocentesPage() {
                     <UserCheck className="h-8 w-8 text-muted-foreground/20" />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-semibold text-muted-foreground ">
+                    <p className="text-sm font-semibold text-foreground mb-1">
                       Sin datos para mostrar
                     </p>
-                    <p className="text-[10px] text-muted-foreground/60 max-w-[200px]">
+                    <p className="ext-xs text-muted-foreground max-w-[220px] mx-auto">
                       Agrega docentes manualmente o sube un archivo CSV para comenzar.
                     </p>
                   </div>

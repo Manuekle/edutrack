@@ -322,3 +322,73 @@ input[type='number'] {
 .dark {
   --scroll-thumb: #4a4a4a;
 }
+
+/* Driver.js Custom Styling - SIRA Theme */
+.sira-theme-driver {
+  border-radius: 1rem !important;
+  padding: 1.25rem !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-xl) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.sira-theme-driver .driver-popover-title {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: var(--foreground) !important;
+  letter-spacing: -0.025em !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.sira-theme-driver .driver-popover-description {
+  font-size: 0.75rem !important;
+  line-height: 1.4 !important;
+  color: var(--muted-foreground) !important;
+}
+
+.sira-theme-driver .driver-popover-footer {
+  margin-top: 1rem !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0.5rem !important;
+}
+
+.sira-theme-driver button {
+  font-size: 0.625rem !important;
+  padding: 0.4rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+  text-shadow: none !important;
+  transition: all 0.2s ease !important;
+  font-weight: 500 !important;
+}
+
+.sira-theme-driver .driver-popover-next-btn {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border: none !important;
+}
+
+.sira-theme-driver .driver-popover-prev-btn {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.sira-theme-driver .driver-popover-close-btn {
+  color: var(--muted-foreground) !important;
+}
+
+.sira-theme-driver .driver-popover-progress-text {
+  font-size: 0.625rem !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* Dark/Light specialized pops */
+.sira-driver-light {
+  background-color: white !important;
+}
+
+.sira-driver-dark {
+  background-color: oklch(0.2385 0.0264 248.9871) !important; /* matching --card in dark mode */
+}
+

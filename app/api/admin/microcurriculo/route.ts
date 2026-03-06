@@ -47,25 +47,49 @@ export async function POST(request: Request) {
 
       for (const item of subjects) {
         try {
-          if (existingCodes.has(item.codigoAsignatura)) {
-            errors.push(`La asignatura ${item.codigoAsignatura} ya existe`);
-            continue;
-          }
-
-          const subject = await db.subject.create({
-            data: {
-              code: item.codigoAsignatura,
-              name: item.nombreAsignatura,
-              program: item.programa || null,
-              semester: item.semestre,
-              credits: item.creditos,
-              directHours: item.horas,
-            },
+          let subjectId: string;
+          const existingSubject = await db.subject.findFirst({
+            where: { code: item.codigoAsignatura },
+            select: { id: true }
           });
 
+          if (existingSubject) {
+            // Actualizar si existe
+            await db.subject.update({
+              where: { id: existingSubject.id },
+              data: {
+                name: item.nombreAsignatura,
+                program: item.programa || null,
+                semester: item.semestre,
+                credits: item.creditos,
+                directHours: item.horas,
+              },
+            });
+            subjectId = existingSubject.id;
+
+            // Eliminar temas antiguos para reemplazarlos (Upsert real en la colección conectada)
+            await db.subjectContent.deleteMany({
+              where: { subjectId: existingSubject.id, type: 'TEMA' }
+            });
+          } else {
+            // Crear si no existe
+            const subject = await db.subject.create({
+              data: {
+                code: item.codigoAsignatura,
+                name: item.nombreAsignatura,
+                program: item.programa || null,
+                semester: item.semestre,
+                credits: item.creditos,
+                directHours: item.horas,
+              },
+            });
+            subjectId = subject.id;
+          }
+
+          // Insertar los nuevos temas independientemente de si se creó o actualizó
           if (item.temas && item.temas.length > 0) {
             const contentData = item.temas.map((tema, index) => ({
-              subjectId: subject.id,
+              subjectId: subjectId,
               type: 'TEMA',
               title: tema.trim(),
               order: index + 1,
@@ -78,7 +102,7 @@ export async function POST(request: Request) {
 
           created.push(item.codigoAsignatura);
         } catch (e) {
-          errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
+          errors.push(`Error procesando ${item.codigoAsignatura}: ${(e as Error).message}`);
         }
       }
 
@@ -87,7 +111,8 @@ export async function POST(request: Request) {
         summary: {
           total: subjects.length,
           created: created.length,
-          existing: subjects.length - created.length - errors.length,
+          existing: 0, // Como todo hace Upsert, no hay ignorados "existing".
+          updatedCount: subjects.length - created.length - errors.length,
           errors: errors.length,
         },
         createdSubjects: created,
@@ -204,7 +229,7 @@ export async function POST(request: Request) {
           temas,
           temasCount: temas.length,
           status: 'existing',
-          message: 'La asignatura ya existe',
+          message: 'Existe (Se actualizará)',
         });
         continue;
       }

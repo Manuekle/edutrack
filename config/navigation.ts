@@ -1,19 +1,18 @@
 import type { NavLinkGroup } from '@/types/navigation';
 import {
-  BookMarked,
-  BookOpen,
-  Calendar,
-  GraduationCap,
-  Home,
-  Layout,
-  QrCode,
-  Settings,
-  TrendingUp,
-  User,
-  UserPlus,
-  Users,
+    BookMarked,
+    BookOpen,
+    Calendar,
+    GraduationCap,
+    Home,
+    Layout,
+    QrCode,
+    Settings,
+    TrendingUp,
+    User,
+    Users
 } from 'lucide-react';
-
+// Navigation configuration for the educational tracking tool
 export const navLinkGroups: NavLinkGroup[] = [
   {
     title: 'Panel Principal',
@@ -152,32 +151,26 @@ export const navLinkGroups: NavLinkGroup[] = [
         description: 'Cargar asignaturas con información de microcurrículo',
       },
       {
+        href: '/dashboard/admin/asignaturas',
+        icon: BookOpen,
+        label: 'Gestión de Asignaturas',
+        roles: ['ADMIN'],
+        description: 'Ver y administrar asignaturas existentes',
+      },
+      {
         href: '/dashboard/admin/grupos',
         icon: Calendar,
         label: 'Grupos y Horarios',
         roles: ['ADMIN'],
         description: 'Crear grupos y horarios de asignaturas',
       },
+
       {
         href: '/dashboard/admin/matricula',
-        icon: UserPlus,
+        icon: GraduationCap,
         label: 'Matrícula',
         roles: ['ADMIN'],
         description: 'Matricular estudiantes en grupos',
-      },
-      {
-        href: '/dashboard/admin/asignaturas',
-        icon: BookMarked,
-        label: 'Ver Asignaturas',
-        roles: ['ADMIN'],
-        description: 'Ver y administrar asignaturas existentes',
-      },
-      {
-        href: '/dashboard/admin/reportes',
-        icon: TrendingUp,
-        label: 'Reportes Docentes',
-        roles: ['ADMIN'],
-        description: 'Reportes generales de docentes',
       },
       {
         href: '/dashboard/admin/salas',
@@ -185,6 +178,13 @@ export const navLinkGroups: NavLinkGroup[] = [
         label: 'Gestión de Salas',
         roles: ['ADMIN'],
         description: 'Administrar salas, salones y auditorios',
+      },
+      {
+        href: '/dashboard/admin/reportes',
+        icon: TrendingUp,
+        label: 'Reportes Docentes',
+        roles: ['ADMIN'],
+        description: 'Reportes generales de asistencia y docentes',
       },
     ],
   },

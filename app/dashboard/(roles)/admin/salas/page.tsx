@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 
+import { SubjectFileUpload } from '@/components/subject-file-upload';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,15 +77,19 @@ import {
   ChevronRight,
   Clock,
   Computer,
+  Download,
   Edit2,
   Eye,
+  FileSpreadsheet,
   Layout,
+  Loader2,
   Mic2,
   MoreHorizontal,
+  Plus,
   Search,
   Trash2,
   User,
-  Users,
+  Users
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -445,6 +450,21 @@ export default function AdminSalasPage() {
   const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // CSV Upload State
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadPreviewData, setUploadPreviewData] = useState<any[]>([]);
+  const [isUploadPreview, setIsUploadPreview] = useState(false);
+
+  // Assign Room to Group State
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [assignRoomId, setAssignRoomId] = useState<string>('');
+  const [assignGroupName, setAssignGroupName] = useState<string>('');
+  const [assignPeriodo, setAssignPeriodo] = useState<string>('');
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [availableGroups, setAvailableGroups] = useState<string[]>([]);
+
   // Managed state for the institutional calendar
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentView, setCurrentView] = useState<string>('month');
@@ -490,6 +510,24 @@ export default function AdminSalasPage() {
     };
     init();
   }, []);
+
+  useEffect(() => {
+    if (isAssignDialogOpen) {
+      const fetchGroups = async () => {
+        try {
+          const response = await fetch('/api/admin/grupos');
+          const data = await response.json();
+          if (response.ok) {
+            setAvailableGroups(data.groups || []);
+          }
+        } catch (error) {
+          console.error('Error fetching groups:', error);
+          setAvailableGroups([]);
+        }
+      };
+      fetchGroups();
+    }
+  }, [isAssignDialogOpen]);
 
   const handleStatusUpdate = async (id: string, status: BookingStatus) => {
     try {
@@ -545,6 +583,98 @@ export default function AdminSalasPage() {
       sileo.error({ title: 'Error de red' });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleUploadPreview = async () => {
+    if (!uploadFile) {
+      sileo.error({ title: 'Selecciona un archivo primero' });
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+      formData.append('preview', 'true');
+      const response = await fetch('/api/admin/salas/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setUploadPreviewData(data.previewData || []);
+        setIsUploadPreview(true);
+      } else {
+        sileo.error({ title: data.error || 'Error al procesar archivo' });
+      }
+    } catch (e) {
+      sileo.error({ title: 'Error de red' });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleUploadConfirm = async () => {
+    if (!uploadFile) return;
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+      const response = await fetch('/api/admin/salas/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        sileo.success({ title: `Se procesaron ${data.created} salas. Hubo ${data.errors} repetidas.` });
+        setIsUploadDialogOpen(false);
+        setUploadFile(null);
+        setIsUploadPreview(false);
+        setUploadPreviewData([]);
+        fetchRooms();
+      } else {
+        sileo.error({ title: data.error || 'Error al procesar archivo' });
+      }
+    } catch (e) {
+      sileo.error({ title: 'Error de red' });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAssignGroup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!assignRoomId || !assignGroupName) {
+      sileo.error({ title: 'Selecciona una sala y un grupo' });
+      return;
+    }
+
+    setIsAssigning(true);
+    try {
+      const response = await fetch('/api/admin/salas/assign-group', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: assignRoomId,
+          groupName: assignGroupName,
+          periodoAcademico: assignPeriodo,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        sileo.success({ title: data.message });
+        setIsAssignDialogOpen(false);
+        setAssignGroupName('');
+        setAssignRoomId('');
+        fetchAllBookings(); // Refresh calendar to show updated classroom names if applicable
+      } else {
+        sileo.error({ title: data.error || 'Error al asignar sala' });
+      }
+    } catch (error) {
+      sileo.error({ title: 'Error de red' });
+    } finally {
+      setIsAssigning(false);
     }
   };
 
@@ -612,7 +742,7 @@ export default function AdminSalasPage() {
       {/* Header Consistent with Users Module but with cleaner spacing */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
         <div className="space-y-1.5">
-          <h1 className="text-3xl font-semibold tracking-card text-foreground/90">
+          <h1 className="sm:text-2xl text-xs font-semibold tracking-card text-foreground/90">
             Gestión de Salas
           </h1>
           <p className="text-xs text-muted-foreground">
@@ -645,97 +775,116 @@ export default function AdminSalasPage() {
             </TabsTrigger>
           </TabsList>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                className="rounded-full px-6 shadow-lg shadow-primary/20 gap-2"
-                onClick={() => {
-                  setEditingRoomId(null);
-                  setFormData({ name: '', type: 'SALON', capacity: '', description: '' });
-                }}
-              >
-                <span>Nueva Sala</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-4xl border-none">
-              <form onSubmit={handleSubmit} className="space-y-6 p-2">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-semibold">
-                    {editingRoomId ? 'Editar Sala' : 'Nueva Sala'}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {editingRoomId
-                      ? 'Actualiza los detalles del espacio institucional.'
-                      : 'Configura los detalles del nuevo espacio institucional.'}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-5">
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
-                      Identificación
-                    </Label>
-                    <Input
-                      className="rounded-xl bg-muted/30 border-none h-11"
-                      value={formData.name}
-                      onChange={e => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Ej: Laboratorio 401"
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="rounded-full px-6 shadow-sm gap-2 bg-background border-primary/20 hidden md:flex"
+              onClick={() => setIsAssignDialogOpen(true)}
+            >
+              <Users className="h-4 w-4" />
+              <span className="text-xs">Asignar a Grupo</span>
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full px-6 shadow-sm gap-2 bg-background border-primary/20 hidden md:flex"
+              onClick={() => setIsUploadDialogOpen(true)}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              <span className="text-xs">Carga Masiva</span>
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  className="rounded-full px-6 shadow-lg shadow-primary/20 gap-2"
+                  onClick={() => {
+                    setEditingRoomId(null);
+                    setFormData({ name: '', type: 'SALON', capacity: '', description: '' });
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="text-xs">Nueva Sala</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] rounded-4xl border-none">
+                <form onSubmit={handleSubmit} className="space-y-6 p-2">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-semibold">
+                      {editingRoomId ? 'Editar Sala' : 'Nueva Sala'}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {editingRoomId
+                        ? 'Actualiza los detalles del espacio institucional.'
+                        : 'Configura los detalles del nuevo espacio institucional.'}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-5">
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
-                        Tipo
-                      </Label>
-                      <Select
-                        value={formData.type}
-                        onValueChange={(value: RoomType) =>
-                          setFormData({ ...formData, type: value })
-                        }
-                      >
-                        <SelectTrigger className="rounded-xl bg-muted/30 border-none h-11">
-                          <SelectValue placeholder="Seleccionar" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-none shadow-xl">
-                          <SelectItem value="SALON">Clase</SelectItem>
-                          <SelectItem value="SALA_COMPUTO">Cómputo</SelectItem>
-                          <SelectItem value="AUDITORIO">Auditorio</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
-                        Capacidad
+                        Identificación
                       </Label>
                       <Input
                         className="rounded-xl bg-muted/30 border-none h-11"
-                        type="number"
-                        value={formData.capacity}
-                        onChange={e => setFormData({ ...formData, capacity: e.target.value })}
-                        placeholder="0"
+                        value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Ej: Laboratorio 401"
+                        required
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                          Tipo
+                        </Label>
+                        <Select
+                          value={formData.type}
+                          onValueChange={(value: RoomType) =>
+                            setFormData({ ...formData, type: value })
+                          }
+                        >
+                          <SelectTrigger className="rounded-xl bg-muted/30 border-none h-11">
+                            <SelectValue placeholder="Seleccionar" />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-xl border-none shadow-xl">
+                            <SelectItem value="SALON">Clase</SelectItem>
+                            <SelectItem value="SALA_COMPUTO">Cómputo</SelectItem>
+                            <SelectItem value="AUDITORIO">Auditorio</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                          Capacidad
+                        </Label>
+                        <Input
+                          className="rounded-xl bg-muted/30 border-none h-11"
+                          type="number"
+                          value={formData.capacity}
+                          onChange={e => setFormData({ ...formData, capacity: e.target.value })}
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                        Descripción
+                      </Label>
+                      <Textarea
+                        className="rounded-xl bg-muted/30 border-none min-h-[100px] resize-none pt-4"
+                        value={formData.description}
+                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Detalles adicionales..."
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
-                      Descripción
-                    </Label>
-                    <Textarea
-                      className="rounded-xl bg-muted/30 border-none min-h-[100px] resize-none pt-4"
-                      value={formData.description}
-                      onChange={e => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Detalles adicionales..."
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" variant="default" className="w-full">
-                    {editingRoomId ? 'Guardar Cambios' : 'Crear Espacio'}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <DialogFooter>
+                    <Button type="submit" variant="default" className="w-full">
+                      {editingRoomId ? 'Guardar Cambios' : 'Crear Espacio'}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
@@ -1179,6 +1328,185 @@ export default function AdminSalasPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+        <DialogContent className="sm:max-w-[800px] h-[90vh] sm:h-[85vh] p-0 overflow-hidden flex flex-col rounded-3xl">
+          <DialogHeader className="px-6 py-4 border-b bg-muted/10 shrink-0">
+            <DialogTitle className="text-xl font-semibold tracking-card">Carga Masiva de Salas</DialogTitle>
+            <DialogDescription className="text-xs">
+              Sube un archivo CSV para importar múltiples espacios físicos a la vez.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="space-y-4">
+              <a href="/formatos/plantilla_salas.csv" download className="block">
+                <Button variant="outline" className="w-full justify-start h-9 text-xs font-semibold tracking-card rounded-xl">
+                  <Download className="mr-2 h-4 w-4 text-primary" />
+                  Descargar Plantilla CSV
+                </Button>
+              </a>
+              <SubjectFileUpload onFileSelect={(f) => { setUploadFile(f); setIsUploadPreview(false); setUploadPreviewData([]); }} file={uploadFile} />
+
+              <div className="flex gap-2 mt-4">
+                <Button
+                  onClick={handleUploadPreview}
+                  disabled={!uploadFile || isUploading || isUploadPreview}
+                  className="flex-1 text-xs h-10 font-semibold tracking-card rounded-xl"
+                >
+                  {isUploading && !isUploadPreview && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Generar Vista Previa
+                </Button>
+                {(uploadFile || isUploadPreview) && (
+                  <Button onClick={() => { setUploadFile(null); setIsUploadPreview(false); setUploadPreviewData([]); }} variant="ghost" className="h-10 w-10 p-0 text-red-500 rounded-xl bg-red-50 hover:bg-red-100">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {isUploadPreview && uploadPreviewData.length > 0 && (
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold tracking-card">Vista Previa de Datos</h3>
+                  <Badge variant="outline" className="text-xs bg-muted/30">
+                    {uploadPreviewData.length} registros
+                  </Badge>
+                </div>
+                <div className="rounded-xl border bg-card overflow-hidden">
+                  <Table>
+                    <TableHeader className="bg-muted/30">
+                      <TableRow>
+                        <TableHead className="text-xs font-semibold">Identificación</TableHead>
+                        <TableHead className="text-xs font-semibold">Tipo</TableHead>
+                        <TableHead className="text-xs font-semibold">Capacidad</TableHead>
+                        <TableHead className="text-xs font-semibold text-right">Estado</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {uploadPreviewData.map((row) => (
+                        <TableRow key={row.name}>
+                          <TableCell className="text-xs font-medium">{row.name}</TableCell>
+                          <TableCell className="text-xs">{row.type}</TableCell>
+                          <TableCell className="text-xs">{row.capacity}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge
+                              variant={row.status === 'success' ? 'default' : 'secondary'}
+                              className={cn(
+                                'text-[10px]',
+                                row.status === 'success' ? 'bg-green-500 hover:bg-green-600' : 'bg-yellow-500 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-700'
+                              )}
+                            >
+                              {row.status === 'success' ? 'Válido' : 'Existente'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="px-6 py-4 border-t bg-muted/5 shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsUploadDialogOpen(false)}
+              disabled={isUploading}
+              className="text-xs font-semibold rounded-xl h-10"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleUploadConfirm}
+              disabled={!isUploadPreview || isUploading || uploadPreviewData.length === 0}
+              className="px-8 shadow-lg shadow-primary/20 text-xs font-semibold rounded-xl h-10"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                'Confirmar e Importar'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-4xl border-none">
+          <form onSubmit={handleAssignGroup} className="space-y-6 p-2">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-semibold tracking-card">
+                Asignar Sala a Grupo
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Asigna un salón a todas las asignaturas y clases de un grupo específico.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-5">
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
+                  Sala Destino *
+                </Label>
+                <Select value={assignRoomId} onValueChange={setAssignRoomId}>
+                  <SelectTrigger className="rounded-xl bg-muted/30 border-none h-11">
+                    <SelectValue placeholder="Seleccionar sala" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-none shadow-xl">
+                    {rooms.map(room => (
+                      <SelectItem key={room.id} value={room.id}>
+                        {room.name} ({getTypeLabel(room.type)})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
+                  Grupo *
+                </Label>
+                <Select value={assignGroupName} onValueChange={setAssignGroupName}>
+                  <SelectTrigger className="rounded-xl bg-muted/30 border-none h-11">
+                    <SelectValue placeholder="Seleccionar grupo" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-none shadow-xl">
+                    {Array.isArray(availableGroups) && availableGroups.map(group => (
+                      <SelectItem key={group} value={group}>
+                        {group}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
+                  Periodo Académico (Opcional)
+                </Label>
+                <Input
+                  className="rounded-xl bg-muted/30 border-none h-11"
+                  value={assignPeriodo}
+                  onChange={e => setAssignPeriodo(e.target.value)}
+                  placeholder="Ej: 2025-1"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit" variant="default" className="w-full h-11 rounded-xl shadow-lg shadow-primary/20" disabled={isAssigning}>
+                {isAssigning ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Asignando...
+                  </>
+                ) : (
+                  'Confirmar Asignación'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <style jsx global>{`
         .no-scrollbar::-webkit-scrollbar {

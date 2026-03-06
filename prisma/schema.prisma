@@ -92,6 +92,10 @@ model User {
 
   // Relaciones con gestión de salas
   roomBookings RoomBooking[] @relation("TeacherBookings")
+
+  // Relaciones nuevas — Flujo Administrador
+  groupAssignments GroupAssignment[] @relation("StudentGroupAssignments")
+  enrollments      Enrollment[]      @relation("StudentEnrollments")
 }
 
 model Subject {
@@ -105,6 +109,7 @@ model Subject {
   credits          Int?
   directHours     Int?
   description      String?
+  periodoAcademico String?           // e.g. "2025-1"
   teachers         User[]            @relation("TeacherSubjects", fields: [teacherIds], references: [id])
   teacherIds       String[]          @db.ObjectId
   studentIds       String[]          @db.ObjectId
@@ -114,6 +119,7 @@ model Subject {
   reports          Report[]
   unenrollRequests UnenrollRequest[]
   contents         SubjectContent[]
+  enrollments      Enrollment[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
@@ -309,4 +315,46 @@ model UnenrollRequest {
   updatedAt     DateTime              @updatedAt
 
   @@index([studentId, subjectId, status])
+}
+
+// ==============================================================
+// Flujo Administrador — Nuevos modelos (Paso 6 y Paso 7)
+// ==============================================================
+
+// Paso 6: Asignación de estudiante a grupo organizativo (previo a matrícula)
+model GroupAssignment {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  student          User     @relation("StudentGroupAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId        String   @db.ObjectId
+  grupoNombre      String   // e.g. "6A", "Fisica-01"
+  periodoAcademico String   // e.g. "2025-1"
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([studentId, grupoNombre, periodoAcademico])
+  @@index([grupoNombre, periodoAcademico])
+}
+
+// Paso 7: Matrícula formal con estado y periodo académico
+enum EnrollmentStatus {
+  ACTIVA
+  CANCELADA
+  APLAZADA
+  FINALIZADA
+}
+
+model Enrollment {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  student          User             @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId        String           @db.ObjectId
+  subject          Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId        String           @db.ObjectId
+  periodoAcademico String           // e.g. "2025-1"
+  status           EnrollmentStatus @default(ACTIVA)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([studentId, subjectId, periodoAcademico])
+  @@index([subjectId, status])
+  @@index([studentId, status])
 }
