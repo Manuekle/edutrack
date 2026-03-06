@@ -103,6 +103,7 @@ model Subject {
   program          String?
   semester         Int?
   credits          Int?
+  directHours     Int?              // Horas de acompañamiento directo
   teachers         User[]            @relation("TeacherSubjects", fields: [teacherIds], references: [id])
   teacherIds       String[]          @db.ObjectId
   studentIds       String[]          @db.ObjectId
