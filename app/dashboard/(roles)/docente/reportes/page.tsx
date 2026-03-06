@@ -177,101 +177,97 @@ export default function ReportsPage() {
         </CardHeader>
 
         <CardContent className="p-0">
-          <div className="border rounded-md overflow-x-auto bg-card shadow-sm">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/60">
-                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">
-                    Asignatura
-                  </TableHead>
-                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">
-                    Fecha
-                  </TableHead>
-                  <TableHead className="text-xs tracking-card font-normal px-4 py-2">
-                    Estado
-                  </TableHead>
-                  <TableHead className="text-xs tracking-card font-normal px-4 py-2 text-right">
-                    Acciones
-                  </TableHead>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/60">
+                <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                  Asignatura
+                </TableHead>
+                <TableHead className="text-xs tracking-card font-normal px-4 py-2">Fecha</TableHead>
+                <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                  Estado
+                </TableHead>
+                <TableHead className="text-xs tracking-card font-normal px-4 py-2 text-right">
+                  Acciones
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reports.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-56 text-center">
+                    <div className="flex flex-col items-center justify-center py-6">
+                      <p className="text-xs">No hay reportes generados</p>
+                      <p className="text-xs text-muted-foreground">
+                        Los reportes que generes aparecerán aquí
+                      </p>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reports.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-56 text-center">
-                      <div className="flex flex-col items-center justify-center py-6">
-                        <p className="text-xs">No hay reportes generados</p>
-                        <p className="text-xs text-muted-foreground">
-                          Los reportes que generes aparecerán aquí
-                        </p>
+              ) : (
+                reports.map(report => (
+                  <TableRow key={report.id} className="group">
+                    <TableCell className="px-4 py-2 text-xs">
+                      <div className="font-medium">
+                        {report.subject?.name || 'Asignatura no disponible'}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-mono">
+                        {report.subject?.code || 'Código no disponible'}
                       </div>
                     </TableCell>
-                  </TableRow>
-                ) : (
-                  reports.map(report => (
-                    <TableRow key={report.id} className="group">
-                      <TableCell className="px-4 py-2 text-xs">
-                        <div className="font-medium">
-                          {report.subject?.name || 'Asignatura no disponible'}
-                        </div>
-                        <div className="text-xs text-muted-foreground font-mono">
-                          {report.subject?.code || 'Código no disponible'}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-2 text-xs">
-                        <div className="text-xs">
-                          {format(new Date(report.createdAt), 'PPP', { locale: es })}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {format(new Date(report.createdAt), 'h:mm a', {
-                            locale: es,
-                          }).toUpperCase()}
-                        </div>
-                      </TableCell>
+                    <TableCell className="py-2 text-xs">
+                      <div className="text-xs">
+                        {format(new Date(report.createdAt), 'PPP', { locale: es })}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {format(new Date(report.createdAt), 'h:mm a', {
+                          locale: es,
+                        }).toUpperCase()}
+                      </div>
+                    </TableCell>
 
-                      <TableCell className="py-2 text-xs">
-                        <ReportStatusBadge status={report.status} />
-                      </TableCell>
-                      <TableCell className="py-2 text-right">
-                        {report.status === 'COMPLETADO' && report.fileUrl ? (
-                          <Button
-                            variant="link"
-                            size="sm"
-                            className="text-xs"
-                            onClick={() => handleDownload(report)}
-                            disabled={downloadingReportId === report.id}
-                          >
-                            {downloadingReportId === report.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-                            ) : (
-                              'Descargar'
-                            )}
-                          </Button>
-                        ) : report.status === 'FALLIDO' ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="inline-flex items-center text-xs text-destructive">
-                                No se pudo generar el reporte
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p className="max-w-[200px] text-xs">
-                                {report.error || 'Error desconocido al generar el reporte'}
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">
-                            {report.status === 'EN_PROCESO' ? 'En progreso...' : 'Pendiente'}
-                          </span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                    <TableCell className="py-2 text-xs">
+                      <ReportStatusBadge status={report.status} />
+                    </TableCell>
+                    <TableCell className="py-2 text-right">
+                      {report.status === 'COMPLETADO' && report.fileUrl ? (
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => handleDownload(report)}
+                          disabled={downloadingReportId === report.id}
+                        >
+                          {downloadingReportId === report.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                          ) : (
+                            'Descargar'
+                          )}
+                        </Button>
+                      ) : report.status === 'FALLIDO' ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center text-xs text-destructive">
+                              No se pudo generar el reporte
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-[200px] text-xs">
+                              {report.error || 'Error desconocido al generar el reporte'}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          {report.status === 'EN_PROCESO' ? 'En progreso...' : 'Pendiente'}
+                        </span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

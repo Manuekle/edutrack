@@ -3,7 +3,7 @@
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
   Table,
@@ -96,66 +96,66 @@ export default function HistorialAsistenciasPage() {
         </CardTitle>
         <CardDescription className="text-xs">Listado de tus asistencias</CardDescription>
       </div>
-      <CardContent className="p-0">
-        {error ? (
-          <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <XCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-xs font-normal text-red-800 dark:text-red-200">
-                  Error al cargar el historial
-                </h3>
-                <div className="mt-2 text-xs text-red-700 dark:text-red-300">
-                  <p>{error}</p>
+      <Card>
+        <CardContent className="p-0">
+          {error ? (
+            <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
                 </div>
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLoading(true);
-                      setError(null);
-                      const fetchAttendances = async () => {
-                        try {
-                          // Llamada al nuevo endpoint específico para el historial del estudiante
-                          const response = await fetch('/api/estudiante/historial');
-                          if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(
-                              errorData.message || 'No se pudieron cargar las asistencias.'
-                            );
+                <div className="ml-3">
+                  <h3 className="text-xs font-normal text-red-800 dark:text-red-200">
+                    Error al cargar el historial
+                  </h3>
+                  <div className="mt-2 text-xs text-red-700 dark:text-red-300">
+                    <p>{error}</p>
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsLoading(true);
+                        setError(null);
+                        const fetchAttendances = async () => {
+                          try {
+                            const response = await fetch('/api/estudiante/historial');
+                            if (!response.ok) {
+                              const errorData = await response.json();
+                              throw new Error(
+                                errorData.message || 'No se pudieron cargar las asistencias.'
+                              );
+                            }
+                            const responseData = await response.json();
+                            setAttendances(responseData.data || []);
+                          } catch (error: unknown) {
+                            const errorMessage =
+                              error instanceof Error
+                                ? error.message
+                                : 'Error al cargar el historial de asistencias';
+                            setError(errorMessage);
+                          } finally {
+                            setIsLoading(false);
                           }
-                          const responseData = await response.json();
-                          setAttendances(responseData.data || []);
-                        } catch (error: unknown) {
-                          const errorMessage =
-                            error instanceof Error
-                              ? error.message
-                              : 'Error al cargar el historial de asistencias';
-                          setError(errorMessage);
-                        } finally {
-                          setIsLoading(false);
-                        }
-                      };
-
-                      fetchAttendances();
-                    }}
-                    className="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-3 py-2 text-xs font-normal text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
-                  >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Reintentar
-                  </button>
+                        };
+                        fetchAttendances();
+                      }}
+                      className="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-3 py-2 text-xs font-normal text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Reintentar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ) : attendances.length === 0 ? (
-          <Alert>
-            <AlertDescription>No tienes asistencias registradas.</AlertDescription>
-          </Alert>
-        ) : (
-          <div className="border rounded-md overflow-x-auto border-gray-200 dark:border-white/10">
+          ) : attendances.length === 0 ? (
+            <div className="p-4">
+              <Alert>
+                <AlertDescription>No tienes asistencias registradas.</AlertDescription>
+              </Alert>
+            </div>
+          ) : (
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/60">
@@ -173,7 +173,7 @@ export default function HistorialAsistenciasPage() {
                     </TableCell>
                     <TableCell className="text-xs px-4 py-2">
                       <div
-                        className="max-w-xs truncate text-gray-900 dark:text-white"
+                        className="max-w-xs truncate"
                         title={attendance.class.topic || 'Clase general'}
                       >
                         {attendance.class.topic || 'Clase general'}
@@ -182,9 +182,7 @@ export default function HistorialAsistenciasPage() {
                     <TableCell className="text-xs px-4 py-2">
                       <div className="flex flex-col">
                         <span>
-                          {format(new Date(attendance.class.date), 'PPP', {
-                            locale: es,
-                          })}
+                          {format(new Date(attendance.class.date), 'PPP', { locale: es })}
                         </span>
                       </div>
                     </TableCell>
@@ -197,18 +195,19 @@ export default function HistorialAsistenciasPage() {
                 ))}
               </TableBody>
             </Table>
-            {/* Pagination */}
-            <div>
-              <TablePagination
-                currentPage={currentPage}
-                totalItems={totalItems}
-                itemsPerPage={ITEMS_PER_PAGE}
-                onPageChange={handlePageChange}
-              />
-            </div>
+          )}
+        </CardContent>
+        {attendances.length > 0 && (
+          <div className="p-4 border-t">
+            <TablePagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={handlePageChange}
+            />
           </div>
         )}
-      </CardContent>
+      </Card>
     </div>
   );
 }
