@@ -1,6 +1,7 @@
 'use client';
 
 import { BulkEnrollModal } from '@/components/modals/bulk-enroll-modal';
+import { Checkbox } from '@/components/ui/checkbox';
 import { CreateSubjectModal } from '@/components/modals/create-subject-modal';
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +26,7 @@ import {
 } from '@/components/ui/table';
 import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
-import { Download, Search, Users } from 'lucide-react';
+import { Download, Search, Trash2, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, useMemo } from 'react';
 
@@ -63,7 +64,7 @@ export default function GestionAsignaturasPage() {
   );
 
   // Usar React Query para obtener asignaturas
-  const { subjects, pagination, isLoading, refetch } = useSubjects({
+  const { subjects, pagination, isLoading, refetch, deleteSubject, isDeleting } = useSubjects({
     page: currentPage,
     limit: itemsPerPage,
     search: debouncedFilters.search,
@@ -88,6 +89,17 @@ export default function GestionAsignaturasPage() {
       setSelectedSubjects(new Set());
     } else {
       setSelectedSubjects(new Set(subjects.map(s => s.id)));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (
+      confirm(
+        `¿Estás seguro de eliminar ${selectedSubjects.size} asignatura(s)? Esta acción no se puede deshacer.`
+      )
+    ) {
+      selectedSubjects.forEach(id => deleteSubject(id));
+      setSelectedSubjects(new Set());
     }
   };
 
@@ -205,9 +217,21 @@ export default function GestionAsignaturasPage() {
             </Select>
 
             {selectedSubjects.size > 0 && (
-              <Button variant="secondary" size="sm" onClick={handleBulkEnroll}>
-                Matricular en {selectedSubjects.size} asignatura(s)
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" onClick={handleBulkEnroll}>
+                  Matricular en {selectedSubjects.size} asignatura(s)
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDeleteSelected}
+                  disabled={isDeleting}
+                  className="gap-1"
+                >
+                  <Trash2 className="h-3 w-3" />
+                  <span>Eliminar</span>
+                </Button>
+              </div>
             )}
           </div>
         </CardHeader>
@@ -246,29 +270,37 @@ export default function GestionAsignaturasPage() {
             </div>
           </div>
 
-          <div className="relative overflow-auto">
+          <div className="relative overflow-x-auto">
             <Table>
               <TableHeader className="bg-muted/30">
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[30px] px-2">
-                    <input
-                      type="checkbox"
-                      className="translate-y-[2px]"
-                      checked={subjects.length > 0 && selectedSubjects.size === subjects.length}
-                      onChange={toggleAll}
-                    />
+                <TableRow className="hover:bg-transparent transition-colors">
+                  <TableHead className="w-[50px] px-2 py-3">
+                    <div className="flex items-center justify-center">
+                      <Checkbox
+                        checked={subjects.length > 0 && selectedSubjects.size === subjects.length}
+                        onCheckedChange={toggleAll}
+                      />
+                    </div>
                   </TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Asignatura</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Código</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Docente(s)</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Programa</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground">
+                    Asignatura
+                  </TableHead>
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground hidden sm:table-cell">
+                    Código
+                  </TableHead>
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground hidden md:table-cell">
+                    Docente(s)
+                  </TableHead>
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground hidden lg:table-cell">
+                    Programa
+                  </TableHead>
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground text-center hidden sm:table-cell">
                     Semestre
                   </TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground text-center hidden sm:table-cell">
                     Créditos
                   </TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                  <TableHead className="text-xs font-medium px-3 py-3 text-muted-foreground text-center">
                     Estudiantes
                   </TableHead>
                 </TableRow>
@@ -324,26 +356,31 @@ export default function GestionAsignaturasPage() {
                   </TableRow>
                 ) : (
                   subjects.map(subject => (
-                    <TableRow key={subject.id} className="hover:bg-muted/50 group">
+                    <TableRow
+                      key={subject.id}
+                      className="hover:bg-muted/50 group transition-colors"
+                    >
                       <TableCell className="px-2">
-                        <input
-                          type="checkbox"
-                          className="translate-y-[2px]"
-                          checked={selectedSubjects.has(subject.id)}
-                          onChange={() => toggleSelection(subject.id)}
-                        />
+                        <div className="flex items-center justify-center">
+                          <Checkbox
+                            checked={selectedSubjects.has(subject.id)}
+                            onCheckedChange={() => toggleSelection(subject.id)}
+                          />
+                        </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <div className="flex items-center space-x-3">
+                      <TableCell className="text-xs px-3 py-3">
+                        <div className="flex items-center gap-3">
                           <div>
-                            <div className="font-normal text-foreground">{subject.name}</div>
+                            <div className="font-normal text-foreground text-sm">
+                              {subject.name}
+                            </div>
                             <div className="text-xs text-muted-foreground">
                               {subject.classCount} clase{subject.classCount !== 1 ? 's' : ''}
                             </div>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
+                      <TableCell className="text-xs px-3 py-3 hidden sm:table-cell">
                         <div className="flex flex-col gap-1">
                           <Badge variant="outline" className="font-mono text-xs w-fit">
                             {subject.code}
@@ -355,7 +392,7 @@ export default function GestionAsignaturasPage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
+                      <TableCell className="text-xs px-3 py-3 hidden md:table-cell">
                         <div className="flex items-center gap-2">
                           <span
                             className="truncate max-w-[150px]"
@@ -367,18 +404,18 @@ export default function GestionAsignaturasPage() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
+                      <TableCell className="text-xs px-3 py-3 hidden lg:table-cell">
                         <span className="text-muted-foreground">
                           {subject.program || 'No especificado'}
                         </span>
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3 text-center">
+                      <TableCell className="text-xs px-3 py-3 text-center hidden sm:table-cell">
                         {subject.semester || '-'}
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3 text-center">
+                      <TableCell className="text-xs px-3 py-3 text-center hidden sm:table-cell">
                         {subject.credits || '-'}
                       </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
+                      <TableCell className="text-xs px-3 py-3">
                         <div className="flex items-center justify-center gap-1">
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <span>{subject.studentCount}</span>

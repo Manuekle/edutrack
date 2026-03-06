@@ -98,25 +98,41 @@ model Subject {
   id               String            @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   code             String
-  group            String?           // Seccion o Grupo (A, B, 1, 2)
-  jornada          Jornada?          // DIURNO o NOCTURNO
+  group            String?
+  jornada          Jornada?
   program          String?
   semester         Int?
   credits          Int?
-  directHours     Int?              // Horas de acompañamiento directo
+  directHours     Int?
+  description      String?
   teachers         User[]            @relation("TeacherSubjects", fields: [teacherIds], references: [id])
   teacherIds       String[]          @db.ObjectId
   studentIds       String[]          @db.ObjectId
-  classroom        String?           // Aula por defecto
+  classroom        String?
   classes          Class[]
   events           SubjectEvent[]
   reports          Report[]
   unenrollRequests UnenrollRequest[]
+  contents         SubjectContent[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
   @@index([teacherIds])
   @@unique([code, group])
+}
+
+model SubjectContent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId   String   @db.ObjectId
+  type        String   // TIPO: RAP, RAC, TEMA, ESTRATEGIA
+  title       String   // Título del contenido
+  description String?  // Descripción o subtema
+  order       Int      @default(0) // Orden de presentación
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([subjectId])
 }
 
 model Class {

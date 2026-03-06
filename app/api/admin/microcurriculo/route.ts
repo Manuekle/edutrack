@@ -1,17 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { parseCSV, validateCSVHeaders, parseCSVLine, detectDelimiter } from '@/lib/csv-parser';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
-
-interface MicrocurriculoRow {
-  codigoAsignatura: string;
-  nombreAsignatura: string;
-  programa: string;
-  semestre: string;
-  creditos: string;
-  horasAcompanamiento: string;
-}
 
 interface PreviewResult {
   codigoAsignatura: string;
@@ -19,7 +9,8 @@ interface PreviewResult {
   programa: string;
   semestre: number;
   creditos: number;
-  directHours: number;
+  horas: number;
+  temasCount: number;
   status: 'success' | 'error' | 'existing';
   message: string;
 }
@@ -43,31 +34,25 @@ export async function POST(request: Request) {
 
     const buffer = await file.arrayBuffer();
     const text = new TextDecoder('utf-8').decode(buffer);
-    const delimiter = detectDelimiter(text);
     const lines = text.split(/\r?\n/).filter(line => line.trim());
 
     if (lines.length === 0) {
       return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
     }
 
-    const headers = parseCSVLine(lines[0], delimiter);
-    const requiredHeaders = ['codigo_asignatura', 'nombre_asignatura'];
-    const validation = validateCSVHeaders(headers, requiredHeaders);
-
-    if (!validation.valid) {
-      return NextResponse.json(
-        { error: `Faltan headers requeridos: ${validation.missing.join(', ')}` },
-        { status: 400 }
-      );
-    }
+    const headers = lines[0]
+      .toLowerCase()
+      .split(/[,;]/)
+      .map(h => h.trim());
 
     const headerMap: Record<string, string[]> = {
-      codigoAsignatura: ['codigo_asignatura', 'codigoAsignatura', 'codigo', 'code'],
-      nombreAsignatura: ['nombre_asignatura', 'nombreAsignatura', 'nombre', 'name', 'asignatura'],
+      codigo: ['codigo_asignatura', 'codigo', 'code'],
+      nombre: ['nombre_asignatura', 'nombre', 'name', 'asignatura'],
       programa: ['programa', 'program', 'carrera'],
       semestre: ['semestre', 'semester'],
-      creditos: ['creditos', 'credits', 'créditos'],
-      horasAcompanamiento: ['horas', 'hours', 'horasAcompanamiento'],
+      creditos: ['creditos', 'credits'],
+      horas: ['horas', 'horas_acompanamiento'],
+      temas: ['temas', 'contenidos', 'temario'],
     };
 
     const findHeader = (variants: string[]): string | undefined => {
@@ -79,8 +64,8 @@ export async function POST(request: Request) {
       return undefined;
     };
 
-    const getValue = (row: string[], header: string | undefined, index: number): string => {
-      if (!header) return row[index] || '';
+    const getValue = (row: string[], header: string | undefined): string => {
+      if (!header) return '';
       const headerIndex = headers.indexOf(header);
       return headerIndex >= 0 ? row[headerIndex] || '' : '';
     };
@@ -91,19 +76,27 @@ export async function POST(request: Request) {
     );
 
     for (let i = 1; i < lines.length; i++) {
-      const values = parseCSVLine(lines[i], delimiter);
-      if (!values.some(v => v.trim())) continue;
+      const cols = lines[i].split(/[,;]/).map(c => c.trim());
+      if (!cols.some(v => v)) continue;
 
-      const codigo = getValue(values, findHeader(headerMap.codigoAsignatura), 0).trim();
-      const nombre = getValue(values, findHeader(headerMap.nombreAsignatura), 1).trim();
-      const programa = getValue(values, findHeader(headerMap.programa), 2).trim();
-      const semestreStr = getValue(values, findHeader(headerMap.semestre), 3).trim();
-      const creditosStr = getValue(values, findHeader(headerMap.creditos), 4).trim();
-      const horasStr = getValue(values, findHeader(headerMap.horasAcompanamiento), 5).trim();
+      const codigo = getValue(cols, findHeader(headerMap.codigo)).trim();
+      const nombre = getValue(cols, findHeader(headerMap.nombre)).trim();
+      const programa = getValue(cols, findHeader(headerMap.programa)).trim();
+      const semestreStr = getValue(cols, findHeader(headerMap.semestre)).trim();
+      const creditosStr = getValue(cols, findHeader(headerMap.creditos)).trim();
+      const horasStr = getValue(cols, findHeader(headerMap.horas)).trim();
+      const temasStr = getValue(cols, findHeader(headerMap.temas)).trim();
 
       const semestre = parseInt(semestreStr) || 1;
       const creditos = parseInt(creditosStr) || 0;
-      const directHours = parseInt(horasStr) || 0;
+      const horas = parseInt(horasStr) || 0;
+
+      const temas = temasStr
+        ? temasStr
+            .split(/[|;]/)
+            .map(t => t.trim())
+            .filter(t => t)
+        : [];
 
       if (!codigo || !nombre) {
         results.push({
@@ -112,7 +105,8 @@ export async function POST(request: Request) {
           programa: '',
           semestre: 1,
           creditos: 0,
-          directHours: 0,
+          horas: 0,
+          temasCount: 0,
           status: 'error',
           message: 'Faltan datos requeridos (código o nombre)',
         });
@@ -126,7 +120,8 @@ export async function POST(request: Request) {
           programa,
           semestre,
           creditos,
-          directHours,
+          horas,
+          temasCount: temas.length,
           status: 'existing',
           message: 'La asignatura ya existe',
         });
@@ -139,7 +134,8 @@ export async function POST(request: Request) {
         programa,
         semestre,
         creditos,
-        directHours,
+        horas,
+        temasCount: temas.length,
         status: 'success',
         message: 'Datos válidos',
       });
@@ -149,31 +145,55 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, previewData: results });
     }
 
-    // Crear asignaturas
     const toCreate = results.filter(r => r.status === 'success');
     const created: string[] = [];
     const errors: string[] = [];
 
-    await db.$transaction(async tx => {
-      for (const item of toCreate) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (tx as any).subject.create({
-            data: {
-              code: item.codigoAsignatura,
-              name: item.nombreAsignatura,
-              program: item.programa || null,
-              semester: item.semestre,
-              credits: item.creditos,
-              directHours: item.directHours,
-            },
+    for (const item of toCreate) {
+      try {
+        const temasStr = getValue(
+          lines
+            .slice(1)
+            .find(l => l.includes(item.codigoAsignatura))
+            ?.split(/[,;]/) || [],
+          findHeader(headerMap.temas)
+        );
+        const temas = temasStr
+          ? temasStr
+              .split(/[|;]/)
+              .map(t => t.trim())
+              .filter(t => t)
+          : [];
+
+        const subject = await db.subject.create({
+          data: {
+            code: item.codigoAsignatura,
+            name: item.nombreAsignatura,
+            program: item.programa || null,
+            semester: item.semestre,
+            credits: item.creditos,
+            directHours: item.horas,
+          },
+        });
+
+        if (temas.length > 0) {
+          const contentData = temas.map((tema, index) => ({
+            subjectId: subject.id,
+            type: 'TEMA',
+            title: tema.trim(),
+            order: index + 1,
+          }));
+
+          await db.subjectContent.createMany({
+            data: contentData,
           });
-          created.push(item.codigoAsignatura);
-        } catch (e) {
-          errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
         }
+
+        created.push(item.codigoAsignatura);
+      } catch (e) {
+        errors.push(`Error creando ${item.codigoAsignatura}: ${(e as Error).message}`);
       }
-    });
+    }
 
     return NextResponse.json({
       success: true,

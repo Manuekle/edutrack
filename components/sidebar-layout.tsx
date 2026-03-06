@@ -40,6 +40,7 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -193,9 +194,9 @@ function AppSidebar({ homePath }: { homePath: string }) {
                         <SidebarMenuButton
                           asChild
                           isActive={isActive}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] ${
                             isActive
-                              ? 'bg-primary/10 text-primary font-medium'
+                              ? 'bg-primary/10 text-primary font-medium shadow-sm'
                               : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
                           }`}
                         >
@@ -225,17 +226,17 @@ function AppSidebar({ homePath }: { homePath: string }) {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center p-3 rounded-lg hover:bg-sidebar-accent transition-colors mx-2 my-1">
-                  <Avatar className="h-9 w-9 border-2 border-primary/20 text-sm font-medium">
+                <button className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-[44px] sm:min-h-[52px]">
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-medium">
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {session?.user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="ml-3 text-left overflow-hidden">
+                  <div className="ml-2 sm:ml-3 text-left overflow-hidden">
                     <p className="text-sm font-medium truncate font-sans">
                       {session?.user?.name?.split(' ')[0] || 'Usuario'}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate font-sans">
+                    <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
                       {getRoleDisplayName(userRole as Role)}
                     </p>
                   </div>
@@ -324,7 +325,14 @@ function AppSidebar({ homePath }: { homePath: string }) {
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { isMobile, setOpenMobile } = useSidebar();
   const userRole = session?.user?.role as Role | undefined;
+
+  React.useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [pathname, isMobile, setOpenMobile]);
 
   const homePath = React.useMemo(() => {
     switch (userRole) {
@@ -441,18 +449,25 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <SidebarProvider>
         <AppSidebar homePath={homePath} />
         <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 px-4 font-sans pt-[env(safe-area-inset-top)]">
-            <SidebarTrigger className="-ml-1" />
-            <Breadcrumb>
+          <header className="flex h-14 sm:h-16 shrink-0 items-center gap-2 px-3 sm:px-4 font-sans pt-[env(safe-area-inset-top)] transition-all duration-200">
+            <SidebarTrigger className="-ml-1 hover:bg-accent hover:scale-105 active:scale-95 transition-transform" />
+            <Breadcrumb className="hidden xs:block">
               <BreadcrumbList>
                 {breadcrumbLinks.map((link, index) => (
                   <React.Fragment key={link.href}>
                     <BreadcrumbItem>
                       {index === breadcrumbLinks.length - 1 ? (
-                        <BreadcrumbPage>{link.label}</BreadcrumbPage>
+                        <BreadcrumbPage className="text-sm sm:text-base">
+                          {link.label}
+                        </BreadcrumbPage>
                       ) : (
                         <BreadcrumbLink asChild>
-                          <Link href={link.href}>{link.label}</Link>
+                          <Link
+                            href={link.href}
+                            className="text-sm sm:text-base hover:text-primary transition-colors"
+                          >
+                            {link.label}
+                          </Link>
                         </BreadcrumbLink>
                       )}
                     </BreadcrumbItem>
@@ -462,7 +477,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               </BreadcrumbList>
             </Breadcrumb>
           </header>
-          <main className="flex-1 p-4 sm:p-6 font-sans pb-safe">{children}</main>
+          <main className="flex-1 p-3 sm:p-4 md:p-6 font-sans pb-safe">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
