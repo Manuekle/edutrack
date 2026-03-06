@@ -40,7 +40,6 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-  useSidebar,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -325,14 +324,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const { isMobile, setOpenMobile } = useSidebar();
   const userRole = session?.user?.role as Role | undefined;
-
-  React.useEffect(() => {
-    if (isMobile) {
-      setOpenMobile(false);
-    }
-  }, [pathname, isMobile, setOpenMobile]);
 
   const homePath = React.useMemo(() => {
     switch (userRole) {
