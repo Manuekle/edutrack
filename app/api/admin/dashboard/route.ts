@@ -36,9 +36,12 @@ export async function GET() {
       // Total de materias
       prisma.subject.count(),
 
-      // Total de grupos
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (prisma as any).subjectGroup.count(),
+      // Total de grupos (ahora cuenta subjects únicos con grupo asignado)
+      prisma.subject.count({
+        where: {
+          group: { not: null },
+        },
+      }),
 
       // Total de clases
       prisma.class.count(),
@@ -80,31 +83,23 @@ export async function GET() {
         },
       }),
 
-      // Top 10 materias con más estudiantes matriculados (ahora a través de grupos)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (prisma as any).subject.findMany({
+      // Top 10 materias con más estudiantes matriculados
+      prisma.subject.findMany({
         select: {
           name: true,
           code: true,
-        },
-        include: {
-          groups: {
+          studentIds: true,
+          _count: {
             select: {
-              studentIds: true,
-              _count: {
-                select: {
-                  classes: true,
-                },
-              },
+              classes: true,
             },
           },
         },
         take: 10,
       }),
 
-      // Datos de ocupación de salones (a través de grupos y clases)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (prisma as any).subject.findMany({
+      // Datos de ocupación de salones
+      prisma.subject.findMany({
         where: {
           classroom: {
             not: null,
@@ -112,11 +107,7 @@ export async function GET() {
         },
         select: {
           classroom: true,
-          groups: {
-            select: {
-              studentIds: true,
-            },
-          },
+          studentIds: true,
         },
       }),
     ]);
@@ -125,10 +116,9 @@ export async function GET() {
     const occupancyMap = new Map<string, number>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (classroomOccupancyRaw as any[]).forEach(
-      (item: { classroom: string | null; groups?: { studentIds: string[] }[] }) => {
+      (item: { classroom: string | null; studentIds?: string[] }) => {
         if (item.classroom) {
-          const studentCount =
-            item.groups?.reduce((sum, g) => sum + (g.studentIds?.length || 0), 0) || 0;
+          const studentCount = item.studentIds?.length || 0;
           const current = occupancyMap.get(item.classroom) || 0;
           occupancyMap.set(item.classroom, current + studentCount);
         }
@@ -213,12 +203,12 @@ export async function GET() {
       clases: count,
     }));
 
-    // Obtener las 3 materias con más clases usando el nuevo modelo de grupos
+    // Obtener las 3 materias con más clases
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topSubjects = (subjectEnrollmentData as any[]).slice(0, 3).map((subject: any) => ({
       name: subject.name,
       code: subject.code,
-      classes: subject.groups?._count?.classes || 0,
+      classes: subject._count?.classes || 0,
     }));
 
     // Calcular métricas adicionales
