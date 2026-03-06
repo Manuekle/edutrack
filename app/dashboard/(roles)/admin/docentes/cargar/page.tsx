@@ -583,7 +583,7 @@ export default function CargarDocentesPage() {
                     <Button
                       onClick={handleConfirmUpload}
                       disabled={isConfirming || successCount === 0}
-                      className="h-9 px-8 text-xs font-semibold shadow-sm"
+                      className="h-9 px-8 text-xs shadow-sm"
                     >
                       {isConfirming ? (
                         <>
@@ -591,7 +591,7 @@ export default function CargarDocentesPage() {
                           PROCESANDO...
                         </>
                       ) : (
-                        'CONFIRMAR Y CREAR'
+                        'Confirmar y Crear'
                       )}
                     </Button>
                   </div>

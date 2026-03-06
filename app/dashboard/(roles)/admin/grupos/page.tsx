@@ -216,11 +216,6 @@ export default function GruposHorariosPage() {
   };
 
   const handleEditItem = (id: string) => {
-    // Editing disabled as per original logic for multi-select pattern
-    sileo.info({
-      title: 'Información',
-      description: 'Para modificar, elimina el grupo y agrégalo nuevamente.',
-    });
     const item = previewData.find(i => i.id === id);
     if (item) {
       setManualForm({
@@ -233,6 +228,8 @@ export default function GruposHorariosPage() {
         salon: item.schedule?.[0]?.salon || '',
       });
       setEditingId(id);
+      // Switch to manual mode so the edit form is visible
+      setMode('manual');
     }
   };
 
@@ -789,12 +786,12 @@ export default function GruposHorariosPage() {
                   <Button
                     onClick={handleConfirmUpload}
                     disabled={isConfirming || successCount === 0 || !selectedSubject}
-                    className="h-9 px-6 text-xs font-semibold min-w-[150px]"
+                    className="h-9 px-6 text-xs min-w-[150px]"
                   >
                     {isConfirming ? (
                       <>
                         <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                        Creando...
+                        Procesando...
                       </>
                     ) : (
                       'Confirmar y Crear'

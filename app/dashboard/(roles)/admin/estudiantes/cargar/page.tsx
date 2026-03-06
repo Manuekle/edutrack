@@ -612,15 +612,15 @@ export default function CargarEstudiantesPage() {
                     <Button
                       onClick={handleConfirmUpload}
                       disabled={isConfirming || successCount === 0}
-                      className="h-9 px-8 text-xs font-semibold shadow-sm"
+                      className="h-9 px-8 text-xs shadow-sm"
                     >
                       {isConfirming ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          PROCESANDO...
+                          Procesando...
                         </>
                       ) : (
-                        'CONFIRMAR Y CREAR'
+                        'Confirmar y Crear'
                       )}
                     </Button>
                   </div>

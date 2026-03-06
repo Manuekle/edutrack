@@ -1,8 +1,8 @@
 import { PWAInstaller } from '@/components/pwa-installer';
+import { SileoToaster } from '@/components/ui/sileo-toaster';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
-import { Toaster } from 'sileo';
 import './globals.css';
 import Providers from './providers';
 
@@ -136,20 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {children}
           <PWAInstaller />
-          <Toaster
-            position="top-right"
-            theme="dark"
-            options={{
-              fill: "#171717",
-              roundness: 16,
-              styles: {
-                title: "text-white font-semibold!",
-                description: "text-white/70!",
-                badge: "bg-white/10!",
-                button: "bg-white/10! hover:bg-white/20! transition-colors",
-              }
-            }}
-          />
+          <SileoToaster />
         </Providers>
       </body>
     </html>
