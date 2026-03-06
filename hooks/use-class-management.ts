@@ -7,7 +7,7 @@ import type { ClassStatus } from '@/lib/class-utils';
 import type { LocalClassWithStatus, TableClassWithStatus } from '@/types/class';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface UseClassManagementProps {
   classes: LocalClassWithStatus[];
@@ -55,7 +55,7 @@ export function useClassManagement({
       if (updatedClass) {
         setClasses(prev => prev.map(c => (c.id === classId ? updatedClass : c)));
       }
-      toast.success(`La clase ha sido marcada como ${status.toLowerCase()}.`);
+      sileo.success({ title: `La clase ha sido marcada como ${status.toLowerCase()}.` });
 
       // Invalidar queries de React Query si existe subjectId
       if (subjectId) {
@@ -65,7 +65,7 @@ export function useClassManagement({
       await fetchClasses();
     } catch (error) {
       setClasses(originalClasses);
-      toast.error(error instanceof Error ? error.message : 'Ocurrió un error inesperado.');
+      sileo.error({ title: error instanceof Error ? error.message : 'Ocurrió un error inesperado.' });
     } finally {
       setIsSubmitting(false);
     }

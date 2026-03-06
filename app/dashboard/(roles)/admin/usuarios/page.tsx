@@ -34,7 +34,7 @@ import { useUsers } from '@/hooks/use-users';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal, Search, UserCheck, UserCog, UserX } from 'lucide-react';
+import { MoreHorizontal, Search, UserCheck, UserCog, UserX, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -110,11 +110,28 @@ export default function GestionUsuariosPage() {
           <Button variant="default" onClick={() => setIsCreateModalOpen(true)} className="gap-2">
             <span>Nuevo Usuario</span>
           </Button>
-          <Link href="/dashboard/admin/docentes/cargar">
-            <Button variant="outline" className="gap-2">
-              <span>Cargar Usuarios</span>
-            </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <span>Cargar Usuarios</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel className="text-xs">Tipo de carga</DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/admin/docentes/cargar" className="cursor-pointer">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span className="text-xs">Cargar Docentes</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/admin/estudiantes/cargar" className="cursor-pointer">
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  <span className="text-xs">Cargar Estudiantes</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -178,12 +195,12 @@ export default function GestionUsuariosPage() {
             <Table>
               <TableHeader className="bg-background">
                 <TableRow className="hover:bg-transparent border-b">
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider">Usuario</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider">Correo</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider">Rol</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider">Código</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider text-center">Estado</TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider text-right">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Usuario</TableHead>
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Correo</TableHead>
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Rol</TableHead>
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">Código</TableHead>
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider text-center">Estado</TableHead>
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider text-right">
                     Acciones
                   </TableHead>
                 </TableRow>

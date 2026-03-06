@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface Teacher {
   id: string;
@@ -127,7 +127,7 @@ export function EditSubjectModal({
         setTeachers(data.data || data);
       }
     } catch (error) {
-      toast.error('Error al cargar los docentes');
+      sileo.error({ title: 'Error al cargar los docentes' });
     } finally {
       setLoadingTeachers(false);
     }
@@ -135,7 +135,7 @@ export function EditSubjectModal({
 
   const onSubmit = async (data: EditSubjectFormValues) => {
     if (!subject) {
-      toast.error('No hay asignatura seleccionada para editar');
+      sileo.error({ title: 'No hay asignatura seleccionada para editar' });
       return;
     }
 
@@ -167,14 +167,14 @@ export function EditSubjectModal({
         throw new Error('La respuesta del servidor no contiene datos válidos');
       }
 
-      toast.success('Asignatura actualizada con éxito.');
+      sileo.success({ title: 'Asignatura actualizada con éxito.' });
       onSubjectUpdate(updatedSubject);
       onClose();
     } catch (err) {
       if (err instanceof Error) {
-        toast.error(err.message);
+        sileo.error({ title: err.message });
       } else {
-        toast.error('Ocurrió un error inesperado.');
+        sileo.error({ title: 'Ocurrió un error inesperado.' });
       }
     } finally {
       setIsUpdating(false);

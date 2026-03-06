@@ -27,7 +27,7 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-card text-muted-foreground">
+        <span className="text-xs font-semibold tracking-card text-muted-foreground">
           Firma Digital
         </span>
         <Button

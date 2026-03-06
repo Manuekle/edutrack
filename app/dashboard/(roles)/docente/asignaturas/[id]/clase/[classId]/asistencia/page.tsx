@@ -16,7 +16,7 @@ import { Loader2, QrCode } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 const QRViewer = dynamic(
   () => import('@/components/qr-viewer').then(mod => ({ default: mod.QRViewer })),
@@ -167,7 +167,7 @@ export default function AttendancePage() {
           errorMessage = 'Esta clase ya ha sido marcada como completada o cancelada.';
         }
 
-        toast.error(errorMessage);
+        sileo.error({ title: errorMessage });
         router.back();
         return;
       }
@@ -179,7 +179,7 @@ export default function AttendancePage() {
       const errorMessage =
         error instanceof Error ? error.message : 'Error al cargar los datos de la clase';
       setError(errorMessage);
-      toast.error(errorMessage);
+      sileo.error({ title: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +195,7 @@ export default function AttendancePage() {
     if (expiresIn <= 0) {
       setQrData(null);
       setExpiresIn(null);
-      toast.info('El código QR ha expirado.');
+      sileo.info({ title: 'El código QR ha expirado.' });
       fetchData();
       return;
     }
@@ -231,11 +231,11 @@ export default function AttendancePage() {
 
       if (!response.ok) throw new Error('Error al guardar la asistencia.');
 
-      toast.success('Asistencia guardada con éxito.');
+      sileo.success({ title: 'Asistencia guardada con éxito.' });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Error al guardar la asistencia';
-      toast.error(errorMessage);
+      sileo.error({ title: errorMessage });
     } finally {
       setIsSaving(false);
     }
@@ -253,10 +253,10 @@ export default function AttendancePage() {
 
       setQrData(responseData.data); // Corregido: usar response.data
       setExpiresIn(300); // 5 minutos en segundos
-      toast.success('Código QR generado. Los estudiantes ya pueden escanear.');
+      sileo.success({ title: 'Código QR generado. Los estudiantes ya pueden escanear.' });
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error al generar el código QR';
-      toast.error(errorMessage);
+      sileo.error({ title: errorMessage });
     } finally {
       setIsGenerating(false);
     }

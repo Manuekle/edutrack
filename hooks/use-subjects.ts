@@ -3,7 +3,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface Subject {
   id: string;
@@ -89,10 +89,10 @@ export function useSubjects(options: UseSubjectsOptions = {}) {
     onSuccess: () => {
       // Invalidar la query para refrescar los datos
       queryClient.invalidateQueries({ queryKey: ['subjects'] });
-      toast.success('Asignatura eliminada correctamente');
+      sileo.success({ title: 'Asignatura eliminada correctamente' });
     },
     onError: error => {
-      toast.error(error instanceof Error ? error.message : 'Error al eliminar la asignatura');
+      sileo.error({ title: error instanceof Error ? error.message : 'Error al eliminar la asignatura' });
     },
   });
 

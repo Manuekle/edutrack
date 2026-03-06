@@ -1,10 +1,11 @@
 'use client';
 
+import { MultiStudentCombobox } from '@/components/ui/multi-student-combobox';
+
 import { SubjectFileUpload } from '@/components/subject-file-upload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -14,22 +15,31 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
   CheckCircle,
   Download,
-  Edit2,
   FileSpreadsheet,
   Loader2,
   Plus,
   Trash2,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface Subject {
   id: string;
   code: string;
   name: string;
+  group?: string;
   studentIds?: string[];
 }
 
@@ -47,8 +57,10 @@ interface PreviewItem {
 
 interface Student {
   id: string;
-  document: string;
-  name: string;
+  name: string | null;
+  document: string | null;
+  correoInstitucional: string | null;
+  codigoEstudiantil: string | null;
 }
 
 export default function MatriculaPage() {
@@ -69,13 +81,11 @@ export default function MatriculaPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [studentsSearch, setStudentsSearch] = useState<string>('');
 
   // Manual form state
   const [manualForm, setManualForm] = useState({
-    documento: '',
-    nombre: '',
     subjectId: '',
+    selectedStudents: [] as Student[],
   });
 
   useEffect(() => {
@@ -93,25 +103,7 @@ export default function MatriculaPage() {
     loadSubjects();
   }, []);
 
-  useEffect(() => {
-    const loadStudents = async () => {
-      if (!studentsSearch || studentsSearch.length < 2) {
-        setStudents([]);
-        return;
-      }
-      try {
-        const res = await fetch(`/api/admin/users?search=${studentsSearch}&role=ESTUDIANTE`);
-        const data = await res.json();
-        setStudents(data.data || []);
-      } catch (error) {
-        console.error('Error loading students:', error);
-      }
-    };
-    const timer = setTimeout(loadStudents, 300);
-    return () => clearTimeout(timer);
-  }, [studentsSearch]);
-
-  const selectedSubjectData = subjects.find(s => s.id === selectedSubject);
+  const selectedSubjectData = subjects.find(s => s.id === manualForm.subjectId);
 
   const handleFileSelect = (selectedFile: File | null) => {
     setFile(selectedFile);
@@ -128,7 +120,10 @@ export default function MatriculaPage() {
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecciona un archivo .csv para continuar.');
+      sileo.error({
+        title: 'Archivo requerido',
+        description: 'Por favor, selecciona un archivo .csv para continuar.',
+      });
       return;
     }
     setIsLoading(true);
@@ -151,13 +146,22 @@ export default function MatriculaPage() {
         }));
         setPreviewData(dataWithIds);
         setIsPreview(true);
-        toast.success('Vista previa generada con éxito');
+        sileo.success({
+          title: 'Vista previa',
+          description: 'Vista previa generada con éxito',
+        });
       } else {
-        toast.error(result.error || 'Error al generar la vista previa');
+        sileo.error({
+          title: 'Error',
+          description: result.error || 'Error al generar la vista previa',
+        });
         handleCancel();
       }
     } catch {
-      toast.error('Ocurrió un error inesperado al procesar el archivo.');
+      sileo.error({
+        title: 'Error inesperado',
+        description: 'Ocurrió un error inesperado al procesar el archivo.',
+      });
       handleCancel();
     } finally {
       setIsLoading(false);
@@ -165,61 +169,46 @@ export default function MatriculaPage() {
   };
 
   const handleAddManual = () => {
-    if (!manualForm.documento || !manualForm.nombre || !manualForm.subjectId) {
-      toast.error('El documento, nombre y asignatura son obligatorios.');
+    if (manualForm.selectedStudents.length === 0 || !manualForm.subjectId) {
+      sileo.error({
+        title: 'Campos requeridos',
+        description: 'Selecciona al menos un estudiante y un grupo.',
+      });
       return;
     }
 
     const sub = subjects.find(s => s.id === manualForm.subjectId);
 
-    const newItem: PreviewItem = {
-      id: `manual-${Date.now()}`,
-      documentoEstudiante: manualForm.documento,
-      nombreEstudiante: manualForm.nombre,
-      codigoAsignatura: sub?.code || '',
-      grupo: 'A',
+    const newItems: PreviewItem[] = manualForm.selectedStudents.map(st => ({
+      id: `manual-${st.id}-${Date.now()}`,
+      documentoEstudiante: st.document || '',
+      nombreEstudiante: st.name || '',
+      codigoAsignatura: selectedSubjectData?.code || '',
+      grupo: selectedSubjectData?.group || 'A',
       jornada: 'DIURNO',
       status: 'manual',
       message: 'Nuevo',
-    };
+    }));
 
-    setPreviewData([...previewData, newItem]);
+    setPreviewData([...previewData, ...newItems]);
     setIsPreview(true);
-    setManualForm({ ...manualForm, documento: '', nombre: '' });
-    toast.success('Estudiante agregado');
+    setManualForm({ ...manualForm, selectedStudents: [] });
+    sileo.success({
+      title: 'Estudiantes agregados',
+      description: `${newItems.length} estudiantes agregados a la lista.`,
+    });
   };
 
   const handleEditItem = (id: string) => {
-    const item = previewData.find(i => i.id === id);
-    if (item) {
-      const sub = subjects.find(s => s.code === item.codigoAsignatura);
-      setManualForm({
-        documento: item.documentoEstudiante,
-        nombre: item.nombreEstudiante,
-        subjectId: sub?.id || '',
-      });
-      setEditingId(id);
-    }
+    // Editing is disabled for multi-select pattern as it's easier to remove and re-add
+    sileo.info({
+      title: 'Información',
+      description: 'Para modificar, elimina al estudiante y agrégalo nuevamente.',
+    });
   };
 
   const handleUpdateItem = () => {
-    const sub = subjects.find(s => s.id === manualForm.subjectId);
-
-    setPreviewData(
-      previewData.map(item =>
-        item.id === editingId
-          ? {
-            ...item,
-            documentoEstudiante: manualForm.documento,
-            nombreEstudiante: manualForm.nombre,
-            codigoAsignatura: sub?.code || item.codigoAsignatura,
-          }
-          : item
-      )
-    );
-    setEditingId(null);
-    setManualForm({ documento: '', nombre: '', subjectId: manualForm.subjectId });
-    toast.success('Estudiante actualizado');
+    // Placeholder as editing is disabled
   };
 
   const handleDeleteItem = (id: string) => {
@@ -229,7 +218,10 @@ export default function MatriculaPage() {
   const handleConfirmUpload = async () => {
     const successCount = previewData.filter(item => item.status !== 'error').length;
     if (successCount === 0) {
-      toast.error('No hay matrículas válidas para procesar.');
+      sileo.error({
+        title: 'Sin datos válidos',
+        description: 'No hay matrículas válidas para procesar.',
+      });
       return;
     }
 
@@ -254,7 +246,10 @@ export default function MatriculaPage() {
         throw new Error(result.error || 'Error al confirmar la matrícula.');
       }
 
-      toast.success(`Matrículas procesadas.`);
+      sileo.success({
+        title: 'Matrícula exitosa',
+        description: 'Matrículas procesadas correctamente.',
+      });
       setFinalResults({
         enrolled: result.summary?.enrolled || 0,
         existing: result.summary?.existing || 0,
@@ -264,7 +259,10 @@ export default function MatriculaPage() {
       setPreviewData([]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
-      toast.error(errorMessage);
+      sileo.error({
+        title: 'Error',
+        description: errorMessage,
+      });
     } finally {
       setIsConfirming(false);
     }
@@ -276,7 +274,7 @@ export default function MatriculaPage() {
     setPreviewData([]);
     setFinalResults(null);
     setEditingId(null);
-    setManualForm({ documento: '', nombre: '', subjectId: manualForm.subjectId });
+    setManualForm({ subjectId: manualForm.subjectId, selectedStudents: [] });
   };
 
   const handleNewUpload = () => {
@@ -292,97 +290,106 @@ export default function MatriculaPage() {
   const errorCount = previewData.filter(item => item.status === 'error').length;
 
   return (
-    <main className="space-y-4">
-      <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-          Matrícula
-        </CardTitle>
-        <CardDescription className="text-xs">
-          Matricula estudiantes en las asignaturas.
-        </CardDescription>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+        <CardHeader className="p-0 w-full">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+            Matrícula
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Matricula estudiantes en las asignaturas de forma manual o mediante carga masiva.
+          </CardDescription>
+        </CardHeader>
+        <div className="flex gap-2">
+          <Button
+            variant={mode === 'csv' ? 'default' : 'outline'}
+            onClick={() => {
+              setMode('csv');
+              handleCancel();
+            }}
+            className="text-xs"
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            Carga Masiva (CSV)
+          </Button>
+          <Button
+            variant={mode === 'manual' ? 'default' : 'outline'}
+            onClick={() => {
+              setMode('manual');
+            }}
+            className="text-xs"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Matricular Manual
+          </Button>
+        </div>
       </div>
 
-      {/* Mode Selection */}
-      <div className="flex gap-2 mb-4">
-        <Button
-          variant={mode === 'csv' ? 'default' : 'outline'}
-          onClick={() => {
-            setMode('csv');
-            handleCancel();
-          }}
-          className="text-xs"
-        >
-          <FileSpreadsheet className="mr-2 h-4 w-4" />
-          Carga Masiva (CSV)
-        </Button>
-        <Button
-          variant={mode === 'manual' ? 'default' : 'outline'}
-          onClick={() => {
-            setMode('manual');
-          }}
-          className="text-xs"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Matricular Manual
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           {mode === 'csv' ? (
             <>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="sm:text-md text-xs font-semibold">Carga Masiva</CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground">
-                    Sube un archivo CSV con los estudiantes.
+              <Card className="overflow-hidden border shadow-xs">
+                <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                    1. Instrucciones del Formato
+                  </CardTitle>
+                  <CardDescription className="text-[11px] mt-0.5">
+                    Sigue estos pasos para la carga masiva.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <a href="/formatos/plantilla_matricula.csv" download>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Download className="mr-2 h-4 w-4" />
-                      Descargar Plantilla
-                    </Button>
-                  </a>
-                  <div className="space-y-2 mt-4">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      <span className="font-medium">Columnas:</span>
+                <CardContent className="space-y-4 p-5">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-foreground">Plantilla base</p>
+                      <a href="/formatos/plantilla_matricula.csv" download className="block">
+                        <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                          <Download className="mr-2 h-4 w-4 text-muted-foreground" />
+                          Descargar Formato CSV
+                        </Button>
+                      </a>
                     </div>
-                    <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                      <li>Documento</li>
-                      <li>Código Asignatura</li>
-                      <li>Grupo</li>
-                    </ul>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-foreground">Requisitos del archivo</p>
+                      <div className="rounded-md bg-muted/30 p-3">
+                        <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
+                          <li><span className="font-medium text-foreground">Estudiante</span>: Documento o ID</li>
+                          <li><span className="font-medium text-foreground">Asignatura</span>: Código oficial</li>
+                          <li><span className="font-medium text-foreground">Grupo</span>: Sección asignada</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="sm:text-md text-xs font-semibold">Subir Archivo</CardTitle>
+              <Card className="overflow-hidden border shadow-xs">
+                <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                    2. Subir Archivo
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-5">
                   <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
-                  <div className="flex gap-2 mt-4 flex-col">
+                  <div className="flex gap-2 mt-4">
                     <Button
                       onClick={handlePreview}
                       disabled={!file || isLoading || isPreview}
-                      className="w-full text-xs"
+                      className="flex-1 text-xs h-9"
                     >
                       {isLoading && !isPreview ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
-                      Vista Previa
+                      Generar Vista Previa
                     </Button>
                     {(file || isPreview) && (
                       <Button
                         onClick={handleCancel}
-                        variant="destructive"
-                        className="w-full text-xs"
+                        variant="ghost"
+                        className="h-9 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
                       >
-                        Cancelar
+                        <X className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
@@ -390,73 +397,52 @@ export default function MatriculaPage() {
               </Card>
             </>
           ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="sm:text-md text-xs font-semibold">
-                  {editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}
+            <Card className="overflow-hidden border shadow-xs">
+              <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                  {editingId ? 'Editar Matrícula' : 'Matrícula Manual'}
                 </CardTitle>
+                <CardDescription className="text-[11px] mt-0.5">
+                  Selecciona el grupo y los estudiantes.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-5">
                 <div className="space-y-2">
-                  <Label>Asignatura *</Label>
+                  <Label className="text-xs font-medium">Grupo (Asignatura) *</Label>
                   {isLoadingSubjects ? (
-                    <div className="h-10 w-full animate-pulse bg-muted rounded-md" />
+                    <div className="h-9 w-full animate-pulse bg-muted rounded-md" />
                   ) : (
                     <Select
                       value={manualForm.subjectId}
                       onValueChange={val => setManualForm({ ...manualForm, subjectId: val })}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una asignatura" />
+                      <SelectTrigger className="h-9 text-xs">
+                        <SelectValue placeholder="Selecciona un grupo..." />
                       </SelectTrigger>
                       <SelectContent>
                         {subjects.map(sub => (
-                          <SelectItem key={sub.id} value={sub.id}>
-                            {sub.code} - {sub.name}
+                          <SelectItem key={sub.id} value={sub.id} className="text-xs">
+                            Gr. {sub.group || 'A'} - {sub.code} ({sub.name})
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
                 </div>
+
                 <div className="space-y-2">
-                  <Label>Documento *</Label>
-                  <Input
-                    value={manualForm.documento}
-                    onChange={e => setManualForm({ ...manualForm, documento: e.target.value })}
-                    placeholder="Número de documento"
+                  <Label className="text-xs font-medium">Estudiantes *</Label>
+                  <MultiStudentCombobox
+                    selectedStudents={manualForm.selectedStudents}
+                    onStudentsChange={students => setManualForm({ ...manualForm, selectedStudents: students })}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Nombre *</Label>
-                  <Input
-                    value={manualForm.nombre}
-                    onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })}
-                    placeholder="Nombre del estudiante"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  {editingId ? (
-                    <>
-                      <Button onClick={handleUpdateItem} className="flex-1">
-                        Actualizar
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setEditingId(null);
-                          handleCancel();
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                    </>
-                  ) : (
-                    <Button onClick={handleAddManual} className="w-full">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Agregar
-                    </Button>
-                  )}
+
+                <div className="pt-2">
+                  <Button onClick={handleAddManual} className="w-full h-9 text-xs">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Agregar a la Lista
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -464,49 +450,96 @@ export default function MatriculaPage() {
         </div>
 
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="sm:text-md text-xs font-semibold">
-                Estudiantes ({previewData.length})
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                Lista de estudiantes para matricular.
-              </CardDescription>
+          <Card className="overflow-hidden border shadow-xs">
+            <CardHeader className="border-b px-5 py-4 bg-muted/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                    Estudiantes para Matricular ({previewData.length})
+                  </CardTitle>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+
+            <CardContent className="p-0">
               {isLoading && !isPreview && !finalResults ? (
-                <div className="flex items-center justify-center h-64">
-                  <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+                <div className="flex flex-col items-center justify-center h-64 gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-xs text-muted-foreground animate-pulse">Procesando...</p>
                 </div>
               ) : finalResults ? (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
-                  <CheckCircle className="h-16 w-16 text-primary" />
+                <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center p-6">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <CheckCircle className="h-8 w-8 text-primary" />
+                  </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-md text-xs tracking-card font-semibold">
-                      Matrícula completada
+                    <h3 className="sm:text-xl text-lg tracking-tight font-semibold">
+                      ¡Matrícula Exitosa!
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {finalResults.enrolled} matriculados, {finalResults.existing} ya existían
+                      {finalResults.enrolled} estudiantes matriculados correctamente.
                     </p>
                   </div>
-                  <Button onClick={handleNewUpload} className="mt-4">
-                    Matricular más estudiantes
+                  <Button onClick={handleNewUpload} variant="outline" className="mt-4 h-9 text-xs">
+                    Realizar nueva matrícula
                   </Button>
                 </div>
               ) : previewData.length > 0 ? (
-                <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-                  {previewData.map(item => (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-sm">
-                              {item.documentoEstudiante} - {item.nombreEstudiante}
-                            </h4>
-                            <Badge variant="secondary" className="text-[10px] h-5">
+                <div className="relative overflow-x-auto overflow-y-auto max-h-[600px]">
+                  <Table>
+                    <TableHeader className="bg-muted/5 sticky top-0 z-10">
+                      <TableRow className="hover:bg-transparent border-b">
+                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                          Estudiante
+                        </TableHead>
+                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                          Asignatura / Grupo
+                        </TableHead>
+                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                          Estado
+                        </TableHead>
+                        <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-right">
+                          Acciones
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {previewData.map((item) => (
+                        <TableRow
+                          key={item.id}
+                          className="hover:bg-muted/20 transition-colors border-b"
+                        >
+                          <TableCell className="px-4 py-3">
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-xs text-foreground">
+                                {item.nombreEstudiante}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground font-mono">
+                                {item.documentoEstudiante}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-4 py-3">
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-xs font-medium text-foreground">
+                                {item.codigoAsignatura}
+                              </span>
+                              <Badge variant="secondary" className="w-fit text-[9px] px-1 py-0 h-4 bg-muted/50">
+                                Grupo {item.grupo}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-4 py-3">
+                            <Badge
+                              variant={
+                                item.status === 'error'
+                                  ? 'destructive'
+                                  : item.status === 'existing'
+                                    ? 'outline'
+                                    : 'secondary'
+                              }
+                              className="text-[9px] px-1.5 py-0 rounded h-5 truncate max-w-[100px]"
+                            >
                               {item.status === 'manual'
                                 ? 'Manual'
                                 : item.status === 'existing'
@@ -515,73 +548,58 @@ export default function MatriculaPage() {
                                     ? 'Error'
                                     : 'CSV'}
                             </Badge>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {item.codigoAsignatura} - Grupo {item.grupo}
-                          </div>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleEditItem(item.id)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-500"
-                            onClick={() => handleDeleteItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                          </TableCell>
+                          <TableCell className="px-4 py-3 text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              {/* Edit disabled for multi-select pattern as per existing logic */}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                                onClick={() => handleDeleteItem(item.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center min-h-[300px] py-12 text-center">
-                  <Users className="h-12 w-12 text-muted-foreground/30 mb-4" />
-                  <p className="text-xs text-muted-foreground max-w-xs">
-                    Agrega estudiantes para matricular.
+                <div className="flex flex-col items-center justify-center min-h-[300px] py-12 text-center p-6">
+                  <div className="bg-muted/30 p-4 rounded-full mb-4">
+                    <Users className="h-10 w-10 text-muted-foreground/40" />
+                  </div>
+                  <h4 className="text-sm font-semibold text-foreground mb-1">Sin estudiantes seleccionados</h4>
+                  <p className="text-xs text-muted-foreground max-w-[220px] mx-auto">
+                    {mode === 'csv'
+                      ? 'Sube un archivo CSV de matrículas o utiliza el formulario manual para ver los datos aquí.'
+                      : 'Busca y agrega estudiantes usando el formulario lateral.'}
                   </p>
                 </div>
               )}
 
               {previewData.length > 0 && (
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex gap-2">
-                    {successCount > 0 && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-emerald-500/10 text-emerald-600"
-                      >
-                        {successCount} nuevos
-                      </Badge>
-                    )}
-                    {existingCount > 0 && (
-                      <Badge variant="outline" className="text-xs text-amber-600">
-                        {existingCount} existentes
-                      </Badge>
-                    )}
-                    {errorCount > 0 && (
-                      <Badge variant="destructive" className="text-xs">
-                        {errorCount} errores
-                      </Badge>
-                    )}
+                <div className="border-t px-5 py-4 bg-muted/5 flex items-center justify-between gap-4">
+                  <div className="flex flex-col whitespace-nowrap">
+                    <span className="text-xs font-semibold text-foreground">Matrículas pendientes</span>
+                    <div className="flex gap-2 mt-0.5">
+                      <span className="text-[10px] text-emerald-600 font-medium">{successCount} listos</span>
+                      {existingCount > 0 && <span className="text-[10px] text-amber-600 font-medium">{existingCount} existentes</span>}
+                      {errorCount > 0 && <span className="text-[10px] text-red-600 font-medium">{errorCount} errores</span>}
+                    </div>
                   </div>
                   <Button
                     onClick={handleConfirmUpload}
                     disabled={isConfirming || successCount === 0}
-                    className="px-8"
+                    className="h-9 px-6 text-xs font-semibold min-w-[150px]"
                   >
                     {isConfirming ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Procesando...
+                        <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                        Matriculando...
                       </>
                     ) : (
                       'Confirmar Matrícula'
@@ -593,6 +611,6 @@ export default function MatriculaPage() {
           </Card>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

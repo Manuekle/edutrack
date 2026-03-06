@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 import { ClassesTable } from '@/components/classes/classes-table';
 import { EventsTable } from '@/components/events/events-table';
@@ -77,12 +77,12 @@ export default function SubjectDetailPage() {
     if (!subject) return;
 
     if (hasScheduledClasses) {
-      toast.error('No se puede generar el reporte porque hay clases programadas pendientes');
+      sileo.error({ title: 'No se puede generar el reporte porque hay clases programadas pendientes' });
       return;
     }
 
     if (reportExistsForCurrentPeriod) {
-      toast.error('Este reporte ya ha sido generado para el período actual');
+      sileo.error({ title: 'Este reporte ya ha sido generado para el período actual' });
       setIsReportModalOpen(false);
       return;
     }

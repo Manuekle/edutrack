@@ -4,7 +4,7 @@ import { getCurrentPeriod } from '@/lib/class-utils';
 import type { LocalClassWithStatus } from '@/types/class';
 import type { Student, Subject } from '@/types/subject';
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 export function useSubjectData(subjectId: string) {
   const [subject, setSubject] = useState<Subject | null>(null);
@@ -77,7 +77,7 @@ export function useSubjectData(subjectId: string) {
         name: 'Asignatura',
         code: 'N/A',
       });
-      toast.error(errorMessage);
+      sileo.error({ title: errorMessage });
     } finally {
       setIsLoadingSubject(false);
     }
@@ -166,22 +166,15 @@ export function useSubjectData(subjectId: string) {
   useEffect(() => {
     if (!subjectId) return;
 
-    const loadingToast = toast.loading('Cargando datos de la asignatura...');
-
     const loadData = async () => {
       try {
         await Promise.all([fetchSubject(), fetchClasses(), fetchEnrolledStudents()]);
-        toast.dismiss(loadingToast);
       } catch (error) {
-        toast.dismiss(loadingToast);
+        // Errors are handled individually in each fetch function
       }
     };
 
     loadData();
-
-    return () => {
-      toast.dismiss(loadingToast);
-    };
   }, [subjectId, fetchSubject, fetchClasses, fetchEnrolledStudents]);
 
   return {

@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Camera, CameraOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 
 interface QRScannerProps {
   onScan: (qrToken: string) => void;
@@ -114,7 +113,7 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
         <CardDescription>Apunta la cámara hacia el código QR de asistencia</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {error && toast.error(error)}
+        {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
         {hasCamera ? (
           <>

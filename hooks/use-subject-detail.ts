@@ -2,11 +2,11 @@
  * Hook personalizado para gestionar detalles de asignatura con React Query
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCurrentPeriod } from '@/lib/class-utils';
 import type { LocalClassWithStatus } from '@/types/class';
-import type { Student, Subject } from '@/types/subject';
-import { toast } from 'sonner';
+import type { Student } from '@/types/subject';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { sileo } from 'sileo';
 
 interface SubjectDetail {
   id: string;
@@ -207,11 +207,11 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       generateReportMutation.mutate(subjectId, {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['report-exists', subjectId] });
-          toast.success('El reporte se está generando. Recibirás un correo cuando esté listo.');
+          sileo.success({ title: 'El reporte se está generando. Recibirás un correo cuando esté listo.' });
           options?.onSuccess?.();
         },
         onError: error => {
-          toast.error(error instanceof Error ? error.message : 'Error al generar el reporte');
+          sileo.error({ title: error instanceof Error ? error.message : 'Error al generar el reporte' });
         },
       });
     },
@@ -223,15 +223,11 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       unenrollMutation.mutate(data, {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['subject-students', subjectId] });
-          toast.success('Solicitud de desmatriculación enviada correctamente');
+          sileo.success({ title: 'Solicitud de desmatriculación enviada correctamente' });
           options?.onSuccess?.();
         },
         onError: error => {
-          toast.error(
-            error instanceof Error
-              ? error.message
-              : 'Error al enviar la solicitud de desmatriculación'
-          );
+          sileo.error({ title: error instanceof Error ? error.message : 'Error al enviar la solicitud de desmatriculación' });
         },
       });
     },

@@ -90,7 +90,7 @@ const getRiskBadge = (percentage: number) => {
     return (
       <Badge
         variant="destructive"
-        className="ml-2 text-xs h-5 px-1.5 uppercase font-semibold animate-pulse"
+        className="ml-2 text-xs h-5 px-1.5 font-semibold animate-pulse"
       >
         RIESGO DE PÉRDIDA
       </Badge>

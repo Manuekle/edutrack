@@ -250,22 +250,22 @@ export default function GestionAsignaturasPage() {
                       />
                     </div>
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider">
                     Asignatura
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider hidden sm:table-cell">
                     Código & Grupo
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider hidden md:table-cell">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider hidden md:table-cell">
                     Docente(s)
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground tracking-wider hidden lg:table-cell">
                     Programa
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center uppercase tracking-wider hidden sm:table-cell">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center tracking-wider hidden sm:table-cell">
                     Semestre / Créditos
                   </TableHead>
-                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center uppercase tracking-wider">
+                  <TableHead className="text-[11px] font-medium px-4 py-3 text-muted-foreground text-center tracking-wider">
                     Estudiantes
                   </TableHead>
                 </TableRow>

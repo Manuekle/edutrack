@@ -4,7 +4,7 @@
 
 import type { User } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface UsersResponse {
   data: User[];
@@ -78,12 +78,10 @@ export function useUsers(options: UseUsersOptions = {}) {
     onSuccess: data => {
       // Invalidar la query para refrescar los datos
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success(
-        `Usuario ${data.name} ${data.isActive ? 'activado' : 'desactivado'} correctamente.`
-      );
+      sileo.success({ title: `Usuario ${data.name} ${data.isActive ? 'activado' : 'desactivado'} correctamente.` });
     },
     onError: error => {
-      toast.error(error instanceof Error ? error.message : 'Error al actualizar el usuario');
+      sileo.error({ title: error instanceof Error ? error.message : 'Error al actualizar el usuario' });
     },
   });
 

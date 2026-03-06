@@ -112,7 +112,7 @@ const AdminDashboardComponent = () => {
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
           <AlertCircle className="h-12 w-12 text-white mb-4" />
-          <h2 className="sm:text-2xl text-xs text-white text-center font-semibold tracking-card pb-2">
+          <h2 className="sm:text-sm text-xs text-white text-center font-semibold tracking-card pb-2">
             Error al cargar datos
           </h2>
           <p className="text-white text-xs text-center mb-6">
@@ -171,7 +171,7 @@ const AdminDashboardComponent = () => {
               <div className="text-muted-foreground">{getCardIcon(index)}</div>
             </CardHeader>
             <CardContent>
-              <div className="sm:text-2xl text-xs font-semibold">{card.value}</div>
+              <div className="sm:text-sm text-xs font-semibold">{card.value}</div>
               <p className="text-xs text-muted-foreground mt-1">{card.subtitle}</p>
               <div className="mt-2 flex items-center text-xs text-muted-foreground">
                 <span className={card.trend.includes('+') ? 'text-green-500' : 'text-red-500'}>
@@ -189,7 +189,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
                 Distribución de Usuarios
               </CardTitle>
             </div>
@@ -248,7 +248,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
                 Clases por Mes
               </CardTitle>
             </div>
@@ -289,7 +289,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
                 Estado de Asistencias
               </CardTitle>
             </div>
@@ -328,7 +328,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
                 Ocupación de Salones
               </CardTitle>
             </div>
@@ -373,7 +373,7 @@ const AdminDashboardComponent = () => {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
                 Materias con Más Estudiantes
               </CardTitle>
             </div>

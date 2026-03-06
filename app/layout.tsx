@@ -1,10 +1,10 @@
-import { Toaster } from '@/components/ui/sonner';
+import { PWAInstaller } from '@/components/pwa-installer';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
+import { Toaster } from 'sileo';
 import './globals.css';
 import Providers from './providers';
-import { PWAInstaller } from '@/components/pwa-installer';
 
 const siteUrl = 'https://sira-fup.vercel.app';
 
@@ -136,7 +136,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {children}
           <PWAInstaller />
-          <Toaster position="top-center" duration={5000} />
+          <Toaster
+            position="top-right"
+            theme="dark"
+            options={{
+              fill: "#171717",
+              roundness: 16,
+              styles: {
+                title: "text-white font-medium!",
+                description: "text-white/70!",
+                badge: "bg-white/10!",
+                button: "bg-white/10! hover:bg-white/20! transition-colors",
+              }
+            }}
+          />
         </Providers>
       </body>
     </html>

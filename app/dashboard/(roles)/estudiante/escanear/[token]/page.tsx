@@ -13,7 +13,7 @@ import { CheckCircle, Info, Loader2, RotateCw, XCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 // Tipos para la respuesta de la API y el estado
 type ApiData = {
@@ -215,7 +215,7 @@ export default function ScanPage() {
 
     if (authStatus === 'authenticated') {
       if (session?.user?.role !== 'ESTUDIANTE') {
-        toast.error('Acceso denegado. Debes ser un estudiante.');
+        sileo.error({ title: 'Acceso denegado. Debes ser un estudiante.' });
         router.push('/dashboard');
         return;
       }

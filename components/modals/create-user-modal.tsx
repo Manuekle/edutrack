@@ -32,7 +32,7 @@ import {
 import type { User } from '@/types';
 import { Role } from '@prisma/client';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -113,15 +113,15 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
         throw new Error('La respuesta del servidor no contiene datos válidos');
       }
 
-      toast.success('Usuario creado con éxito.');
+      sileo.success({ title: 'Usuario creado con éxito.' });
       onUserCreated(createdUser);
       onClose();
       form.reset();
     } catch (err) {
       if (err instanceof Error) {
-        toast.error(err.message);
+        sileo.error({ title: err.message });
       } else {
-        toast.error('Ocurrió un error inesperado.');
+        sileo.error({ title: 'Ocurrió un error inesperado.' });
       }
     } finally {
       setIsCreating(false);

@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { sileo } from 'sileo';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 
 interface Teacher {
   id: string;
@@ -116,7 +116,7 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
         setTeachers(data.data || data);
       }
     } catch (error) {
-      toast.error('Error al cargar los docentes');
+      sileo.error({ title: 'Error al cargar los docentes' });
     } finally {
       setLoadingTeachers(false);
     }
@@ -150,15 +150,15 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
         throw new Error('La respuesta del servidor no contiene datos válidos');
       }
 
-      toast.success('Asignatura creada con éxito.');
+      sileo.success({ title: 'Asignatura creada con éxito.' });
       onSubjectCreated(createdSubject);
       onClose();
       form.reset();
     } catch (err) {
       if (err instanceof Error) {
-        toast.error(err.message);
+        sileo.error({ title: err.message });
       } else {
-        toast.error('Ocurrió un error inesperado.');
+        sileo.error({ title: 'Ocurrió un error inesperado.' });
       }
     } finally {
       setIsCreating(false);

@@ -31,7 +31,7 @@ import {
 import type { Role, User } from '@/types';
 import { ROLES } from '@/types';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface EditUserRoleModalProps {
   user: User | null;
@@ -82,10 +82,10 @@ export function EditUserRoleModal({ user, isOpen, onClose, onUserUpdate }: EditU
 
       const updatedUser = await response.json();
       onUserUpdate(updatedUser);
-      toast.success(`El rol de ${updatedUser.name} ha sido actualizado a ${updatedUser.role}.`);
+      sileo.success({ title: `El rol de ${updatedUser.name} ha sido actualizado a ${updatedUser.role}.` });
       onClose();
     } catch (error) {
-      toast.error('Error al actualizar el rol del usuario.');
+      sileo.error({ title: 'Error al actualizar el rol del usuario.' });
     } finally {
       setIsSaving(false);
     }

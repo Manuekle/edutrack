@@ -138,6 +138,7 @@
     "react-signature-canvas": "^1.1.0-alpha.2",
     "recharts": "^3.6.0",
     "roboto-font": "^0.1.0",
+    "sileo": "^0.1.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",

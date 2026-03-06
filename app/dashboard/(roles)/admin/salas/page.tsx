@@ -87,7 +87,7 @@ import {
   Users,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 // --- CUSTOM CALENDAR COMPONENTS ---
 
@@ -114,7 +114,7 @@ const MonthView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =>
       {['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'].map(day => (
         <div
           key={day}
-          className="py-4 text-center text-xs font-semibold uppercase tracking-card text-muted-foreground border-r border-b bg-muted/5"
+          className="py-4 text-center text-xs font-semibold tracking-card text-muted-foreground border-r border-b bg-muted/5"
         >
           {day}
         </div>
@@ -149,7 +149,7 @@ const MonthView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =>
                 </div>
               ))}
             {events.filter(e => isSameDay(e.start, day)).length > 3 && (
-              <p className="text-xs font-semibold text-muted-foreground pl-1 mt-1 uppercase tracking-card">
+              <p className="text-xs font-semibold text-muted-foreground pl-1 mt-1 tracking-card">
                 + {events.filter(e => isSameDay(e.start, day)).length - 3} más
               </p>
             )}
@@ -174,7 +174,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
         <div className="p-4 border-r" />
         {weekDays.map(day => (
           <div key={day.toISOString()} className="p-4 text-center border-r last:border-r-0">
-            <p className="text-xs font-semibold uppercase tracking-card text-muted-foreground mb-1">
+            <p className="text-xs font-semibold tracking-card text-muted-foreground mb-1">
               {format(day, 'EEE', { locale: es })}
             </p>
             <p
@@ -209,7 +209,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                         key={event.id || `${day.toISOString()}-${hour.toISOString()}-${idx}`}
                         className="absolute inset-x-1 top-1 p-2 rounded-xl bg-primary/10 text-primary border border-primary/30 z-10 shadow-lg"
                       >
-                        <p className="text-xs font-semibold uppercase truncate leading-none mb-1">
+                        <p className="text-xs font-semibold truncate leading-none mb-1">
                           {event.room}
                         </p>
                         <p className="text-xs font-semibold opacity-70 truncate">{event.teacher}</p>
@@ -234,7 +234,7 @@ const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
   return (
     <div className="border rounded-3xl overflow-hidden bg-background shadow-xl shadow-black/5">
       <div className="p-10 bg-muted/5 border-b text-center">
-        <p className="text-xs font-semibold uppercase tracking-card text-primary/60 mb-2">
+        <p className="text-xs font-semibold tracking-card text-primary/60 mb-2">
           {format(date, 'EEEE', { locale: es })}
         </p>
         <h2 className="text-4xl font-semibold tracking-card">
@@ -256,7 +256,7 @@ const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
                     className="absolute inset-x-4 inset-y-2 rounded-2xl bg-primary text-primary-foreground p-4 shadow-xl shadow-primary/20 flex flex-col justify-center"
                   >
                     <div className="flex justify-between items-start">
-                      <p className="text-xs font-semibold uppercase tracking-card">{event.room}</p>
+                      <p className="text-xs font-semibold tracking-card">{event.room}</p>
                       <Clock className="h-4 w-4 opacity-50" />
                     </div>
                     <p className="text-xs font-semibold mt-1">{event.teacher}</p>
@@ -290,7 +290,7 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
             <div className="absolute left-[-4px] top-2 h-2 w-2 rounded-full bg-primary ring-4 ring-primary/10" />
 
             <div className="w-40 shrink-0">
-              <p className="text-xs font-semibold uppercase tracking-card text-primary mb-1">
+              <p className="text-xs font-semibold tracking-card text-primary mb-1">
                 {format(event.start, 'hh:mm a')}
               </p>
               <p className="text-xs font-semibold text-muted-foreground uppercase">
@@ -309,7 +309,7 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
                     </span>
                   </div>
                 </div>
-                <Badge className="rounded-full px-3 py-1 font-semibold text-xs uppercase tracking-card bg-primary/5 text-primary border-none shadow-none hover:bg-primary/10 hover:text-primary">
+                <Badge className="rounded-full px-3 py-1 font-semibold text-xs tracking-card bg-primary/5 text-primary border-none shadow-none hover:bg-primary/10 hover:text-primary">
                   {format(event.start, 'hh:mm a')} - {format(event.end, 'hh:mm a')}
                 </Badge>
               </div>
@@ -455,7 +455,7 @@ export default function AdminSalasPage() {
       const data = await response.json();
       setRooms(response.ok ? data : []);
     } catch (error) {
-      toast.error('Error al cargar salas');
+      sileo.error({ title: 'Error al cargar salas' });
     }
   };
 
@@ -478,7 +478,7 @@ export default function AdminSalasPage() {
       }));
       setCalendarEvents(formatted);
     } catch (error) {
-      toast.error('Error al cargar solicitudes');
+      sileo.error({ title: 'Error al cargar solicitudes' });
     }
   };
 
@@ -500,16 +500,16 @@ export default function AdminSalasPage() {
       });
 
       if (response.ok) {
-        toast.success(`Reserva ${status.toLowerCase()} exitosamente`);
+        sileo.success({ title: `Reserva ${status.toLowerCase()} exitosamente` });
         setIsReviewDialogOpen(false);
         setReviewComment('');
         setSelectedBooking(null);
         fetchAllBookings();
       } else {
-        toast.error('Error al actualizar estado');
+        sileo.error({ title: 'Error al actualizar estado' });
       }
     } catch (error) {
-      toast.error('Error de red');
+      sileo.error({ title: 'Error de red' });
     }
   };
 
@@ -533,16 +533,16 @@ export default function AdminSalasPage() {
       });
 
       if (response.ok) {
-        toast.success('Sala eliminada exitosamente');
+        sileo.success({ title: 'Sala eliminada exitosamente' });
         setIsDeleteDialogOpen(false);
         setRoomToDelete(null);
         fetchRooms();
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Error al eliminar sala');
+        sileo.error({ title: error.error || 'Error al eliminar sala' });
       }
     } catch (error) {
-      toast.error('Error de red');
+      sileo.error({ title: 'Error de red' });
     } finally {
       setIsDeleting(false);
     }
@@ -561,17 +561,17 @@ export default function AdminSalasPage() {
       });
 
       if (response.ok) {
-        toast.success(editingRoomId ? 'Sala actualizada exitosamente' : 'Sala creada exitosamente');
+        sileo.success({ title: editingRoomId ? 'Sala actualizada exitosamente' : 'Sala creada exitosamente' });
         setIsDialogOpen(false);
         setEditingRoomId(null);
         setFormData({ name: '', type: 'SALON', capacity: '', description: '' });
         fetchRooms();
       } else {
         const error = await response.json();
-        toast.error(error.error || 'Error al procesar solicitud');
+        sileo.error({ title: error.error || 'Error al procesar solicitud' });
       }
     } catch (error) {
-      toast.error('Error de red');
+      sileo.error({ title: 'Error de red' });
     }
   };
 

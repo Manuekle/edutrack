@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Link, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 const justifyAbsenceSchema = z.object({
   reason: z.string().min(1, 'Por favor ingresa una justificación'),
@@ -146,12 +146,12 @@ function JustificarAusenciaContent() {
         throw new Error(responseData.message || 'Error al procesar la justificación');
       }
 
-      toast.success('Tu justificación ha sido enviada correctamente.');
+      sileo.success({ title: 'Tu justificación ha sido enviada correctamente.' });
       form.reset();
       setIsJustificationSubmitted(true);
       handleSuccessfulSubmission();
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Ocurrió un error al enviar la justificación');
+      sileo.error({ title: error instanceof Error ? error.message : 'Ocurrió un error al enviar la justificación' });
     } finally {
       setIsSubmitting(false);
     }

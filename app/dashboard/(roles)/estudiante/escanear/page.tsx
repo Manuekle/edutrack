@@ -7,7 +7,7 @@ import { CheckCircle2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 const QRScanner = dynamic(() => import('@/components/qr-scanner'), {
   loading: () => (
@@ -33,7 +33,7 @@ export default function ScannerPage() {
     setIsProcessing(true);
     setSuccess(false);
 
-    const loadingToast = toast.loading('Procesando código QR...');
+    const loadingId = sileo.show({ title: 'Procesando código QR...', type: 'loading' });
 
     try {
       const response = await fetch('/api/asistencia/scan', {
@@ -56,20 +56,23 @@ export default function ScannerPage() {
             timeStyle: 'short',
           }),
         });
-        toast.success('¡Asistencia registrada exitosamente!', { id: loadingToast });
+        sileo.success({ title: '¡Asistencia registrada exitosamente!' });
+        sileo.dismiss(loadingId);
       } else {
-        toast.error(data.message || 'Código QR inválido', { id: loadingToast });
+        sileo.error({ title: data.message || 'Código QR inválido' });
+        sileo.dismiss(loadingId);
       }
     } catch (err) {
       const errorMsg = 'Error al procesar el código QR. Intenta nuevamente.';
-      toast.error(errorMsg, { id: loadingToast });
+      sileo.error({ title: errorMsg });
+      sileo.dismiss(loadingId);
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleError = (errorMessage: string) => {
-    toast.error(errorMessage);
+    sileo.error({ title: errorMessage });
   };
 
   const handleReset = () => {

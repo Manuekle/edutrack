@@ -35,7 +35,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Edit, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 import { EventForm } from './event-form';
 import { EventTypeBadge } from './event-type-badge';
 
@@ -61,7 +61,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
       const data = await response.json();
       setEvents(data.data);
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      sileo.error({ title: getErrorMessage(error) });
     } finally {
       setIsLoadingEvents(false);
     }
@@ -79,7 +79,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
     date: Date;
     type: EventType;
   }) => {
-    const toastId = toast.loading('Creando evento...');
+    const loadingId = sileo.show({ title: 'Creando evento...', type: 'loading' });
     try {
       const response = await fetch('/api/docente/eventos', {
         method: 'POST',
@@ -104,10 +104,12 @@ export function EventsTable({ subjectId }: EventsTableProps) {
       }
 
       setEvents(prevEvents => [...prevEvents, createdEvent]);
-      toast.success('Evento creado con éxito', { id: toastId });
+      sileo.success({ title: 'Evento creado con éxito' });
+      sileo.dismiss(loadingId);
       setIsCreateEventDialogOpen(false);
     } catch (error) {
-      toast.error(getErrorMessage(error), { id: toastId });
+      sileo.error({ title: getErrorMessage(error) });
+      sileo.dismiss(loadingId);
     }
   };
 
@@ -123,11 +125,11 @@ export function EventsTable({ subjectId }: EventsTableProps) {
     type: EventType;
   }) => {
     if (!currentEvent) {
-      toast.error('No hay evento seleccionado para editar');
+      sileo.error({ title: 'No hay evento seleccionado para editar' });
       return;
     }
 
-    const toastId = toast.loading('Actualizando evento...');
+    const loadingId2 = sileo.show({ title: 'Actualizando evento...', type: 'loading' });
     try {
       const response = await fetch(`/api/docente/eventos/${currentEvent.id}`, {
         method: 'PUT',
@@ -153,17 +155,19 @@ export function EventsTable({ subjectId }: EventsTableProps) {
       setEvents(prevEvents =>
         prevEvents.map(event => (event.id === currentEvent.id ? updatedEvent : event))
       );
-      toast.success('Evento actualizado con éxito', { id: toastId });
+      sileo.success({ title: 'Evento actualizado con éxito' });
+      sileo.dismiss(loadingId2);
       setIsEditEventDialogOpen(false);
       setCurrentEvent(null);
     } catch (error) {
-      toast.error(getErrorMessage(error), { id: toastId });
+      sileo.error({ title: getErrorMessage(error) });
+      sileo.dismiss(loadingId2);
     }
   };
 
   const handleDeleteEvent = async (eventId: string) => {
     if (!eventId) return;
-    const toastId = toast.loading('Eliminando evento...');
+    const loadingId3 = sileo.show({ title: 'Eliminando evento...', type: 'loading' });
     try {
       const response = await fetch(`/api/docente/eventos/${eventId}`, {
         method: 'DELETE',
@@ -173,10 +177,12 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         throw new Error(errorData.message || 'Error al eliminar el evento');
       }
       setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
-      toast.success('Evento eliminado con éxito', { id: toastId });
+      sileo.success({ title: 'Evento eliminado con éxito' });
+      sileo.dismiss(loadingId3);
       setEventToDelete(null);
     } catch (error) {
-      toast.error(getErrorMessage(error), { id: toastId });
+      sileo.error({ title: getErrorMessage(error) });
+      sileo.dismiss(loadingId3);
       setEventToDelete(null);
     }
   };

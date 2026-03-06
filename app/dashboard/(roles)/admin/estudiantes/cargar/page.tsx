@@ -6,9 +6,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Download, Edit2, Loader2, Plus, Trash2, UserCheck } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  CheckCircle,
+  Download,
+  Edit2,
+  FileSpreadsheet,
+  Loader2,
+  Plus,
+  Trash2,
+  UserCheck,
+  X
+} from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface PreviewItem {
   id: string;
@@ -43,19 +61,16 @@ export default function CargarEstudiantesPage() {
   const handleFileSelect = (selectedFile: File | null) => {
     setFile(selectedFile);
     if (!selectedFile) {
-      setIsPreview(false);
-      setPreviewData([]);
-      setFinalResults(null);
-    } else {
-      setFinalResults(null);
-      setIsPreview(false);
-      setPreviewData([]);
+      handleCancel();
     }
   };
 
   const handlePreview = async () => {
     if (!file) {
-      toast.error('Por favor, selecciona un archivo .csv para continuar.');
+      sileo.error({
+        title: 'Archivo requerido',
+        description: 'Por favor, selecciona un archivo .csv para continuar.',
+      });
       return;
     }
     setIsLoading(true);
@@ -78,13 +93,22 @@ export default function CargarEstudiantesPage() {
         }));
         setPreviewData(dataWithIds);
         setIsPreview(true);
-        toast.success('Vista previa generada con éxito');
+        sileo.success({
+          title: 'Vista previa',
+          description: 'Vista previa generada con éxito',
+        });
       } else {
-        toast.error(result.error || 'Error al generar la vista previa');
+        sileo.error({
+          title: 'Error',
+          description: result.error || 'Error al generar la vista previa',
+        });
         handleCancel();
       }
     } catch {
-      toast.error('Ocurrió un error inesperado al procesar el archivo.');
+      sileo.error({
+        title: 'Error inesperado',
+        description: 'Ocurrió un error inesperado al procesar el archivo.',
+      });
       handleCancel();
     } finally {
       setIsLoading(false);
@@ -93,7 +117,10 @@ export default function CargarEstudiantesPage() {
 
   const handleAddManual = () => {
     if (!manualForm.documento || !manualForm.nombre) {
-      toast.error('El documento y nombre son obligatorios.');
+      sileo.error({
+        title: 'Campos requeridos',
+        description: 'El documento y nombre son obligatorios.',
+      });
       return;
     }
 
@@ -111,7 +138,10 @@ export default function CargarEstudiantesPage() {
     setPreviewData([...previewData, newItem]);
     setIsPreview(true);
     setManualForm({ documento: '', nombre: '', correo: '', telefono: '', codigo: '' });
-    toast.success('Estudiante agregado');
+    sileo.success({
+      title: 'Estudiante agregado',
+      description: 'El estudiante ha sido añadido a la lista.',
+    });
   };
 
   const handleEditItem = (id: string) => {
@@ -125,6 +155,7 @@ export default function CargarEstudiantesPage() {
         codigo: item.code || '',
       });
       setEditingId(id);
+      setMode('manual');
     }
   };
 
@@ -148,7 +179,10 @@ export default function CargarEstudiantesPage() {
     );
     setEditingId(null);
     setManualForm({ documento: '', nombre: '', correo: '', telefono: '', codigo: '' });
-    toast.success('Estudiante actualizado');
+    sileo.success({
+      title: 'Actualizado',
+      description: 'Estudiante actualizado correctamente.',
+    });
   };
 
   const handleDeleteItem = (id: string) => {
@@ -158,7 +192,10 @@ export default function CargarEstudiantesPage() {
   const handleConfirmUpload = async () => {
     const successCount = previewData.filter(item => item.status !== 'error').length;
     if (successCount === 0) {
-      toast.error('No hay estudiantes válidos para crear.');
+      sileo.error({
+        title: 'Sin datos válidos',
+        description: 'No hay estudiantes válidos para crear.',
+      });
       return;
     }
 
@@ -176,12 +213,18 @@ export default function CargarEstudiantesPage() {
         throw new Error(result.error || 'Error al confirmar la carga.');
       }
 
-      toast.success('Estudiantes creados exitosamente.');
+      sileo.success({
+        title: 'Carga exitosa',
+        description: 'Estudiantes creados exitosamente.',
+      });
       setFinalResults(result.results || []);
       setPreviewData([]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
-      toast.error(errorMessage);
+      sileo.error({
+        title: 'Error',
+        description: errorMessage,
+      });
     } finally {
       setIsConfirming(false);
     }
@@ -197,11 +240,7 @@ export default function CargarEstudiantesPage() {
   };
 
   const handleNewUpload = () => {
-    setFile(null);
-    setIsPreview(false);
-    setPreviewData([]);
-    setFinalResults(null);
-    setEditingId(null);
+    handleCancel();
   };
 
   const successCount = previewData.filter(item => item.status !== 'error').length;
@@ -209,174 +248,224 @@ export default function CargarEstudiantesPage() {
   const errorCount = previewData.filter(item => item.status === 'error').length;
 
   return (
-    <>
-      <div className="pb-4 col-span-1 w-full">
-        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-          Cargar Estudiantes
-        </CardTitle>
-        <CardDescription className="text-xs">
-          Agrega estudiantes de forma manual o masiva.
-        </CardDescription>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+        <CardHeader className="p-0 w-full">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+            Carga de Estudiantes
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Agrega estudiantes de forma manual o masiva al sistema.
+          </CardDescription>
+        </CardHeader>
+        <div className="flex gap-2">
+          <Button
+            variant={mode === 'csv' ? 'default' : 'outline'}
+            onClick={() => {
+              setMode('csv');
+              handleCancel();
+            }}
+            className="text-xs h-9 px-4 font-medium"
+          >
+            <FileSpreadsheet className="mr-2 h-4 w-4" />
+            Carga Masiva (CSV)
+          </Button>
+          <Button
+            variant={mode === 'manual' ? 'default' : 'outline'}
+            onClick={() => setMode('manual')}
+            className="text-xs h-9 px-4 font-medium"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Crear Manual
+          </Button>
+        </div>
       </div>
 
-      {/* Mode Selection */}
-      <div className="flex gap-2 mb-4">
-        <Button
-          variant={mode === 'csv' ? 'default' : 'outline'}
-          onClick={() => {
-            setMode('csv');
-            handleCancel();
-          }}
-          className="text-xs"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Carga Masiva (CSV)
-        </Button>
-        <Button
-          variant={mode === 'manual' ? 'default' : 'outline'}
-          onClick={() => {
-            setMode('manual');
-          }}
-          className="text-xs"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Crear Manual
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Lado izquierdo: Formulario de carga */}
+        <div className="lg:col-span-4 space-y-4">
           {mode === 'csv' ? (
             <>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="sm:text-md text-xs font-semibold">Carga Masiva</CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground">
-                    Sube un archivo CSV con los estudiantes.
+              <Card className="overflow-hidden border shadow-xs">
+                <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                    1. Instrucciones del Formato
+                  </CardTitle>
+                  <CardDescription className="text-[11px] mt-0.5">
+                    Formato requerido para la carga de estudiantes.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <a href="/formatos/plantilla_estudiantes.csv" download>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Download className="mr-2 h-4 w-4" />
-                      Descargar Plantilla
-                    </Button>
-                  </a>
-                  <div className="space-y-2 mt-4">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <UserCheck className="h-4 w-4" />
-                      <span className="font-medium">Columnas:</span>
+                <CardContent className="p-5 space-y-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-foreground">Plantilla base</p>
+                      <a href="/formatos/plantilla_estudiantes.csv" download className="block">
+                        <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                          <Download className="mr-2 h-4 w-4 text-muted-foreground" />
+                          Descargar Formato CSV
+                        </Button>
+                      </a>
                     </div>
-                    <ul className="text-xs text-muted-foreground space-y-1 ml-6 list-disc">
-                      <li>Documento</li>
-                      <li>Nombre</li>
-                      <li>Apellido</li>
-                      <li>Correo</li>
-                      <li>Teléfono</li>
-                      <li>Grupo</li>
-                    </ul>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-foreground">Columnas requeridas</p>
+                      <div className="rounded-md bg-muted/30 p-3">
+                        <ul className="text-[11px] text-muted-foreground space-y-1.5 list-disc list-inside">
+                          <li><span className="font-medium text-foreground">Documento</span> / <span className="font-medium text-foreground">Código</span></li>
+                          <li><span className="font-medium text-foreground">Nombre</span> y <span className="font-medium text-foreground">Apellido</span></li>
+                          <li><span className="font-medium text-foreground">Correo</span> institucional</li>
+                          <li><span className="font-medium text-foreground">Teléfono</span> de contacto</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="sm:text-md text-xs font-semibold">Subir Archivo</CardTitle>
+              <Card className="overflow-hidden border shadow-xs">
+                <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                    2. Subir Archivo
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
-                  <div className="flex gap-2 mt-4 flex-col">
-                    <Button
-                      onClick={handlePreview}
-                      disabled={!file || isLoading || isPreview}
-                      className="w-full text-xs"
-                    >
-                      {isLoading && !isPreview ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : null}
-                      Vista Previa
-                    </Button>
-                    {(file || isPreview) && (
+                <CardContent className="p-5 space-y-4">
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-medium mb-2 block text-foreground">
+                        Seleccionar Archivo .CSV
+                      </Label>
+                      <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
                       <Button
-                        onClick={handleCancel}
-                        variant="destructive"
-                        className="w-full text-xs"
+                        onClick={handlePreview}
+                        disabled={!file || isLoading || isPreview}
+                        className="flex-1 h-9 text-xs"
                       >
-                        Cancelar
+                        {isLoading && !isPreview ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
+                        Generar Vista Previa
                       </Button>
-                    )}
+                      {(file || isPreview) && (
+                        <Button
+                          onClick={handleCancel}
+                          variant="ghost"
+                          className="h-9 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </>
           ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="sm:text-md text-xs font-semibold">
+            <Card className="overflow-hidden border shadow-xs">
+              <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
                   {editingId ? 'Editar Estudiante' : 'Nuevo Estudiante'}
                 </CardTitle>
+                <CardDescription className="text-[11px] mt-0.5">
+                  Ingresa la información básica del estudiante.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Documento *</Label>
-                  <Input
-                    value={manualForm.documento}
-                    onChange={e => setManualForm({ ...manualForm, documento: e.target.value })}
-                    placeholder="Número de documento"
-                  />
+              <CardContent className="p-5 space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="documento" className="text-xs font-medium text-foreground">
+                      Documento *
+                    </Label>
+                    <Input
+                      id="documento"
+                      value={manualForm.documento}
+                      onChange={e => setManualForm({ ...manualForm, documento: e.target.value })}
+                      className="h-9 text-xs"
+                      placeholder="12345678"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="codigo" className="text-xs font-medium text-foreground">
+                      Código
+                    </Label>
+                    <Input
+                      id="codigo"
+                      value={manualForm.codigo}
+                      onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })}
+                      className="h-9 text-xs"
+                      placeholder="701234"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Nombre *</Label>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="nombre" className="text-xs font-medium text-foreground">
+                    Nombre Completo *
+                  </Label>
                   <Input
+                    id="nombre"
                     value={manualForm.nombre}
                     onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })}
-                    placeholder="Nombre completo"
+                    className="h-9 text-xs"
+                    placeholder="Juan Pérez"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Código Estudiantil</Label>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="correo" className="text-xs font-medium text-foreground">
+                    Correo Electrónico
+                  </Label>
                   <Input
-                    value={manualForm.codigo}
-                    onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })}
-                    placeholder="Código institucional"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Correo</Label>
-                  <Input
+                    id="correo"
                     value={manualForm.correo}
                     onChange={e => setManualForm({ ...manualForm, correo: e.target.value })}
-                    placeholder="correo@est.fup.edu.co"
+                    className="h-9 text-xs"
+                    placeholder="ejemplo@est.fup.edu.co"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>Teléfono</Label>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="telefono" className="text-xs font-medium text-foreground">
+                    Teléfono
+                  </Label>
                   <Input
+                    id="telefono"
                     value={manualForm.telefono}
                     onChange={e => setManualForm({ ...manualForm, telefono: e.target.value })}
+                    className="h-9 text-xs"
                     placeholder="3001234567"
                   />
                 </div>
-                <div className="flex gap-2">
+
+                <div className="flex gap-2 pt-3">
                   {editingId ? (
                     <>
-                      <Button onClick={handleUpdateItem} className="flex-1">
+                      <Button onClick={handleUpdateItem} className="flex-1 h-9 text-xs">
                         Actualizar
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => {
                           setEditingId(null);
-                          handleCancel();
+                          setManualForm({
+                            documento: '',
+                            nombre: '',
+                            correo: '',
+                            telefono: '',
+                            codigo: '',
+                          });
                         }}
+                        className="h-9 text-xs"
                       >
                         Cancelar
                       </Button>
                     </>
                   ) : (
-                    <Button onClick={handleAddManual} className="w-full">
+                    <Button onClick={handleAddManual} className="w-full h-9 text-xs">
                       <Plus className="mr-2 h-4 w-4" />
-                      Agregar
+                      Agregar a la lista
                     </Button>
                   )}
                 </div>
@@ -385,137 +474,176 @@ export default function CargarEstudiantesPage() {
           )}
         </div>
 
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="sm:text-md text-xs font-semibold">
-                Estudiantes ({previewData.length})
+        {/* Lado derecho: Tabla de vista previa */}
+        <div className="lg:col-span-8">
+          <Card className="overflow-hidden border shadow-xs">
+            <CardHeader className="border-b px-5 py-4 bg-muted/10 flex flex-row items-center justify-between">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-tight text-foreground">
+                Vista Previa de Estudiantes ({previewData.length})
               </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                Lista de estudiantes para cargar.
-              </CardDescription>
+              <div className="flex gap-2">
+                {successCount > 0 && (
+                  <Badge className="text-[9px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-normal">
+                    {successCount} VÁLIDOS
+                  </Badge>
+                )}
+                {errorCount > 0 && (
+                  <Badge variant="destructive" className="text-[9px] font-normal">
+                    {errorCount} ERRORES
+                  </Badge>
+                )}
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-0">
               {isLoading && !isPreview && !finalResults ? (
-                <div className="flex items-center justify-center h-64">
-                  <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+                <div className="flex flex-col items-center justify-center h-64 gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+                  <p className="text-[10px] font-bold text-muted-foreground/60 tracking-widest">
+                    Procesando Archivo...
+                  </p>
                 </div>
               ) : finalResults ? (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
-                  <UserCheck className="h-16 w-16 text-primary" />
+                <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center p-6">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <CheckCircle className="h-8 w-8 text-primary" />
+                  </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-md text-xs tracking-card font-semibold">
-                      Carga completada
+                    <h3 className="sm:text-xl text-lg tracking-tight font-semibold">
+                      ¡Carga Exitosa!
                     </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Estudiantes procesados:{' '}
-                      {finalResults.filter(r => r.status !== 'error').length} creados
+                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                      Se han procesado correctamente los estudiantes en el sistema.
                     </p>
                   </div>
-                  <Button onClick={handleNewUpload} className="mt-4">
-                    Cargar más estudiantes
+                  <Button onClick={handleNewUpload} variant="outline" className="mt-4 h-9 text-xs">
+                    Realizar nueva carga
                   </Button>
                 </div>
               ) : previewData.length > 0 ? (
-                <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-                  {previewData.map(item => (
-                    <div
-                      key={item.id}
-                      className="p-4 rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-800"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-sm">
-                              {item.document} - {item.name}
-                            </h4>
-                            <Badge variant="secondary" className="text-[10px] h-5">
-                              {item.status === 'manual'
-                                ? 'Manual'
-                                : item.status === 'existing'
-                                  ? 'Ya existe'
-                                  : item.status === 'error'
-                                    ? 'Error'
-                                    : 'CSV'}
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {item.email} {item.code && `(${item.code})`}
-                          </div>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => handleEditItem(item.id)}
+                <>
+                  <div className="overflow-x-auto max-h-[500px]">
+                    <Table>
+                      <TableHeader className="bg-muted/5 sticky top-0 z-10">
+                        <TableRow className="hover:bg-transparent border-b">
+                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                            Estudiante
+                          </TableHead>
+                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest">
+                            Documento / Código
+                          </TableHead>
+                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-center">
+                            Estado
+                          </TableHead>
+                          <TableHead className="text-[10px] font-bold px-4 py-3 text-muted-foreground tracking-widest text-right">
+                            Acciones
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {previewData.map(item => (
+                          <TableRow
+                            key={item.id}
+                            className="group hover:bg-zinc-50 border-zinc-100 dark:border-zinc-800"
                           >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-500"
-                            onClick={() => handleDeleteItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center min-h-[300px] py-12 text-center">
-                  <UserCheck className="h-12 w-12 text-muted-foreground/30 mb-4" />
-                  <p className="text-xs text-muted-foreground max-w-xs">
-                    Agrega estudiantes para cargar.
-                  </p>
-                </div>
-              )}
-
-              {previewData.length > 0 && (
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex gap-2">
-                    {successCount > 0 && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs bg-emerald-500/10 text-emerald-600"
-                      >
-                        {successCount} nuevos
-                      </Badge>
-                    )}
-                    {existingCount > 0 && (
-                      <Badge variant="outline" className="text-xs text-amber-600">
-                        {existingCount} existentes
-                      </Badge>
-                    )}
-                    {errorCount > 0 && (
-                      <Badge variant="destructive" className="text-xs">
-                        {errorCount} errores
-                      </Badge>
-                    )}
+                            <TableCell className="py-2.5">
+                              <div className="flex flex-col">
+                                <span className="text-xs font-semibold">{item.name}</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {item.email}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-2.5">
+                              <div className="flex flex-col">
+                                <span className="text-xs font-medium">{item.document}</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {item.code || '-'}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-center">
+                              <Badge
+                                variant="outline"
+                                className={`text-[9px] px-1.5 py-0 font-normal ${item.status === 'error'
+                                  ? 'bg-red-50 text-red-600 border-red-100'
+                                  : item.status === 'existing'
+                                    ? 'bg-amber-50 text-amber-600 border-amber-100'
+                                    : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                  }`}
+                              >
+                                {item.status === 'manual'
+                                  ? 'Manual'
+                                  : item.status === 'existing'
+                                    ? 'Existente'
+                                    : item.status === 'error'
+                                      ? 'Error'
+                                      : 'Nuevo'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="py-2.5 text-right">
+                              <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-muted-foreground"
+                                  onClick={() => handleEditItem(item.id)}
+                                >
+                                  <Edit2 className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                  onClick={() => handleDeleteItem(item.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                  <Button
-                    onClick={handleConfirmUpload}
-                    disabled={isConfirming || successCount === 0}
-                    className="px-8"
-                  >
-                    {isConfirming ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Procesando...
-                      </>
-                    ) : (
-                      'Confirmar y Crear'
-                    )}
-                  </Button>
+                  <div className="p-4 bg-muted/20 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                    <p className="text-[10px] font-medium text-muted-foreground italic">
+                      * Verifica que los datos coincidan con la base de datos oficial.
+                    </p>
+                    <Button
+                      onClick={handleConfirmUpload}
+                      disabled={isConfirming || successCount === 0}
+                      className="h-9 px-8 text-xs font-bold shadow-sm"
+                    >
+                      {isConfirming ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          PROCESANDO...
+                        </>
+                      ) : (
+                        'CONFIRMAR Y CREAR'
+                      )}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
+                  <div className="h-16 w-16 bg-zinc-50 rounded-full flex items-center justify-center">
+                    <UserCheck className="h-8 w-8 text-muted-foreground/20" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-muted-foreground tracking-wider">
+                      Sin datos para mostrar
+                    </p>
+                    <p className="text-[10px] text-muted-foreground/60 max-w-[200px]">
+                      Agrega estudiantes manualmente o sube un archivo CSV para comenzar.
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
       </div>
-    </>
+    </div>
   );
 }

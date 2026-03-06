@@ -37,7 +37,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 export default function DocenteAgendarPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -62,7 +62,7 @@ export default function DocenteAgendarPage() {
         if (data.length > 0) setSelectedRoom(data[0].id);
       }
     } catch (error) {
-      toast.error('Error al cargar salas');
+      sileo.error({ title: 'Error al cargar salas' });
     } finally {
       setLoading(false);
     }
@@ -90,7 +90,7 @@ export default function DocenteAgendarPage() {
 
   const handleBookingSubmit = async () => {
     if (!bookingForm.reason || !bookingForm.signature) {
-      toast.error('Por favor completa todos los campos y firma la solicitud');
+      sileo.error({ title: 'Por favor completa todos los campos y firma la solicitud' });
       return;
     }
 
@@ -108,16 +108,16 @@ export default function DocenteAgendarPage() {
       });
 
       if (response.ok) {
-        toast.success('Solicitud enviada exitosamente');
+        sileo.success({ title: 'Solicitud enviada exitosamente' });
         setIsBookingModalOpen(false);
         setBookingForm({ ...bookingForm, reason: '', signature: '' });
         if (selectedRoom) fetchRoomBookings(selectedRoom);
       } else {
         const err = await response.json();
-        toast.error(err.error || 'Error al agendar');
+        sileo.error({ title: err.error || 'Error al agendar' });
       }
     } catch (error) {
-      toast.error('Error de red');
+      sileo.error({ title: 'Error de red' });
     }
   };
 
@@ -146,7 +146,7 @@ export default function DocenteAgendarPage() {
         <div className="space-y-4">
           <Card className="border-none shadow-sm h-full">
             <CardHeader className="pb-3 px-6 pt-6">
-              <CardTitle className="text-xs font-semibold uppercase tracking-card text-muted-foreground">
+              <CardTitle className="text-xs font-semibold tracking-card text-muted-foreground">
                 Salas e Instalaciones
               </CardTitle>
               <CardDescription className="text-xs">
@@ -214,13 +214,13 @@ export default function DocenteAgendarPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30">
-                    <TableHead className="text-xs uppercase font-semibold text-muted-foreground/60 px-6">
+                    <TableHead className="text-xs font-semibold text-muted-foreground/60 px-6">
                       Horario
                     </TableHead>
-                    <TableHead className="text-xs uppercase font-semibold text-muted-foreground/60 px-4">
+                    <TableHead className="text-xs font-semibold text-muted-foreground/60 px-4">
                       Motivo / Clase
                     </TableHead>
-                    <TableHead className="text-xs uppercase font-semibold text-muted-foreground/60 px-6 text-right">
+                    <TableHead className="text-xs font-semibold text-muted-foreground/60 px-6 text-right">
                       Estado
                     </TableHead>
                   </TableRow>

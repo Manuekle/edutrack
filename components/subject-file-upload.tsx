@@ -2,7 +2,7 @@
 
 import { FileUpload } from '@/components/ui/file-upload';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface UploadedFile {
   id: string;
@@ -54,7 +54,7 @@ export function SubjectFileUpload({ onFileSelect, file }: SubjectFileUploadProps
     if (files.length > 0) {
       const fileName = files[0].name;
       const fileExtension = fileName.split('.').pop()?.toLowerCase();
-      toast.error(`Tipo de archivo no válido: ${fileName}. Solo se permiten archivos .csv.`);
+      sileo.error({ title: `Tipo de archivo no válido: ${fileName}. Solo se permiten archivos .csv.` });
     }
   };
 

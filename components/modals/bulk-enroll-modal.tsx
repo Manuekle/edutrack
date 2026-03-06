@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface BulkEnrollModalProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ export function BulkEnrollModal({
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       if (!selectedFile.name.endsWith('.csv')) {
-        toast.error('Solo se permiten archivos CSV');
+        sileo.error({ title: 'Solo se permiten archivos CSV' });
         return;
       }
       setFile(selectedFile);
@@ -62,12 +62,12 @@ export function BulkEnrollModal({
         throw new Error(data.error || 'Error en la carga masiva');
       }
 
-      toast.success(data.message || 'Estudiantes matriculados exitosamente');
+      sileo.success({ title: data.message || 'Estudiantes matriculados exitosamente' });
       onSuccess();
       onClose();
       setFile(null);
     } catch (error: any) {
-      toast.error(error.message);
+      sileo.error({ title: error.message });
     } finally {
       setIsUploading(false);
     }

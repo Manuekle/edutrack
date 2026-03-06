@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Check, Clock, Copy, Loader2, Maximize2, RefreshCw } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface QRViewerProps {
   qrUrl: string;
@@ -36,7 +36,7 @@ export function QRViewer({
   const toggleFullscreen = () => {
     if (!qrContainerRef.current) return;
     if (!document.fullscreenElement) {
-      qrContainerRef.current.requestFullscreen().catch(() => {});
+      qrContainerRef.current.requestFullscreen().catch(() => { });
       setIsFullscreen(true);
     } else {
       document.exitFullscreen();
@@ -61,10 +61,10 @@ export function QRViewer({
     try {
       await navigator.clipboard.writeText(qrToken);
       setCopied(true);
-      toast.success('Código copiado al portapapeles');
+      sileo.success({ title: 'Código copiado al portapapeles' });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      toast.error('No se pudo copiar el código');
+      sileo.error({ title: 'No se pudo copiar el código' });
     }
   };
 
@@ -121,20 +121,18 @@ export function QRViewer({
                   className="h-8 w-8 p-0 relative overflow-visible"
                 >
                   <div
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${
-                      copied
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
                         ? 'translate-y-0 opacity-100'
                         : '-translate-y-2 opacity-0 pointer-events-none'
-                    }`}
+                      }`}
                   >
                     <Check className="h-3 w-3 text-green-500" />
                   </div>
                   <div
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${
-                      copied
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
                         ? 'translate-y-2 opacity-0 pointer-events-none'
                         : 'translate-y-0 opacity-100'
-                    }`}
+                      }`}
                   >
                     <Copy className="h-3 w-3" />
                   </div>

@@ -18,7 +18,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AlertCircle, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 interface Report {
   id: string;
@@ -87,7 +87,7 @@ export default function ReportsPage() {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error al cargar los reportes';
       setError(errorMessage);
-      toast.error(errorMessage);
+      sileo.error({ title: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -113,12 +113,12 @@ export default function ReportsPage() {
 
   const handleDownload = async (report: Report) => {
     if (!report.fileUrl || !report.fileName) {
-      toast.error('La URL o el nombre del archivo no están disponibles.');
+      sileo.error({ title: 'La URL o el nombre del archivo no están disponibles.' });
       return;
     }
 
     setDownloadingReportId(report.id);
-    toast.info('Iniciando la descarga...');
+    sileo.info({ title: 'Iniciando la descarga...' });
 
     try {
       const response = await fetch(report.fileUrl);
@@ -136,11 +136,11 @@ export default function ReportsPage() {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success('Descarga completada.');
+      sileo.success({ title: 'Descarga completada.' });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Ocurrió un error al descargar el reporte';
-      toast.error(errorMessage);
+      sileo.error({ title: errorMessage });
     } finally {
       setDownloadingReportId(null);
     }

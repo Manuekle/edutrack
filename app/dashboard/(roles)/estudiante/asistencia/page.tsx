@@ -9,7 +9,7 @@ import { CheckCircle, Loader2, Send } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { sileo } from 'sileo';
 
 type AttendanceResponse = {
   message: string;
@@ -38,12 +38,12 @@ export default function StudentAttendancePage() {
     e.preventDefault();
 
     if (!token.trim()) {
-      toast.error('Ingresa el código de asistencia');
+      sileo.error({ title: 'Ingresa el código de asistencia' });
       return;
     }
 
     if (!isValidToken(token)) {
-      toast.error('Formato de código inválido');
+      sileo.error({ title: 'Formato de código inválido' });
       return;
     }
 
@@ -66,17 +66,17 @@ export default function StudentAttendancePage() {
           409: 'Asistencia ya registrada',
           410: 'Token expirado',
         };
-        toast.error(errorMessages[response.status] || 'Error al procesar código');
+        sileo.error({ title: errorMessages[response.status] || 'Error al procesar código' });
         return;
       }
 
       setSuccess(data);
       setToken('');
-      toast.success('¡Asistencia registrada!');
+      sileo.success({ title: '¡Asistencia registrada!' });
 
       setTimeout(() => setSuccess(null), 8000);
     } catch {
-      toast.error('Error de conexión');
+      sileo.error({ title: 'Error de conexión' });
     } finally {
       setIsLoading(false);
     }
