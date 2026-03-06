@@ -1248,13 +1248,17 @@ export default function AdminSalasPage() {
                     <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
                       Firma del Responsable
                     </Label>
-                    <div className="bg-white dark:bg-muted/20 rounded-4xl p-4 border border-muted/50 flex items-center justify-center h-40 shadow-inner overflow-hidden">
-                      <Image
-                        src={selectedBooking.signatureUrl}
-                        alt="Firma Digital"
-                        fill
-                        className="object-contain mix-blend-multiply dark:mix-blend-normal dark:invert dark:opacity-80 transition-all duration-500"
-                      />
+                    <div className="bg-white dark:bg-muted/20 rounded-4xl p-4 border border-muted/50 flex items-center justify-center h-40 shadow-inner overflow-hidden relative">
+                      {selectedBooking.signatureUrl ? (
+                        <Image
+                          src={selectedBooking.signatureUrl}
+                          alt="Firma Digital"
+                          fill
+                          className="object-contain mix-blend-multiply dark:mix-blend-normal dark:invert dark:opacity-80 transition-all duration-500"
+                        />
+                      ) : (
+                        <p className="text-xs text-muted-foreground/50 italic">Sin firma registrada</p>
+                      )}
                     </div>
                   </div>
 
