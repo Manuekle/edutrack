@@ -38,7 +38,7 @@
   --sidebar-ring: oklch(0 0 0);
   --font-sans: Geist, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Adamina, ui-serif, serif;
-  --font-mono: IBM Plex Mono, monospace;
+  --font-mono: Geist Mono, ui-monospace, monospace;
   --radius: 1.4rem;
   --shadow-x: 0px;
   --shadow-y: 2px;
@@ -54,7 +54,7 @@
   --shadow-lg: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 4px 6px -1px hsl(0 0% 0% / 0.16);
   --shadow-xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 8px 10px -1px hsl(0 0% 0% / 0.16);
   --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.4);
-  --tracking-normal: -0.04em;
+  --tracking-normal: -0.02em;
   --spacing: 0.27rem;
 
   --success: oklch(0.45 0.18 150);
@@ -100,7 +100,7 @@
   --sidebar-ring: oklch(0.6132 0.2294 291.7437);
   --font-sans: Geist, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Adamina, ui-serif, serif;
-  --font-mono: IBM Plex Mono, monospace;
+  --font-mono: Geist Mono, ui-monospace, monospace;
   --radius: 1.4rem;
   --shadow-x: 0px;
   --shadow-y: 2px;
