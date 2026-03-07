@@ -92,7 +92,7 @@ export function PWAInstaller() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md pb-safe">
-      <div className="bg-card border border-border rounded-lg shadow-lg p-4">
+      <div className="bg-card border border-border/30 rounded-2xl shadow-lg p-5">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
             <svg
@@ -117,7 +117,7 @@ export function PWAInstaller() {
           </div>
           <button
             onClick={handleDismiss}
-            className="flex-shrink-0 p-1 hover:bg-muted rounded"
+            className="flex-shrink-0 p-1 hover:bg-muted rounded-full"
             aria-label="Cerrar"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,16 +130,16 @@ export function PWAInstaller() {
             </svg>
           </button>
         </div>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-4 flex gap-2">
           <button
             onClick={handleInstall}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold py-2 px-4 rounded-md transition-colors"
+            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold py-2 px-4 rounded-full transition-colors"
           >
             Instalar
           </button>
           <button
             onClick={handleDismiss}
-            className="flex-1 bg-muted hover:bg-muted/80 text-xs font-semibold py-2 px-4 rounded-md transition-colors"
+            className="flex-1 bg-muted hover:bg-muted/80 text-xs font-semibold py-2 px-4 rounded-full transition-colors"
           >
             Ahora no
           </button>

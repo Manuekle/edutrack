@@ -79,11 +79,11 @@ const config: Config = {
           ring: 'oklch(var(--sidebar-ring))',
         },
         brand: {
-          light: '#F3F4F6',
-          dark: '#1F2937',
-          primary: '#6366F1',
-          secondary: '#FBBF24',
-          accent: '#F59E0B',
+          light: '#F7F9F9',
+          dark: '#16181C',
+          primary: '#1D9BF0',
+          secondary: '#EFF3F4',
+          accent: '#E8F5FE',
         },
       },
       borderRadius: {

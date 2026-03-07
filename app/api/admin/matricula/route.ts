@@ -1,7 +1,94 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const grupoNombre = searchParams.get('grupoNombre');
+    const periodo = searchParams.get('periodo');
+
+    const where: Record<string, unknown> = {};
+    if (grupoNombre) where.grupoNombre = grupoNombre;
+    if (periodo) where.periodoAcademico = periodo;
+
+    const assignments = await db.groupAssignment.findMany({
+      where,
+      include: {
+        student: {
+          select: {
+            id: true,
+            name: true,
+            document: true,
+            correoInstitucional: true,
+            codigoEstudiantil: true,
+          },
+        },
+      },
+      orderBy: [{ grupoNombre: 'asc' }, { periodoAcademico: 'desc' }],
+    });
+
+    // Group by grupoNombre + periodoAcademico
+    const groupMap = new Map<string, {
+      grupoNombre: string;
+      periodoAcademico: string;
+      students: { id: string; name: string | null; document: string | null; correoInstitucional: string | null; codigoEstudiantil: string | null }[];
+    }>();
+
+    for (const a of assignments) {
+      const key = `${a.grupoNombre}|${a.periodoAcademico}`;
+      if (!groupMap.has(key)) {
+        groupMap.set(key, {
+          grupoNombre: a.grupoNombre,
+          periodoAcademico: a.periodoAcademico,
+          students: [],
+        });
+      }
+      groupMap.get(key)!.students.push(a.student);
+    }
+
+    return NextResponse.json({
+      groups: Array.from(groupMap.values()),
+    });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const { studentId, grupoNombre, periodoAcademico } = await request.json();
+
+    if (!studentId || !grupoNombre || !periodoAcademico) {
+      return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
+    }
+
+    await db.groupAssignment.delete({
+      where: {
+        studentId_grupoNombre_periodoAcademico: {
+          studentId,
+          grupoNombre,
+          periodoAcademico,
+        },
+      },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}
 
 interface AssignmentRow {
   documentoEstudiante: string;

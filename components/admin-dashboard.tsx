@@ -136,11 +136,10 @@ const AdminDashboardComponent = () => {
 
   // Paleta colorida usando CHART_COLORS
   const PIE_COLORS = CHART_COLORS.primary;
-  // Paleta vibrante para barras
   const BAR_COLORS = CHART_COLORS.primary;
 
-  const axisStyle = { fontSize: '0.75rem', fill: 'var(--foreground)' } as const;
-  const gridStyle = { stroke: 'hsl(var(--border) / 0.5)' } as const;
+  const axisStyle = { fontSize: '0.75rem', fill: 'var(--foreground)', fontFamily: 'var(--font-sans)', fontWeight: 400 } as const;
+  const gridStyle = { stroke: 'var(--border)', strokeOpacity: 0.1 } as const;
 
   return (
     <div className="space-y-6">
@@ -174,7 +173,7 @@ const AdminDashboardComponent = () => {
               <div className="sm:text-sm text-xs font-semibold">{card.value}</div>
               <p className="text-xs text-muted-foreground mt-1">{card.subtitle}</p>
               <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                <span className={card.trend.includes('+') ? 'text-green-500' : 'text-red-500'}>
+                <span className={card.trend.includes('+') ? 'text-primary' : 'text-destructive'}>
                   {card.trend}
                 </span>
               </div>
@@ -222,8 +221,8 @@ const AdminDashboardComponent = () => {
                     <Cell
                       key={`cell-${index}`}
                       fill={PIE_COLORS[index % PIE_COLORS.length]}
-                      stroke="#fff"
-                      strokeWidth={1}
+                      stroke="transparent"
+                      strokeWidth={0}
                       style={{
                         transition: 'all 0.3s ease',
                       }}
@@ -274,9 +273,9 @@ const AdminDashboardComponent = () => {
                 <Tooltip content={<ChartTooltipContent />} />
                 <Area
                   type="monotone"
-                  dataKey="clases"
+                  dataKey="count"
                   stroke={CHART_COLORS.primary[0]}
-                  strokeWidth={2}
+                  strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorCount)"
                 />
@@ -383,7 +382,7 @@ const AdminDashboardComponent = () => {
               {data.charts.topSubjects.slice(0, 6).map((subject, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between py-2 border-b border-border last:border-b-0"
+                  className="flex items-center justify-between py-2.5 last:pb-0"
                 >
                   <div className="flex-1">
                     <p className="text-xs font-semibold">{subject.code}</p>

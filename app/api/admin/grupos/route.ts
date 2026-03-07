@@ -10,18 +10,24 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    // Retornar asignaturas que tienen grupo asignado
     const subjects = await db.subject.findMany({
       where: { group: { not: null } },
-      select: { group: true },
-      distinct: ['group'],
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        group: true,
+        jornada: true,
+        periodoAcademico: true,
+        program: true,
+        teachers: { select: { id: true, name: true } },
+        _count: { select: { classes: true } },
+      },
+      orderBy: [{ periodoAcademico: 'desc' }, { code: 'asc' }],
     });
 
-    const groups = subjects
-      .map(s => s.group)
-      .filter(Boolean)
-      .sort();
-
-    return NextResponse.json({ groups });
+    return NextResponse.json({ groups: subjects });
   } catch (error) {
     return NextResponse.json({ error: 'Error obteniendo grupos' }, { status: 500 });
   }

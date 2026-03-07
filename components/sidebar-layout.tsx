@@ -25,7 +25,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
 import {
   Sidebar,
   SidebarContent,
@@ -249,13 +248,12 @@ function AppSidebar({ homePath }: { homePath: string }) {
                 alignOffset={-20}
                 collisionPadding={16}
               >
-                <div className="px-4 py-1 my-1">
+                <div className="px-4 py-1.5 my-1">
                   <p className="text-xs font-semibold truncate">{session?.user?.name || 'Usuario'}</p>
                   <p className="text-xs text-muted-foreground truncate">
                     {session?.user?.correoInstitucional || getRoleDisplayName(userRole as Role)}
                   </p>
                 </div>
-                <Separator />
                 <DropdownMenuItem
                   onClick={() => router.push('/dashboard/profile')}
                   className="cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
@@ -302,7 +300,6 @@ function AppSidebar({ homePath }: { homePath: string }) {
                       : 'Modo Oscuro'}
                   </span>
                 </DropdownMenuItem>
-                <Separator />
                 <DropdownMenuItem
                   onClick={handleSignOut}
                   className="text-destructive cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
@@ -314,9 +311,9 @@ function AppSidebar({ homePath }: { homePath: string }) {
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter>
+      </SidebarFooter >
       <SidebarRail />
-    </Sidebar>
+    </Sidebar >
   );
 }
 

@@ -62,7 +62,7 @@ const PROGRAMAS = [
   'Otro',
 ];
 
-export default function MicrocurriculoPage() {
+export function MicrocurriculoTab() {
   const [mode, setMode] = useState<'csv' | 'manual'>('csv');
   const [file, setFile] = useState<File | null>(null);
   const [isPreview, setIsPreview] = useState(false);
@@ -73,7 +73,6 @@ export default function MicrocurriculoPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
-  // Manual form state
   const [manualForm, setManualForm] = useState<{
     codigo: string;
     nombre: string;
@@ -109,49 +108,30 @@ export default function MicrocurriculoPage() {
 
   const handlePreview = async () => {
     if (!file) {
-      sileo.error({
-        title: 'Archivo requerido',
-        description: 'Por favor, selecciona un archivo .csv para continuar.',
-      });
+      sileo.error({ title: 'Archivo requerido', description: 'Por favor, selecciona un archivo .csv para continuar.' });
       return;
     }
     setIsLoading(true);
-
     try {
       const formData = new FormData();
       formData.append('file', file);
-
-      const res = await fetch('/api/admin/microcurriculo?preview=true', {
-        method: 'POST',
-        body: formData,
-      });
-
+      const res = await fetch('/api/admin/microcurriculo?preview=true', { method: 'POST', body: formData });
       const result = await res.json();
-
       if (res.ok && result.success) {
         const dataWithIds = (result.previewData || []).map((item: PreviewItem, index: number) => ({
           ...item,
           id: `csv-${index}-${Date.now()}`,
-          temas: item.temas || [], // keep temas from backend
+          temas: item.temas || [],
         }));
         setPreviewData(dataWithIds);
         setIsPreview(true);
-        sileo.success({
-          title: 'Vista previa',
-          description: 'Vista previa generada con éxito',
-        });
+        sileo.success({ title: 'Vista previa', description: 'Vista previa generada con éxito' });
       } else {
-        sileo.error({
-          title: 'Error de previsualización',
-          description: result.error || 'Error al generar la vista previa',
-        });
+        sileo.error({ title: 'Error de previsualización', description: result.error || 'Error al generar la vista previa' });
         handleCancel();
       }
     } catch {
-      sileo.error({
-        title: 'Error inesperado',
-        description: 'Ocurrió un error inesperado al procesar el archivo.',
-      });
+      sileo.error({ title: 'Error inesperado', description: 'Ocurrió un error inesperado al procesar el archivo.' });
       handleCancel();
     } finally {
       setIsLoading(false);
@@ -160,13 +140,9 @@ export default function MicrocurriculoPage() {
 
   const handleAddManual = () => {
     if (!manualForm.codigo || !manualForm.nombre) {
-      sileo.error({
-        title: 'Campos requeridos',
-        description: 'El código y nombre son obligatorios.',
-      });
+      sileo.error({ title: 'Campos requeridos', description: 'El código y nombre son obligatorios.' });
       return;
     }
-
     const newItem: PreviewItem = {
       id: `manual-${Date.now()}`,
       codigoAsignatura: manualForm.codigo,
@@ -180,22 +156,10 @@ export default function MicrocurriculoPage() {
       status: 'manual',
       message: 'Nuevo',
     };
-
     setPreviewData([...previewData, newItem]);
     setIsPreview(true);
-    setManualForm({
-      codigo: '',
-      nombre: '',
-      programa: PROGRAMAS[0],
-      semestre: '1',
-      creditos: '3',
-      horas: '4',
-      temas: [],
-    });
-    sileo.success({
-      title: 'Agregado',
-      description: 'Asignatura agregada a la lista',
-    });
+    setManualForm({ codigo: '', nombre: '', programa: PROGRAMAS[0], semestre: '1', creditos: '3', horas: '4', temas: [] });
+    sileo.success({ title: 'Agregado', description: 'Asignatura agregada a la lista' });
   };
 
   const handleEditItem = (id: string) => {
@@ -218,45 +182,28 @@ export default function MicrocurriculoPage() {
   const handleUpdateItem = () => {
     if (!editingId) return;
     if (!manualForm.codigo || !manualForm.nombre) {
-      sileo.error({
-        title: 'Campos requeridos',
-        description: 'El código y nombre son obligatorios.',
-      });
+      sileo.error({ title: 'Campos requeridos', description: 'El código y nombre son obligatorios.' });
       return;
     }
-
-    setPreviewData(
-      previewData.map(item =>
-        item.id === editingId
-          ? {
-            ...item,
-            codigoAsignatura: manualForm.codigo,
-            nombreAsignatura: manualForm.nombre,
-            programa: manualForm.programa,
-            semestre: parseInt(manualForm.semestre) || 1,
-            creditos: parseInt(manualForm.creditos) || 3,
-            horas: parseInt(manualForm.horas) || 4,
-            temas: manualForm.temas,
-            temasCount: manualForm.temas.length,
-          }
-          : item
-      )
-    );
+    setPreviewData(previewData.map(item =>
+      item.id === editingId
+        ? {
+          ...item,
+          codigoAsignatura: manualForm.codigo,
+          nombreAsignatura: manualForm.nombre,
+          programa: manualForm.programa,
+          semestre: parseInt(manualForm.semestre) || 1,
+          creditos: parseInt(manualForm.creditos) || 3,
+          horas: parseInt(manualForm.horas) || 4,
+          temas: manualForm.temas,
+          temasCount: manualForm.temas.length,
+        }
+        : item
+    ));
     setEditingId(null);
     setMode('csv');
-    setManualForm({
-      codigo: '',
-      nombre: '',
-      programa: PROGRAMAS[0],
-      semestre: '1',
-      creditos: '3',
-      horas: '4',
-      temas: [],
-    });
-    sileo.success({
-      title: 'Actualizado',
-      description: 'Asignatura actualizada',
-    });
+    setManualForm({ codigo: '', nombre: '', programa: PROGRAMAS[0], semestre: '1', creditos: '3', horas: '4', temas: [] });
+    sileo.success({ title: 'Actualizado', description: 'Asignatura actualizada' });
   };
 
   const handleDeleteItem = (id: string) => {
@@ -266,50 +213,28 @@ export default function MicrocurriculoPage() {
   const handleConfirmUpload = async () => {
     const successCount = previewData.filter(item => item.status !== 'error').length;
     if (successCount === 0) {
-      sileo.error({
-        title: 'Sin datos válidos',
-        description: 'No hay asignaturas válidas para crear.',
-      });
+      sileo.error({ title: 'Sin datos válidos', description: 'No hay asignaturas válidas para crear.' });
       return;
     }
-
     setIsConfirming(true);
     try {
       const validItems = previewData.filter(item => item.status !== 'error');
-
       const res = await fetch('/api/admin/microcurriculo', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subjects: validItems }),
       });
-
       const result = await res.json();
-
       if (res.ok && result.success) {
         const totalProcessed = (result.summary?.created || 0) + (result.summary?.updatedCount || 0);
-        sileo.success({
-          title: 'Carga completada',
-          description: `Proceso finalizado. Se procesaron ${totalProcessed} asignaturas.`,
-        });
-        setFinalResults({
-          created: totalProcessed,
-          errors: result.summary?.errors || 0,
-        });
+        sileo.success({ title: 'Carga completada', description: `Proceso finalizado. Se procesaron ${totalProcessed} asignaturas.` });
+        setFinalResults({ created: totalProcessed, errors: result.summary?.errors || 0 });
         setPreviewData([]);
       } else {
-        sileo.error({
-          title: 'Error de carga',
-          description: result.error || 'Ocurrió un error en la carga.',
-        });
+        sileo.error({ title: 'Error de carga', description: result.error || 'Ocurrió un error en la carga.' });
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado.';
-      sileo.error({
-        title: 'Error de red',
-        description: errorMessage,
-      });
+      sileo.error({ title: 'Error de red', description: error instanceof Error ? error.message : 'Ocurrió un error inesperado.' });
     } finally {
       setIsConfirming(false);
     }
@@ -319,19 +244,13 @@ export default function MicrocurriculoPage() {
     e?.preventDefault();
     const tema = newTema.trim();
     if (tema && !manualForm.temas.includes(tema)) {
-      setManualForm({
-        ...manualForm,
-        temas: [...manualForm.temas, tema],
-      });
+      setManualForm({ ...manualForm, temas: [...manualForm.temas, tema] });
       setNewTema('');
     }
   };
 
   const handleRemoveTema = (temaToRemove: string) => {
-    setManualForm({
-      ...manualForm,
-      temas: manualForm.temas.filter(t => t !== temaToRemove),
-    });
+    setManualForm({ ...manualForm, temas: manualForm.temas.filter(t => t !== temaToRemove) });
   };
 
   const handleCancel = () => {
@@ -340,15 +259,7 @@ export default function MicrocurriculoPage() {
     setPreviewData([]);
     setFinalResults(null);
     setEditingId(null);
-    setManualForm({
-      codigo: '',
-      nombre: '',
-      programa: PROGRAMAS[0],
-      semestre: '1',
-      creditos: '3',
-      horas: '4',
-      temas: [],
-    });
+    setManualForm({ codigo: '', nombre: '', programa: PROGRAMAS[0], semestre: '1', creditos: '3', horas: '4', temas: [] });
   };
 
   const handleNewUpload = () => {
@@ -364,43 +275,30 @@ export default function MicrocurriculoPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
-        <CardHeader className="p-0 w-full" id="tour-microcurriculo-title">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-            Carga de Microcurrículos
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Carga las asignaturas con sus temas de forma manual o masiva.
-          </CardDescription>
-        </CardHeader>
-        <div className="flex gap-2" id="tour-microcurriculo-mode">
-          <Button
-            variant={mode === 'csv' ? 'default' : 'outline'}
-            onClick={() => {
-              setMode('csv');
-              handleCancel();
-            }}
-            className="text-xs"
-          >
-            <FileSpreadsheet className="mr-2 h-4 w-4" />
-            Carga Masiva (CSV)
-          </Button>
-          <Button
-            variant={mode === 'manual' ? 'default' : 'outline'}
-            onClick={() => setMode('manual')}
-            className="text-xs"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Crear Manual
-          </Button>
-        </div>
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={mode === 'csv' ? 'default' : 'outline'}
+          onClick={() => { setMode('csv'); handleCancel(); }}
+          className="text-xs"
+        >
+          <FileSpreadsheet className="mr-2 h-4 w-4" />
+          Carga Masiva (CSV)
+        </Button>
+        <Button
+          variant={mode === 'manual' ? 'default' : 'outline'}
+          onClick={() => setMode('manual')}
+          className="text-xs"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Crear Manual
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           {mode === 'csv' ? (
             <>
-              <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-instructions">
+              <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Instrucciones
@@ -419,7 +317,6 @@ export default function MicrocurriculoPage() {
                       </Button>
                     </a>
                   </div>
-
                   <div className="space-y-2">
                     <p className="text-xs font-semibold">2. Completa los datos</p>
                     <div className="rounded-md bg-muted/30 p-3 space-y-2 text-[11px] text-muted-foreground">
@@ -437,7 +334,7 @@ export default function MicrocurriculoPage() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-upload">
+              <Card className="overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Subir Archivo
@@ -451,17 +348,11 @@ export default function MicrocurriculoPage() {
                       disabled={!file || isLoading || isPreview}
                       className="w-full text-xs h-9"
                     >
-                      {isLoading && !isPreview ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : null}
+                      {isLoading && !isPreview && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Generar Vista Previa
                     </Button>
                     {(file || isPreview) && (
-                      <Button
-                        onClick={handleCancel}
-                        variant="ghost"
-                        className="w-full text-xs h-9 text-muted-foreground hover:text-destructive"
-                      >
+                      <Button onClick={handleCancel} variant="ghost" className="w-full text-xs h-9 text-muted-foreground hover:text-destructive">
                         Limpiar todo
                       </Button>
                     )}
@@ -470,7 +361,7 @@ export default function MicrocurriculoPage() {
               </Card>
             </>
           ) : (
-            <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-manual">
+            <Card className="overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
                 <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Asignatura' : 'Nueva Asignatura'}
@@ -482,52 +373,32 @@ export default function MicrocurriculoPage() {
               <CardContent className="space-y-4 p-5">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="codigo" className="text-xs font-semibold">Código</Label>
-                    <Input
-                      id="codigo"
-                      className="h-9 text-xs"
-                      value={manualForm.codigo}
-                      onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })}
-                      placeholder="Ej: 718004"
-                    />
+                    <Label htmlFor="micro-codigo" className="text-xs font-semibold">Código</Label>
+                    <Input id="micro-codigo" className="h-9 text-xs" value={manualForm.codigo}
+                      onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })} placeholder="Ej: 718004" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="semestre" className="text-xs font-semibold">Semestre</Label>
-                    <Input
-                      id="semestre"
-                      type="number"
-                      className="h-9 text-xs"
-                      value={manualForm.semestre}
-                      onChange={e => setManualForm({ ...manualForm, semestre: e.target.value })}
-                    />
+                    <Label htmlFor="micro-semestre" className="text-xs font-semibold">Semestre</Label>
+                    <Input id="micro-semestre" type="number" className="h-9 text-xs" value={manualForm.semestre}
+                      onChange={e => setManualForm({ ...manualForm, semestre: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="nombre" className="text-xs font-semibold">Nombre de la Asignatura</Label>
-                  <Input
-                    id="nombre"
-                    className="h-9 text-xs"
-                    value={manualForm.nombre}
-                    onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })}
-                    placeholder="Ej: Matemáticas I"
-                  />
+                  <Label htmlFor="micro-nombre" className="text-xs font-semibold">Nombre de la Asignatura</Label>
+                  <Input id="micro-nombre" className="h-9 text-xs" value={manualForm.nombre}
+                    onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })} placeholder="Ej: Matemáticas I" />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="programa" className="text-xs font-semibold">Programa Académico</Label>
-                  <Select
-                    value={manualForm.programa}
-                    onValueChange={value => setManualForm({ ...manualForm, programa: value })}
-                  >
-                    <SelectTrigger id="programa" className="h-9 text-xs">
+                  <Label htmlFor="micro-programa" className="text-xs font-semibold">Programa Académico</Label>
+                  <Select value={manualForm.programa} onValueChange={value => setManualForm({ ...manualForm, programa: value })}>
+                    <SelectTrigger id="micro-programa" className="h-9 text-xs">
                       <SelectValue placeholder="Selecciona..." />
                     </SelectTrigger>
                     <SelectContent>
                       {PROGRAMAS.map(p => (
-                        <SelectItem key={p} value={p} className="text-xs">
-                          {p}
-                        </SelectItem>
+                        <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -535,61 +406,35 @@ export default function MicrocurriculoPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="creditos" className="text-xs font-semibold">Créditos</Label>
-                    <Input
-                      id="creditos"
-                      type="number"
-                      className="h-9 text-xs"
-                      value={manualForm.creditos}
-                      onChange={e => setManualForm({ ...manualForm, creditos: e.target.value })}
-                    />
+                    <Label htmlFor="micro-creditos" className="text-xs font-semibold">Créditos</Label>
+                    <Input id="micro-creditos" type="number" className="h-9 text-xs" value={manualForm.creditos}
+                      onChange={e => setManualForm({ ...manualForm, creditos: e.target.value })} />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="horas" className="text-xs font-semibold">Horas Semanales</Label>
-                    <Input
-                      id="horas"
-                      type="number"
-                      className="h-9 text-xs"
-                      value={manualForm.horas}
-                      onChange={e => setManualForm({ ...manualForm, horas: e.target.value })}
-                    />
+                    <Label htmlFor="micro-horas" className="text-xs font-semibold">Horas Semanales</Label>
+                    <Input id="micro-horas" type="number" className="h-9 text-xs" value={manualForm.horas}
+                      onChange={e => setManualForm({ ...manualForm, horas: e.target.value })} />
                   </div>
                 </div>
 
                 <div className="space-y-2 pt-2 border-t">
                   <Label className="text-xs font-semibold text-foreground">Gestión de Temas</Label>
                   <div className="flex gap-2">
-                    <Input
-                      placeholder="Agrega un tema y pulsa Enter..."
-                      className="h-9 text-xs"
-                      value={newTema}
+                    <Input placeholder="Agrega un tema y pulsa Enter..." className="h-9 text-xs" value={newTema}
                       onChange={e => setNewTema(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddTema())}
-                    />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="h-9 px-3"
-                      onClick={() => handleAddTema()}
-                    >
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddTema())} />
+                    <Button type="button" variant="secondary" size="sm" className="h-9 px-3" onClick={() => handleAddTema()}>
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-
                   <div className="flex flex-wrap gap-1.5 mt-2 min-h-[60px] p-2.5 rounded-xl bg-muted/20 border border-dashed border-muted-foreground/20 content-start">
                     {manualForm.temas.length > 0 ? (
                       manualForm.temas.map(t => (
-                        <Badge
-                          key={t}
-                          variant="secondary"
-                          className="pl-2 pr-1 py-0.5 text-[10px] bg-background border border-muted-foreground/10 hover:bg-muted/50 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
-                        >
+                        <Badge key={t} variant="secondary"
+                          className="pl-2 pr-1 py-0.5 text-[10px] bg-background border border-muted-foreground/10 hover:bg-muted/50 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs">
                           {t}
-                          <button
-                            onClick={() => handleRemoveTema(t)}
-                            className="bg-muted-foreground/20 hover:bg-destructive/10 hover:text-destructive p-0.5 rounded-full transition-colors"
-                          >
+                          <button onClick={() => handleRemoveTema(t)}
+                            className="bg-muted-foreground/20 hover:bg-destructive/10 hover:text-destructive p-0.5 rounded-full transition-colors">
                             <X className="h-2.5 w-2.5" />
                           </button>
                         </Badge>
@@ -605,18 +450,9 @@ export default function MicrocurriculoPage() {
                 <div className="flex gap-2 pt-4 border-t">
                   {editingId ? (
                     <>
-                      <Button onClick={handleUpdateItem} className="flex-1 h-9 text-xs">
-                        Guardar Cambios
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="h-9 text-xs text-muted-foreground hover:text-destructive"
-                        onClick={() => {
-                          setEditingId(null);
-                          setMode('csv');
-                          handleCancel();
-                        }}
-                      >
+                      <Button onClick={handleUpdateItem} className="flex-1 h-9 text-xs">Guardar Cambios</Button>
+                      <Button variant="ghost" className="h-9 text-xs text-muted-foreground hover:text-destructive"
+                        onClick={() => { setEditingId(null); setMode('csv'); handleCancel(); }}>
                         Cancelar
                       </Button>
                     </>
@@ -633,17 +469,12 @@ export default function MicrocurriculoPage() {
         </div>
 
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden border shadow-xs" id="tour-microcurriculo-preview">
+          <Card className="overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
-                    Asignaturas para Cargar ({previewData.length})
-                  </CardTitle>
-                </div>
-              </div>
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
+                Asignaturas para Cargar ({previewData.length})
+              </CardTitle>
             </CardHeader>
-
             <CardContent className="p-0">
               {isLoading && !isPreview ? (
                 <div className="flex flex-col items-center justify-center h-64 gap-3">
@@ -656,9 +487,7 @@ export default function MicrocurriculoPage() {
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
                   <div className="space-y-1">
-                    <h3 className="sm:text-xl text-lg tracking-heading font-semibold">
-                      ¡Carga Exitosa!
-                    </h3>
+                    <h3 className="sm:text-xl text-lg tracking-heading font-semibold">¡Carga Exitosa!</h3>
                     <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                       Se han procesado correctamente {finalResults.created} asignaturas en el sistema.
                     </p>
@@ -672,61 +501,38 @@ export default function MicrocurriculoPage() {
                   <Table>
                     <TableHeader className="bg-muted/5 sticky top-0 z-10">
                       <TableRow className="hover:bg-transparent border-b">
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
-                          Asignatura
-                        </TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  hidden sm:table-cell">
-                          Información
-                        </TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
-                          Temas
-                        </TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-right">
-                          Acciones
-                        </TableHead>
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">Asignatura</TableHead>
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground hidden sm:table-cell">Información</TableHead>
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">Temas</TableHead>
+                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground text-right">Acciones</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {previewData.map((item) => (
-                        <TableRow
-                          key={item.id}
-                          className="hover:bg-muted/20 transition-colors border-b"
-                        >
+                        <TableRow key={item.id} className="hover:bg-muted/20 transition-colors border-b">
                           <TableCell className="px-4 py-3">
                             <div className="flex flex-col">
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold text-xs text-foreground">
-                                  {item.nombreAsignatura}
-                                </span>
+                                <span className="font-semibold text-xs text-foreground">{item.nombreAsignatura}</span>
                                 {item.status === 'existing' && (
-                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">
-                                    Actualización
-                                  </Badge>
+                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">Actualización</Badge>
                                 )}
                                 {item.status === 'error' && (
-                                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 font-normal">
-                                    Error
-                                  </Badge>
+                                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 font-normal">Error</Badge>
                                 )}
                               </div>
                               <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="secondary" className="font-mono text-[9px] px-1.5 py-0 rounded bg-muted/50 text-muted-foreground">
-                                  {item.codigoAsignatura}
-                                </Badge>
-                                <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">
-                                  {item.programa || 'Sin programa'}
-                                </span>
+                                <Badge variant="secondary" className="font-mono text-[9px] px-1.5 py-0 rounded bg-muted/50 text-muted-foreground">{item.codigoAsignatura}</Badge>
+                                <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">{item.programa || 'Sin programa'}</span>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell className="px-4 py-3 hidden sm:table-cell">
                             <div className="flex flex-col gap-1">
-                              <span className="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
-                                <span className="font-semibold text-foreground">Sem:</span> {item.semestre}°
-                              </span>
-                              <span className="text-[11px] text-muted-foreground inline-flex items-center gap-1.5">
+                              <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">Sem:</span> {item.semestre}°</span>
+                              <span className="text-[11px] text-muted-foreground">
                                 <span className="font-semibold text-foreground">Cred:</span> {item.creditos}
-                                <span className="w-1 h-1 rounded-full bg-muted-foreground/30 mx-0.5"></span>
+                                <span className="w-1 h-1 rounded-full bg-muted-foreground/30 mx-1 inline-block" />
                                 <span className="font-semibold text-foreground">Horas:</span> {item.horas}
                               </span>
                             </div>
@@ -735,13 +541,9 @@ export default function MicrocurriculoPage() {
                             <div className="flex flex-wrap gap-1 max-w-[200px]">
                               {item.temas && item.temas.length > 0 ? (
                                 <>
-                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal">
-                                    {item.temas[0]}
-                                  </Badge>
+                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal">{item.temas[0]}</Badge>
                                   {item.temas.length > 1 && (
-                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal bg-muted/10">
-                                      +{item.temas.length - 1} más
-                                    </Badge>
+                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal bg-muted/10">+{item.temas.length - 1} más</Badge>
                                   )}
                                 </>
                               ) : (
@@ -751,20 +553,12 @@ export default function MicrocurriculoPage() {
                           </TableCell>
                           <TableCell className="px-4 py-3 text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                onClick={() => handleEditItem(item.id)}
-                              >
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                onClick={() => handleEditItem(item.id)}>
                                 <Edit2 className="h-3.5 w-3.5" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-                                onClick={() => handleDeleteItem(item.id)}
-                              >
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                                onClick={() => handleDeleteItem(item.id)}>
                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
                             </div>
@@ -794,21 +588,15 @@ export default function MicrocurriculoPage() {
                     <span className="text-xs font-semibold text-foreground">Resumen de carga</span>
                     <span className="text-[11px] text-muted-foreground">
                       {successCount} asignatura{successCount !== 1 ? 's' : ''} lista{successCount !== 1 ? 's' : ''} para importar/actualizar
+                      {errorCount > 0 && ` · ${errorCount} con errores`}
                     </span>
                   </div>
                   <Button
                     onClick={handleConfirmUpload}
                     disabled={isConfirming || successCount === 0}
-                    className="h-9 px-6 text-xs font-semibold"
+                    className="h-9 px-6 text-xs min-w-[150px]"
                   >
-                    {isConfirming ? (
-                      <>
-                        <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                        Procesando...
-                      </>
-                    ) : (
-                      'Confirmar e Importar'
-                    )}
+                    {isConfirming ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Procesando...</> : 'Confirmar y Crear'}
                   </Button>
                 </div>
               )}

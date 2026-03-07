@@ -49,6 +49,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(semester !== undefined && { semester: semester ? parseInt(semester) : null }),
       ...(credits !== undefined && { credits: credits ? parseInt(credits) : null }),
       ...(directHours !== undefined && { directHours: directHours ? parseInt(directHours) : null }),
+      // Group fields
+      ...(body.group !== undefined && { group: body.group }),
+      ...(body.jornada !== undefined && { jornada: body.jornada }),
+      ...(body.periodoAcademico !== undefined && { periodoAcademico: body.periodoAcademico }),
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

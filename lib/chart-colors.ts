@@ -1,33 +1,33 @@
-// Paletas de colores premium para gráficos
+// Paletas de colores premium para gráficos (EduTrack Color Library)
 export const CHART_COLORS = {
   // Paleta principal (Vibrant & Professional)
   primary: [
-    '#0ea5e9', // Sky 500
-    '#8b5cf6', // Violet 500
-    '#10b981', // Emerald 500
-    '#f59e0b', // Amber 500
-    '#f43f5e', // Rose 500
-    '#6366f1', // Indigo 500
+    '#272AB0', // Deep Blue
+    '#9C27B0', // Purple
+    '#E91E63', // Magenta
+    '#57ACDC', // Sky Blue
+    '#57DCBE', // Teal
+    '#60C689', // Green
   ],
   // Paleta para estados de asistencia (Semántica)
   attendance: {
-    present: '#10b981', // Emerald 500
-    absent: '#f43f5e', // Rose 500
-    late: '#f59e0b', // Amber 500
-    justified: '#3b82f6', // Blue 500
+    present: '#60C689', // Green
+    absent: '#E91E63', // Magenta (replaced Rose)
+    late: '#57ACDC', // Sky Blue (replaced Amber)
+    justified: '#9C27B0', // Purple (replaced Blue)
   },
   // Paleta para roles (Distintiva)
   roles: {
-    admin: '#6366f1', // Indigo 500
-    student: '#0ea5e9', // Sky 500
-    teacher: '#8b5cf6', // Violet 500
-    coordinator: '#f59e0b', // Amber 500
+    admin: '#9C27B0', // Purple
+    student: '#272AB0', // Deep Blue
+    teacher: '#57ACDC', // Sky Blue
+    coordinator: '#E91E63', // Magenta
   },
   // Degradados (para áreas y fondos)
   gradients: {
-    blue: ['#0ea5e9', '#e0f2fe'],
-    emerald: ['#10b981', '#d1fae5'],
-    violet: ['#8b5cf6', '#ede9fe'],
-    rose: ['#f43f5e', '#ffe4e6'],
+    blue: ['#272AB0', '#EFF6FF'],
+    emerald: ['#60C689', '#F0FDF4'],
+    violet: ['#9C27B0', '#FAF5FF'],
+    rose: ['#E91E63', '#FFF1F2'],
   },
 };

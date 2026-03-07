@@ -143,13 +143,7 @@ export const navLinkGroups: NavLinkGroup[] = [
           },
         ],
       },
-      {
-        href: '/dashboard/admin/microcurriculo',
-        icon: BookMarked,
-        label: 'Microcurrículo',
-        roles: ['ADMIN'],
-        description: 'Cargar asignaturas con información de microcurrículo',
-      },
+
       {
         href: '/dashboard/admin/asignaturas',
         icon: BookOpen,

@@ -140,7 +140,7 @@ export default function HomePageWeb() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2, duration: 0.5 }}
-                  className="inline-flex items-center rounded-full px-4 py-2 text-xs font-normal bg-muted/50 backdrop-blur-sm border border-border text-muted-foreground"
+                  className="inline-flex items-center rounded-full px-4 py-2 text-xs font-normal bg-muted/50 backdrop-blur-sm border border-border/30 text-muted-foreground"
                 >
                   Moderno, Rápido y Fácil de Usar
                 </motion.div>
@@ -203,7 +203,7 @@ export default function HomePageWeb() {
                 ].map((feature, index) => (
                   <div
                     key={index}
-                    className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/50 hover:bg-white/90 dark:hover:bg-muted/70 transition-all duration-500 shadow-sm hover:shadow-md"
+                    className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/20 hover:bg-white/90 dark:hover:bg-muted/70 transition-all duration-500 shadow-sm hover:shadow-md"
                   >
                     <div className="p-8 relative z-10">
                       <div className="space-y-6">
@@ -242,7 +242,7 @@ export default function HomePageWeb() {
               transition={{ duration: 0.6 }}
               className="flex flex-col items-center justify-center space-y-4 text-center mb-16"
             >
-              <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border text-muted-foreground">
+              <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border/20 text-muted-foreground">
                 Características
               </div>
               <h2 className="sm:text-2xl text-xs font-semibold tracking-card sm:text-4xl text-foreground">
@@ -264,7 +264,7 @@ export default function HomePageWeb() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="h-full"
                 >
-                  <div className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/50 hover:bg-white/90 dark:hover:bg-muted/70 transition-all duration-500 h-full shadow-sm hover:shadow-md">
+                  <div className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/20 hover:bg-white/90 dark:hover:bg-muted/70 transition-all duration-500 h-full shadow-sm hover:shadow-md">
                     <div className="p-8 relative z-10 h-full">
                       <div className="space-y-6">
                         <div className="flex items-center space-x-3">
@@ -301,7 +301,7 @@ export default function HomePageWeb() {
               transition={{ duration: 0.6 }}
               className="flex flex-col items-center justify-center space-y-4 text-center mb-16"
             >
-              <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border text-muted-foreground">
+              <div className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-normal bg-muted/50 backdrop-blur-sm border-border/20 text-muted-foreground">
                 Proceso
               </div>
               <h2 className="sm:text-2xl text-xs font-semibold tracking-card sm:text-4xl text-foreground">
@@ -354,7 +354,7 @@ export default function HomePageWeb() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="relative"
               >
-                <div className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/50 hover:bg-white/90 dark:hover:bg-muted/70 transition-all duration-500 shadow-sm hover:shadow-md">
+                <div className="group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/20 hover:bg-white/90 dark:hover:bg-muted/70 transition-all duration-500 shadow-sm hover:shadow-md">
                   <div className="p-8 relative z-10">
                     <div className="flex flex-col items-center">
                       <div className="relative">
@@ -456,7 +456,7 @@ export default function HomePageWeb() {
                       viewport={{ once: true }}
                       transition={{ delay: 0.1 * index }}
                     >
-                      <div className="h-full group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/50 hover:bg-white/90 dark:hover:bg-muted-70 transition-all duration-500 shadow-sm hover:shadow-md">
+                      <div className="h-full group relative overflow-hidden rounded-2xl backdrop-blur-sm bg-white/80 dark:bg-muted/50 border border-border/20 hover:bg-white/90 dark:hover:bg-muted-70 transition-all duration-500 shadow-sm hover:shadow-md">
                         <div className="p-6 relative z-10">
                           <div className="flex items-start space-x-4">
                             <div className="bg-muted/50 p-3 rounded-xl backdrop-blur-sm">

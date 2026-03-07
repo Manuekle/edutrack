@@ -306,11 +306,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const created: string[] = [];
     const errors: string[] = [];
+    // Whether the subject had NO group assigned before this operation
+    const hadNoGroupBefore = !subject.group;
 
     await db.$transaction(async tx => {
-      for (const [key, data] of groupsMap.entries()) {
-        const existingGroup = subject.group === data.group;
-
+      for (const [, data] of groupsMap.entries()) {
         // Actualizar asignatura con grupo, jornada, periodo y docente
         const updateData: Record<string, unknown> = {
           group: data.group,
@@ -330,7 +330,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           data: updateData,
         });
 
-        if (!existingGroup) {
+        // Count as "created" if the subject had no group before, or if a new group letter/jornada combo is new
+        if (hadNoGroupBefore || subject.group !== data.group || subject.jornada !== data.jornada) {
           created.push(`Grupo ${data.group} - ${data.jornada}`);
         }
 
