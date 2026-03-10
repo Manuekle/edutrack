@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 
@@ -10,8 +11,15 @@ interface SignaturePadProps {
   onClear: () => void;
 }
 
+/** Colores de trazo visibles en ambos temas (canvas no usa currentColor) */
+const PEN_COLOR_LIGHT = '#171717';
+const PEN_COLOR_DARK = '#fafafa';
+
 export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
   const sigCanvas = useRef<SignatureCanvas>(null);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const penColor = isDark ? PEN_COLOR_DARK : PEN_COLOR_LIGHT; // canvas no usa CSS currentColor
 
   const clear = () => {
     sigCanvas.current?.clear();
@@ -41,15 +49,19 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
           Limpiar
         </Button>
       </div>
-      <div className="border border-dashed rounded-xl bg-white dark:bg-zinc-950 overflow-hidden">
-        <div className="h-32 w-full relative">
+      <div className="border border-dashed rounded-xl border-border bg-white dark:bg-zinc-950 overflow-hidden">
+        <div className="h-32 w-full relative touch-none select-none">
           <SignatureCanvas
             ref={sigCanvas}
-            penColor="currentColor"
+            penColor={penColor}
             onEnd={save}
+            velocityFilterWeight={0.7}
+            minWidth={2}
+            maxWidth={4}
+            throttle={16}
             canvasProps={{
-              className: 'signature-canvas w-full h-full cursor-crosshair text-foreground',
-              style: { width: '100%', height: '100%' },
+              className: 'signature-canvas w-full h-full cursor-crosshair touch-none bg-transparent',
+              style: { width: '100%', height: '100%', touchAction: 'none' },
             }}
           />
         </div>

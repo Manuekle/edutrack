@@ -25,8 +25,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: 'Asignatura no encontrada' }, { status: 404 });
     }
 
-    // Validar los datos de la asignatura
-    const validado = DocenteSubjectSchema.safeParse(subject);
+    // Map Prisma shape (teacherIds) to schema shape (teacherId) for validation
+    const validado = DocenteSubjectSchema.safeParse({
+      ...subject,
+      teacherId: subject.teacherIds?.[0] ?? '',
+    });
     if (!validado.success) {
       return NextResponse.json(
         {

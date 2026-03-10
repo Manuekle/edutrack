@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 font-sans">
+    <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
                     <FormLabel>Correo electrónico</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                        <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                           type="email"
                           placeholder="tu@correo.com"

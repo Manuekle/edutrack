@@ -189,6 +189,7 @@ export default function GestionUsuariosPage() {
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Usuario</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Documento</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Correo</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Rol</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Código</TableHead>
@@ -203,13 +204,12 @@ export default function GestionUsuariosPage() {
                     Array.from({ length: itemsPerPage }).map((_, index) => (
                       <TableRow key={index} className="hover:bg-muted/50 group">
                         <TableCell className="px-4 py-3">
-                          <div className="flex items-center space-x-3">
-                            <Skeleton className="h-10 w-10 rounded-full" />
-                            <div className="space-y-1.5">
-                              <Skeleton className="h-4 w-[120px]" />
-                              <Skeleton className="h-3 w-[80px]" />
-                            </div>
+                          <div className="space-y-1.5">
+                            <Skeleton className="h-4 w-[120px]" />
                           </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <Skeleton className="h-4 w-[90px]" />
                         </TableCell>
                         <TableCell className="px-4 py-3">
                           <Skeleton className="h-4 w-[160px]" />
@@ -234,7 +234,7 @@ export default function GestionUsuariosPage() {
                     ))
                   ) : users.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
+                      <TableCell colSpan={7} className="h-24 text-center">
                         {searchTerm ? (
                           <div className="flex flex-col items-center justify-center py-6">
                             <Search className="h-8 w-8 text-muted-foreground mb-2" />
@@ -255,14 +255,14 @@ export default function GestionUsuariosPage() {
                     users.map(user => (
                       <TableRow key={user.id} className="hover:bg-muted/50 group transition-colors">
                         <TableCell className="px-4 py-3">
-                          <div className="flex flex-col justify-center">
-                            <span className="font-semibold text-foreground text-xs">
-                              {user.name || 'Usuario sin nombre'}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground mt-0.5">
-                              ID: {user.document || 'N/A'}
-                            </span>
-                          </div>
+                          <span className="font-semibold text-foreground text-xs">
+                            {user.name || 'Usuario sin nombre'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <span className="text-xs font-mono text-muted-foreground">
+                            {user.document || '—'}
+                          </span>
                         </TableCell>
                         <TableCell className="px-4 py-3">
                           <span

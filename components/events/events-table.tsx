@@ -9,17 +9,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Loading } from '@/components/ui/loading';
 import {
@@ -189,42 +187,42 @@ export function EventsTable({ subjectId }: EventsTableProps) {
 
   return (
     <>
-      <Card className="p-0">
-        <CardHeader>
-          <div className="flex justify-between items-center flex-wrap gap-2">
-            <div>
-              <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card font-sans">
-                Gestión de Eventos Especiales
-              </CardTitle>
-              <CardDescription className="text-xs font-sans">
-                Gestiona exámenes, entregas y anuncios importantes.
-              </CardDescription>
-            </div>
-            <Dialog open={isCreateEventDialogOpen} onOpenChange={setIsCreateEventDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" onClick={() => setIsCreateEventDialogOpen(true)}>
-                  Crear Evento
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="font-sans font-semibold sm:text-2xl text-xs tracking-card">
-                    Crear Nuevo Evento
-                  </DialogTitle>
-                  <DialogDescription className="text-xs font-sans text-muted-foreground">
-                    Gestiona exámenes, entregas y anuncios importantes.
-                  </DialogDescription>
-                </DialogHeader>
-                <EventForm
-                  onSubmit={handleCreateEvent}
-                  onCancel={() => setIsCreateEventDialogOpen(false)}
-                  submitLabel="Crear Evento"
-                />
-              </DialogContent>
-            </Dialog>
+      <div>
+        <div className="flex flex-row items-center justify-between gap-4 flex-wrap">
+          <div className="flex flex-col gap-1">
+            <CardTitle className="sm:text-lg text-xs font-semibold tracking-card font-sans">
+              Gestión de Eventos Especiales
+            </CardTitle>
+            <CardDescription className="text-xs font-sans">
+              Gestiona exámenes, entregas y anuncios importantes.
+            </CardDescription>
           </div>
-        </CardHeader>
-        <CardContent>
+          <Dialog open={isCreateEventDialogOpen} onOpenChange={setIsCreateEventDialogOpen}>
+            <Button
+              variant="outline"
+              className="rounded-full text-xs h-9 shrink-0"
+              onClick={() => setIsCreateEventDialogOpen(true)}
+            >
+              Crear Evento
+            </Button>
+            <DialogContent className="rounded-2xl border border-border gap-6 sm:max-w-[440px]">
+              <DialogHeader className="gap-1.5 text-left">
+                <DialogTitle className="text-lg font-semibold tracking-card">
+                  Crear nuevo evento
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  Completa los datos del evento (examen, entrega, anuncio, etc.).
+                </DialogDescription>
+              </DialogHeader>
+              <EventForm
+                onSubmit={handleCreateEvent}
+                onCancel={() => setIsCreateEventDialogOpen(false)}
+                submitLabel="Crear Evento"
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+        <div className='mt-4'>
           {isLoadingEvents ? (
             <Loading />
           ) : events.length > 0 ? (
@@ -261,39 +259,38 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                         </Button>
                         <AlertDialog
                           open={eventToDelete?.id === event.id}
-                          onOpenChange={isOpen => !isOpen && setEventToDelete(null)}
+                          onOpenChange={open => !open && setEventToDelete(null)}
                         >
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-                              onClick={() => setEventToDelete(event)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            aria-label="Eliminar evento"
+                            onClick={() => setEventToDelete(event)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <AlertDialogContent className="rounded-2xl border border-border">
                             <AlertDialogHeader>
-                              <AlertDialogTitle className="font-sans sm:text-2xl text-xs font-semibold tracking-card">
-                                ¿Estás seguro?
+                              <AlertDialogTitle className="text-lg font-semibold tracking-card">
+                                ¿Eliminar evento?
                               </AlertDialogTitle>
-                              <AlertDialogDescription className="font-sans text-xs text-muted-foreground">
-                                Esta acción no se puede deshacer. Se eliminará el evento
+                              <AlertDialogDescription className="text-xs text-muted-foreground">
+                                Esta acción no se puede deshacer. El evento se eliminará
                                 permanentemente.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter>
+                            <AlertDialogFooter className="gap-2 ">
                               <AlertDialogCancel
-                                className="font-sans"
+                                className="rounded-full text-xs"
                                 onClick={() => setEventToDelete(null)}
                               >
                                 Cancelar
                               </AlertDialogCancel>
                               <AlertDialogAction
-                                variant="destructive"
-                                className="font-sans"
-                                onClick={() => handleDeleteEvent(event.id)}
+                                className="rounded-full text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                onClick={() => event.id && handleDeleteEvent(event.id)}
                               >
                                 Eliminar
                               </AlertDialogAction>
@@ -311,18 +308,18 @@ export function EventsTable({ subjectId }: EventsTableProps) {
               <p className="text-xs text-muted-foreground">No hay eventos especiales creados.</p>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Edit Event Dialog */}
       {currentEvent && (
         <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="font-sans sm:text-2xl text-xs font-semibold tracking-card">
-                Editar Evento
+          <DialogContent className="rounded-2xl border border-border gap-6 sm:max-w-[440px]">
+            <DialogHeader className="gap-1.5 text-left">
+              <DialogTitle className="text-lg font-semibold tracking-card">
+                Editar evento
               </DialogTitle>
-              <DialogDescription className="font-sans text-xs text-muted-foreground">
+              <DialogDescription className="text-xs text-muted-foreground">
                 Modifica los detalles del evento.
               </DialogDescription>
             </DialogHeader>

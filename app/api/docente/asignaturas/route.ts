@@ -37,14 +37,8 @@ export async function GET(request: Request) {
       sortOrder: searchParams.get('sortOrder'),
     });
 
-    // Build the where clause with proper TypeScript types
-    const where: {
-      teacherId: string;
-      OR?: Array<{ code: { contains: string } }>;
-    } = { teacherId: session.user.id };
-
     const subjects = await db.subject.findMany({
-      where,
+      where: { teacherIds: { has: session.user.id } },
       orderBy: { [query.sortBy]: query.sortOrder },
     });
 
@@ -55,7 +49,12 @@ export async function GET(request: Request) {
           return subjectPeriod === period;
         })
       : subjects;
-    const validados = z.array(DocenteSubjectSchema).safeParse(filteredSubjects);
+    // Map Prisma shape (teacherIds) to schema shape (teacherId) for validation
+    const mappedForValidation = filteredSubjects.map(subject => ({
+      ...subject,
+      teacherId: subject.teacherIds?.[0] ?? '',
+    }));
+    const validados = z.array(DocenteSubjectSchema).safeParse(mappedForValidation);
     if (!validados.success) {
       return NextResponse.json(
         {
@@ -116,7 +115,10 @@ export async function POST(request: Request) {
         teacherIds: [session.user.id],
       },
     });
-    const validado = DocenteSubjectSchema.safeParse(newSubject);
+    const validado = DocenteSubjectSchema.safeParse({
+      ...newSubject,
+      teacherId: newSubject.teacherIds?.[0] ?? '',
+    });
     if (!validado.success) {
       return NextResponse.json(
         {
@@ -171,7 +173,10 @@ export async function PUT(request: Request) {
         credits: data.credits === undefined ? null : data.credits,
       },
     });
-    const validado = DocenteSubjectSchema.safeParse(updatedSubject);
+    const validado = DocenteSubjectSchema.safeParse({
+      ...updatedSubject,
+      teacherId: updatedSubject.teacherIds?.[0] ?? '',
+    });
     if (!validado.success) {
       return NextResponse.json(
         {

@@ -21,7 +21,7 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
   const router = useRouter();
 
   return (
-    <Card className="p-0">
+    <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">

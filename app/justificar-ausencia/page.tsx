@@ -163,18 +163,18 @@ function JustificarAusenciaContent() {
 
   if (isJustificationSubmitted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[100dvh] p-4 font-sans">
+      <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
         <Card className="w-full max-w-sm mx-auto">
           <CardHeader>
             <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
               Justificación Enviada
             </CardTitle>
-            <CardDescription className="text-center">
+            <CardDescription className="text-center text-muted-foreground">
               Ya has enviado una justificación para esta clase.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Serás redirigido a la página principal en {redirectIn} segundos...
             </p>
             <Button variant="outline" className="w-full" onClick={() => router.push('/')}>
@@ -188,29 +188,28 @@ function JustificarAusenciaContent() {
 
   if (!classId || !studentId) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-4 text-center">
-        <Card className="w-full max-w-md p-8">
-          <CardHeader className="space-y-1">
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
+      <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
               Enlace inválido
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-muted-foreground">
               El enlace de justificación no es válido o ha expirado.
             </CardDescription>
           </CardHeader>
-
-          <Button asChild className="text-xs">
-            <Link href="/dashboard" className="px-6 py-2">
-              Volver al inicio
-            </Link>
-          </Button>
+          <CardContent className="flex justify-center pt-2">
+            <Button asChild variant="outline">
+              <Link href="/dashboard">Volver al inicio</Link>
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[100dvh] p-4 font-sans">
+    <div className="flex items-center justify-center min-h-dvh p-4 font-sans">
       <Card className="w-full max-w-sm mx-auto my-auto">
         <CardHeader>
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">

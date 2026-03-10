@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -20,7 +20,17 @@ import * as dateUtils from '@/lib/time-utils';
 export default function SubjectDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const subjectId = Array.isArray(params?.id) ? params.id[0] : params?.id || '';
+
+  // Toast de asistencia cuando el docente llega desde una URL de asistencia no permitida
+  useEffect(() => {
+    const asistenciaError = searchParams.get('asistenciaError');
+    if (asistenciaError) {
+      sileo.error({ title: decodeURIComponent(asistenciaError) });
+      router.replace(`/dashboard/docente/asignaturas/${subjectId}`, { scroll: false });
+    }
+  }, [subjectId, searchParams, router]);
 
   // Subject data hook with React Query
   const {

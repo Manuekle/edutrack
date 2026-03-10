@@ -24,7 +24,7 @@ export function TeacherStatsCards({
 }: StatsProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-      <Card className="p-0">
+      <Card >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-xs font-semibold">Asignaturas Activas</CardTitle>
           <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -35,7 +35,7 @@ export function TeacherStatsCards({
         </CardContent>
       </Card>
 
-      <Card className="p-0">
+      <Card >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-xs font-semibold">Clases Totales</CardTitle>
           <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -46,7 +46,7 @@ export function TeacherStatsCards({
         </CardContent>
       </Card>
 
-      <Card className="p-0">
+      <Card >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-xs font-semibold">Clases Impartidas</CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
@@ -57,7 +57,7 @@ export function TeacherStatsCards({
         </CardContent>
       </Card>
 
-      <Card className="p-0">
+      <Card >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-xs font-semibold">Próxima Clase</CardTitle>
           <Calendar className="h-4 w-4 text-muted-foreground" />

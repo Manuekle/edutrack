@@ -71,11 +71,11 @@ export default function AttendancePage() {
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isClassPast, setIsClassPast] = useState(false);
   const [isClassTooEarly, setIsClassTooEarly] = useState(false);
   const [isClassCompleted, setIsClassCompleted] = useState(false);
 
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [qrData, setQrData] = useState<{
     qrUrl: string;
     qrToken: string;
@@ -102,7 +102,6 @@ export default function AttendancePage() {
     if (!classId) return;
 
     if (!qrData) setIsLoading(true);
-    setError(null);
     try {
       const [classRes, attendanceRes] = await Promise.all([
         fetch(`/api/docente/clases/${classId}`),
@@ -167,23 +166,26 @@ export default function AttendancePage() {
           errorMessage = 'Esta clase ya ha sido marcada como completada o cancelada.';
         }
 
-        sileo.error({ title: errorMessage });
-        router.back();
+        router.replace(
+          `/dashboard/docente/asignaturas/${subjectId}?asistenciaError=${encodeURIComponent(errorMessage)}`
+        );
         return;
       }
 
       if (!attendanceRes.ok) throw new Error('No se pudo cargar la lista de asistencia.');
       const attendanceResponse = await attendanceRes.json();
       setStudents(attendanceResponse.data); // Corregido: usar response.data
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Error al cargar los datos de la clase';
-      setError(errorMessage);
+        err instanceof Error ? err.message : 'Error al cargar los datos de la clase';
       sileo.error({ title: errorMessage });
+      setIsRedirecting(true);
+      router.replace(`/dashboard/docente/asignaturas/${subjectId}`);
+      return;
     } finally {
       setIsLoading(false);
     }
-  }, [classId, router]);
+  }, [classId, subjectId, router]);
 
   useEffect(() => {
     fetchData();
@@ -262,30 +264,13 @@ export default function AttendancePage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isRedirecting) {
     return <LoadingPage />;
   }
 
-  if (error || isClassTooEarly || isClassCompleted || isClassPast) {
-    return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-        <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
-          <h2 className="sm:text-2xl text-xs text-white text-center font-semibold tracking-card pb-2">
-            No disponible
-          </h2>
-          <p className="text-white text-center mb-4 text-xs">
-            {isClassTooEarly
-              ? 'La clase aún no ha comenzado.'
-              : isClassCompleted
-                ? 'La asistencia ya fue registrada.'
-                : 'El tiempo para registrar asistencia ha finalizado.'}
-          </p>
-          <Button onClick={() => router.back()} variant="default" className="w-full sm:w-auto">
-            Volver a la clase
-          </Button>
-        </div>
-      </div>
-    );
+  // Clase no empezada / ya finalizada: se redirige en fetchData; mostramos loading hasta que navegue
+  if (isClassTooEarly || isClassCompleted || isClassPast) {
+    return <LoadingPage />;
   }
 
   return (

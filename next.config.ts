@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         hostname: '*.public.blob.vercel-storage.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        pathname: '/**',
+      },
     ],
   },
 
@@ -25,7 +30,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.vercel-insights.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
+              "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://placehold.co",
               "font-src 'self' data:",
               "connect-src 'self' https://*.vercel-insights.com",
               "frame-ancestors 'none'",

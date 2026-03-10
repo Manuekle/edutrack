@@ -144,29 +144,28 @@ function ResetPasswordContent() {
 
   if (!isValidToken) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] p-4 text-center">
-        <Card className="w-full max-w-md p-8">
-          <CardHeader className="space-y-1">
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
+      <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
               Enlace inválido
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-muted-foreground">
               El enlace de restablecimiento no es válido o ha expirado.
             </CardDescription>
           </CardHeader>
-
-          <Button asChild className="text-xs">
-            <Link href="/forgot-password" className="px-6 py-2">
-              Solicitar un nuevo enlace
-            </Link>
-          </Button>
+          <CardContent className="flex justify-center pt-2">
+            <Button asChild variant="outline">
+              <Link href="/forgot-password">Solicitar un nuevo enlace</Link>
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 font-sans">
+    <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
@@ -212,7 +211,7 @@ function ResetPasswordContent() {
                         />
                         <button
                           type="button"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           onClick={() => setShowPassword(!showPassword)}
                           aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                           disabled={isSubmitting}
@@ -247,7 +246,7 @@ function ResetPasswordContent() {
                         />
                         <button
                           type="button"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           aria-label={
                             showConfirmPassword ? 'Ocultar confirmación' : 'Mostrar confirmación'

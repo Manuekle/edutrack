@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const { id } = await params;
     const body = await req.json();
-    const { name, code, program, semester, credits, directHours } = body;
+    const { name, code, program, semester, credits, directHours, teacherId } = body;
 
     // Verificar que la asignatura existe
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +41,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     }
 
+    // Solo un docente por materia y grupo
+    if (teacherId !== undefined) {
+      if (teacherId) {
+        const teacher = await db.user.findUnique({
+          where: { id: teacherId },
+        });
+        if (!teacher) {
+          return NextResponse.json({ message: 'El docente no existe.' }, { status: 404 });
+        }
+        if (teacher.role !== Role.DOCENTE && teacher.role !== Role.ADMIN) {
+          return NextResponse.json(
+            { message: 'El usuario seleccionado no es un docente.' },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: any = {
       ...(name && { name }),
@@ -53,6 +71,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(body.group !== undefined && { group: body.group }),
       ...(body.jornada !== undefined && { jornada: body.jornada }),
       ...(body.periodoAcademico !== undefined && { periodoAcademico: body.periodoAcademico }),
+      // Un solo docente por asignatura
+      ...(teacherId !== undefined && {
+        teacherIds: teacherId ? [teacherId] : [],
+      }),
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

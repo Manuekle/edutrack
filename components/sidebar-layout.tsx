@@ -43,11 +43,56 @@ import {
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
+function getRoleDisplayName(role: Role) {
+  switch (role) {
+    case 'ADMIN':
+      return 'Administrador';
+    case 'DOCENTE':
+      return 'Docente';
+    case 'ESTUDIANTE':
+      return 'Estudiante';
+    default:
+      return 'Usuario';
+  }
+}
+
+function UserMenuButton({
+  session,
+  roleDisplayName,
+}: {
+  session: { user?: { name?: string | null } } | null;
+  roleDisplayName: string;
+}) {
+  return (
+    <button
+      type="button"
+      className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-[44px] sm:min-h-[52px] group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center"
+    >
+      <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
+        <AvatarFallback className="bg-primary/10 text-primary">
+          {session?.user?.name?.charAt(0) || 'U'}
+        </AvatarFallback>
+      </Avatar>
+      <div className="ml-2 sm:ml-3 text-left overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden">
+        <p className="text-sm font-semibold truncate font-sans">
+          {session?.user?.name?.split(' ')[0] || 'Usuario'}
+        </p>
+        <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
+          {roleDisplayName}
+        </p>
+      </div>
+      <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
+    </button>
+  );
+}
+
 function AppSidebar({ homePath }: { homePath: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, status } = useSession();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   const handleSignOut = async () => {
     try {
@@ -125,23 +170,10 @@ function AppSidebar({ homePath }: { homePath: string }) {
     return pathname.startsWith(href);
   };
 
-  const getRoleDisplayName = (role: Role) => {
-    switch (role) {
-      case 'ADMIN':
-        return 'Administrador';
-      case 'DOCENTE':
-        return 'Docente';
-      case 'ESTUDIANTE':
-        return 'Estudiante';
-      default:
-        return 'Usuario';
-    }
-  };
-
   return (
     <Sidebar
       variant="inset"
-      className="h-screen fixed font-sans border-r bg-sidebar pt-[env(safe-area-inset-top)]"
+      className="h-screen fixed font-sans bg-sidebar pt-[env(safe-area-inset-top)]"
     >
       <SidebarHeader>
         <SidebarMenu>
@@ -221,99 +253,94 @@ function AppSidebar({ homePath }: { homePath: string }) {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-[44px] sm:min-h-[52px]">
-                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold">
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {session?.user?.name?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="ml-2 sm:ml-3 text-left overflow-hidden">
-                    <p className="text-sm font-semibold truncate font-sans">
-                      {session?.user?.name?.split(' ')[0] || 'Usuario'}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
-                      {getRoleDisplayName(userRole as Role)}
+            {mounted ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <UserMenuButton
+                    session={session}
+                    roleDisplayName={getRoleDisplayName(userRole as Role)}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="font-sans w-64 sm:w-80"
+                  side="bottom"
+                  align="end"
+                  sideOffset={8}
+                  alignOffset={-20}
+                  collisionPadding={16}
+                >
+                  <div className="px-4 py-1.5 my-1">
+                    <p className="text-xs font-semibold truncate">{session?.user?.name || 'Usuario'}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {session?.user?.correoInstitucional || getRoleDisplayName(userRole as Role)}
                     </p>
                   </div>
-                  <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="font-sans w-80 sm:w-64"
-                side="bottom"
-                align="end"
-                sideOffset={8}
-                alignOffset={-20}
-                collisionPadding={16}
-              >
-                <div className="px-4 py-1.5 my-1">
-                  <p className="text-xs font-semibold truncate">{session?.user?.name || 'Usuario'}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {session?.user?.correoInstitucional || getRoleDisplayName(userRole as Role)}
-                  </p>
-                </div>
-                <DropdownMenuItem
-                  onClick={() => router.push('/dashboard/profile')}
-                  className="cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
-                >
-                  <Settings className="mr-3 h-4 w-4 shrink-0" />
-                  <span>Perfil</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  aria-label="Cambiar entre modo oscuro y modo claro"
-                  onClick={e => {
-                    e.preventDefault();
-                    // Determinar el tema actual efectivo (si es 'system', detectar el modo del sistema)
-                    let currentEffectiveTheme = theme;
-                    if (theme === 'system' && typeof window !== 'undefined') {
-                      currentEffectiveTheme = window.matchMedia('(prefers-color-scheme: dark)')
-                        .matches
-                        ? 'dark'
-                        : 'light';
-                    }
-                    // Cambiar entre dark y light (nunca volver a system desde aquí)
-                    const newTheme = currentEffectiveTheme === 'dark' ? 'light' : 'dark';
-                    setTheme(newTheme);
-                    // next-themes ya guarda automáticamente, pero aseguramos persistencia
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('theme', newTheme);
-                    }
-                  }}
-                  className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
-                >
-                  {theme === 'dark' ||
-                    (theme === 'system' &&
-                      typeof window !== 'undefined' &&
-                      window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
-                    <Sun className="mr-3 h-4 w-4 shrink-0" />
-                  ) : (
-                    <Moon className="mr-3 h-4 w-4 shrink-0" />
-                  )}
-                  <span className="font-sans">
+                  <DropdownMenuItem
+                    onClick={() => router.push('/dashboard/profile')}
+                    className="cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
+                  >
+                    <Settings className="mr-3 h-4 w-4 shrink-0" />
+                    <span>Perfil</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    aria-label="Cambiar entre modo oscuro y modo claro"
+                    onClick={e => {
+                      e.preventDefault();
+                      // Determinar el tema actual efectivo (si es 'system', detectar el modo del sistema)
+                      let currentEffectiveTheme = theme;
+                      if (theme === 'system' && typeof window !== 'undefined') {
+                        currentEffectiveTheme = window.matchMedia('(prefers-color-scheme: dark)')
+                          .matches
+                          ? 'dark'
+                          : 'light';
+                      }
+                      // Cambiar entre dark y light (nunca volver a system desde aquí)
+                      const newTheme = currentEffectiveTheme === 'dark' ? 'light' : 'dark';
+                      setTheme(newTheme);
+                      // next-themes ya guarda automáticamente, pero aseguramos persistencia
+                      if (typeof window !== 'undefined') {
+                        localStorage.setItem('theme', newTheme);
+                      }
+                    }}
+                    className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
+                  >
                     {theme === 'dark' ||
                       (theme === 'system' &&
                         typeof window !== 'undefined' &&
-                        window.matchMedia('(prefers-color-scheme: dark)').matches)
-                      ? 'Modo Claro'
-                      : 'Modo Oscuro'}
-                  </span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleSignOut}
-                  className="text-destructive cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
-                >
-                  <LogOut className="mr-3 h-4 w-4 shrink-0" />
-                  <span className="font-sans">Cerrar sesión</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                        window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
+                      <Sun className="mr-3 h-4 w-4 shrink-0" />
+                    ) : (
+                      <Moon className="mr-3 h-4 w-4 shrink-0" />
+                    )}
+                    <span className="font-sans">
+                      {theme === 'dark' ||
+                        (theme === 'system' &&
+                          typeof window !== 'undefined' &&
+                          window.matchMedia('(prefers-color-scheme: dark)').matches)
+                        ? 'Modo Claro'
+                        : 'Modo Oscuro'}
+                    </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="text-destructive cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
+                  >
+                    <LogOut className="mr-3 h-4 w-4 shrink-0" />
+                    <span className="font-sans">Cerrar sesión</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <UserMenuButton
+                session={session}
+                roleDisplayName={getRoleDisplayName(userRole as Role)}
+              />
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter >
+      </SidebarFooter>
       <SidebarRail />
-    </Sidebar >
+    </Sidebar>
   );
 }
 
@@ -470,7 +497,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               <TutorialButton />
             </div>
           </header>
-          <main className="flex-1 p-3 sm:p-4 md:p-6 font-sans pb-safe">{children}</main>
+          <main className="flex-1 p-3 sm:p-4 md:p-6 font-sans">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

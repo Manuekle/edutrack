@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
 import { Loading } from '@/components/ui/loading';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -74,18 +74,18 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
 
   return (
     <>
-      <Card className="p-0">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <div>
+        <div className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+            <CardTitle className="sm:text-lg text-xs font-semibold tracking-card">
               Gestión de Estudiantes
             </CardTitle>
             <CardDescription className="text-xs">
               Gestiona los estudiantes matriculados en esta asignatura.
             </CardDescription>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className='mt-4'>
           {isLoading ? (
             <div className="flex justify-center py-8">
               <Loading className="h-8 w-8" />
@@ -140,8 +140,8 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               No hay estudiantes matriculados en esta asignatura.
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <UnenrollDialog
         isOpen={isDialogOpen}

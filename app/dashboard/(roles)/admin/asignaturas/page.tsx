@@ -1,6 +1,7 @@
 'use client';
 
 import { MicrocurriculoTab } from '@/components/admin/microcurriculo-tab';
+import { EditSubjectModal } from '@/components/modals/edit-subject-modal';
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSubjects } from '@/hooks/use-subjects';
 import { useQueryClient } from '@tanstack/react-query';
-import { Search, Trash2, Users } from 'lucide-react';
+import { Edit2, Search, Trash2, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
@@ -61,6 +62,7 @@ export default function GestionAsignaturasPage() {
     }[]
     | undefined;
   } | null>(null);
+  const [subjectToEdit, setSubjectToEdit] = useState<typeof subjects[0] | null>(null);
 
   // Memoize debounced values
   const debouncedFilters = useMemo(
@@ -236,7 +238,7 @@ export default function GestionAsignaturasPage() {
                             Código & Grupo
                           </TableHead>
                           <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground hidden md:table-cell">
-                            Docente(s)
+                            Docente
                           </TableHead>
                           <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground hidden lg:table-cell">
                             Programa
@@ -246,6 +248,9 @@ export default function GestionAsignaturasPage() {
                           </TableHead>
                           <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">
                             Estudiantes
+                          </TableHead>
+                          <TableHead className="w-[50px] text-xs font-normal px-4 py-2 text-muted-foreground text-right">
+                            Acciones
                           </TableHead>
                         </TableRow>
                       </TableHeader>
@@ -285,11 +290,14 @@ export default function GestionAsignaturasPage() {
                               <TableCell className="px-4 py-3">
                                 <Skeleton className="h-6 w-[40px] rounded-full mx-auto" />
                               </TableCell>
+                              <TableCell className="px-4 py-3 text-right">
+                                <Skeleton className="h-8 w-8 ml-auto" />
+                              </TableCell>
                             </TableRow>
                           ))
                         ) : subjects.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={8} className="h-24 text-center">
+                            <TableCell colSpan={9} className="h-24 text-center">
                               {searchTerm ? (
                                 <div className="flex flex-col items-center justify-center py-6">
                                   <Search className="h-8 w-8 text-muted-foreground mb-2" />
@@ -346,11 +354,9 @@ export default function GestionAsignaturasPage() {
                               <TableCell className="px-4 py-3 hidden md:table-cell">
                                 <span
                                   className="text-xs text-muted-foreground truncate max-w-[150px] inline-block"
-                                  title={subject.teachers?.map(t => t.name).join(', ') || ''}
+                                  title={subject.teachers?.[0]?.name ?? undefined}
                                 >
-                                  {subject.teachers && subject.teachers.length > 0
-                                    ? subject.teachers.map(t => t.name || 'Sin nombre').join(', ')
-                                    : '—'}
+                                  {subject.teachers?.length ? (subject.teachers[0]?.name ?? 'Sin nombre') : '—'}
                                 </span>
                               </TableCell>
                               <TableCell className="px-4 py-3 hidden lg:table-cell">
@@ -380,6 +386,18 @@ export default function GestionAsignaturasPage() {
                                     {subject.studentCount}
                                   </span>
                                 </button>
+                              </TableCell>
+                              <TableCell className="px-4 py-3 text-right">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                  onClick={() => setSubjectToEdit(subject)}
+                                  title="Editar grupo, programa y docente"
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </Button>
                               </TableCell>
                             </TableRow>
                           ))
@@ -432,6 +450,16 @@ export default function GestionAsignaturasPage() {
           <MicrocurriculoTab />
         </TabsContent>
       </Tabs>
+
+      <EditSubjectModal
+        subject={subjectToEdit}
+        isOpen={!!subjectToEdit}
+        onClose={() => setSubjectToEdit(null)}
+        onSubjectUpdate={() => {
+          queryClient.invalidateQueries({ queryKey: ['subjects'] });
+          setSubjectToEdit(null);
+        }}
+      />
 
       <Dialog
         open={!!selectedSubjectForStudents}

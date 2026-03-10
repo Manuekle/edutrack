@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { CardDescription, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -193,7 +194,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
           </div>
         ))}
       </div>
-      <div className="max-height-[600px] overflow-auto">
+      <div className="max-h-[600px] overflow-auto">
         <div className="grid grid-cols-[80px_repeat(7,1fr)] relative">
           {hours.map(hour => (
             <React.Fragment key={hour.toISOString()}>
@@ -739,15 +740,15 @@ export default function AdminSalasPage() {
 
   return (
     <Tabs defaultValue="list" className="flex flex-col gap-8 h-full">
-      {/* Header Consistent with Users Module but with cleaner spacing */}
+      {/* Header alineado con Asignaturas / Grupos */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5" id="tour-salas-title">
-          <h1 className="sm:text-2xl text-xs font-semibold tracking-card text-foreground/90">
+        <div className="space-y-1" id="tour-salas-title">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Gestión de Salas
-          </h1>
-          <p className="text-xs text-muted-foreground">
+          </CardTitle>
+          <CardDescription className="text-xs">
             Administración centralizada de espacios físicos y programación institucional.
-          </p>
+          </CardDescription>
         </div>
 
         <div className="flex items-center gap-3">
@@ -766,11 +767,13 @@ export default function AdminSalasPage() {
             </TabsTrigger>
             <TabsTrigger
               value="requests"
-              className="rounded-full px-7 text-xs font-normal transition-all shrink-0 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30 data-[state=active]:hover:bg-primary text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground border-none relative"
+              className="rounded-full px-7 text-xs font-normal transition-all shrink-0 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground! data-[state=active]:shadow-lg data-[state=active]:shadow-primary/30 data-[state=active]:hover:bg-primary text-muted-foreground/60 hover:bg-muted/50 hover:text-foreground border-none relative gap-1.5"
             >
               Solicitudes
               {bookings.filter(b => b.status === 'PENDIENTE').length > 0 && (
-                <span>{bookings.filter(b => b.status === 'PENDIENTE').length}</span>
+                <Badge variant="secondary" className="h-5 min-w-5 px-1.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                  {bookings.filter(b => b.status === 'PENDIENTE').length}
+                </Badge>
               )}
             </TabsTrigger>
           </TabsList>
@@ -805,7 +808,7 @@ export default function AdminSalasPage() {
                   <span className="text-xs">Nueva Sala</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] rounded-4xl border-none">
+              <DialogContent className="sm:max-w-[425px] rounded-2xl border border-border">
                 <form onSubmit={handleSubmit} className="space-y-6 p-2">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-semibold">
@@ -819,7 +822,7 @@ export default function AdminSalasPage() {
                   </DialogHeader>
                   <div className="grid gap-5">
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                      <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
                         Identificación
                       </Label>
                       <Input
@@ -832,7 +835,7 @@ export default function AdminSalasPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                        <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
                           Tipo
                         </Label>
                         <Select
@@ -852,7 +855,7 @@ export default function AdminSalasPage() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                        <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
                           Capacidad
                         </Label>
                         <Input
@@ -865,7 +868,7 @@ export default function AdminSalasPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold  tracking-card text-muted-foreground ml-1">
+                      <Label className="text-xs font-semibold tracking-card text-muted-foreground ml-1">
                         Descripción
                       </Label>
                       <Textarea
@@ -929,13 +932,19 @@ export default function AdminSalasPage() {
                 <Table>
                   <TableHeader className="bg-muted/30">
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="text-xs font-normal px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                         Nombre del Espacio
                       </TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2">Tipo</TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2">Capacidad</TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2">Descripción</TableHead>
-                      <TableHead className="text-xs font-normal text-right px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                        Tipo
+                      </TableHead>
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                        Capacidad
+                      </TableHead>
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                        Descripción
+                      </TableHead>
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
                         Acciones
                       </TableHead>
                     </TableRow>
@@ -1071,9 +1080,9 @@ export default function AdminSalasPage() {
               <TableBody>
                 {bookings.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                      <div className="flex flex-col items-center justify-center py-6">
-                        <p className="text-xs text-muted-foreground">
+                    <TableCell colSpan={5} className="py-12 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="text-xs font-medium text-muted-foreground">
                           No hay solicitudes registradas
                         </p>
                       </div>
@@ -1161,7 +1170,7 @@ export default function AdminSalasPage() {
 
       {/* Audit Dialog Rediseñado */}
       <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-4xl border-none bg-card">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl border border-border bg-card">
           <DialogHeader className="sr-only">
             <DialogTitle>Detalle de Reserva</DialogTitle>
             <DialogDescription>
@@ -1189,13 +1198,13 @@ export default function AdminSalasPage() {
 
                   <div className="space-y-6">
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
+                      <p className="text-xs font-semibold tracking-card text-muted-foreground/60">
                         Docente
                       </p>
                       <p className="font-semibold text-xs">{selectedBooking.teacher.name}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
+                      <p className="text-xs font-semibold tracking-card text-muted-foreground/60">
                         Fecha
                       </p>
                       <p className="font-semibold text-xs">
@@ -1203,7 +1212,7 @@ export default function AdminSalasPage() {
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold  tracking-card text-muted-foreground/60">
+                      <p className="text-xs font-semibold tracking-card text-muted-foreground/60">
                         Horario
                       </p>
                       <p className="font-semibold text-xs">
@@ -1238,14 +1247,14 @@ export default function AdminSalasPage() {
               <div className="flex-1 py-10 px-4 flex flex-col">
                 <div className="flex-1 space-y-8">
                   <div className="space-y-3">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
+                    <Label className="text-xs font-semibold tracking-card text-muted-foreground/70">
                       Motivo Institucional
                     </Label>
                     <p className="text-xs text-foreground/80">"{selectedBooking.reason}"</p>
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
+                    <Label className="text-xs font-semibold tracking-card text-muted-foreground/70">
                       Firma del Responsable
                     </Label>
                     <div className="bg-white dark:bg-muted/20 rounded-4xl p-4 border border-muted/50 flex items-center justify-center h-40 shadow-inner overflow-hidden relative">
@@ -1263,7 +1272,7 @@ export default function AdminSalasPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-xs font-semibold  tracking-card text-muted-foreground/70">
+                    <Label className="text-xs font-semibold tracking-card text-muted-foreground/70">
                       Notas Administrativas
                     </Label>
                     <Textarea
@@ -1308,7 +1317,7 @@ export default function AdminSalasPage() {
         </DialogContent>
       </Dialog>
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-4xl border-none shadow-2xl bg-card">
+        <AlertDialogContent className="rounded-2xl border border-border bg-card">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-semibold tracking-card">
               ¿Estás completamente seguro?
@@ -1334,7 +1343,7 @@ export default function AdminSalasPage() {
       </AlertDialog>
 
       <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] h-[90vh] sm:h-[85vh] p-0 overflow-hidden flex flex-col rounded-3xl">
+        <DialogContent className="sm:max-w-[800px] h-[90vh] sm:h-[85vh] p-0 overflow-hidden flex flex-col rounded-2xl border border-border">
           <DialogHeader className="px-6 py-4 border-b bg-muted/10 shrink-0">
             <DialogTitle className="text-xl font-semibold tracking-card">Carga Masiva de Salas</DialogTitle>
             <DialogDescription className="text-xs">
@@ -1441,7 +1450,7 @@ export default function AdminSalasPage() {
       </Dialog>
 
       <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-4xl border-none">
+        <DialogContent className="sm:max-w-[425px] rounded-2xl border border-border">
           <form onSubmit={handleAssignGroup} className="space-y-6 p-2">
             <DialogHeader>
               <DialogTitle className="text-2xl font-semibold tracking-card">

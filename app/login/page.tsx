@@ -146,7 +146,7 @@ function LoginForm() {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                         aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                         disabled={isLoading}
@@ -185,11 +185,11 @@ function LoginForm() {
 // Main page component with Suspense boundary
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-[100dvh] p-4 font-sans">
+    <div className="flex items-center justify-center min-h-dvh p-4 font-sans">
       <Suspense
         fallback={
           <Card className="w-full max-w-sm mx-auto my-auto p-8">
-            <div className="text-center">Cargando...</div>
+            <div className="text-center text-sm text-muted-foreground">Cargando...</div>
           </Card>
         }
       >

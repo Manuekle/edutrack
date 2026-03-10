@@ -19,7 +19,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
   const router = useRouter();
 
   return (
-    <Card className="p-0">
+    <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
@@ -31,7 +31,10 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
         {subjects.length > 0 ? (
           <div className="space-y-3">
             {subjects.slice(0, 3).map(subject => {
-              const progress = (subject.completedClasses / subject.totalClasses) * 100;
+              const progress =
+                subject.totalClasses > 0
+                  ? (subject.completedClasses / subject.totalClasses) * 100
+                  : 0;
               return (
                 <div
                   role="button"

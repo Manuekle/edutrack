@@ -228,6 +228,12 @@ export async function POST(request: Request) {
           h => normalizeHeader(h).includes('nombre') || normalizeHeader(h).includes('name')
         );
 
+      const apellidoHeader =
+        findHeader(['apellido', 'apellidos', 'lastname', 'last name', 'surname']) ||
+        availableHeaders.find(
+          h => normalizeHeader(h).includes('apellido') || normalizeHeader(h).includes('lastname')
+        );
+
       const documentHeader =
         findHeader([
           'document',
@@ -286,13 +292,20 @@ export async function POST(request: Request) {
 
       for (const row of rows) {
         // Mapeo flexible de cabeceras usando los headers encontrados o fallback
+        const nombreVal =
+          (nameHeader ? row[nameHeader] : undefined) ||
+          row.nombre ||
+          row.Nombre ||
+          row.name ||
+          row.Name;
+        const apellidoVal =
+          (apellidoHeader ? row[apellidoHeader] : undefined) || row.apellido || row.Apellido;
+        const fullName = [String(nombreVal || '').trim(), String(apellidoVal || '').trim()]
+          .filter(Boolean)
+          .join(' ');
+
         const mappedRow = {
-          name:
-            (nameHeader ? row[nameHeader] : undefined) ||
-            row.name ||
-            row.Name ||
-            row.nombre ||
-            row.Nombre,
+          name: fullName || (nombreVal as string),
           document:
             (documentHeader ? row[documentHeader] : undefined) ||
             row.document ||

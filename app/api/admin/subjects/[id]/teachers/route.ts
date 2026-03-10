@@ -1,7 +1,7 @@
 import { authOptions } from '@/lib/auth';
+import { detectDelimiter, parseCSVLine, validateCSVHeaders } from '@/lib/csv-parser';
 import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
-import { parseCSV, validateCSVHeaders, parseCSVLine, detectDelimiter } from '@/lib/csv-parser';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
@@ -161,21 +161,33 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ success: true, previewData: results });
     }
 
-    // Asignar docentes
-    const toAssign = results.filter(r => r.status === 'success');
-    const teacherIdsToAdd = toAssign
-      .map(r => {
-        const docente = allDocentes.find(d => d.document === r.documentoDocente);
-        return docente?.id;
-      })
-      .filter(Boolean) as string[];
+    // Regla: solo un docente por materia y grupo
+    if (subject.teachers.length >= 1) {
+      return NextResponse.json(
+        {
+          error:
+            'No se puede asignar más de un docente a la misma materia con el mismo grupo. Esta asignatura ya tiene un docente asignado.',
+        },
+        { status: 400 }
+      );
+    }
 
-    if (teacherIdsToAdd.length > 0) {
+    // Asignar un único docente (solo el primero del CSV)
+    const toAssign = results.filter(r => r.status === 'success');
+    const teacherIdToAdd =
+      toAssign.length > 0
+        ? (() => {
+            const docente = allDocentes.find(d => d.document === toAssign[0].documentoDocente);
+            return docente?.id;
+          })()
+        : null;
+
+    if (teacherIdToAdd) {
       await db.subject.update({
         where: { id: subjectId },
         data: {
           teacherIds: {
-            push: teacherIdsToAdd,
+            set: [teacherIdToAdd],
           },
         },
       });
@@ -185,7 +197,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       success: true,
       summary: {
         total: results.length,
-        assigned: toAssign.length,
+        assigned: teacherIdToAdd ? 1 : 0,
         existing: results.filter(r => r.status === 'existing').length,
         errors: results.filter(r => r.status === 'error').length,
       },

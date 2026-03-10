@@ -31,21 +31,20 @@ export function SignatureFileUpload({ onFileSelect }: SignatureFileUploadProps) 
   return (
     <div
       {...getRootProps()}
-      className={`flex flex-col h-full min-h-[150px] w-full items-center justify-center border border-dashed rounded-lg p-4 sm:p-6 space-y-2 cursor-pointer transition-colors ${isDragActive ? 'bg-muted/50 border' : 'hover:bg-muted/30'
-        }`}
+      className={`flex flex-col min-h-[150px] w-full items-center justify-center p-5 sm:p-6 space-y-3 cursor-pointer transition-all duration-200 ${isDragActive ? 'bg-primary/5' : 'bg-transparent'}`}
     >
       <input {...getInputProps()} />
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
-        <UploadCloud className="h-6 w-6 text-muted-foreground" />
+      <div
+        className={`mx-auto flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${isDragActive ? 'bg-primary/15 text-primary' : 'bg-muted/80 text-muted-foreground'
+          }`}
+      >
+        <UploadCloud className="h-7 w-7" />
       </div>
-      <p className="text-xs font-semibold text-center">
+      <p className="text-sm font-medium text-center text-foreground">
         {isDragActive ? 'Suelta la imagen aquí' : 'Seleccionar archivo'}
       </p>
       <p className="text-xs text-muted-foreground text-center">
-        Arrastra y suelta la imagen, o haz clic para seleccionar
-      </p>
-      <p className="text-xs text-muted-foreground text-center">
-        PNG con fondo transparente (máx. 2MB)
+        Arrastra y suelta, o haz clic para elegir · PNG (máx. 2MB)
       </p>
     </div>
   );

@@ -85,9 +85,21 @@ export default function ProfilePage() {
   // Signature
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
+  const [signaturePenColor, setSignaturePenColor] = useState<string>('#171717');
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
+
+  // Color del trazo según tema (canvas no resuelve CSS vars; debe ser color válido para verse en light/dark)
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const apply = () => setSignaturePenColor(root.classList.contains('dark') ? '#e5e5e5' : '#171717');
+    apply();
+    const obs = new MutationObserver(apply);
+    obs.observe(root, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -128,50 +140,36 @@ export default function ProfilePage() {
     }
   }, [session, signatureFile, profileForm]);
 
-  // This effect handles the resizing of the signature canvas to prevent pixelation.
+  // Redimensionar el canvas cuando la pestaña Firma está visible (si estaba oculta al montar tenía 0x0 y no se podía dibujar).
   useEffect(() => {
+    if (activeTab !== 'signature') return;
+
     const canvas = sigCanvas.current?.getCanvas();
     const wrapper = canvasWrapperRef.current;
-
     if (!canvas || !wrapper) return;
 
-    const handleResize = () => {
-      const { width, height } = wrapper.getBoundingClientRect();
-      // Adjust for device pixel ratio for better quality on mobile
-      const dpr = window.devicePixelRatio || 1;
-
-      // Set canvas size in display pixels
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      // Set actual canvas size in memory (scaled for device resolution)
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-
-      // Scale the canvas context to account for the DPR
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.scale(dpr, dpr);
-      }
-
-      // Clear and redraw if needed
+    const applySize = () => {
+      const rect = wrapper.getBoundingClientRect();
+      const w = rect.width > 0 ? rect.width : 400;
+      const h = rect.height > 0 ? rect.height : 180;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      canvas.width = w;
+      canvas.height = h;
       sigCanvas.current?.clear();
     };
 
-    // Initial setup
-    handleResize();
-
-    // Add event listeners
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(wrapper);
-    window.addEventListener('resize', handleResize);
+    const id = setTimeout(applySize, 80);
+    const ro = new ResizeObserver(applySize);
+    ro.observe(wrapper);
+    window.addEventListener('resize', applySize);
 
     return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', handleResize);
-      document.removeEventListener('touchmove', preventScroll);
+      clearTimeout(id);
+      ro.disconnect();
+      window.removeEventListener('resize', applySize);
     };
-  }, []);
+  }, [activeTab]);
 
   // Handle file selection for signature
   const handleFileSelect = (file: File | null) => {
@@ -670,11 +668,12 @@ export default function ProfilePage() {
             <Card className="p-0">
               <CardHeader className="border-b px-5 py-4">
                 <CardTitle className="text-sm font-semibold">Firma Digital</CardTitle>
-                <CardDescription className="text-xs">Gestiona tu firma oficial para certificados y documentos.</CardDescription>
+                <CardDescription className="text-xs text-muted-foreground">
+                  Gestiona tu firma oficial para certificados y documentos.
+                </CardDescription>
               </CardHeader>
               <CardContent className="px-5 py-5 space-y-6">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  {/* Subir imagen */}
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Subir imagen de firma</Label>
                     <div className="rounded-xl overflow-hidden border border-dashed border-border">
@@ -683,19 +682,18 @@ export default function ProfilePage() {
                     <p className="text-[11px] text-muted-foreground">PNG con fondo transparente o blanco. Máximo 2 MB.</p>
                   </div>
 
-                  {/* Dibujar */}
                   <div className="space-y-2">
                     <Label className="text-xs text-muted-foreground">Dibujar firma a mano</Label>
                     <div
                       ref={canvasWrapperRef}
-                      className="w-full h-[180px] border border-border rounded-xl bg-muted/10 relative overflow-hidden touch-none"
+                      className="signature-canvas-container w-full h-[180px] rounded-xl bg-white dark:bg-zinc-900/80 border border-border relative overflow-hidden touch-none select-none"
                     >
                       <SignatureCanvas
                         ref={sigCanvas}
-                        penColor="hsl(var(--primary))"
+                        penColor={signaturePenColor}
                         canvasProps={{
                           className: 'w-full h-full rounded-xl touch-none cursor-crosshair',
-                          style: { touchAction: 'none' }
+                          style: { touchAction: 'none', display: 'block' }
                         }}
                         velocityFilterWeight={0.7}
                         minWidth={2}
@@ -710,40 +708,45 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Vista previa */}
-                <div className="border-t pt-5 space-y-3">
-                  <Label className="text-xs text-muted-foreground">Vista previa / Firma actual</Label>
-                  <div className="flex flex-col md:flex-row items-start gap-5">
-                    <div className="w-full md:w-64 h-36 border border-border rounded-xl flex items-center justify-center bg-white dark:bg-zinc-950/50 overflow-hidden shrink-0">
+                <div className="border-t border-border/80 pt-6">
+                  <p className="text-sm font-medium text-foreground mb-3">Vista previa</p>
+                  <div className="flex flex-col sm:flex-row gap-6 items-stretch sm:items-center">
+                    <div className="shrink-0 w-full sm:w-56 h-32 rounded-xl bg-muted/30 dark:bg-muted/10 border border-border/80 shadow-sm overflow-hidden flex items-center justify-center ring-1 ring-black/4 dark:ring-white/6">
                       {signaturePreview ? (
-                        <div className="relative w-full h-full p-3">
+                        <div className="relative w-full h-full p-4">
                           <Image
                             src={signaturePreview}
                             alt="Firma"
                             fill
                             style={{ objectFit: 'contain' }}
-                            className="rounded-lg dark:invert"
+                            className="rounded-md dark:invert"
                           />
                         </div>
                       ) : (
-                        <div className="text-center text-muted-foreground space-y-1">
-                          <PenLine className="h-6 w-6 mx-auto opacity-20" />
-                          <p className="text-xs">Sin firma registrada</p>
+                        <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                          <div className="rounded-full bg-muted/80 dark:bg-muted/40 p-2.5">
+                            <PenLine className="h-5 w-5 opacity-60" />
+                          </div>
+                          <span className="text-xs font-medium">Sin firma</span>
+                          <span className="text-[11px] text-muted-foreground/90">Aparecerá aquí</span>
                         </div>
                       )}
                     </div>
-                    <div className="space-y-3 flex-1">
-                      <div className="text-xs">
-                        {signatureFile ? (
-                          <span className="text-orange-600 font-semibold">● Pendiente de guardar</span>
-                        ) : signaturePreview ? (
-                          <span className="text-green-600 font-semibold">● Firma registrada</span>
-                        ) : (
-                          <span className="text-muted-foreground">Sin firma. Sube o dibuja tu firma.</span>
-                        )}
-                      </div>
+                    <div className="flex flex-col justify-center gap-2 min-w-0">
+                      {signatureFile ? (
+                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Pendiente de guardar</p>
+                      ) : signaturePreview ? (
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Firma guardada</p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">Sube una imagen o dibuja y pulsa «Capturar trazo».</p>
+                      )}
                       <div className="flex gap-2 flex-wrap">
-                        <Button onClick={handleUploadSignature} disabled={!signatureFile || isSignatureLoading} size="sm" className="text-xs">
+                        <Button
+                          onClick={handleUploadSignature}
+                          disabled={!signatureFile || isSignatureLoading}
+                          size="sm"
+                          className="text-xs h-8"
+                        >
                           {isSignatureLoading ? (
                             <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Guardando...</>
                           ) : (
@@ -751,7 +754,7 @@ export default function ProfilePage() {
                           )}
                         </Button>
                         {signatureFile && (
-                          <Button onClick={handleCancelSignature} variant="ghost" size="sm" className="text-xs text-muted-foreground">Cancelar</Button>
+                          <Button onClick={handleCancelSignature} variant="ghost" size="sm" className="text-xs h-8 text-muted-foreground">Cancelar</Button>
                         )}
                       </div>
                     </div>

@@ -44,11 +44,11 @@ const normalizeJornada = (value: string): Jornada | null => {
 const DAY_MAP: Record<string, string> = {
   lunes: 'LUNES',
   martes: 'MARTES',
-  'miércoles': 'MIERCOLES',
+  miércoles: 'MIERCOLES',
   miercoles: 'MIERCOLES',
   jueves: 'JUEVES',
   viernes: 'VIERNES',
-  'sábado': 'SABADO',
+  sábado: 'SABADO',
   sabado: 'SABADO',
   domingo: 'DOMINGO',
 };
@@ -137,8 +137,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     const groupsMap = new Map<string, GroupData>();
-    const existingGroups = new Set<string>();
-    existingGroups.add(subject.group || 'A');
+
+    // Grupos que ya existen para este código (misma materia, otro grupo ya creado)
+    const existingSubjectsWithCode = await db.subject.findMany({
+      where: { code: subject.code },
+      select: { group: true },
+    });
+    const existingGroups = new Set(
+      existingSubjectsWithCode.map(s => s.group).filter((g): g is string => g != null)
+    );
 
     for (const row of rawRows) {
       const group = row.grupo?.trim() || 'A';
@@ -181,9 +188,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         // Buscar clases existentes el mismo día (por classroom o por docente)
         const existingClasses = await db.class.findMany({
           where: {
-            ...(slot.salon && slot.salon !== 'Por asignar'
-              ? { classroom: slot.salon }
-              : {}),
+            ...(slot.salon && slot.salon !== 'Por asignar' ? { classroom: slot.salon } : {}),
             startTime: { not: null },
           },
           select: {
@@ -207,7 +212,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           if (!cls.startTime || !cls.endTime) continue;
 
           // Verificar que sea el mismo día de la semana
-          const clsDayOfWeek = cls.startTime.toLocaleDateString('es-CO', { weekday: 'long' }).toUpperCase();
+          const clsDayOfWeek = cls.startTime
+            .toLocaleDateString('es-CO', { weekday: 'long' })
+            .toUpperCase();
           const clsDayNormalized = normalizeDay(clsDayOfWeek);
           if (clsDayNormalized !== dia) continue;
 
@@ -224,7 +231,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           }
 
           // Choque de docente
-          if (docenteId && cls.subject.teacherIds.includes(docenteId) && cls.subjectId !== subjectId) {
+          if (
+            docenteId &&
+            cls.subject.teacherIds.includes(docenteId) &&
+            cls.subjectId !== subjectId
+          ) {
             conflictErrors.push(
               `⚠️ Choque de docente: el docente ya tiene clase el ${dia} de ${slot.horaInicio} a ${slot.horaFin} en "${cls.subject.code} - ${cls.subject.name}".`
             );
@@ -242,17 +253,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         if (slot.salon && slot.salon !== 'Por asignar') {
           const existingBookings = await db.roomBooking.findMany({
             where: {
-               status: 'APROBADO',
-               room: { name: slot.salon }
+              status: 'APROBADO',
+              room: { name: slot.salon },
             },
             include: {
-               room: true,
-               teacher: { select: { name: true } }
-            }
+              room: true,
+              teacher: { select: { name: true } },
+            },
           });
 
           for (const booking of existingBookings) {
-            const bDayOfWeek = booking.startTime.toLocaleDateString('es-CO', { weekday: 'long' }).toUpperCase();
+            const bDayOfWeek = booking.startTime
+              .toLocaleDateString('es-CO', { weekday: 'long' })
+              .toUpperCase();
             const bDayNormalized = normalizeDay(bDayOfWeek);
             if (bDayNormalized !== dia) continue;
 
@@ -262,7 +275,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             if (!rangesOverlap(newStart, newEnd, bStart, bEnd)) continue;
 
             conflictErrors.push(
-              `⚠️ Choque con reserva puntual: El salón "${slot.salon}" ya tiene una reserva el ${booking.startTime.toLocaleDateString('es-CO')} de ${booking.startTime.toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'})} a ${booking.endTime.toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'})} por ${booking.teacher.name}.`
+              `⚠️ Choque con reserva puntual: El salón "${slot.salon}" ya tiene una reserva el ${booking.startTime.toLocaleDateString('es-CO')} de ${booking.startTime.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })} a ${booking.endTime.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })} por ${booking.teacher.name}.`
             );
           }
         }
@@ -306,33 +319,55 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const created: string[] = [];
     const errors: string[] = [];
-    // Whether the subject had NO group assigned before this operation
-    const hadNoGroupBefore = !subject.group;
 
     await db.$transaction(async tx => {
       for (const [, data] of groupsMap.entries()) {
-        // Actualizar asignatura con grupo, jornada, periodo y docente
-        const updateData: Record<string, unknown> = {
-          group: data.group,
-          jornada: data.jornada,
-          ...(periodoAcademico ? { periodoAcademico } : {}),
-        };
-
-        if (docenteId) {
-          const currentTeacherIds: string[] = subject.teacherIds || [];
-          if (!currentTeacherIds.includes(docenteId)) {
-            updateData.teacherIds = { push: docenteId };
-          }
-        }
-
-        await tx.subject.update({
-          where: { id: subjectId },
-          data: updateData,
+        // Buscar o crear la asignatura para esta combinación (code, group)
+        // Así la misma materia puede tener varios grupos (Gr. A, Gr. B, etc.)
+        let targetSubject = await tx.subject.findUnique({
+          where: {
+            code_group: {
+              code: subject.code,
+              group: data.group,
+            },
+          },
         });
 
-        // Count as "created" if the subject had no group before, or if a new group letter/jornada combo is new
-        if (hadNoGroupBefore || subject.group !== data.group || subject.jornada !== data.jornada) {
+        if (!targetSubject) {
+          // Crear nueva asignatura: mismo código, otro grupo
+          targetSubject = await tx.subject.create({
+            data: {
+              name: subject.name,
+              code: subject.code,
+              group: data.group,
+              jornada: data.jornada,
+              program: subject.program ?? undefined,
+              semester: subject.semester ?? undefined,
+              credits: subject.credits ?? undefined,
+              directHours: subject.directHours ?? undefined,
+              description: subject.description ?? undefined,
+              periodoAcademico: periodoAcademico ?? subject.periodoAcademico ?? undefined,
+              teacherIds: docenteId ? [docenteId] : [],
+              studentIds: [],
+            },
+          });
           created.push(`Grupo ${data.group} - ${data.jornada}`);
+        } else {
+          // Actualizar asignatura existente: jornada, periodo, docente
+          const updateData: Record<string, unknown> = {
+            jornada: data.jornada,
+            ...(periodoAcademico ? { periodoAcademico } : {}),
+          };
+          if (docenteId) {
+            const currentTeacherIds: string[] = targetSubject.teacherIds || [];
+            if (!currentTeacherIds.includes(docenteId)) {
+              updateData.teacherIds = { set: [docenteId] };
+            }
+          }
+          await tx.subject.update({
+            where: { id: targetSubject.id },
+            data: updateData,
+          });
         }
 
         if (data.schedule && data.schedule.length > 0) {
@@ -366,7 +401,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
               endTime.setHours(endH, endM, 0, 0);
 
               classesToCreate.push({
-                subjectId: subject.id,
+                subjectId: targetSubject.id,
                 date: classDate,
                 startTime,
                 endTime,

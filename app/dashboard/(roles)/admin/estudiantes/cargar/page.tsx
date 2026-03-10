@@ -87,9 +87,20 @@ export default function CargarEstudiantesPage() {
       const result = await res.json();
 
       if (res.ok) {
-        const dataWithIds = (result || []).map((item: PreviewItem, index: number) => ({
-          ...item,
+        const apiItems = (result || []) as Array<{
+          data: { name: string; document: string; correoPersonal: string; correoInstitucional?: string };
+          status: 'success' | 'warning' | 'error';
+          message: string;
+        }>;
+        const dataWithIds: PreviewItem[] = apiItems.map((item, index) => ({
           id: `csv-${index}-${Date.now()}`,
+          document: item.data?.document ?? '',
+          name: item.data?.name ?? '',
+          email: item.data?.correoInstitucional || item.data?.correoPersonal ?? '',
+          phone: '',
+          code: '',
+          status: item.status === 'warning' ? 'existing' : item.status,
+          message: item.message ?? '',
         }));
         setPreviewData(dataWithIds);
         setIsPreview(true);
@@ -201,10 +212,21 @@ export default function CargarEstudiantesPage() {
 
     setIsConfirming(true);
     try {
+      const payload = previewData.map(item => ({
+        data: {
+          name: item.name,
+          document: item.document,
+          correoPersonal: item.email,
+          correoInstitucional: item.email,
+          role: 'ESTUDIANTE',
+        },
+        status: item.status === 'manual' ? 'success' : item.status === 'existing' ? 'warning' : item.status,
+        message: item.message,
+      }));
       const response = await fetch('/api/admin/cargar-usuarios', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ previewData, forceRole: 'ESTUDIANTE' }),
+        body: JSON.stringify({ previewData: payload, forceRole: 'ESTUDIANTE' }),
       });
 
       const result = await response.json();
@@ -244,6 +266,9 @@ export default function CargarEstudiantesPage() {
   };
 
   const successCount = previewData.filter(item => item.status !== 'error').length;
+  const hasValidData = previewData.some(
+    item => item.status !== 'error' && (item.name?.trim() && item.document?.trim())
+  );
   const existingCount = previewData.filter(item => item.status === 'existing').length;
   const errorCount = previewData.filter(item => item.status === 'error').length;
 
@@ -613,7 +638,7 @@ export default function CargarEstudiantesPage() {
                     </p>
                     <Button
                       onClick={handleConfirmUpload}
-                      disabled={isConfirming || successCount === 0}
+                      disabled={isConfirming || successCount === 0 || !hasValidData}
                       className="h-9 px-8 text-xs shadow-sm"
                     >
                       {isConfirming ? (

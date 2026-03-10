@@ -34,9 +34,9 @@ import { sileo } from 'sileo';
 
 interface Teacher {
   id: string;
-  name: string;
-  correoInstitucional: string;
-  codigoDocente: string;
+  name: string | null;
+  correoInstitucional: string | null;
+  codigoDocente: string | null;
 }
 
 interface Subject {
@@ -44,8 +44,7 @@ interface Subject {
   name: string;
   code: string;
   program?: string | null;
-  semester?: number | null;
-  credits?: number | null;
+  group?: string | null;
   teacherIds: string[];
   teachers: Teacher[];
   studentCount: number;
@@ -59,24 +58,10 @@ interface EditSubjectModalProps {
   onSubjectUpdate: (subject: Subject) => void;
 }
 
+/** Solo se pueden editar: grupo, programa y docente */
 const editSubjectSchema = z.object({
-  name: z.string().min(1, 'El nombre de la asignatura es requerido'),
-  code: z.string().min(1, 'El código es requerido'),
+  group: z.string().optional(),
   program: z.string().optional(),
-  semester: z
-    .string()
-    .optional()
-    .refine(
-      val => !val || (Number(val) >= 1 && Number(val) <= 10),
-      'El semestre debe ser un número entre 1 y 10'
-    ),
-  credits: z
-    .string()
-    .optional()
-    .refine(
-      val => !val || (Number(val) >= 1 && Number(val) <= 10),
-      'Los créditos deben ser un número entre 1 y 10'
-    ),
   teacherId: z.string().min(1, 'El docente es requerido'),
 });
 
@@ -95,11 +80,8 @@ export function EditSubjectModal({
   const form = useForm<EditSubjectFormValues>({
     resolver: zodResolver(editSubjectSchema),
     defaultValues: {
-      name: '',
-      code: '',
+      group: '',
       program: '',
-      semester: '',
-      credits: '',
       teacherId: '',
     },
   });
@@ -107,11 +89,8 @@ export function EditSubjectModal({
   useEffect(() => {
     if (subject && isOpen) {
       form.reset({
-        name: subject.name,
-        code: subject.code,
+        group: subject.group || '',
         program: subject.program || '',
-        semester: subject.semester?.toString() || '',
-        credits: subject.credits?.toString() || '',
         teacherId: subject.teacherIds[0] || '',
       });
       fetchTeachers();
@@ -146,10 +125,9 @@ export function EditSubjectModal({
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...data,
-          semester: data.semester ? parseInt(data.semester, 10) : null,
-          credits: data.credits ? parseInt(data.credits, 10) : null,
+          group: data.group || undefined,
           program: data.program || undefined,
+          teacherId: data.teacherId || null,
         }),
       });
 
@@ -191,82 +169,46 @@ export function EditSubjectModal({
             Editar Asignatura
           </DialogTitle>
           <DialogDescription className="text-xs">
-            Modifica los datos de la asignatura {subject.name}.
+            {subject.name} ({subject.code}). Solo puedes editar grupo, programa y docente.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="group"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre de la Asignatura</FormLabel>
+                  <FormLabel>Grupo</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      placeholder="Ej. A, B, 01"
+                      value={field.value ?? ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Código</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="program"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Programa</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="semester"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Semestre</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" max="10" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="credits"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Créditos</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" max="10" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="program"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Programa</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Ej. Ingeniería de Sistemas"
+                      value={field.value ?? ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -287,7 +229,8 @@ export function EditSubjectModal({
                     <SelectContent className="font-sans">
                       {teachers.map(teacher => (
                         <SelectItem key={teacher.id} value={teacher.id}>
-                          {teacher.name} {teacher.codigoDocente ? `(${teacher.codigoDocente})` : ''}
+                          {teacher.name ?? 'Sin nombre'}{' '}
+                          {teacher.codigoDocente ? `(${teacher.codigoDocente})` : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -302,7 +245,7 @@ export function EditSubjectModal({
                 Cancelar
               </Button>
               <Button type="submit" disabled={isUpdating}>
-                {isUpdating ? 'Actualizando...' : 'Actualizar Asignatura'}
+                {isUpdating ? 'Actualizando...' : 'Actualizar'}
               </Button>
             </DialogFooter>
           </form>

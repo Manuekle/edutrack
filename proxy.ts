@@ -125,8 +125,13 @@ export default withAuth(
       response.headers.set('X-XSS-Protection', '1; mode=block');
       response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-      // Admin-only API routes
+      // Admin-only API routes (con excepción: docentes pueden listar salas para Agendar Sala)
       if (pathname.startsWith('/api/admin') && userRole !== Role.ADMIN) {
+        const isDocenteListingRooms =
+          pathname === '/api/admin/rooms' && req.method === 'GET' && userRole === Role.DOCENTE;
+        if (isDocenteListingRooms) {
+          return response;
+        }
         return new NextResponse(JSON.stringify({ message: 'Unauthorized' }), {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
