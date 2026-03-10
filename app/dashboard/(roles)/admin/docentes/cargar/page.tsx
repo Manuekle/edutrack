@@ -94,7 +94,7 @@ export default function CargarDocentesPage() {
           id: `csv-${index}-${Date.now()}`,
           document: item.data?.document ?? '',
           name: item.data?.name ?? '',
-          email: item.data?.correoInstitucional || item.data?.correoPersonal ?? '',
+          email: (item.data?.correoInstitucional || item.data?.correoPersonal) ?? '',
           phone: '',
           status: item.status === 'warning' ? 'existing' : item.status,
           message: item.message ?? '',
