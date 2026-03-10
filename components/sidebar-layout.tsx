@@ -255,12 +255,24 @@ function AppSidebar({ homePath }: { homePath: string }) {
         <SidebarMenu>
           <SidebarMenuItem>
             {mounted ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <UserMenuButton
-                    session={session}
-                    roleDisplayName={getRoleDisplayName(userRole as Role)}
-                  />
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger
+                  className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center data-[state=open]:bg-sidebar-accent"
+                >
+                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {session?.user?.name?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-2 sm:ml-3 text-left overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden">
+                    <p className="text-sm font-semibold truncate font-sans">
+                      {session?.user?.name?.split(' ')[0] || 'Usuario'}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
+                      {getRoleDisplayName(userRole as Role)}
+                    </p>
+                  </div>
+                  <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   className="font-sans w-64 sm:w-80"
