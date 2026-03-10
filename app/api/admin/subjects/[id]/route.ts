@@ -68,24 +68,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             codigoDocente: true,
           },
         },
-        groups: {
-          select: {
-            id: true,
-            groupNumber: true,
-            jornada: true,
-            maxCapacity: true,
-            studentIds: true,
-          },
-        },
       },
     });
 
-    // Calcular total de estudiantes desde grupos
-    const totalStudents =
-      updatedSubject.groups?.reduce(
-        (sum: number, g: { studentIds?: string[] }) => sum + (g.studentIds?.length || 0),
-        0
-      ) || 0;
+    // Calcular total de estudiantes desde el propio subject (mantener compatibilidad)
+    const totalStudents = Array.isArray(updatedSubject.studentIds)
+      ? updatedSubject.studentIds.length
+      : 0;
 
     return NextResponse.json({
       ...updatedSubject,

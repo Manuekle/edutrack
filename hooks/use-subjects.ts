@@ -21,6 +21,12 @@ interface Subject {
     codigoDocente: string | null;
   }[];
   studentIds: string[];
+  students?: {
+    id: string;
+    name: string | null;
+    correoInstitucional: string | null;
+    codigoEstudiantil: string | null;
+  }[];
   studentCount: number;
   classCount: number;
   createdAt: Date;
@@ -92,7 +98,9 @@ export function useSubjects(options: UseSubjectsOptions = {}) {
       sileo.success({ title: 'Asignatura eliminada correctamente' });
     },
     onError: error => {
-      sileo.error({ title: error instanceof Error ? error.message : 'Error al eliminar la asignatura' });
+      sileo.error({
+        title: error instanceof Error ? error.message : 'Error al eliminar la asignatura',
+      });
     },
   });
 

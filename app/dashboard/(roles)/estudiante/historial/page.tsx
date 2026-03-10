@@ -96,7 +96,7 @@ export default function HistorialAsistenciasPage() {
         </CardTitle>
         <CardDescription className="text-xs">Listado de tus asistencias</CardDescription>
       </div>
-      <Card>
+      <Card className="p-0">
         <CardContent className="p-0">
           {error ? (
             <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
@@ -156,45 +156,47 @@ export default function HistorialAsistenciasPage() {
               </Alert>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/60">
-                  <TableHead className="text-xs font-normal px-4 py-2">Asignatura</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Tema</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Fecha</TableHead>
-                  <TableHead className="text-xs font-normal text-right px-4 py-2">Estado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedAttendances.map(attendance => (
-                  <TableRow key={attendance.id}>
-                    <TableCell className="text-xs px-4 py-2">
-                      {attendance.class.subject.name}
-                    </TableCell>
-                    <TableCell className="text-xs px-4 py-2">
-                      <div
-                        className="max-w-xs truncate"
-                        title={attendance.class.topic || 'Clase general'}
-                      >
-                        {attendance.class.topic || 'Clase general'}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs px-4 py-2">
-                      <div className="flex flex-col">
-                        <span>
-                          {format(new Date(attendance.class.date), 'PPP', { locale: es })}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-right px-4 py-2">
-                      <Badge variant="outline" className="lowercase font-normal">
-                        {attendance.status}
-                      </Badge>
-                    </TableCell>
+            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Asignatura</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tema</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Estado</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {paginatedAttendances.map(attendance => (
+                    <TableRow key={attendance.id} className="hover:bg-muted/50 group">
+                      <TableCell className="text-xs px-4 py-3">
+                        {attendance.class.subject.name}
+                      </TableCell>
+                      <TableCell className="text-xs px-4 py-3">
+                        <div
+                          className="max-w-xs truncate"
+                          title={attendance.class.topic || 'Clase general'}
+                        >
+                          {attendance.class.topic || 'Clase general'}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs px-4 py-3">
+                        <div className="flex flex-col">
+                          <span>
+                            {format(new Date(attendance.class.date), 'PPP', { locale: es })}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs text-right px-4 py-3">
+                        <Badge variant="outline" className="lowercase font-normal">
+                          {attendance.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
         {attendances.length > 0 && (

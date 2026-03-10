@@ -95,10 +95,10 @@ export function ClassTableRow({
 
   return (
     <TableRow
-      className={cls.status === 'CANCELADA' ? 'opacity-70 bg-gray-50 dark:bg-zinc-900' : ''}
+      className={cn('hover:bg-muted/50 group', cls.status === 'CANCELADA' && 'opacity-70 bg-muted/30')}
       data-state={cls.status === 'CANCELADA' ? 'cancelled' : undefined}
     >
-      <TableCell className="text-xs px-4 py-2">
+      <TableCell className="text-xs px-4 py-3">
         <div className="flex flex-col">
           <span>{dateUtils.formatDisplayDate(classDate)}</span>
           {cls.startTime && (
@@ -109,8 +109,8 @@ export function ClassTableRow({
           )}
         </div>
       </TableCell>
-      <TableCell className="text-xs px-4 py-2 font-sans">{cls.classroom || 'N/A'}</TableCell>
-      <TableCell className="text-xs px-4 py-2">
+      <TableCell className="text-xs px-4 py-3 font-sans">{cls.classroom || 'N/A'}</TableCell>
+      <TableCell className="text-xs px-4 py-3">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -132,12 +132,12 @@ export function ClassTableRow({
           </Tooltip>
         </TooltipProvider>
       </TableCell>
-      <TableCell className="px-4 py-2 text-center">
-        <Badge variant="outline" className={cn('font-light text-xs dark:text-white', statusColor)}>
+      <TableCell className="text-xs px-4 py-3 text-center">
+        <Badge variant="outline" className={cn('font-light text-xs', statusColor)}>
           {statusLabel}
         </Badge>
       </TableCell>
-      <TableCell className="text-xs text-right px-4 py-2 font-sans">
+      <TableCell className="text-xs text-right px-4 py-3 font-sans">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

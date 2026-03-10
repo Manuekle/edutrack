@@ -81,7 +81,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
 
   return (
     <>
-      <Card>
+      <Card className="p-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
@@ -98,17 +98,17 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               <Loading className="h-8 w-8" />
             </div>
           ) : allClasses.length > 0 ? (
-            <div className="rounded-md border">
+            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
               <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/60">
-                    <TableHead className="text-xs font-normal px-4 py-2">Fecha y Hora</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2">Salón</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2">Tema</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                <TableHeader className="bg-muted/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha y Hora</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Salón</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tema</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">
                       Estado
                     </TableHead>
-                    <TableHead className="text-xs font-normal text-right px-4 py-2 pr-6">
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
                       Acciones
                     </TableHead>
                   </TableRow>

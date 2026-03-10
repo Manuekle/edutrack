@@ -298,7 +298,7 @@ export function MicrocurriculoTab() {
         <div className="lg:col-span-1 space-y-6">
           {mode === 'csv' ? (
             <>
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="p-0 overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Instrucciones
@@ -334,7 +334,7 @@ export function MicrocurriculoTab() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="p-0 overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     Subir Archivo
@@ -361,7 +361,7 @@ export function MicrocurriculoTab() {
               </Card>
             </>
           ) : (
-            <Card className="overflow-hidden border shadow-xs">
+            <Card className="p-0 overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10">
                 <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   {editingId ? 'Editar Asignatura' : 'Nueva Asignatura'}
@@ -469,7 +469,7 @@ export function MicrocurriculoTab() {
         </div>
 
         <div className="lg:col-span-2">
-          <Card className="overflow-hidden border shadow-xs">
+          <Card className="p-0 overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                 Asignaturas para Cargar ({previewData.length})
@@ -497,76 +497,78 @@ export function MicrocurriculoTab() {
                   </Button>
                 </div>
               ) : previewData.length > 0 ? (
-                <div className="relative overflow-x-auto overflow-y-auto max-h-[600px]">
-                  <Table>
-                    <TableHeader className="bg-muted/5 sticky top-0 z-10">
-                      <TableRow className="hover:bg-transparent border-b">
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">Asignatura</TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground hidden sm:table-cell">Información</TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground">Temas</TableHead>
-                        <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground text-right">Acciones</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {previewData.map((item) => (
-                        <TableRow key={item.id} className="hover:bg-muted/20 transition-colors border-b">
-                          <TableCell className="px-4 py-3">
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-xs text-foreground">{item.nombreAsignatura}</span>
-                                {item.status === 'existing' && (
-                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">Actualización</Badge>
-                                )}
-                                {item.status === 'error' && (
-                                  <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 font-normal">Error</Badge>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="secondary" className="font-mono text-[9px] px-1.5 py-0 rounded bg-muted/50 text-muted-foreground">{item.codigoAsignatura}</Badge>
-                                <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">{item.programa || 'Sin programa'}</span>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 py-3 hidden sm:table-cell">
-                            <div className="flex flex-col gap-1">
-                              <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">Sem:</span> {item.semestre}°</span>
-                              <span className="text-[11px] text-muted-foreground">
-                                <span className="font-semibold text-foreground">Cred:</span> {item.creditos}
-                                <span className="w-1 h-1 rounded-full bg-muted-foreground/30 mx-1 inline-block" />
-                                <span className="font-semibold text-foreground">Horas:</span> {item.horas}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 py-3">
-                            <div className="flex flex-wrap gap-1 max-w-[200px]">
-                              {item.temas && item.temas.length > 0 ? (
-                                <>
-                                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal">{item.temas[0]}</Badge>
-                                  {item.temas.length > 1 && (
-                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal bg-muted/10">+{item.temas.length - 1} más</Badge>
-                                  )}
-                                </>
-                              ) : (
-                                <span className="text-[10px] text-muted-foreground italic">Sin temas</span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="px-4 py-3 text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                onClick={() => handleEditItem(item.id)}>
-                                <Edit2 className="h-3.5 w-3.5" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-                                onClick={() => handleDeleteItem(item.id)}>
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
-                            </div>
-                          </TableCell>
+                <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+                  <div className="relative overflow-x-auto overflow-y-auto max-h-[600px]">
+                    <Table>
+                      <TableHeader className="bg-muted/30 sticky top-0 z-10">
+                        <TableRow className="hover:bg-transparent">
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Asignatura</TableHead>
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground hidden sm:table-cell">Información</TableHead>
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Temas</TableHead>
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Acciones</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {previewData.map((item) => (
+                          <TableRow key={item.id} className="hover:bg-muted/50 group">
+                            <TableCell className="text-xs px-4 py-3">
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-xs text-foreground">{item.nombreAsignatura}</span>
+                                  {item.status === 'existing' && (
+                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">Actualización</Badge>
+                                  )}
+                                  {item.status === 'error' && (
+                                    <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 font-normal">Error</Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="secondary" className="font-mono text-[9px] px-1.5 py-0 rounded bg-muted/50 text-muted-foreground">{item.codigoAsignatura}</Badge>
+                                  <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">{item.programa || 'Sin programa'}</span>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs px-4 py-3 hidden sm:table-cell">
+                              <div className="flex flex-col gap-1">
+                                <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">Sem:</span> {item.semestre}°</span>
+                                <span className="text-[11px] text-muted-foreground">
+                                  <span className="font-semibold text-foreground">Cred:</span> {item.creditos}
+                                  <span className="w-1 h-1 rounded-full bg-muted-foreground/30 mx-1 inline-block" />
+                                  <span className="font-semibold text-foreground">Horas:</span> {item.horas}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs px-4 py-3">
+                              <div className="flex flex-wrap gap-1 max-w-[200px]">
+                                {item.temas && item.temas.length > 0 ? (
+                                  <>
+                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal">{item.temas[0]}</Badge>
+                                    {item.temas.length > 1 && (
+                                      <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-muted-foreground/20 font-normal bg-muted/10">+{item.temas.length - 1} más</Badge>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="text-[10px] text-muted-foreground italic">Sin temas</span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs px-4 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                  onClick={() => handleEditItem(item.id)}>
+                                  <Edit2 className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                                  onClick={() => handleDeleteItem(item.id)}>
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center min-h-[300px] py-12 text-center p-6">

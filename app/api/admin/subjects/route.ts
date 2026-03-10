@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Prisma, Role } from '@prisma/client';
+import { EnrollmentStatus, Prisma, Role } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -55,6 +55,21 @@ export async function GET(req: NextRequest) {
           codigoDocente: true,
         },
       },
+      enrollments: {
+        where: {
+          status: EnrollmentStatus.ACTIVA,
+        },
+        select: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              correoInstitucional: true,
+              codigoEstudiantil: true,
+            },
+          },
+        },
+      },
       _count: {
         select: {
           classes: true,
@@ -77,12 +92,19 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Transform the data to include student count
+    // Transformar para incluir conteo de estudiantes y lista básica de estudiantes
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subjectsWithCounts = subjects.map((subject: any) => ({
       ...subject,
-      studentCount: subject.studentIds?.length || 0,
+      studentCount: subject.enrollments?.length || subject.studentIds?.length || 0,
       classCount: subject._count?.classes || 0,
+      students:
+        subject.enrollments?.map((enrollment: any) => ({
+          id: enrollment.student.id,
+          name: enrollment.student.name,
+          correoInstitucional: enrollment.student.correoInstitucional,
+          codigoEstudiantil: enrollment.student.codigoEstudiantil,
+        })) || [],
     }));
 
     const totalPages = Math.ceil(total / pageSize);

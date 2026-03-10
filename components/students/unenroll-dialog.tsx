@@ -44,7 +44,7 @@ export function UnenrollDialog({
               asignatura.
             </p>
             <div className="space-y-2">
-              <Label className="text-xs font-normal text-black dark:text-white" htmlFor="reason">
+              <Label className="text-xs font-normal text-foreground" htmlFor="reason">
                 Motivo de la solicitud
               </Label>
               <Input
@@ -71,7 +71,7 @@ export function UnenrollDialog({
           <Button
             type="button"
             onClick={onConfirm}
-            className="bg-amber-600 text-white hover:bg-amber-700 font-sans"
+            className="bg-warning text-warning-foreground hover:bg-warning/90 font-sans"
             disabled={!reason.trim() || isSubmitting}
           >
             {isSubmitting ? 'Enviando...' : 'Enviar solicitud'}

@@ -74,9 +74,9 @@ const calculatePercentage = (value: number, total: number) => {
 };
 
 const getBadgeClass = (percentage: number) => {
-  if (percentage < 60) return 'bg-rose-600 text-white';
-  if (percentage >= 80) return 'bg-emerald-600 text-white';
-  return 'bg-amber-600 text-white';
+  if (percentage < 60) return 'bg-destructive text-destructive-foreground';
+  if (percentage >= 80) return 'bg-success text-success-foreground';
+  return 'bg-warning text-warning-foreground';
 };
 
 // ----------------------------------------------------------------------
@@ -164,13 +164,11 @@ function SubjectDetailsPanel({
     {
       name: 'Presente',
       value: attendanceTotals.present,
-      fill: '#0F7B3F',
       percentage: calculatePercentage(attendanceTotals.present, totalAttendance),
     },
     {
       name: 'Ausente',
       value: attendanceTotals.absent + attendanceTotals.late,
-      fill: '#8C171D',
       percentage: calculatePercentage(
         attendanceTotals.absent + attendanceTotals.late,
         totalAttendance
@@ -179,7 +177,6 @@ function SubjectDetailsPanel({
     {
       name: 'Justificado',
       value: attendanceTotals.justified,
-      fill: '#FDBE0F',
       percentage: calculatePercentage(attendanceTotals.justified, totalAttendance),
     },
   ].filter(item => item.value > 0);
@@ -187,15 +184,15 @@ function SubjectDetailsPanel({
   const chartConfig = {
     Presente: {
       label: 'Presente',
-      color: '#0F7BF0',
+      color: CHART_COLORS.attendance.present,
     },
     Ausente: {
       label: 'Ausente',
-      color: '#8C171D',
+      color: CHART_COLORS.attendance.absent,
     },
     Justificado: {
       label: 'Justificado',
-      color: '#FDBE0F',
+      color: CHART_COLORS.attendance.justified,
     },
   };
 
@@ -259,14 +256,14 @@ function SubjectDetailsPanel({
                               variant="outline"
                               className="h-5 px-1.5 text-xs font-mono border-muted-foreground/30 bg-muted/50"
                             >
-                              <span className="text-emerald-600">P:</span>{' '}
+                              <span className="text-success">P:</span>{' '}
                               {cls.attendanceStats.present}
                             </Badge>
                             <Badge
                               variant="outline"
                               className="h-5 px-1.5 text-xs font-mono border-muted-foreground/30 bg-muted/50"
                             >
-                              <span className="text-rose-600">A:</span>{' '}
+                              <span className="text-destructive">A:</span>{' '}
                               {cls.attendanceStats.absent + cls.attendanceStats.late}
                             </Badge>
                             {cls.attendanceStats.justified > 0 && (
@@ -274,7 +271,7 @@ function SubjectDetailsPanel({
                                 variant="outline"
                                 className="h-5 px-1.5 text-xs font-mono border-muted-foreground/30 bg-muted/50"
                               >
-                                <span className="text-amber-600">J:</span>{' '}
+                                <span className="text-warning">J:</span>{' '}
                                 {cls.attendanceStats.justified}
                               </Badge>
                             )}
@@ -562,7 +559,7 @@ export function TeacherReport() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-background">
       {/* Sidebar - Only sticky on desktop */}
-      <Card className="p-0 w-full md:w-96 shadow-sm rounded-xl flex flex-col self-start md:sticky md:top-0 h-auto md:h-[53dvh] z-10 overflow-y-auto" id="tour-reportes-list">
+      <Card className="w-full md:w-96 shadow-sm rounded-xl flex flex-col self-start md:sticky md:top-0 h-auto md:h-[53dvh] z-10 overflow-y-auto" id="tour-reportes-list">
         <CardHeader className="p-0">
           <div className="relative p-0 px-3 pt-4">
             <Input
@@ -650,7 +647,7 @@ export function TeacherReport() {
         {selectedTeacher ? (
           <div className="space-y-6">
             {/* Header */}
-            <Card>
+            <Card className="">
               <CardHeader>
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-center gap-3">
@@ -715,9 +712,9 @@ export function TeacherReport() {
             </Card>
 
             {/* Chart */}
-            <Card id="tour-reportes-chart">
-              <CardContent>
-                <div className="relative h-72 md:h-80">
+            <Card id="tour-reportes-chart" className="overflow-hidden">
+              <CardContent className="overflow-hidden">
+                <div className="relative h-72 md:h-80 min-w-0 overflow-hidden">
                   {loadingData && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm">
                       <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -726,12 +723,12 @@ export function TeacherReport() {
                   {chartData.length > 0 ? (
                     <ChartContainer
                       config={{}}
-                      className="aspect-auto h-[250px] md:h-[350px] w-full"
+                      className="h-full min-h-0 w-full min-w-0"
                     >
                       <LineChart
                         accessibilityLayer
                         data={chartData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
                       >
                         <CartesianGrid
                           vertical={false}

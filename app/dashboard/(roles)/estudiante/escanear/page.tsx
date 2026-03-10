@@ -138,7 +138,7 @@ export default function ScannerPage() {
             <QRScanner onScan={handleScan} onError={handleError} isLoading={isProcessing} />
 
             {/* Help Text */}
-            <Card>
+            <Card className="p-0">
               <CardContent className="pt-6">
                 <div className="space-y-3 text-xs text-muted-foreground">
                   <p className="font-semibold text-foreground">Instrucciones:</p>

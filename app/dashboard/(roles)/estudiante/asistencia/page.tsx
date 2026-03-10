@@ -127,7 +127,7 @@ export default function StudentAttendancePage() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="p-0">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">

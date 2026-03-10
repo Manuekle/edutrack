@@ -211,77 +211,79 @@ export default function DocenteAgendarPage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30">
-                    <TableHead className="text-xs font-semibold text-muted-foreground/60 px-6">
-                      Horario
-                    </TableHead>
-                    <TableHead className="text-xs font-semibold text-muted-foreground/60 px-4">
-                      Motivo / Clase
-                    </TableHead>
-                    <TableHead className="text-xs font-semibold text-muted-foreground/60 px-6 text-right">
-                      Estado
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {roomBookings.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center py-20">
-                        <div className="flex flex-col items-center gap-3">
-                          <CalendarIcon className="h-10 w-10 text-muted-foreground/20" />
-                          <p className="text-muted-foreground text-xs font-semibold">
-                            No hay ocupación programada
-                          </p>
-                        </div>
-                      </TableCell>
+              <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+                <Table>
+                  <TableHeader className="bg-muted/30">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                        Horario
+                      </TableHead>
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                        Motivo / Clase
+                      </TableHead>
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
+                        Estado
+                      </TableHead>
                     </TableRow>
-                  ) : (
-                    roomBookings.map(booking => (
-                      <TableRow
-                        key={booking.id}
-                        className="text-xs font-semibold border-b border-muted/30 last:border-0"
-                      >
-                        <TableCell className="px-6 py-4">
-                          <div className="flex flex-col gap-0.5">
-                            <div className="flex items-center gap-1.5 text-foreground font-semibold">
-                              <Clock className="h-3 w-3 text-primary/50" />
-                              {format(new Date(booking.startTime), 'hh:mm a')} -{' '}
-                              {format(new Date(booking.endTime), 'hh:mm a')}
-                            </div>
-                            <span className="text-xs text-muted-foreground capitalize">
-                              {format(new Date(booking.startTime), "EEEE dd 'de' MMMM", {
-                                locale: es,
-                              })}
-                            </span>
+                  </TableHeader>
+                  <TableBody>
+                    {roomBookings.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center py-12 text-xs px-4">
+                          <div className="flex flex-col items-center gap-3">
+                            <CalendarIcon className="h-10 w-10 text-muted-foreground/20" />
+                            <p className="text-muted-foreground text-xs font-semibold">
+                              No hay ocupación programada
+                            </p>
                           </div>
                         </TableCell>
-                        <TableCell className="px-4 py-4">
-                          <span className="italic text-muted-foreground group-hover:text-foreground">
-                            "{booking.reason}"
-                          </span>
-                        </TableCell>
-                        <TableCell className="px-6 py-4 text-right">
-                          <Badge
-                            variant="secondary"
-                            className={cn(
-                              'text-xs font-semibold px-2 py-0.5',
-                              booking.status === 'APROBADO'
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400'
-                                : booking.status === 'RECHAZADO'
-                                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
-                                  : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
-                            )}
-                          >
-                            {booking.status}
-                          </Badge>
-                        </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
+                    ) : (
+                      roomBookings.map(booking => (
+                        <TableRow
+                          key={booking.id}
+                          className="hover:bg-muted/50 group"
+                        >
+                          <TableCell className="text-xs px-4 py-3">
+                            <div className="flex flex-col gap-0.5">
+                              <div className="flex items-center gap-1.5 text-foreground font-semibold">
+                                <Clock className="h-3 w-3 text-primary/50" />
+                                {format(new Date(booking.startTime), 'hh:mm a')} -{' '}
+                                {format(new Date(booking.endTime), 'hh:mm a')}
+                              </div>
+                              <span className="text-xs text-muted-foreground capitalize">
+                                {format(new Date(booking.startTime), "EEEE dd 'de' MMMM", {
+                                  locale: es,
+                                })}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs px-4 py-3">
+                            <span className="italic text-muted-foreground group-hover:text-foreground">
+                              "{booking.reason}"
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-xs px-4 py-3 text-right">
+                            <Badge
+                              variant="secondary"
+                              className={cn(
+                                'text-xs font-semibold px-2 py-0.5',
+                                booking.status === 'APROBADO'
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400'
+                                  : booking.status === 'RECHAZADO'
+                                    ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
+                                    : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
+                              )}
+                            >
+                              {booking.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 

@@ -19,7 +19,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
   const router = useRouter();
 
   return (
-    <Card>
+    <Card className="p-0">
       <CardHeader>
         <div className="flex items-center gap-2">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">

@@ -74,7 +74,8 @@ export function CancelClassDialog({
           <Button
             disabled={!cancelReason.trim() || isSubmitting}
             onClick={onConfirm}
-            className="bg-rose-600 text-white hover:bg-rose-700 font-sans"
+            variant="destructive"
+            className="font-sans"
             aria-label="Confirmar cancelación de clase"
           >
             {isSubmitting ? 'Cancelando...' : 'Confirmar Cancelación'}

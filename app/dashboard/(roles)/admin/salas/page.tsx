@@ -463,7 +463,7 @@ export default function AdminSalasPage() {
   const [assignGroupName, setAssignGroupName] = useState<string>('');
   const [assignPeriodo, setAssignPeriodo] = useState<string>('');
   const [isAssigning, setIsAssigning] = useState(false);
-  const [availableGroups, setAvailableGroups] = useState<string[]>([]);
+  const [availableGroups, setAvailableGroups] = useState<{ id: string; name: string }[]>([]);
 
   // Managed state for the institutional calendar
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -903,7 +903,7 @@ export default function AdminSalasPage() {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                 <Input
                   placeholder="Buscar por nombre o tipo..."
-                  className="pl-10 h-11 bg-muted/20 border-none rounded-2xl focus-visible:ring-1"
+                  className="pl-10 bg-muted/20 rounded-full focus-visible:ring-1"
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                 />
@@ -997,7 +997,7 @@ export default function AdminSalasPage() {
                                   <span className="text-xs font-sans">Editar Sala</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  className="cursor-pointer gap-2 text-red-600"
+                                  className="cursor-pointer gap-2 text-destructive"
                                   onClick={() => {
                                     setRoomToDelete(room);
                                     setIsDeleteDialogOpen(true);
@@ -1057,13 +1057,13 @@ export default function AdminSalasPage() {
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="text-xs font-normal px-4 py-2">Solicitante</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Espacio</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2">Programación</TableHead>
-                  <TableHead className="text-xs font-normal px-4 py-2 text-center">
+                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Solicitante</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Espacio</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Programación</TableHead>
+                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">
                     Estado
                   </TableHead>
-                  <TableHead className="text-xs font-normal text-right px-4 py-2">
+                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
                     Acciones
                   </TableHead>
                 </TableRow>
@@ -1376,28 +1376,30 @@ export default function AdminSalasPage() {
                     {uploadPreviewData.length} registros
                   </Badge>
                 </div>
-                <div className="rounded-xl border bg-card overflow-hidden">
+                <div className="bg-card border rounded-md overflow-hidden shadow-sm">
                   <Table>
                     <TableHeader className="bg-muted/30">
-                      <TableRow>
-                        <TableHead className="text-xs font-semibold">Identificación</TableHead>
-                        <TableHead className="text-xs font-semibold">Tipo</TableHead>
-                        <TableHead className="text-xs font-semibold">Capacidad</TableHead>
-                        <TableHead className="text-xs font-semibold text-right">Estado</TableHead>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Identificación</TableHead>
+                        <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tipo</TableHead>
+                        <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Capacidad</TableHead>
+                        <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Estado</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {uploadPreviewData.map((row) => (
-                        <TableRow key={row.name}>
-                          <TableCell className="text-xs font-medium">{row.name}</TableCell>
-                          <TableCell className="text-xs">{row.type}</TableCell>
-                          <TableCell className="text-xs">{row.capacity}</TableCell>
-                          <TableCell className="text-right">
+                        <TableRow key={row.name} className="hover:bg-muted/50 group">
+                          <TableCell className="text-xs px-4 py-3 font-medium">{row.name}</TableCell>
+                          <TableCell className="text-xs px-4 py-3">{row.type}</TableCell>
+                          <TableCell className="text-xs px-4 py-3">{row.capacity}</TableCell>
+                          <TableCell className="text-xs px-4 py-3 text-right">
                             <Badge
                               variant={row.status === 'success' ? 'default' : 'secondary'}
                               className={cn(
                                 'text-[10px]',
-                                row.status === 'success' ? 'bg-green-500 hover:bg-green-600' : 'bg-yellow-500 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-700'
+                                row.status === 'success'
+                                  ? 'bg-success text-success-foreground hover:bg-success/90'
+                                  : 'bg-warning/10 text-warning hover:bg-warning/20'
                               )}
                             >
                               {row.status === 'success' ? 'Válido' : 'Existente'}
@@ -1477,8 +1479,8 @@ export default function AdminSalasPage() {
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-none shadow-xl">
                     {Array.isArray(availableGroups) && availableGroups.map(group => (
-                      <SelectItem key={group} value={group}>
-                        {group}
+                      <SelectItem key={group.id} value={group.name}>
+                        {group.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

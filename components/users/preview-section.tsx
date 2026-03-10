@@ -50,7 +50,7 @@ export function UsersPreviewSection({
 
   return (
     <div className="lg:col-span-2">
-      <Card>
+      <Card className="p-0">
         <CardHeader className="pb-3">
           <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Previsualización y Confirmación

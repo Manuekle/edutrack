@@ -13,10 +13,10 @@ interface StudentTableRowProps {
 
 export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowProps) {
   return (
-    <TableRow>
-      <TableCell className="text-xs px-4 py-2">{student.name || 'N/A'}</TableCell>
-      <TableCell className="text-xs px-4 py-2">{student.document || 'N/A'}</TableCell>
-      <TableCell className="text-xs px-4 py-2">
+    <TableRow className="hover:bg-muted/50 group">
+      <TableCell className="text-xs px-4 py-3">{student.name || 'N/A'}</TableCell>
+      <TableCell className="text-xs px-4 py-3">{student.document || 'N/A'}</TableCell>
+      <TableCell className="text-xs px-4 py-3">
         {student.correoInstitucional ? (
           <a
             href={`mailto:${student.correoInstitucional}`}
@@ -29,7 +29,7 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
           'N/A'
         )}
       </TableCell>
-      <TableCell className="text-xs px-4 py-2">
+      <TableCell className="text-xs px-4 py-3">
         {student.correoPersonal ? (
           <a
             href={`mailto:${student.correoPersonal}`}
@@ -42,7 +42,7 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
           'N/A'
         )}
       </TableCell>
-      <TableCell className="text-xs px-4 py-2">
+      <TableCell className="text-xs px-4 py-3">
         {student.telefono ? (
           <a href={`tel:${student.telefono}`} className="hover:underline" title="Llamar">
             {student.telefono}
@@ -51,7 +51,7 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
           'N/A'
         )}
       </TableCell>
-      <TableCell className="text-xs tracking-card text-right px-4 py-2">
+      <TableCell className="text-xs tracking-card text-right px-4 py-3">
         <DialogTrigger asChild>
           <Button
             variant="ghost"

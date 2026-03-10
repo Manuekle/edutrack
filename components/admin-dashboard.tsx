@@ -285,7 +285,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Estado de Asistencias */}
-        <Card>
+        <Card className="p-0">
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
@@ -324,7 +324,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Ocupación de Salones */}
-        <Card>
+        <Card className="p-0">
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
@@ -369,7 +369,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Top Materias */}
-        <Card>
+        <Card className="p-0">
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">

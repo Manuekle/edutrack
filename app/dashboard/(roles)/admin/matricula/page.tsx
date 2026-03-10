@@ -353,7 +353,7 @@ export default function MatriculaPage() {
             <div className="lg:col-span-1 space-y-6">
               {mode === 'csv' ? (
                 <>
-                  <Card className="overflow-hidden border shadow-xs" id="tour-instructions">
+                  <Card className="p-0 overflow-hidden border shadow-xs" id="tour-instructions">
                     <div className="border-b px-5 py-4 bg-muted/10">
                       <p className="text-xs font-semibold tracking-heading">Instrucciones</p>
                       <p className="text-[11px] text-muted-foreground mt-0.5">Sigue estos pasos para la carga masiva.</p>
@@ -385,7 +385,7 @@ export default function MatriculaPage() {
                     </div>
                   </Card>
 
-                  <Card className="overflow-hidden border shadow-xs" id="tour-upload-panel">
+                  <Card className="p-0 overflow-hidden border shadow-xs" id="tour-upload-panel">
                     <div className="border-b px-5 py-4 bg-muted/10">
                       <p className="text-xs font-semibold tracking-heading">Subir Archivo</p>
                     </div>
@@ -410,7 +410,7 @@ export default function MatriculaPage() {
                   </Card>
                 </>
               ) : (
-                <Card className="overflow-hidden border shadow-xs" id="tour-upload-panel">
+                <Card className="p-0 overflow-hidden border shadow-xs" id="tour-upload-panel">
                   <div className="border-b px-5 py-4 bg-muted/10">
                     <p className="text-xs font-semibold">Configuración</p>
                   </div>
@@ -482,7 +482,7 @@ export default function MatriculaPage() {
 
             {/* Right column: preview/results */}
             <div className="lg:col-span-2 space-y-4" id="tour-preview">
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="p-0 overflow-hidden border shadow-xs">
                 <div className="border-b px-5 py-4 bg-muted/10">
                   <p className="text-xs font-semibold tracking-heading">
                     Vista Previa de Asignación {previewData.length > 0 && `(${previewData.length})`}
@@ -502,8 +502,12 @@ export default function MatriculaPage() {
                       <h3 className="sm:text-xl text-lg font-semibold mb-2">¡Asignación Completada!</h3>
                       <div className="space-y-1 mb-6 text-sm text-muted-foreground">
                         <p>{finalResults.assigned} estudiantes asignados exitosamente.</p>
-                        {finalResults.existing > 0 && <p className="text-amber-600">{finalResults.existing} ya estaban asignados.</p>}
-                        {finalResults.errors > 0 && <p className="text-red-500">{finalResults.errors} errores omitidos.</p>}
+                        {finalResults.existing > 0 && (
+                          <p className="text-warning">{finalResults.existing} ya estaban asignados.</p>
+                        )}
+                        {finalResults.errors > 0 && (
+                          <p className="text-destructive">{finalResults.errors} errores omitidos.</p>
+                        )}
                       </div>
                       <Button onClick={() => { handleCancel(); setMode('csv'); }} variant="outline">
                         Realizar nueva asignación
@@ -511,59 +515,65 @@ export default function MatriculaPage() {
                     </div>
                   ) : previewData.length > 0 ? (
                     <>
-                      <div className="relative overflow-x-auto overflow-y-auto max-h-[500px]">
-                        <Table>
-                          <TableHeader className="bg-muted/5 sticky top-0 z-10">
-                            <TableRow className="border-b">
-                              <TableHead className="text-[10px] font-semibold">Estudiante</TableHead>
-                              <TableHead className="text-[10px] font-semibold">Grupo</TableHead>
-                              <TableHead className="text-[10px] font-semibold">Periodo</TableHead>
-                              <TableHead className="text-[10px] font-semibold">Estado</TableHead>
-                              <TableHead className="text-[10px] font-semibold text-right">Acciones</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {previewData.map((item) => (
-                              <TableRow key={item.id} className="border-b hover:bg-muted/10">
-                                <TableCell className="px-4 py-3">
-                                  <p className="text-xs font-semibold">{item.nombreEstudiante || 'Desconocido'}</p>
-                                  <p className="text-[10px] text-muted-foreground">{item.documentoEstudiante}</p>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-xs font-medium">{item.grupoNombre}</TableCell>
-                                <TableCell className="px-4 py-3 text-xs">{item.periodoAcademico}</TableCell>
-                                <TableCell className="px-4 py-3">
-                                  <Badge
-                                    variant={
-                                      item.status === 'success' || item.status === 'manual' ? 'default' :
-                                        item.status === 'existing' ? 'outline' : 'destructive'
-                                    }
-                                    className={`text-[10px] ${item.status === 'success' || item.status === 'manual' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
-                                  >
-                                    {item.status === 'success' || item.status === 'manual' ? 'Listo' :
-                                      item.status === 'existing' ? 'Ya asignado' : 'Error'}
-                                  </Badge>
-                                  {item.message && <p className="text-[9px] text-muted-foreground mt-1 max-w-[150px] truncate">{item.message}</p>}
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-right">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                                    onClick={() => handleDeleteItem(item.id)}
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </Button>
-                                </TableCell>
+                      <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+                        <div className="relative overflow-x-auto overflow-y-auto max-h-[500px]">
+                          <Table>
+                            <TableHeader className="bg-muted/30 sticky top-0 z-10">
+                              <TableRow className="hover:bg-transparent">
+                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Estudiante</TableHead>
+                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Grupo</TableHead>
+                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Periodo</TableHead>
+                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Estado</TableHead>
+                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Acciones</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                            </TableHeader>
+                            <TableBody>
+                              {previewData.map((item) => (
+                                <TableRow key={item.id} className="hover:bg-muted/50 group">
+                                  <TableCell className="text-xs px-4 py-3">
+                                    <p className="text-xs font-semibold">{item.nombreEstudiante || 'Desconocido'}</p>
+                                    <p className="text-[10px] text-muted-foreground">{item.documentoEstudiante}</p>
+                                  </TableCell>
+                                  <TableCell className="px-4 py-3 text-xs font-medium">{item.grupoNombre}</TableCell>
+                                  <TableCell className="px-4 py-3 text-xs">{item.periodoAcademico}</TableCell>
+                                  <TableCell className="text-xs px-4 py-3">
+                                    <Badge
+                                      variant={
+                                        item.status === 'success' || item.status === 'manual' ? 'default' :
+                                          item.status === 'existing' ? 'outline' : 'destructive'
+                                      }
+                                      className={`text-[10px] ${item.status === 'success' || item.status === 'manual' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}
+                                    >
+                                      {item.status === 'success' || item.status === 'manual' ? 'Listo' :
+                                        item.status === 'existing' ? 'Ya asignado' : 'Error'}
+                                    </Badge>
+                                    {item.message && <p className="text-[9px] text-muted-foreground mt-1 max-w-[150px] truncate">{item.message}</p>}
+                                  </TableCell>
+                                  <TableCell className="px-4 py-3 text-right">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                      onClick={() => handleDeleteItem(item.id)}
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </div>
                       <div className="border-t px-5 py-4 bg-muted/5 flex items-center justify-between">
                         <div className="flex gap-4">
-                          <span className="text-xs font-semibold text-emerald-600">{successCount} listos</span>
-                          {existingCount > 0 && <span className="text-xs font-semibold text-amber-600">{existingCount} existentes</span>}
-                          {errorCount > 0 && <span className="text-xs font-semibold text-red-600">{errorCount} errores</span>}
+                          <span className="text-xs font-semibold text-success">{successCount} listos</span>
+                          {existingCount > 0 && (
+                            <span className="text-xs font-semibold text-warning">{existingCount} existentes</span>
+                          )}
+                          {errorCount > 0 && (
+                            <span className="text-xs font-semibold text-destructive">{errorCount} errores</span>
+                          )}
                         </div>
                         <Button
                           onClick={handleConfirm}

@@ -74,7 +74,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
 
   return (
     <>
-      <Card>
+      <Card className="p-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
@@ -91,27 +91,27 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               <Loading className="h-8 w-8" />
             </div>
           ) : allStudents.length > 0 ? (
-            <div className="rounded-md border">
+            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/60">
-                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                  <TableHeader className="bg-muted/30">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                         Nombre
                       </TableHead>
-                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                         Documento
                       </TableHead>
-                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                         Correo Institucional
                       </TableHead>
-                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                         Correo Personal
                       </TableHead>
-                      <TableHead className="text-xs tracking-card font-normal px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                         Teléfono
                       </TableHead>
-                      <TableHead className="text-xs tracking-card font-normal text-right px-4 py-2">
+                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
                         Acciones
                       </TableHead>
                     </TableRow>

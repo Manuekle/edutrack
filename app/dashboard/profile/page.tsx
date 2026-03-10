@@ -474,7 +474,7 @@ export default function ProfilePage() {
 
         <TabsContent value="profile" className="space-y-4">
           {/* Resumen del usuario */}
-          <Card>
+          <Card className="p-0">
             <CardContent className="py-4 px-5 flex items-center gap-4">
               <Avatar className="h-12 w-12 border border-border bg-muted shrink-0">
                 <AvatarFallback className="text-lg font-semibold text-primary">
@@ -490,7 +490,7 @@ export default function ProfilePage() {
 
           <Form {...profileForm}>
             <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-              <Card>
+              <Card className='p-0'>
                 <CardHeader className="border-b px-5 py-4">
                   <CardTitle className="text-sm font-semibold">Información de Perfil</CardTitle>
                   <CardDescription className="text-xs">Actualiza los datos de tu cuenta.</CardDescription>
@@ -598,7 +598,7 @@ export default function ProfilePage() {
         <TabsContent value="security" className="space-y-4">
           <Form {...passwordForm}>
             <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
-              <Card>
+              <Card className="p-0">
                 <CardHeader className="border-b px-5 py-4">
                   <CardTitle className="text-sm font-semibold">Cambiar Contraseña</CardTitle>
                   <CardDescription className="text-xs">Recomendamos cambiar tu contraseña periódicamente.</CardDescription>
@@ -667,7 +667,7 @@ export default function ProfilePage() {
 
         {session?.user?.role === 'DOCENTE' && (
           <TabsContent value="signature" className="space-y-4">
-            <Card>
+            <Card className="p-0">
               <CardHeader className="border-b px-5 py-4">
                 <CardTitle className="text-sm font-semibold">Firma Digital</CardTitle>
                 <CardDescription className="text-xs">Gestiona tu firma oficial para certificados y documentos.</CardDescription>

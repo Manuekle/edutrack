@@ -189,7 +189,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
 
   return (
     <>
-      <Card>
+      <Card className="p-0">
         <CardHeader>
           <div className="flex justify-between items-center flex-wrap gap-2">
             <div>
@@ -228,29 +228,29 @@ export function EventsTable({ subjectId }: EventsTableProps) {
           {isLoadingEvents ? (
             <Loading />
           ) : events.length > 0 ? (
-            <div className="rounded-md border">
+            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
               <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/60">
-                    <TableHead className="text-xs font-normal px-4 py-2">Título</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2">Fecha</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2">Tipo</TableHead>
-                    <TableHead className="text-xs font-normal text-right px-4 py-2">
+                <TableHeader className="bg-muted/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Título</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tipo</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
                       Acciones
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {events.map(event => (
-                    <TableRow key={event.id}>
-                      <TableCell className="font-normal px-4 py-2">{event.title}</TableCell>
-                      <TableCell className="px-4 py-2">
+                    <TableRow key={event.id} className="hover:bg-muted/50 group">
+                      <TableCell className="text-xs font-normal px-4 py-3">{event.title}</TableCell>
+                      <TableCell className="text-xs px-4 py-3">
                         {format(new Date(event.date), 'PPP', { locale: es })}
                       </TableCell>
-                      <TableCell className="px-4 py-2">
+                      <TableCell className="text-xs px-4 py-3">
                         <EventTypeBadge type={event.type} />
                       </TableCell>
-                      <TableCell className="text-right font-sans">
+                      <TableCell className="text-xs px-4 py-3 text-right">
                         <Button
                           variant="ghost"
                           size="icon"
@@ -291,7 +291,8 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                                 Cancelar
                               </AlertDialogCancel>
                               <AlertDialogAction
-                                className="bg-rose-600 text-white hover:bg-rose-700 font-sans"
+                                variant="destructive"
+                                className="font-sans"
                                 onClick={() => handleDeleteEvent(event.id)}
                               >
                                 Eliminar

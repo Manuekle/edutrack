@@ -195,7 +195,7 @@ export default function CargarAsignaturasPage() {
         <div className="lg:col-span-4 space-y-4">
           {mode === 'csv' ? (
             <>
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="p-0 overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     1. Instrucciones del Formato
@@ -230,7 +230,7 @@ export default function CargarAsignaturasPage() {
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden border shadow-xs">
+              <Card className="p-0 overflow-hidden border shadow-xs">
                 <CardHeader className="border-b px-5 py-4 bg-muted/10">
                   <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                     2. Subir Archivo
@@ -271,7 +271,7 @@ export default function CargarAsignaturasPage() {
               </Card>
             </>
           ) : (
-            <Card className="overflow-hidden border shadow-xs">
+            <Card className="p-0 overflow-hidden border shadow-xs">
               <CardHeader className="border-b px-5 py-4 bg-muted/10 text-center">
                 <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                   Carga Manual
@@ -300,7 +300,7 @@ export default function CargarAsignaturasPage() {
 
         {/* Lado derecho: Tabla de vista previa o Resultados */}
         <div className="lg:col-span-8">
-          <Card className="overflow-hidden border shadow-xs">
+          <Card className="p-0 overflow-hidden border shadow-xs">
             <CardHeader className="border-b px-5 py-4 bg-muted/10 flex flex-row items-center justify-between">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-heading text-foreground">
                 Vista Previa de Asignaturas ({previewData.length})
@@ -377,67 +377,68 @@ export default function CargarAsignaturasPage() {
                 </div>
               ) : previewData.length > 0 ? (
                 <>
-                  <div className="overflow-x-auto max-h-[500px]">
-                    <Table>
-                      <TableHeader className="bg-muted/5 sticky top-0 z-10">
-                        <TableRow className="hover:bg-transparent border-b">
-                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
-                            Asignatura
-                          </TableHead>
-                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground ">
-                            Detalles
-                          </TableHead>
-                          <TableHead className="text-[10px] font-semibold px-4 py-3 text-muted-foreground  text-center">
-                            Estado
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {previewData.map((item, index) => (
-                          <TableRow
-                            key={index}
-                            className={`group border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 ${item.status === 'existing' ? 'bg-amber-500/5' : ''
-                              }`}
-                          >
-                            <TableCell className="py-2.5">
-                              <div className="flex flex-col">
-                                <span className="text-xs font-semibold">{item.nombreAsignatura}</span>
-                                <span className="text-[10px] text-muted-foreground">
-                                  Código: {item.codigoAsignatura}
-                                </span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="py-2.5">
-                              <div className="flex flex-col gap-0.5 text-[10px] text-muted-foreground">
-                                <span className="font-semibold text-zinc-600">
-                                  Docente: {item.docente || 'Sin asignar'}
-                                  {!item.teacherFound && item.docente && (
-                                    <span className="text-red-500 ml-1 italic text-[9px]">
-                                      (No encontrado)
-                                    </span>
-                                  )}
-                                </span>
-                                <span>Salón: {item.salon || 'N/A'}</span>
-                                <span>Créditos: {item.creditosClase} | Semestre: {item.semestreAsignatura}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-4 py-3 text-center">
-                              <Badge
-                                variant="outline"
-                                className={`text-[9px] px-1.5 py-0 font-normal ${item.status === 'error'
-                                  ? 'bg-red-50 text-red-600 border-red-100'
-                                  : item.status === 'existing'
-                                    ? 'bg-amber-50 text-amber-600 border-amber-100'
-                                    : 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                                  }`}
-                              >
-                                {item.status === 'new' ? 'NUEVA' : 'EXISTENTE'}
-                              </Badge>
-                            </TableCell>
+                  <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+                    <div className="overflow-x-auto max-h-[500px]">
+                      <Table>
+                        <TableHeader className="bg-muted/30 sticky top-0 z-10">
+                          <TableRow className="hover:bg-transparent">
+                            <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                              Asignatura
+                            </TableHead>
+                            <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                              Detalles
+                            </TableHead>
+                            <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">
+                              Estado
+                            </TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {previewData.map((item, index) => (
+                            <TableRow
+                              key={index}
+                              className={`hover:bg-muted/50 group ${item.status === 'existing' ? 'bg-amber-500/5' : ''}`}
+                            >
+                              <TableCell className="py-2.5">
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-semibold">{item.nombreAsignatura}</span>
+                                  <span className="text-[10px] text-muted-foreground">
+                                    Código: {item.codigoAsignatura}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="py-2.5">
+                                <div className="flex flex-col gap-0.5 text-[10px] text-muted-foreground">
+                                  <span className="font-semibold text-zinc-600">
+                                    Docente: {item.docente || 'Sin asignar'}
+                                    {!item.teacherFound && item.docente && (
+                                      <span className="text-red-500 ml-1 italic text-[9px]">
+                                        (No encontrado)
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span>Salón: {item.salon || 'N/A'}</span>
+                                  <span>Créditos: {item.creditosClase} | Semestre: {item.semestreAsignatura}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-4 py-3 text-center">
+                                <Badge
+                                  variant="outline"
+                                  className={`text-[9px] px-1.5 py-0 font-normal ${item.status === 'error'
+                                    ? 'bg-red-50 text-red-600 border-red-100'
+                                    : item.status === 'existing'
+                                      ? 'bg-amber-50 text-amber-600 border-amber-100'
+                                      : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                    }`}
+                                >
+                                  {item.status === 'new' ? 'NUEVA' : 'EXISTENTE'}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                   <div className="p-4 bg-muted/20 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                     <p className="text-[10px] font-semibold text-muted-foreground italic">
