@@ -49,7 +49,7 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
           Limpiar
         </Button>
       </div>
-      <div className="border border-dashed rounded-xl border-border bg-white dark:bg-zinc-950 overflow-hidden">
+      <div className="border border-dashed rounded-xl border-border bg-card overflow-hidden">
         <div className="h-32 w-full relative touch-none select-none">
           <SignatureCanvas
             ref={sigCanvas}

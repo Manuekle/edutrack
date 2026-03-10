@@ -84,13 +84,13 @@ body {
   --secondary: oklch(0.1869 0.0092 263); /* #1D1F23 */
   --secondary-foreground: oklch(0.9275 0.0053 236.6);
   --muted: oklch(0.1869 0.0092 263); /* #1D1F23 */
-  --muted-foreground: oklch(0.5635 0.0148 252.1); /* #71767B */
+  --muted-foreground: oklch(0.58 0.016 252); /* Slightly lighter for WCAG AA on dark bg */
   --accent: oklch(0.2287 0.0459 233.8); /* #162D3F */
   --accent-foreground: oklch(0.6563 0.1738 228.6);
   --destructive: #e91e63; /* Magenta from Color Library */
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.2 0.01 255); /* Very Soft Dark Border (#202327 approx) */
-  --input: oklch(0.2 0.01 255);
+  --border: oklch(0.28 0.012 255); /* Dark border visible on black, WCAG AA friendly */
+  --input: oklch(0.28 0.012 255);
   --ring: oklch(0.6563 0.1738 228.6);
   --chart-1: oklch(0.6563 0.1738 228.6);
   --chart-2: oklch(0.6964 0.1561 160.5769);

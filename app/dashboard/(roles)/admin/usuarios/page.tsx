@@ -155,7 +155,7 @@ export default function GestionUsuariosPage() {
 
               <div className="flex items-center gap-2 w-full md:w-auto">
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger className="w-full md:w-[130px] h-9 text-xs bg-background">
+                  <SelectTrigger className="w-full md:w-32 h-9 text-xs bg-background">
                     <SelectValue placeholder="Rol" />
                   </SelectTrigger>
                   <SelectContent>
@@ -167,7 +167,7 @@ export default function GestionUsuariosPage() {
                 </Select>
 
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="w-full md:w-[130px] h-9 text-xs bg-background">
+                  <SelectTrigger className="w-full md:w-32 h-9 text-xs bg-background">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
                   <SelectContent>

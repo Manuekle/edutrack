@@ -56,17 +56,18 @@ function getRoleDisplayName(role: Role) {
   }
 }
 
-function UserMenuButton({
-  session,
-  roleDisplayName,
-}: {
-  session: { user?: { name?: string | null } } | null;
-  roleDisplayName: string;
-}) {
+const UserMenuButton = React.forwardRef<
+  HTMLButtonElement,
+  {
+    session: { user?: { name?: string | null } } | null;
+    roleDisplayName: string;
+  }
+>(function UserMenuButton({ session, roleDisplayName }, ref) {
   return (
     <button
+      ref={ref}
       type="button"
-      className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-[44px] sm:min-h-[52px] group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center"
+      className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center"
     >
       <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
         <AvatarFallback className="bg-primary/10 text-primary">
@@ -84,7 +85,7 @@ function UserMenuButton({
       <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
     </button>
   );
-}
+});
 
 function AppSidebar({ homePath }: { homePath: string }) {
   const pathname = usePathname();

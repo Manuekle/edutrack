@@ -19,7 +19,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loading } from '@/components/ui/loading';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -31,7 +32,7 @@ import {
 import { type EventType, type SubjectEvent, getErrorMessage } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Edit, Trash2 } from 'lucide-react';
+import { CalendarDays, Edit, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 import { EventForm } from './event-form';
@@ -205,7 +206,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
             >
               Crear Evento
             </Button>
-            <DialogContent className="rounded-2xl border border-border gap-6 sm:max-w-[440px]">
+            <DialogContent className="rounded-2xl border border-border gap-6 sm:max-w-lg">
               <DialogHeader className="gap-1.5 text-left">
                 <DialogTitle className="text-lg font-semibold tracking-card">
                   Crear nuevo evento
@@ -224,7 +225,30 @@ export function EventsTable({ subjectId }: EventsTableProps) {
         </div>
         <div className='mt-4'>
           {isLoadingEvents ? (
-            <Loading />
+            <div className="bg-card border rounded-lg overflow-hidden shadow-sm">
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Título</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tipo</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
+                      Acciones
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4].map((i) => (
+                    <TableRow key={i}>
+                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell className="px-4 py-3"><Skeleton className="h-5 w-20 rounded-md" /></TableCell>
+                      <TableCell className="px-4 py-3 text-right"><Skeleton className="h-8 w-16 ml-auto rounded-md" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : events.length > 0 ? (
             <div className="bg-card border rounded-md overflow-hidden shadow-sm">
               <Table>
@@ -252,7 +276,8 @@ export function EventsTable({ subjectId }: EventsTableProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-zinc-600 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
+                          className="text-muted-foreground hover:text-foreground"
+                          aria-label="Editar evento"
                           onClick={() => openEditEventDialog(event)}
                         >
                           <Edit className="h-4 w-4" />
@@ -304,9 +329,11 @@ export function EventsTable({ subjectId }: EventsTableProps) {
               </Table>
             </div>
           ) : (
-            <div className="h-56 py-12 text-center flex items-center justify-center">
-              <p className="text-xs text-muted-foreground">No hay eventos especiales creados.</p>
-            </div>
+            <EmptyState
+              icon={CalendarDays}
+              title="No hay eventos especiales creados"
+              description="Crea exámenes, entregas o anuncios para esta asignatura."
+            />
           )}
         </div>
       </div>
@@ -314,7 +341,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
       {/* Edit Event Dialog */}
       {currentEvent && (
         <Dialog open={isEditEventDialogOpen} onOpenChange={setIsEditEventDialogOpen}>
-          <DialogContent className="rounded-2xl border border-border gap-6 sm:max-w-[440px]">
+          <DialogContent className="rounded-2xl border border-border gap-6 sm:max-w-lg">
             <DialogHeader className="gap-1.5 text-left">
               <DialogTitle className="text-lg font-semibold tracking-card">
                 Editar evento

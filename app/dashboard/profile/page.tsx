@@ -504,7 +504,7 @@ export default function ProfilePage() {
                           <FormControl>
                             <Input disabled placeholder="Tu nombre completo" {...field} />
                           </FormControl>
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -517,7 +517,7 @@ export default function ProfilePage() {
                           <FormControl>
                             <Input type="email" placeholder="correo@institucion.edu" {...field} />
                           </FormControl>
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -530,7 +530,7 @@ export default function ProfilePage() {
                           <FormControl>
                             <Input type="email" placeholder="correo@personal.com" {...field} />
                           </FormControl>
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -543,7 +543,7 @@ export default function ProfilePage() {
                           <FormControl>
                             <Input type="tel" placeholder="+57 312 312 312" {...field} />
                           </FormControl>
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -557,7 +557,7 @@ export default function ProfilePage() {
                             <FormControl>
                               <Input placeholder="Ingrese su código" {...field} />
                             </FormControl>
-                            <FormMessage className="text-[10px]" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -572,7 +572,7 @@ export default function ProfilePage() {
                             <FormControl>
                               <Input disabled placeholder="Su código docente" {...field} />
                             </FormControl>
-                            <FormMessage className="text-[10px]" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -612,7 +612,7 @@ export default function ProfilePage() {
                           <FormControl>
                             <Input type="password" placeholder="••••••••" {...field} />
                           </FormControl>
-                          <FormMessage className="text-[10px]" />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -626,7 +626,7 @@ export default function ProfilePage() {
                             <FormControl>
                               <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
-                            <FormMessage className="text-[10px]" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -639,7 +639,7 @@ export default function ProfilePage() {
                             <FormControl>
                               <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
-                            <FormMessage className="text-[10px]" />
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -686,7 +686,7 @@ export default function ProfilePage() {
                     <Label className="text-xs text-muted-foreground">Dibujar firma a mano</Label>
                     <div
                       ref={canvasWrapperRef}
-                      className="signature-canvas-container w-full h-[180px] rounded-xl bg-white dark:bg-zinc-900/80 border border-border relative overflow-hidden touch-none select-none"
+                      className="signature-canvas-container w-full h-[180px] rounded-xl bg-card border border-border relative overflow-hidden touch-none select-none"
                     >
                       <SignatureCanvas
                         ref={sigCanvas}
@@ -734,9 +734,9 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex flex-col justify-center gap-2 min-w-0">
                       {signatureFile ? (
-                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Pendiente de guardar</p>
+                        <p className="text-xs text-warning font-medium">Pendiente de guardar</p>
                       ) : signaturePreview ? (
-                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Firma guardada</p>
+                        <p className="text-xs text-success font-medium">Firma guardada</p>
                       ) : (
                         <p className="text-xs text-muted-foreground">Sube una imagen o dibuja y pulsa «Capturar trazo».</p>
                       )}

@@ -129,7 +129,7 @@ const MonthView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =>
         <div
           key={day.toISOString()}
           className={cn(
-            'min-h-[120px] p-2 border-r border-b transition-colors relative',
+            'min-h-32 p-2 border-r border-b transition-colors relative',
             !isSameMonth(day, monthStart) && 'bg-muted/5 opacity-40',
             isToday(day) && 'bg-primary/5'
           )}
@@ -194,7 +194,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
           </div>
         ))}
       </div>
-      <div className="max-h-[600px] overflow-auto">
+      <div className="max-h-[36rem] overflow-auto">
         <div className="grid grid-cols-[80px_repeat(7,1fr)] relative">
           {hours.map(hour => (
             <React.Fragment key={hour.toISOString()}>
@@ -360,6 +360,7 @@ const CustomCalendar = ({
             variant="outline"
             size="icon"
             className="h-9 w-9 rounded-full bg-background hover:bg-primary hover:text-primary-foreground transition-all"
+            aria-label="Mes anterior"
             onClick={() => onNavigate('PREV')}
           >
             <ChevronLeft className="h-5 w-5" />
@@ -375,6 +376,7 @@ const CustomCalendar = ({
             variant="outline"
             size="icon"
             className="h-9 w-9 rounded-full bg-background hover:bg-primary hover:text-primary-foreground transition-all"
+            aria-label="Mes siguiente"
             onClick={() => onNavigate('NEXT')}
           >
             <ChevronRight className="h-5 w-5" />
@@ -771,7 +773,7 @@ export default function AdminSalasPage() {
             >
               Solicitudes
               {bookings.filter(b => b.status === 'PENDIENTE').length > 0 && (
-                <Badge variant="secondary" className="h-5 min-w-5 px-1.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                <Badge variant="warningSoft" className="h-5 min-w-5 px-1.5 rounded-full text-[10px] font-semibold">
                   {bookings.filter(b => b.status === 'PENDIENTE').length}
                 </Badge>
               )}
@@ -808,7 +810,7 @@ export default function AdminSalasPage() {
                   <span className="text-xs">Nueva Sala</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] rounded-2xl border border-border">
+              <DialogContent className="sm:max-w-lg rounded-2xl border border-border">
                 <form onSubmit={handleSubmit} className="space-y-6 p-2">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-semibold">
@@ -872,7 +874,7 @@ export default function AdminSalasPage() {
                         Descripción
                       </Label>
                       <Textarea
-                        className="rounded-xl bg-muted/30 border-none min-h-[100px] resize-none pt-4"
+                        className="rounded-xl bg-muted/30 border-none min-h-24 resize-none pt-4"
                         value={formData.description}
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
                         placeholder="Detalles adicionales..."
@@ -920,7 +922,7 @@ export default function AdminSalasPage() {
                 ))}
               </div>
             ) : filteredRooms.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-32 text-center rounded-[3rem] border border-dashed">
+              <div className="flex flex-col items-center justify-center py-32 text-center rounded-3xl border border-dashed">
                 <AlertCircle className="h-14 w-14 text-muted-foreground/20 mb-6" />
                 <h3 className="text-xs font-semibold text-foreground/80">Sin resultados</h3>
                 <p className="text-muted-foreground text-xs mt-2 max-w-xs mx-auto">
@@ -1132,10 +1134,10 @@ export default function AdminSalasPage() {
                                 className={cn(
                                   'w-2 h-2 rounded-full',
                                   booking.status === 'APROBADO'
-                                    ? 'bg-green-500'
+                                    ? 'bg-success'
                                     : booking.status === 'PENDIENTE'
-                                      ? 'bg-amber-500'
-                                      : 'bg-red-500'
+                                      ? 'bg-warning'
+                                      : 'bg-destructive'
                                 )}
                               ></span>
                               {booking.status.toLowerCase()}
@@ -1178,7 +1180,7 @@ export default function AdminSalasPage() {
             </DialogDescription>
           </DialogHeader>
           {selectedBooking && (
-            <div className="flex flex-col lg:flex-row min-h-[500px]">
+            <div className="flex flex-col lg:flex-row min-h-[28rem]">
               {/* Lado Izquierdo: Resumen Visual */}
               <div className="w-full lg:w-1/3 bg-muted/30 p-10 flex flex-col justify-between border-r">
                 <div className="space-y-8">
@@ -1232,10 +1234,10 @@ export default function AdminSalasPage() {
                       className={cn(
                         'w-2 h-2 rounded-full',
                         selectedBooking.status === 'APROBADO'
-                          ? 'bg-green-500'
+                          ? 'bg-success'
                           : selectedBooking.status === 'PENDIENTE'
-                            ? 'bg-amber-500'
-                            : 'bg-red-500'
+                            ? 'bg-warning'
+                            : 'bg-destructive'
                       )}
                     ></span>
                     {selectedBooking.status.toLowerCase()}
@@ -1279,7 +1281,7 @@ export default function AdminSalasPage() {
                       placeholder="Escribe comentarios internos sobre esta reserva..."
                       value={reviewComment}
                       onChange={e => setReviewComment(e.target.value)}
-                      className="bg-muted/10 border-none rounded-2xl min-h-[80px] focus-visible:ring-1 p-4"
+                      className="bg-muted/10 border-none rounded-2xl min-h-20 focus-visible:ring-1 p-4"
                     />
                   </div>
                 </div>
@@ -1370,7 +1372,7 @@ export default function AdminSalasPage() {
                   Generar Vista Previa
                 </Button>
                 {(uploadFile || isUploadPreview) && (
-                  <Button onClick={() => { setUploadFile(null); setIsUploadPreview(false); setUploadPreviewData([]); }} variant="ghost" className="h-10 w-10 p-0 text-red-500 rounded-xl bg-red-50 hover:bg-red-100">
+                  <Button onClick={() => { setUploadFile(null); setIsUploadPreview(false); setUploadPreviewData([]); }} variant="ghost" className="h-10 w-10 p-0 text-destructive rounded-xl bg-destructive/10 hover:bg-destructive/20">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
@@ -1450,7 +1452,7 @@ export default function AdminSalasPage() {
       </Dialog>
 
       <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-2xl border border-border">
+        <DialogContent className="sm:max-w-lg rounded-2xl border border-border">
           <form onSubmit={handleAssignGroup} className="space-y-6 p-2">
             <DialogHeader>
               <DialogTitle className="text-2xl font-semibold tracking-card">

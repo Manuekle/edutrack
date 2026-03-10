@@ -352,7 +352,7 @@ export default function AttendancePage() {
                     disabled={isClassPast}
                     name={`status-${student.studentId}`}
                   >
-                    <SelectTrigger className="w-full md:w-[180px]">
+                    <SelectTrigger className="w-full md:w-44">
                       <SelectValue placeholder="Seleccionar estado" />
                     </SelectTrigger>
                     <SelectContent>

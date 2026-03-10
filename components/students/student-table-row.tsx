@@ -56,6 +56,7 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Solicitar desmatrícula"
             title="Solicitar desmatrícula"
             onClick={() =>
               onUnenrollClick({

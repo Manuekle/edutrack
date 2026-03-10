@@ -4,6 +4,14 @@ import { SubjectFileUpload } from '@/components/subject-file-upload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   CheckCircle,
   Download,
@@ -23,10 +32,22 @@ import {
   Plus,
   Trash2,
   UserCheck,
-  X
+  X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { sileo } from 'sileo';
+import { z } from 'zod';
+
+const manualEstudianteSchema = z.object({
+  documento: z.string().min(1, 'El documento es obligatorio'),
+  codigo: z.string().optional(),
+  nombre: z.string().min(1, 'El nombre es obligatorio'),
+  correo: z.string().email('Correo no válido').optional().or(z.literal('')),
+  telefono: z.string().optional(),
+});
+
+type ManualEstudianteForm = z.infer<typeof manualEstudianteSchema>;
 
 interface PreviewItem {
   id: string;
@@ -49,14 +70,11 @@ export default function CargarEstudiantesPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Manual form state
-  const [manualForm, setManualForm] = useState({
-    documento: '',
-    nombre: '',
-    correo: '',
-    telefono: '',
-    codigo: '',
+  const manualForm = useForm<ManualEstudianteForm>({
+    resolver: zodResolver(manualEstudianteSchema),
+    defaultValues: { documento: '', codigo: '', nombre: '', correo: '', telefono: '' },
   });
+  const { setValue: setManualFormValue, reset: resetManualForm } = manualForm;
 
   const handleFileSelect = (selectedFile: File | null) => {
     setFile(selectedFile);
@@ -126,29 +144,20 @@ export default function CargarEstudiantesPage() {
     }
   };
 
-  const handleAddManual = () => {
-    if (!manualForm.documento || !manualForm.nombre) {
-      sileo.error({
-        title: 'Campos requeridos',
-        description: 'El documento y nombre son obligatorios.',
-      });
-      return;
-    }
-
+  const onAddManual = (data: ManualEstudianteForm) => {
     const newItem: PreviewItem = {
       id: `manual-${Date.now()}`,
-      document: manualForm.documento,
-      name: manualForm.nombre,
-      email: manualForm.correo || `${manualForm.codigo || manualForm.documento}@est.fup.edu.co`,
-      phone: manualForm.telefono || '',
-      code: manualForm.codigo || '',
+      document: data.documento,
+      name: data.nombre,
+      email: data.correo || `${data.codigo || data.documento}@est.fup.edu.co`,
+      phone: data.telefono || '',
+      code: data.codigo || '',
       status: 'manual',
       message: 'Nuevo',
     };
-
-    setPreviewData([...previewData, newItem]);
+    setPreviewData(prev => [...prev, newItem]);
     setIsPreview(true);
-    setManualForm({ documento: '', nombre: '', correo: '', telefono: '', codigo: '' });
+    resetManualForm();
     sileo.success({
       title: 'Estudiante agregado',
       description: 'El estudiante ha sido añadido a la lista.',
@@ -158,43 +167,51 @@ export default function CargarEstudiantesPage() {
   const handleEditItem = (id: string) => {
     const item = previewData.find(i => i.id === id);
     if (item) {
-      setManualForm({
-        documento: item.document,
-        nombre: item.name,
-        correo: item.email,
-        telefono: item.phone || '',
-        codigo: item.code || '',
-      });
+      setManualFormValue('documento', item.document);
+      setManualFormValue('codigo', item.code || '');
+      setManualFormValue('nombre', item.name);
+      setManualFormValue('correo', item.email || '');
+      setManualFormValue('telefono', item.phone || '');
       setEditingId(id);
       setMode('manual');
     }
   };
 
-  const handleUpdateItem = () => {
+  const onUpdateItem = (data: ManualEstudianteForm) => {
     if (!editingId) return;
-
-    setPreviewData(
-      previewData.map(item =>
+    setPreviewData(prev =>
+      prev.map(item =>
         item.id === editingId
           ? {
             ...item,
-            document: manualForm.documento,
-            name: manualForm.nombre,
-            email:
-              manualForm.correo || `${manualForm.codigo || manualForm.documento}@est.fup.edu.co`,
-            phone: manualForm.telefono,
-            code: manualForm.codigo,
+            document: data.documento,
+            name: data.nombre,
+            email: data.correo || `${data.codigo || data.documento}@est.fup.edu.co`,
+            phone: data.telefono || '',
+            code: data.codigo || '',
           }
           : item
       )
     );
     setEditingId(null);
-    setManualForm({ documento: '', nombre: '', correo: '', telefono: '', codigo: '' });
+    resetManualForm();
     sileo.success({
       title: 'Actualizado',
       description: 'Estudiante actualizado correctamente.',
     });
   };
+  useEffect(() => {
+    if (editingId) {
+      const item = previewData.find(p => p.id === editingId);
+      if (item) {
+        setManualFormValue('documento', item.document);
+        setManualFormValue('codigo', item.code || '');
+        setManualFormValue('nombre', item.name);
+        setManualFormValue('correo', item.email || '');
+        setManualFormValue('telefono', item.phone || '');
+      }
+    }
+  }, [editingId, previewData, setManualFormValue]);
 
   const handleDeleteItem = (id: string) => {
     setPreviewData(previewData.filter(item => item.id !== id));
@@ -258,7 +275,7 @@ export default function CargarEstudiantesPage() {
     setPreviewData([]);
     setFinalResults(null);
     setEditingId(null);
-    setManualForm({ documento: '', nombre: '', correo: '', telefono: '', codigo: '' });
+    resetManualForm();
   };
 
   const handleNewUpload = () => {
@@ -377,7 +394,7 @@ export default function CargarEstudiantesPage() {
                         <Button
                           onClick={handleCancel}
                           variant="ghost"
-                          className="h-9 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
+                          className="h-9 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -397,103 +414,121 @@ export default function CargarEstudiantesPage() {
                   Ingresa la información básica del estudiante.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-5 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="documento" className="text-xs font-semibold text-foreground">
-                      Documento *
-                    </Label>
-                    <Input
-                      id="documento"
-                      value={manualForm.documento}
-                      onChange={e => setManualForm({ ...manualForm, documento: e.target.value })}
-                      className="h-9 text-xs"
-                      placeholder="12345678"
+              <CardContent className="p-5">
+                <Form {...manualForm}>
+                  <form
+                    onSubmit={manualForm.handleSubmit(editingId ? onUpdateItem : onAddManual)}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField
+                        control={manualForm.control}
+                        name="documento"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold text-foreground">
+                              Documento *
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="h-9 text-xs" placeholder="12345678" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={manualForm.control}
+                        name="codigo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs font-semibold text-foreground">
+                              Código
+                            </FormLabel>
+                            <FormControl>
+                              <Input className="h-9 text-xs" placeholder="701234" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={manualForm.control}
+                      name="nombre"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-semibold text-foreground">
+                            Nombre Completo *
+                          </FormLabel>
+                          <FormControl>
+                            <Input className="h-9 text-xs" placeholder="Juan Pérez" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="codigo" className="text-xs font-semibold text-foreground">
-                      Código
-                    </Label>
-                    <Input
-                      id="codigo"
-                      value={manualForm.codigo}
-                      onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })}
-                      className="h-9 text-xs"
-                      placeholder="701234"
+                    <FormField
+                      control={manualForm.control}
+                      name="correo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-semibold text-foreground">
+                            Correo Electrónico
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              className="h-9 text-xs"
+                              placeholder="ejemplo@est.fup.edu.co"
+                              type="email"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="nombre" className="text-xs font-semibold text-foreground">
-                    Nombre Completo *
-                  </Label>
-                  <Input
-                    id="nombre"
-                    value={manualForm.nombre}
-                    onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })}
-                    className="h-9 text-xs"
-                    placeholder="Juan Pérez"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="correo" className="text-xs font-semibold text-foreground">
-                    Correo Electrónico
-                  </Label>
-                  <Input
-                    id="correo"
-                    value={manualForm.correo}
-                    onChange={e => setManualForm({ ...manualForm, correo: e.target.value })}
-                    className="h-9 text-xs"
-                    placeholder="ejemplo@est.fup.edu.co"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="telefono" className="text-xs font-semibold text-foreground">
-                    Teléfono
-                  </Label>
-                  <Input
-                    id="telefono"
-                    value={manualForm.telefono}
-                    onChange={e => setManualForm({ ...manualForm, telefono: e.target.value })}
-                    className="h-9 text-xs"
-                    placeholder="3001234567"
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-3">
-                  {editingId ? (
-                    <>
-                      <Button onClick={handleUpdateItem} className="flex-1 h-9 text-xs">
-                        Actualizar
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setEditingId(null);
-                          setManualForm({
-                            documento: '',
-                            nombre: '',
-                            correo: '',
-                            telefono: '',
-                            codigo: '',
-                          });
-                        }}
-                        className="h-9 text-xs"
-                      >
-                        Cancelar
-                      </Button>
-                    </>
-                  ) : (
-                    <Button onClick={handleAddManual} className="w-full h-9 text-xs">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Agregar a la lista
-                    </Button>
-                  )}
-                </div>
+                    <FormField
+                      control={manualForm.control}
+                      name="telefono"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs font-semibold text-foreground">
+                            Teléfono
+                          </FormLabel>
+                          <FormControl>
+                            <Input className="h-9 text-xs" placeholder="3001234567" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex gap-2 pt-3">
+                      {editingId ? (
+                        <>
+                          <Button type="submit" className="flex-1 h-9 text-xs">
+                            Actualizar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingId(null);
+                              resetManualForm();
+                            }}
+                            className="h-9 text-xs"
+                          >
+                            Cancelar
+                          </Button>
+                        </>
+                      ) : (
+                        <Button type="submit" className="w-full h-9 text-xs">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Agregar a la lista
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
           )}
@@ -508,7 +543,7 @@ export default function CargarEstudiantesPage() {
               </CardTitle>
               <div className="flex gap-2">
                 {successCount > 0 && (
-                  <Badge className="text-[9px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-normal">
+                  <Badge variant="successSoft" className="text-[9px] font-normal">
                     {successCount} VÁLIDOS
                   </Badge>
                 )}
@@ -528,7 +563,7 @@ export default function CargarEstudiantesPage() {
                   </p>
                 </div>
               ) : finalResults ? (
-                <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center p-6">
+                <div className="flex flex-col items-center justify-center min-h-96 space-y-4 text-center p-6">
                   <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
@@ -547,7 +582,7 @@ export default function CargarEstudiantesPage() {
               ) : previewData.length > 0 ? (
                 <>
                   <div className="bg-card border rounded-md overflow-hidden shadow-sm">
-                    <div className="overflow-x-auto max-h-[500px]">
+                    <div className="overflow-x-auto max-h-[32rem]">
                       <Table>
                         <TableHeader className="bg-muted/30 sticky top-0 z-10">
                           <TableRow className="hover:bg-transparent">
@@ -591,10 +626,10 @@ export default function CargarEstudiantesPage() {
                                 <Badge
                                   variant="outline"
                                   className={`text-[9px] px-1.5 py-0 font-normal ${item.status === 'error'
-                                    ? 'bg-red-50 text-red-600 border-red-100'
+                                    ? 'bg-destructive/10 text-destructive border-destructive/20'
                                     : item.status === 'existing'
-                                      ? 'bg-amber-50 text-amber-600 border-amber-100'
-                                      : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                      ? 'bg-warning/10 text-warning border-warning/20'
+                                      : 'bg-success/10 text-success border-success/20'
                                     }`}
                                 >
                                   {item.status === 'manual'
@@ -612,6 +647,7 @@ export default function CargarEstudiantesPage() {
                                     variant="ghost"
                                     size="icon"
                                     className="h-7 w-7 text-muted-foreground"
+                                    aria-label="Editar estudiante"
                                     onClick={() => handleEditItem(item.id)}
                                   >
                                     <Edit2 className="h-3.5 w-3.5" />
@@ -619,7 +655,8 @@ export default function CargarEstudiantesPage() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                    className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    aria-label="Eliminar estudiante"
                                     onClick={() => handleDeleteItem(item.id)}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
@@ -632,7 +669,7 @@ export default function CargarEstudiantesPage() {
                       </Table>
                     </div>
                   </div>
-                  <div className="p-4 bg-muted/20 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                  <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between">
                     <p className="text-[10px] font-semibold text-muted-foreground italic">
                       * Verifica que los datos coincidan con la base de datos oficial.
                     </p>
@@ -654,14 +691,14 @@ export default function CargarEstudiantesPage() {
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
-                  <div className="h-16 w-16 bg-zinc-50 rounded-full flex items-center justify-center">
+                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center">
                     <UserCheck className="h-8 w-8 text-muted-foreground/20" />
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-semibold text-foreground mb-1">
                       Sin datos para mostrar
                     </p>
-                    <p className="text-xs text-muted-foreground max-w-[220px] mx-auto">
+                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                       Agrega estudiantes manualmente o sube un archivo CSV para comenzar.
                     </p>
                   </div>

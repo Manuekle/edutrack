@@ -1,8 +1,17 @@
 'use client';
 
 import { CardDescription, CardTitle } from '@/components/ui/card';
-import { Loading } from '@/components/ui/loading';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { CalendarRange } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { TablePagination } from '../shared/table-pagination';
@@ -94,8 +103,29 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
         </div>
         <div className='mt-4'>
           {isLoading ? (
-            <div className="flex justify-center py-8" role="status" aria-label="Cargando clases">
-              <Loading className="h-8 w-8" />
+            <div className="bg-card border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando clases">
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha y Hora</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Salón</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tema</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">Estado</TableHead>
+                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <TableRow key={i}>
+                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-28" /></TableCell>
+                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-20" /></TableCell>
+                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-40" /></TableCell>
+                      <TableCell className="px-4 py-3 flex justify-center"><Skeleton className="h-5 w-24 rounded-md" /></TableCell>
+                      <TableCell className="px-4 py-3 text-right"><Skeleton className="h-8 w-20 ml-auto rounded-md" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           ) : allClasses.length > 0 ? (
             <div className="bg-card border rounded-md overflow-hidden shadow-sm">
@@ -145,9 +175,11 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               />
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground text-center py-12">
-              Aún no hay clases programadas para esta asignatura.
-            </p>
+            <EmptyState
+              icon={CalendarRange}
+              title="Aún no hay clases programadas"
+              description="Las clases de esta asignatura aparecerán aquí."
+            />
           )}
         </div>
       </div>

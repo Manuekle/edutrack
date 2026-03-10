@@ -230,11 +230,11 @@ export default function ScanPage() {
       case 'loading':
         return <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />;
       case 'success':
-        return <CheckCircle className="h-6 w-6 text-green-600" />;
+        return <CheckCircle className="h-6 w-6 text-success" />;
       case 'error':
         return <XCircle className="h-6 w-6 text-destructive" />;
       case 'info':
-        return <Info className="h-6 w-6 text-blue-600" />;
+        return <Info className="h-6 w-6 text-primary" />;
       default:
         return null;
     }

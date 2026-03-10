@@ -10,7 +10,7 @@ interface LoadingProps {
 
 export function Loading({ className, text = 'Cargando...' }: LoadingProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center min-h-[200px] gap-4', className)}>
+    <div className={cn('flex flex-col items-center justify-center min-h-48 gap-4', className)}>
       <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       <p className="text-muted-foreground text-xs">{text}</p>
     </div>

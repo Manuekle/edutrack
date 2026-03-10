@@ -31,7 +31,7 @@ export function GenerateReportModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="sm:text-2xl text-xs font-semibold tracking-card">
             Generar Bitacora Docente

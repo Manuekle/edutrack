@@ -220,7 +220,7 @@ function SubjectDetailsPanel({
                 {subjectData.totalClasses} {subjectData.totalClasses === 1 ? 'clase' : 'clases'}
               </Badge>
             </div>
-            <div className="max-h-[420px] overflow-y-auto pr-2 -mr-2 space-y-3 [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar-track]:hidden [&::-webkit-scrollbar-thumb]:hidden">
+            <div className="max-h-[28rem] overflow-y-auto pr-2 -mr-2 space-y-3 [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar-track]:hidden [&::-webkit-scrollbar-thumb]:hidden">
               {subjectData.classes.map((cls, index) => {
                 const totalInClass =
                   cls.attendanceStats.present +
@@ -311,7 +311,7 @@ function SubjectDetailsPanel({
               </Badge>
             </div>
             <div className="border rounded-lg p-4">
-              <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[250px]">
+              <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-60">
                 <PieChart>
                   <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                   <Pie

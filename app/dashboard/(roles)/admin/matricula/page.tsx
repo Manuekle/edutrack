@@ -401,7 +401,7 @@ export default function MatriculaPage() {
                           Generar Vista Previa
                         </Button>
                         {(file || isPreview) && (
-                          <Button onClick={handleCancel} variant="ghost" className="h-9 w-9 p-0 text-red-500">
+                          <Button onClick={handleCancel} variant="ghost" className="h-9 w-9 p-0 text-destructive">
                             <X className="h-4 w-4" />
                           </Button>
                         )}
@@ -495,7 +495,7 @@ export default function MatriculaPage() {
                       <p className="text-xs text-muted-foreground animate-pulse">Procesando...</p>
                     </div>
                   ) : finalResults ? (
-                    <div className="flex flex-col items-center justify-center min-h-[300px] text-center p-6">
+                    <div className="flex flex-col items-center justify-center min-h-72 text-center p-6">
                       <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                         <CheckCircle className="h-8 w-8 text-primary" />
                       </div>
@@ -516,7 +516,7 @@ export default function MatriculaPage() {
                   ) : previewData.length > 0 ? (
                     <>
                       <div className="bg-card border rounded-md overflow-hidden shadow-sm">
-                        <div className="relative overflow-x-auto overflow-y-auto max-h-[500px]">
+                        <div className="relative overflow-x-auto overflow-y-auto max-h-[32rem]">
                           <Table>
                             <TableHeader className="bg-muted/30 sticky top-0 z-10">
                               <TableRow className="hover:bg-transparent">
@@ -554,6 +554,7 @@ export default function MatriculaPage() {
                                       variant="ghost"
                                       size="icon"
                                       className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                      aria-label="Eliminar elemento"
                                       onClick={() => handleDeleteItem(item.id)}
                                     >
                                       <Trash2 className="h-3.5 w-3.5" />
@@ -586,7 +587,7 @@ export default function MatriculaPage() {
                       </div>
                     </>
                   ) : (
-                    <div className="flex flex-col items-center justify-center min-h-[300px] text-center p-6 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center min-h-72 text-center p-6 text-muted-foreground">
                       <UserPlus className="h-10 w-10 mb-4 opacity-20" />
                       <p className="text-sm font-medium text-foreground">Lista vacía</p>
                       <p className="text-xs">Usa el panel izquierdo para cargar estudiantes.</p>
@@ -677,6 +678,7 @@ export default function MatriculaPage() {
                                 size="icon"
                                 className="h-6 w-6 shrink-0 ml-2 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
                                 disabled={isRemoving}
+                                aria-label="Quitar de la lista"
                                 onClick={() =>
                                   handleRemoveStudentFromGroup(
                                     student.id,

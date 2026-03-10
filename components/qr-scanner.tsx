@@ -117,7 +117,7 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
 
         {hasCamera ? (
           <>
-            <div className="relative aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+            <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover"
@@ -126,7 +126,7 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
                 playsInline
               />
               {!isScanning && (
-                <div className="absolute inset-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-900">
+                <div className="absolute inset-0 flex items-center justify-center bg-muted">
                   <div className="text-center text-muted-foreground">
                     <Camera className="h-8 w-8 mx-auto mb-2" />
                     <p className="text-xs">Presiona iniciar para comenzar</p>
@@ -156,8 +156,8 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
           </>
         ) : (
           <div className="text-center py-8">
-            <CameraOff className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No se encontró cámara disponible</p>
+            <CameraOff className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No se encontró cámara disponible</p>
           </div>
         )}
 

@@ -100,9 +100,9 @@ export default function StudentAttendancePage() {
       </div>
 
       {success ? (
-        <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+        <Card className="border-success/50 bg-success/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-center text-green-700 dark:text-green-300 flex items-center justify-center gap-2 text-xs">
+            <CardTitle className="text-center text-success flex items-center justify-center gap-2 text-xs">
               <CheckCircle className="h-4 w-4" />
               ¡Registrado!
             </CardTitle>

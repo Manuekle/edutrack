@@ -260,7 +260,7 @@ export default function CargarAsignaturasPage() {
                         <Button
                           onClick={handleCancel}
                           variant="ghost"
-                          className="h-9 text-xs text-red-500 hover:text-red-600 hover:bg-red-50"
+                          className="h-9 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -278,8 +278,8 @@ export default function CargarAsignaturasPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8 text-center space-y-4">
-                <div className="bg-amber-500/10 p-4 rounded-full w-fit mx-auto">
-                  <AlertTriangle className="h-6 w-6 text-amber-600" />
+                <div className="bg-warning/10 p-4 rounded-full w-fit mx-auto">
+                  <AlertTriangle className="h-6 w-6 text-warning" />
                 </div>
                 <p className="text-xs text-muted-foreground">
                   La carga manual de asignaturas estará disponible próximamente.
@@ -307,12 +307,12 @@ export default function CargarAsignaturasPage() {
               </CardTitle>
               <div className="flex gap-2">
                 {newCount > 0 && (
-                  <Badge className="text-[9px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20 font-normal">
+                  <Badge variant="successSoft" className="text-[9px] font-normal">
                     {newCount} NUEVAS
                   </Badge>
                 )}
                 {existingCount > 0 && (
-                  <Badge className="text-[9px] bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">
+                  <Badge variant="warningSoft" className="text-[9px] font-normal">
                     {existingCount} EXISTENTES
                   </Badge>
                 )}
@@ -329,7 +329,7 @@ export default function CargarAsignaturasPage() {
               ) : finalResults ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center px-4">
                   <div className="h-16 w-16 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
-                    <CheckCircle className="h-10 w-10 text-emerald-500" />
+                    <CheckCircle className="h-10 w-10 text-success" />
                   </div>
                   <div className="space-y-1">
                     <h3 className="sm:text-xl text-lg tracking-heading font-semibold">
@@ -339,17 +339,17 @@ export default function CargarAsignaturasPage() {
                       Resumen del procesamiento masivo realizado con éxito.
                     </p>
                   </div>
-                  <div className="w-full max-w-md bg-zinc-50 border rounded-xl overflow-hidden mt-4">
-                    <div className="max-h-[300px] overflow-y-auto">
+                  <div className="w-full max-w-md bg-muted border border-border rounded-xl overflow-hidden mt-4">
+                    <div className="max-h-72 overflow-y-auto">
                       <Table>
                         <TableBody>
                           {finalResults.map((res, i) => (
-                            <TableRow key={i} className="border-zinc-100 last:border-0 hover:bg-transparent">
+                            <TableRow key={i} className="border-border last:border-0 hover:bg-transparent">
                               <TableCell className="w-10">
                                 {res.status === 'created' ? (
-                                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                                  <CheckCircle className="h-4 w-4 text-success" />
                                 ) : (
-                                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                                  <AlertTriangle className="h-4 w-4 text-warning" />
                                 )}
                               </TableCell>
                               <TableCell className="text-[11px] font-semibold py-2">
@@ -378,7 +378,7 @@ export default function CargarAsignaturasPage() {
               ) : previewData.length > 0 ? (
                 <>
                   <div className="bg-card border rounded-md overflow-hidden shadow-sm">
-                    <div className="overflow-x-auto max-h-[500px]">
+                    <div className="overflow-x-auto max-h-[32rem]">
                       <Table>
                         <TableHeader className="bg-muted/30 sticky top-0 z-10">
                           <TableRow className="hover:bg-transparent">
@@ -397,7 +397,7 @@ export default function CargarAsignaturasPage() {
                           {previewData.map((item, index) => (
                             <TableRow
                               key={index}
-                              className={`hover:bg-muted/50 group ${item.status === 'existing' ? 'bg-amber-500/5' : ''}`}
+                              className={`hover:bg-muted/50 group ${item.status === 'existing' ? 'bg-warning/5' : ''}`}
                             >
                               <TableCell className="py-2.5">
                                 <div className="flex flex-col">
@@ -412,7 +412,7 @@ export default function CargarAsignaturasPage() {
                                   <span className="font-semibold text-zinc-600">
                                     Docente: {item.docente || 'Sin asignar'}
                                     {!item.teacherFound && item.docente && (
-                                      <span className="text-red-500 ml-1 italic text-[9px]">
+                                      <span className="text-destructive ml-1 italic text-[9px]">
                                         (No encontrado)
                                       </span>
                                     )}
@@ -425,10 +425,10 @@ export default function CargarAsignaturasPage() {
                                 <Badge
                                   variant="outline"
                                   className={`text-[9px] px-1.5 py-0 font-normal ${item.status === 'error'
-                                    ? 'bg-red-50 text-red-600 border-red-100'
+                                    ? 'bg-destructive/10 text-destructive border-destructive/20'
                                     : item.status === 'existing'
-                                      ? 'bg-amber-50 text-amber-600 border-amber-100'
-                                      : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                      ? 'bg-warning/10 text-warning border-warning/20'
+                                      : 'bg-success/10 text-success border-success/20'
                                     }`}
                                 >
                                   {item.status === 'new' ? 'NUEVA' : 'EXISTENTE'}
@@ -440,7 +440,7 @@ export default function CargarAsignaturasPage() {
                       </Table>
                     </div>
                   </div>
-                  <div className="p-4 bg-muted/20 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                  <div className="p-4 bg-muted/20 border-t border-border flex items-center justify-between">
                     <p className="text-[10px] font-semibold text-muted-foreground italic">
                       * Verifica los docentes subrayados antes de confirmar.
                     </p>
@@ -462,7 +462,7 @@ export default function CargarAsignaturasPage() {
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
-                  <div className="h-16 w-16 bg-zinc-50 rounded-full flex items-center justify-center">
+                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center">
                     <FileSpreadsheet className="h-8 w-8 text-muted-foreground/20" />
                   </div>
                   <div className="space-y-1">

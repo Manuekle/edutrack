@@ -97,12 +97,12 @@ export default function ScannerPage() {
 
         {/* Success Message */}
         {success && attendanceData ? (
-          <Card className="border-green-200 dark:border-green-800">
+          <Card className="border-success/50 bg-success/5">
             <CardHeader className="text-center pb-3">
               <div className="flex justify-center mb-2">
-                <CheckCircle2 className="h-16 w-16 text-green-500" />
+                <CheckCircle2 className="h-16 w-16 text-success" />
               </div>
-              <CardTitle className="text-green-700 dark:text-green-400">
+              <CardTitle className="text-success">
                 ¡Asistencia Registrada!
               </CardTitle>
               <CardDescription>Tu asistencia ha sido registrada correctamente</CardDescription>

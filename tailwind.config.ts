@@ -52,6 +52,14 @@ const config: Config = {
           DEFAULT: 'oklch(var(--destructive))',
           foreground: 'oklch(var(--destructive-foreground))',
         },
+        success: {
+          DEFAULT: 'var(--accent-green)',
+          foreground: '#ffffff',
+        },
+        warning: {
+          DEFAULT: 'var(--accent-purple)',
+          foreground: '#ffffff',
+        },
         muted: {
           DEFAULT: 'oklch(var(--muted))',
           foreground: 'oklch(var(--muted-foreground))',

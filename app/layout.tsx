@@ -88,7 +88,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="es"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning
-      style={{ colorScheme: 'dark' }}
     >
       <head>
         <script

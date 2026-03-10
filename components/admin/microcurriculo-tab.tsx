@@ -427,16 +427,22 @@ export function MicrocurriculoTab() {
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 mt-2 min-h-[60px] p-2.5 rounded-xl bg-muted/20 border border-dashed border-muted-foreground/20 content-start">
+                  <div className="flex flex-wrap gap-1.5 mt-2 min-h-16 p-2.5 rounded-xl bg-muted/20 border border-dashed border-muted-foreground/20 content-start">
                     {manualForm.temas.length > 0 ? (
                       manualForm.temas.map(t => (
                         <Badge key={t} variant="secondary"
                           className="pl-2 pr-1 py-0.5 text-[10px] bg-background border border-muted-foreground/10 hover:bg-muted/50 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs">
                           {t}
-                          <button onClick={() => handleRemoveTema(t)}
-                            className="bg-muted-foreground/20 hover:bg-destructive/10 hover:text-destructive p-0.5 rounded-full transition-colors">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 shrink-0 rounded-full bg-muted-foreground/20 hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => handleRemoveTema(t)}
+                            aria-label="Quitar tema"
+                          >
                             <X className="h-2.5 w-2.5" />
-                          </button>
+                          </Button>
                         </Badge>
                       ))
                     ) : (
@@ -482,7 +488,7 @@ export function MicrocurriculoTab() {
                   <p className="text-xs text-muted-foreground animate-pulse">Procesando archivo...</p>
                 </div>
               ) : finalResults ? (
-                <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center p-6">
+                <div className="flex flex-col items-center justify-center min-h-96 space-y-4 text-center p-6">
                   <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
@@ -555,11 +561,13 @@ export function MicrocurriculoTab() {
                             <TableCell className="text-xs px-4 py-3 text-right">
                               <div className="flex items-center justify-end gap-1">
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                  onClick={() => handleEditItem(item.id)}>
+                                  onClick={() => handleEditItem(item.id)}
+                                  aria-label="Editar elemento">
                                   <Edit2 className="h-3.5 w-3.5" />
                                 </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-                                  onClick={() => handleDeleteItem(item.id)}>
+                                  onClick={() => handleDeleteItem(item.id)}
+                                  aria-label="Eliminar elemento">
                                   <Trash2 className="h-3.5 w-3.5" />
                                 </Button>
                               </div>
@@ -571,12 +579,12 @@ export function MicrocurriculoTab() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center min-h-[300px] py-12 text-center p-6">
+                <div className="flex flex-col items-center justify-center min-h-72 py-12 text-center p-6">
                   <div className="bg-muted/30 p-4 rounded-full mb-4">
                     <BookOpen className="h-10 w-10 text-muted-foreground/40" />
                   </div>
                   <h4 className="text-sm font-semibold text-foreground mb-1">Sin información para cargar</h4>
-                  <p className="text-xs text-muted-foreground max-w-[220px] mx-auto">
+                  <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                     {mode === 'csv'
                       ? 'Sube un archivo CSV o utiliza la carga manual para ver los datos aquí.'
                       : 'Agrega asignaturas usando el formulario lateral para ver el resumen.'}

@@ -856,9 +856,9 @@ export default function GruposHorariosPage() {
             <div className="lg:col-span-2 space-y-4">
               {/* Panel de conflictos */}
               {conflicts.length > 0 && (
-                <Card className="overflow-hidden border border-amber-200 shadow-xs bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
-                  <CardHeader className="border-b border-amber-200 dark:border-amber-800 px-5 py-3 bg-amber-100/50 dark:bg-amber-900/20">
-                    <CardTitle className="text-xs font-semibold text-amber-800 dark:text-amber-400 flex items-center gap-2">
+                <Card className="overflow-hidden border border-warning/40 shadow-xs bg-warning/5">
+                  <CardHeader className="border-b border-warning/40 px-5 py-3 bg-warning/10">
+                    <CardTitle className="text-xs font-semibold text-warning flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />
                       Conflictos de Horario Detectados ({conflicts.length})
                     </CardTitle>
@@ -866,7 +866,7 @@ export default function GruposHorariosPage() {
                   <CardContent className="p-4">
                     <ul className="space-y-1.5">
                       {conflicts.map((c, i) => (
-                        <li key={i} className="text-[11px] text-amber-800 dark:text-amber-300">{c}</li>
+                        <li key={i} className="text-[11px] text-warning">{c}</li>
                       ))}
                     </ul>
                   </CardContent>
@@ -902,7 +902,7 @@ export default function GruposHorariosPage() {
                       <p className="text-xs text-muted-foreground animate-pulse">Procesando...</p>
                     </div>
                   ) : finalResults ? (
-                    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-center p-6">
+                    <div className="flex flex-col items-center justify-center min-h-96 space-y-4 text-center p-6">
                       <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                         <CheckCircle className="h-8 w-8 text-primary" />
                       </div>
@@ -920,7 +920,7 @@ export default function GruposHorariosPage() {
                     </div>
                   ) : previewData.length > 0 ? (
                     <div className="bg-card border rounded-md overflow-hidden shadow-sm">
-                      <div className="relative overflow-x-auto overflow-y-auto max-h-[600px]">
+                      <div className="relative overflow-x-auto overflow-y-auto max-h-[36rem]">
                         <Table>
                           <TableHeader className="bg-muted/30 sticky top-0 z-10">
                             <TableRow className="hover:bg-transparent">
@@ -988,6 +988,7 @@ export default function GruposHorariosPage() {
                                       size="icon"
                                       className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
                                       onClick={() => handleEditItem(item.id)}
+                                      aria-label="Editar grupo"
                                     >
                                       <Edit2 className="h-3.5 w-3.5" />
                                     </Button>
@@ -996,6 +997,7 @@ export default function GruposHorariosPage() {
                                       size="icon"
                                       className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
                                       onClick={() => handleDeleteItem(item.id)}
+                                      aria-label="Eliminar grupo"
                                     >
                                       <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
@@ -1008,12 +1010,12 @@ export default function GruposHorariosPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center min-h-[300px] py-12 text-center p-6">
+                    <div className="flex flex-col items-center justify-center min-h-72 py-12 text-center p-6">
                       <div className="bg-muted/30 p-4 rounded-full mb-4">
                         <Calendar className="h-10 w-10 text-muted-foreground/40" />
                       </div>
                       <h4 className="text-sm font-semibold text-foreground mb-1">Sin grupos para cargar</h4>
-                      <p className="text-xs text-muted-foreground max-w-[220px] mx-auto">
+                      <p className="text-xs text-muted-foreground max-w-xs mx-auto">
                         {mode === 'csv'
                           ? 'Sube un archivo CSV de grupos o utiliza el formulario manual para ver los datos aquí.'
                           : 'Agrega grupos usando el formulario lateral para ver el resumen.'}
@@ -1026,9 +1028,9 @@ export default function GruposHorariosPage() {
                       <div className="flex flex-col whitespace-nowrap">
                         <span className="text-xs font-semibold text-foreground">Resumen</span>
                         <div className="flex gap-3 mt-0.5">
-                          <span className="text-[10px] text-emerald-600 font-semibold">{successCount} listos</span>
-                          {errorCount > 0 && <span className="text-[10px] text-red-600 font-semibold">{errorCount} errores</span>}
-                          {conflicts.length > 0 && <span className="text-[10px] text-amber-600 font-semibold">{conflicts.length} conflictos</span>}
+                          <span className="text-[10px] text-success font-semibold">{successCount} listos</span>
+                          {errorCount > 0 && <span className="text-[10px] text-destructive font-semibold">{errorCount} errores</span>}
+                          {conflicts.length > 0 && <span className="text-[10px] text-warning font-semibold">{conflicts.length} conflictos</span>}
                         </div>
                       </div>
                       <Button
@@ -1144,6 +1146,7 @@ export default function GruposHorariosPage() {
                                         className="h-7 w-7 text-primary hover:bg-primary/10"
                                         onClick={handleSaveGroupEdit}
                                         disabled={isSavingGroup}
+                                        aria-label="Guardar cambios del grupo"
                                       >
                                         {isSavingGroup ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                                       </Button>
@@ -1152,6 +1155,7 @@ export default function GruposHorariosPage() {
                                         size="icon"
                                         className="h-7 w-7 text-muted-foreground hover:text-destructive"
                                         onClick={() => setEditingGroupId(null)}
+                                        aria-label="Cancelar edición"
                                       >
                                         <X className="h-3.5 w-3.5" />
                                       </Button>
@@ -1161,6 +1165,7 @@ export default function GruposHorariosPage() {
                                       variant="ghost"
                                       size="icon"
                                       className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                      aria-label="Editar grupo"
                                       onClick={() => {
                                         setEditingGroupId(grp.id);
                                         setEditGroupForm({

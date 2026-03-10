@@ -114,10 +114,10 @@ export default async function PreviewPage({ params }: PageProps) {
       </div>
       <div
         id="pdf-section"
-        className="mx-auto px-4 sm:px-8 pb-6 bg-white dark:bg-gray-800 rounded-md shadow-sm ring-1 ring-gray-200 dark:ring-gray-700"
+        className="mx-auto px-4 sm:px-8 pb-6 bg-card rounded-md shadow-sm ring-1 ring-border"
       >
         {/* Header estilo “PDF” */}
-        <div className="border-b border-[#005a9c] dark:border-blue-500 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="border-b border-primary p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Logo */}
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-start">
             <div className="relative h-24 w-24 sm:h-32 sm:w-32">
@@ -135,20 +135,20 @@ export default async function PreviewPage({ params }: PageProps) {
 
           {/* Títulos */}
           <div className="w-full sm:w-1/2 text-center">
-            <div className="text-[#003366] dark:text-blue-200 font-semibold sm:text-2xl text-xs">
+            <div className="text-primary font-semibold sm:text-2xl text-xs">
               REGISTRO DE CLASES Y ASISTENCIA
             </div>
-            <div className="text-[#003366] dark:text-blue-200 text-xs">DOCENCIA</div>
+            <div className="text-primary text-xs">DOCENCIA</div>
           </div>
 
           {/* Meta info */}
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
-            <div className="text-xs border border-[#005a9c] dark:border-blue-400 rounded dark:text-gray-100">
-              <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
+            <div className="text-xs border border-primary rounded text-foreground">
+              <div className="flex gap-1 border-b border-primary py-1 px-3">
                 <span className="font-semibold">Código:</span>
                 <span>FO-DO-005</span>
               </div>
-              <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
+              <div className="flex gap-1 border-b border-primary py-1 px-3">
                 <span className="font-semibold">Versión:</span>
                 <span>08</span>
               </div>
@@ -161,7 +161,7 @@ export default async function PreviewPage({ params }: PageProps) {
         </div>
 
         {/* Info Docente/Asignatura */}
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs border border-gray-200 dark:border-gray-700 my-4 rounded-md text-gray-900 dark:text-gray-100">
+        <div className="bg-muted px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs border border-border my-4 rounded-md text-foreground">
           <div className="flex gap-2">
             <span className="font-semibold">NOMBRE DEL DOCENTE:</span>
             <span>{teacherName}</span>
@@ -189,43 +189,43 @@ export default async function PreviewPage({ params }: PageProps) {
         </div>
 
         {/* Tabla principal */}
-        <div className="text-xs dark:text-gray-100">
+        <div className="text-xs text-foreground">
           <div className="-mx-4 sm:mx-0 overflow-x-auto">
-            <div className="min-w-[720px] w-full border border-[#ECEEDF] dark:border-gray-700">
+            <div className="min-w-[720px] w-full border border-border">
               {/* Header principal */}
               <div className="grid" style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}>
                 {/* No. */}
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] h-full flex items-center justify-center p-2">
+                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80 h-full flex items-center justify-center p-2">
                   No.
                 </div>
                 {/* Fecha */}
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0]">
+                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80">
                   <div className="p-1">FECHA</div>
-                  <div className="grid grid-cols-2 border-t border-[#24699be0]">
+                  <div className="grid grid-cols-2 border-t border-primary/80">
                     <div className="p-1 text-xs">DD</div>
                     <div className="p-1 text-xs">MM</div>
                   </div>
                 </div>
                 {/* Hora */}
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0]">
+                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80">
                   <div className="p-1">HORA</div>
-                  <div className="grid grid-cols-2 border-t border-[#24699be0]">
+                  <div className="grid grid-cols-2 border-t border-primary/80">
                     <div className="p-1 text-xs">INICIO</div>
                     <div className="p-1 text-xs">FINAL</div>
                   </div>
                 </div>
                 {/* Tema */}
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] p-2 h-full flex items-center justify-center">
+                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80 p-2 h-full flex items-center justify-center">
                   TEMA
                 </div>
                 {/* Total Horas */}
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] p-2 h-full flex items-center justify-center">
+                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80 p-2 h-full flex items-center justify-center">
                   TOTAL
                   <br />
                   HORAS
                 </div>
                 {/* Firma */}
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs p-2 h-full flex items-center justify-center">
+                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs p-2 h-full flex items-center justify-center">
                   FIRMA
                   <br />
                   DOCENTE
@@ -242,41 +242,41 @@ export default async function PreviewPage({ params }: PageProps) {
                   return (
                     <div
                       key={cls.id}
-                      className={`grid min-h-[48px] items-stretch border-t border-[#ECEEDF] dark:border-gray-700 ${idx % 2 === 1 ? 'bg-[#f8f9fa] dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}
+                      className={`grid min-h-[48px] items-stretch border-t border-border ${idx % 2 === 1 ? 'bg-muted' : 'bg-card'}`}
                       style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}
                     >
                       {/* No. */}
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
+                      <div className="flex items-center justify-center border-r border-border text-xs">
                         {idx + 1}
                       </div>
 
                       {/* Fecha DD/MM */}
-                      <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
+                      <div className="grid grid-cols-2 border-r border-border">
                         <div className="flex items-center justify-center text-xs">
                           {formatDD(dateObj)}
                         </div>
-                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
+                        <div className="flex items-center justify-center text-xs border-l border-border">
                           {formatMM(dateObj)}
                         </div>
                       </div>
 
                       {/* Hora Inicio/Final */}
-                      <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
+                      <div className="grid grid-cols-2 border-r border-border">
                         <div className="flex items-center justify-center text-xs">
                           {formatTimeHHmm(cls.startTime as Date | null)}
                         </div>
-                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
+                        <div className="flex items-center justify-center text-xs border-l border-border">
                           {formatTimeHHmm(cls.endTime as Date | null)}
                         </div>
                       </div>
 
                       {/* Tema */}
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 p-2 text-center text-xs">
+                      <div className="flex items-center justify-center border-r border-border p-2 text-center text-xs">
                         {cls.topic?.trim() || `Sesión ${idx + 1}`}
                       </div>
 
                       {/* Total Horas */}
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
+                      <div className="flex items-center justify-center border-r border-border text-xs">
                         {calculateHours(cls.startTime as Date | null, cls.endTime as Date | null)}
                       </div>
 

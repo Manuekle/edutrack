@@ -3,6 +3,7 @@
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
@@ -99,21 +100,24 @@ export default function HistorialAsistenciasPage() {
       <Card className="p-0">
         <CardContent className="p-0">
           {error ? (
-            <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
+            <div className="rounded-md bg-destructive/10 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-xs font-normal text-red-800 dark:text-red-200">
+                  <h3 className="text-xs font-normal text-destructive">
                     Error al cargar el historial
                   </h3>
-                  <div className="mt-2 text-xs text-red-700 dark:text-red-300">
+                  <div className="mt-2 text-xs text-destructive/90">
                     <p>{error}</p>
                   </div>
                   <div className="mt-4">
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-destructive/50 text-destructive hover:bg-destructive/10 focus-visible:ring-destructive"
                       onClick={() => {
                         setIsLoading(true);
                         setError(null);
@@ -128,10 +132,10 @@ export default function HistorialAsistenciasPage() {
                             }
                             const responseData = await response.json();
                             setAttendances(responseData.data || []);
-                          } catch (error: unknown) {
+                          } catch (err: unknown) {
                             const errorMessage =
-                              error instanceof Error
-                                ? error.message
+                              err instanceof Error
+                                ? err.message
                                 : 'Error al cargar el historial de asistencias';
                             setError(errorMessage);
                           } finally {
@@ -140,11 +144,10 @@ export default function HistorialAsistenciasPage() {
                         };
                         fetchAttendances();
                       }}
-                      className="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/30 px-3 py-2 text-xs font-normal text-red-800 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
                     >
                       <RefreshCw className="mr-2 h-4 w-4" />
                       Reintentar
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

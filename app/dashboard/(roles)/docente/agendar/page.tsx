@@ -342,7 +342,7 @@ export default function DocenteAgendarPage() {
       </Card>
 
       <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-2xl border-border">
+        <DialogContent className="sm:max-w-lg rounded-2xl border-border">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold">
               Nueva Solicitud de Reserva

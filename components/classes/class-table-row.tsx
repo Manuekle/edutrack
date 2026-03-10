@@ -149,7 +149,7 @@ export function ClassTableRow({
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[180px]">
+          <DropdownMenuContent align="end" className="min-w-44">
             <DropdownMenuLabel className="font-sans font-semibold">Acciones</DropdownMenuLabel>
             <DropdownMenuItem
               asChild

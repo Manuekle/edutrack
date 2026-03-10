@@ -184,7 +184,7 @@ export default function GestionAsignaturasPage() {
                         onChange={e => setSelectedProgram(e.target.value)}
                       />
                       <Select value={selectedSemester} onValueChange={setSelectedSemester}>
-                        <SelectTrigger className="w-full md:w-[130px] h-9 text-xs bg-background">
+                        <SelectTrigger className="w-full md:w-32 h-9 text-xs bg-background">
                           <SelectValue placeholder="Semestre" />
                         </SelectTrigger>
                         <SelectContent>
@@ -227,7 +227,7 @@ export default function GestionAsignaturasPage() {
                               <Checkbox
                                 checked={subjects.length > 0 && selectedSubjects.size === subjects.length}
                                 onCheckedChange={toggleAll}
-                                className="rounded-[4px]"
+                                className="rounded-sm"
                               />
                             </div>
                           </TableHead>
@@ -260,7 +260,7 @@ export default function GestionAsignaturasPage() {
                             <TableRow key={index} className="hover:bg-muted/50 group">
                               <TableCell className="px-4 py-3">
                                 <div className="flex items-center justify-center">
-                                  <Skeleton className="h-4 w-4 rounded-[4px]" />
+                                  <Skeleton className="h-4 w-4 rounded-sm" />
                                 </div>
                               </TableCell>
                               <TableCell className="px-4 py-3">
@@ -325,7 +325,7 @@ export default function GestionAsignaturasPage() {
                                   <Checkbox
                                     checked={selectedSubjects.has(subject.id)}
                                     onCheckedChange={() => toggleSelection(subject.id)}
-                                    className="rounded-[4px]"
+                                    className="rounded-sm"
                                   />
                                 </div>
                               </TableCell>
@@ -394,6 +394,7 @@ export default function GestionAsignaturasPage() {
                                   size="icon"
                                   className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                   onClick={() => setSubjectToEdit(subject)}
+                                  aria-label="Editar asignatura"
                                   title="Editar grupo, programa y docente"
                                 >
                                   <Edit2 className="h-4 w-4" />

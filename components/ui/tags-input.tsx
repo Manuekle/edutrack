@@ -65,9 +65,9 @@ export function TagsInput({
         className
       )}
     >
-      <div className="group flex min-h-[36px] w-full flex-wrap gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs shadow-xs ring-offset-background transition-colors focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50">
+      <div className="group flex min-h-9 w-full flex-wrap gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs shadow-xs ring-offset-background transition-colors focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50">
         {value.map(tag => (
-          <Badge key={tag} variant="secondary" className="px-2 py-0.5 text-[10px] bg-muted/50 hover:bg-muted/80 rounded-[4px] font-semibold flex items-center gap-1">
+          <Badge key={tag} variant="secondary" className="px-2 py-0.5 text-[10px] bg-muted/50 hover:bg-muted/80 rounded-sm font-semibold flex items-center gap-1">
             {tag}
             <button
               className="rounded-full outline-none focus:ring-1 focus:ring-ring focus:ring-offset-0 opacity-70 hover:opacity-100 transition-opacity"

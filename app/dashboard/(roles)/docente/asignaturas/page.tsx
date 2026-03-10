@@ -67,7 +67,7 @@ export default function SubjectsPage() {
                 Período:
               </label>
               <Select value={selectedPeriod} onValueChange={setSelectedPeriod} name="period">
-                <SelectTrigger id="period-select" className="text-xs w-[180px]">
+                <SelectTrigger id="period-select" className="text-xs w-44">
                   <SelectValue placeholder="Seleccionar período" />
                 </SelectTrigger>
                 <SelectContent>

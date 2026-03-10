@@ -1,7 +1,13 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Home, Info, Menu, Moon, Sun, User, X, Zap } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Home, Info, Menu, Monitor, Moon, Sun, User, X, Zap } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -24,7 +30,7 @@ export default function Navbar() {
     []
   );
 
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -99,18 +105,18 @@ export default function Navbar() {
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 pt-[env(safe-area-inset-top)] ${scrolled
-          ? 'bg-background/90 backdrop-blur-md border-b border-border/40 shadow-sm'
-          : 'bg-background/80 backdrop-blur-sm border-b border-transparent'
+        ? 'bg-background/90 backdrop-blur-md border-b border-border/40 shadow-sm'
+        : 'bg-background/80 backdrop-blur-sm border-b border-transparent'
         }`}
     >
       <div className="container px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="sm:text-2xl text-xs font-semibold bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                edu<span className="text-amber-500">Track</span>
-              </span>
+<span className="sm:text-2xl text-xs font-semibold text-primary">
+              edu<span className="font-bold">Track</span>
+            </span>
             </Link>
           </div>
 
@@ -122,8 +128,8 @@ export default function Navbar() {
                 asChild
                 variant="ghost"
                 className={`px-4 py-2 text-xs font-normal transition-colors ${item.sectionId === activeSection || (!activeSection && item.sectionId === 'home')
-                    ? 'text-foreground bg-muted/50'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                  ? 'text-foreground bg-muted/50'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                   }`}
               >
                 <Link href={item.href}>
@@ -135,16 +141,48 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center space-x-2">
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              className="rounded-full"
-              aria-label="Toggle theme"
-            >
-              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </Button>
+            {/* Theme: Claro / Oscuro / Sistema */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="Elegir tema (claro, oscuro o sistema)"
+                >
+                  {resolvedTheme === 'dark' ? (
+                    <Moon className="h-5 w-5" />
+                  ) : resolvedTheme === 'light' ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Monitor className="h-5 w-5" />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="rounded-xl border border-border">
+                <DropdownMenuItem
+                  onClick={() => setTheme('light')}
+                  className="cursor-pointer gap-2 text-xs"
+                >
+                  <Sun className="h-4 w-4" />
+                  Modo claro
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setTheme('dark')}
+                  className="cursor-pointer gap-2 text-xs"
+                >
+                  <Moon className="h-4 w-4" />
+                  Modo oscuro
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setTheme('system')}
+                  className="cursor-pointer gap-2 text-xs"
+                >
+                  <Monitor className="h-4 w-4" />
+                  Usar sistema
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Authentication */}
             <Button variant="ghost" asChild className="rounded-lg">

@@ -341,7 +341,7 @@ export const FileListItemProgressBar = ({
               <div className="h-4 w-px bg-border" />
 
               <div className="flex items-center gap-1">
-                {isComplete && <CircleCheck className="h-4 w-4 text-green-600" />}
+                {isComplete && <CircleCheck className="h-4 w-4 text-success" />}
                 {isComplete && <p className="text-xs font-normal">100%</p>}
 
                 {!isComplete && !failed && (
@@ -403,7 +403,7 @@ export const FileListItemProgressFill = ({
       <div className="absolute inset-0 z-0">
         <div
           className={cn(
-            'h-full w-full origin-left bg-green-50 transition-transform',
+            'h-full w-full origin-left bg-success/10 transition-transform',
             failed && 'bg-destructive/10'
           )}
           style={{ transform: `scaleX(${progress / 100})` }}
@@ -471,7 +471,7 @@ export const FileListItemProgressFill = ({
               <div className="h-4 w-px bg-border" />
 
               <div className="flex items-center gap-1">
-                {isComplete && <CircleCheck className="h-4 w-4 text-green-600" />}
+                {isComplete && <CircleCheck className="h-4 w-4 text-success" />}
                 {isComplete && <p className="text-xs font-normal">100%</p>}
 
                 {!isComplete && !failed && (

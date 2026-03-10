@@ -2,6 +2,7 @@
 
 import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
+import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import {
   BarChart2,
@@ -373,13 +374,13 @@ export default function HomePageWeb() {
                           </span>
                         </p>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                          <button className="px-6 py-2 bg-black text-white rounded-lg font-normal  shadow-lg flex items-center justify-center gap-2 text-xs">
+                          <Button className="shadow-lg" size="lg">
                             <ScanLine className="h-4 w-4" />
                             Escanear código
-                          </button>
-                          <button className="px-6 py-2 border-2 border-border bg-white text-black rounded-lg font-normal text-xs">
+                          </Button>
+                          <Button variant="outline" size="lg">
                             Ingresar código
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -393,9 +394,9 @@ export default function HomePageWeb() {
         {/* About Section */}
         <section id="about" className="w-full py-16 md:py-24 md:pb-56 relative overflow-hidden">
           {/* Background blur elements */}
-          <div className="absolute top-20 right-20 w-56 h-56 bg-green-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-20 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 right-20 w-56 h-56 bg-primary/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-20 w-64 h-64 bg-accent rounded-full blur-3xl opacity-30"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-muted rounded-full blur-3xl opacity-50"></div>
 
           <div className="container px-4 mx-auto relative z-10">
             <div className="max-w-6xl mx-auto">
