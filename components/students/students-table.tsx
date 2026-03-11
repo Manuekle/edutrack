@@ -96,7 +96,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
         </div>
         <div className='mt-4'>
           {isLoading ? (
-            <div className="bg-card border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando estudiantes">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando estudiantes">
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
@@ -123,7 +123,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               </Table>
             </div>
           ) : allStudents.length > 0 ? (
-            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <Table>
                   <TableHeader className="bg-muted/30">

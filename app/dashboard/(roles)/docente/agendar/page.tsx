@@ -162,7 +162,7 @@ export default function DocenteAgendarPage() {
         <CardContent className="p-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Sidebar: Salas */}
-            <Card className="p-0 border-none shadow-none bg-transparent lg:border lg:border-border lg:rounded-md lg:bg-card lg:shadow-sm">
+            <Card className="p-0 border border-border rounded-lg bg-card shadow-sm">
               <CardHeader className="px-4 pt-4 pb-2">
                 <CardTitle className="text-xs font-semibold tracking-card text-muted-foreground">
                   Salas e Instalaciones
@@ -171,7 +171,7 @@ export default function DocenteAgendarPage() {
                   Selecciona para ver disponibilidad
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-2 pb-4 pt-0">
+              <CardContent className="px-4 pb-4 pt-0">
                 {loading ? (
                   <div className="py-8 flex justify-center">
                     <Loading />
@@ -227,8 +227,8 @@ export default function DocenteAgendarPage() {
 
             {/* Tabla de disponibilidad */}
             <div className="lg:col-span-2 space-y-4">
-              <Card className="border-none shadow-none bg-transparent p-0">
-                <CardHeader className="px-0 pt-0">
+              <Card className="border border-border rounded-lg bg-card shadow-sm p-0">
+                <CardHeader className="px-4 pt-4 pb-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <CardTitle className="text-xs font-semibold tracking-card">
@@ -246,8 +246,8 @@ export default function DocenteAgendarPage() {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="p-0">
-                  <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+                <CardContent className="px-4 pb-4 pt-0">
+                  <div className="bg-muted/20 border border-border rounded-lg overflow-hidden">
                     <Table>
                       <TableHeader className="bg-muted/30">
                         <TableRow className="hover:bg-transparent">
@@ -310,7 +310,7 @@ export default function DocenteAgendarPage() {
                                     booking.status === 'RECHAZADO' &&
                                     'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400',
                                     booking.status === 'PENDIENTE' &&
-                                    'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400'
+                                    'bg-warning/10 text-warning border border-warning/20'
                                   )}
                                 >
                                   {booking.status}

@@ -409,7 +409,7 @@ export default function CargarAsignaturasPage() {
                               </TableCell>
                               <TableCell className="py-2.5">
                                 <div className="flex flex-col gap-0.5 text-[10px] text-muted-foreground">
-                                  <span className="font-semibold text-zinc-600">
+                                  <span className="font-semibold text-foreground">
                                     Docente: {item.docente || 'Sin asignar'}
                                     {!item.teacherFound && item.docente && (
                                       <span className="text-destructive ml-1 italic text-[9px]">

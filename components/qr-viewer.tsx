@@ -75,7 +75,7 @@ export function QRViewer({
         'transition-all duration-300',
         isFullscreen
           ? 'bg-white dark:bg-black w-screen h-screen fixed inset-0 z-50 flex items-center justify-center'
-          : 'bg-background rounded-xl shadow-sm dark:shadow-zinc-900 w-full max-w-md mx-auto p-8 flex flex-col items-center justify-center'
+          : 'bg-background rounded-xl shadow-sm dark:shadow-lg w-full max-w-md mx-auto p-8 flex flex-col items-center justify-center'
       )}
     >
       {isFullscreen ? (
@@ -86,7 +86,7 @@ export function QRViewer({
         <>
           {/* QR Code */}
           <div className="relative mb-8">
-            <div className="bg-white p-4 rounded-lg shadow-sm dark:shadow-zinc-900">
+            <div className="bg-card border border-border p-4 rounded-lg shadow-sm">
               <QRCodeCanvas
                 value={qrUrl}
                 size={qrSize}

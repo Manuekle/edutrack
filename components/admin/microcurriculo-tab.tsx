@@ -522,7 +522,7 @@ export function MicrocurriculoTab() {
                                 <div className="flex items-center gap-2">
                                   <span className="font-semibold text-xs text-foreground">{item.nombreAsignatura}</span>
                                   {item.status === 'existing' && (
-                                    <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 font-normal">Actualización</Badge>
+                                    <Badge variant="warningSoft" className="text-[9px] px-1.5 py-0 h-4 font-normal">Actualización</Badge>
                                   )}
                                   {item.status === 'error' && (
                                     <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 font-normal">Error</Badge>

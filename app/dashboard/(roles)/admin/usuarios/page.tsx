@@ -99,10 +99,10 @@ export default function GestionUsuariosPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
         <CardHeader className="p-0 w-full" id="tour-users-title">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+          <CardTitle className="text-xl sm:text-2xl font-semibold tracking-card text-foreground">
             Gestión de Usuarios
           </CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-sm text-muted-foreground">
             Administra los usuarios y sus permisos en el sistema
           </CardDescription>
         </CardHeader>

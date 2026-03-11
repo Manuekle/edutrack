@@ -277,11 +277,11 @@ export default function AttendancePage() {
     <div className="space-y-4">
       <div className="flex justify-between items-start">
         <div>
-          <CardTitle className="font-semibold sm:text-2xl text-xs tracking-card">
+          <CardTitle className="text-xl sm:text-2xl font-semibold tracking-card text-foreground">
             Toma de Asistencia
           </CardTitle>
           {classInfo && (
-            <CardDescription className="mt-1">
+            <CardDescription className="text-sm text-muted-foreground mt-1">
               {classInfo.subject.name} -{' '}
               {new Date(classInfo.date).toLocaleDateString('es-ES', {
                 year: 'numeric',
@@ -336,7 +336,7 @@ export default function AttendancePage() {
               {students.map(student => (
                 <div
                   key={student.studentId}
-                  className="flex flex-col md:flex-row items-start md:items-center justify-between p-3 border rounded-lg gap-4 md:gap-2"
+                  className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border border-border rounded-lg bg-card gap-4 md:gap-2"
                 >
                   <div className="w-full md:w-auto">
                     <p className="font-semibold tracking-card text-xs">{student.name}</p>
@@ -368,7 +368,7 @@ export default function AttendancePage() {
             </div>
             <div className="flex justify-end mt-6">
               <Button
-                variant="outline"
+                variant="default"
                 onClick={handleSaveChanges}
                 disabled={isSaving || isClassPast}
               >

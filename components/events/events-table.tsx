@@ -200,7 +200,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
           </div>
           <Dialog open={isCreateEventDialogOpen} onOpenChange={setIsCreateEventDialogOpen}>
             <Button
-              variant="outline"
+              variant="default"
               className="rounded-full text-xs h-9 shrink-0"
               onClick={() => setIsCreateEventDialogOpen(true)}
             >
@@ -250,7 +250,7 @@ export function EventsTable({ subjectId }: EventsTableProps) {
               </Table>
             </div>
           ) : events.length > 0 ? (
-            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">

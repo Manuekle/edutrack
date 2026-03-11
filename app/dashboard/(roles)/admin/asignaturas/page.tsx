@@ -141,10 +141,10 @@ export default function GestionAsignaturasPage() {
     <div className="flex flex-col gap-6">
       {/* Page header */}
       <div id="tour-asignaturas-title">
-        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+        <CardTitle className="text-xl sm:text-2xl font-semibold tracking-card text-foreground">
           Gestión de Asignaturas
         </CardTitle>
-        <CardDescription className="text-xs mt-1">
+        <CardDescription className="text-sm text-muted-foreground mt-1">
           Administra las asignaturas y sus microcurrículos
         </CardDescription>
       </div>

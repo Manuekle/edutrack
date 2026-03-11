@@ -587,7 +587,7 @@ export function TeacherReport() {
                   onClick={() => setSelectedTeacher(teacher)}
                 >
                   <div className="flex items-center gap-3 w-full">
-                    <div className="h-8 w-8 rounded-full bg-muted border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                    <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground">
                       {teacher.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 text-left">
@@ -651,7 +651,7 @@ export function TeacherReport() {
               <CardHeader>
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-full bg-muted border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                    <div className="h-12 w-12 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground">
                       {selectedTeacher.name
                         .split(' ')
                         .map(n => n[0])

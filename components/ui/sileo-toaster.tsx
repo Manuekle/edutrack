@@ -31,10 +31,10 @@ export function SileoToaster() {
             fill: '#ffffff',
             roundness: 16,
             styles: {
-              title: 'text-neutral-900 font-semibold!',
-              description: 'text-neutral-500!',
-              badge: 'bg-neutral-100!',
-              button: 'bg-neutral-100! hover:bg-neutral-200! transition-colors',
+              title: 'text-foreground font-semibold!',
+              description: 'text-muted-foreground!',
+              badge: 'bg-muted!',
+              button: 'bg-muted! hover:bg-muted/80! transition-colors',
             },
           }
       }

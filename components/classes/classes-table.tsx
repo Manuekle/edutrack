@@ -103,7 +103,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
         </div>
         <div className='mt-4'>
           {isLoading ? (
-            <div className="bg-card border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando clases">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando clases">
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
@@ -128,7 +128,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               </Table>
             </div>
           ) : allClasses.length > 0 ? (
-            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
+            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">

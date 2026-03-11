@@ -65,7 +65,7 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
               })
             }
           >
-            <UserX className="h-4 w-4 text-amber-500" />
+            <UserX className="h-4 w-4 text-warning" />
           </Button>
         </DialogTrigger>
       </TableCell>

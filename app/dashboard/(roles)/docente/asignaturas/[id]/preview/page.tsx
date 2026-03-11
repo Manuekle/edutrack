@@ -103,7 +103,7 @@ export default async function PreviewPage({ params }: PageProps) {
     <div className="space-y-6">
       <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
         <div>
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card dark:text-gray-100">
+          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-foreground">
             Bitacora Docente
           </CardTitle>
           <CardDescription className="text-xs dark:text-gray-300">
@@ -292,7 +292,7 @@ export default async function PreviewPage({ params }: PageProps) {
                           />
                         ) : (
                           // Nota: “finalizada” (PROGRAMADA con endTime pasado) NO muestra firma
-                          <span className="text-xs text-gray-400 dark:text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {cls.status === 'PROGRAMADA'
                               ? finalizada
                                 ? 'Finalizada'

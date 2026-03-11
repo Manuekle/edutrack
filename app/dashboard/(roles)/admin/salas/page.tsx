@@ -387,7 +387,7 @@ const CustomCalendar = ({
           </h2>
         </div>
 
-        <div className="flex items-center p-1 gap-2 bg-muted/20 rounded-full border border-muted/50 overflow-x-auto no-scrollbar">
+        <div className="flex items-center p-2 gap-2 bg-muted/20 rounded-full border border-border overflow-x-auto no-scrollbar">
           {[
             { id: 'month', label: 'Mes' },
             { id: 'week', label: 'Semana' },

@@ -157,7 +157,7 @@ export default function HomePageWeb() {
                   </span>
                   <span className="relative inline-block mt-2">
                     <span className="relative z-10 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-card bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                      edu<span className="text-amber-500">Track</span>
+                      edu<span className="text-primary">Track</span>
                     </span>
                   </span>
                 </motion.h1>
@@ -413,7 +413,7 @@ export default function HomePageWeb() {
                 <h2 className="sm:text-2xl text-xs font-semibold tracking-card sm:text-3xl md:text-4xl mb-6 text-foreground">
                   Conoce más sobre{' '}
                   <span className="bg-gradient-to-r from-primary to-amber-500 bg-clip-text text-transparent">
-                    edu<span className="text-amber-500">Track</span>
+                    edu<span className="text-primary">Track</span>
                   </span>
                 </h2>
                 <p className="max-w-3xl mx-auto text-xs text-muted-foreground">

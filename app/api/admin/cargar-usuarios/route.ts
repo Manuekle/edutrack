@@ -106,16 +106,37 @@ export async function POST(request: Request) {
       const buffer = await file.arrayBuffer();
       let rows: ExcelRow[] = [];
 
-      // CSV Logic Only
-      const text = new TextDecoder('utf-8').decode(buffer);
+      // CSV: soporte UTF-8 con BOM (Excel) y detección de delimitador (; o ,)
+      const rawBytes = new Uint8Array(buffer);
+      const hasBOM =
+        rawBytes.length >= 3 &&
+        rawBytes[0] === 0xef &&
+        rawBytes[1] === 0xbb &&
+        rawBytes[2] === 0xbf;
+      const text = new TextDecoder('utf-8').decode(hasBOM ? rawBytes.slice(3) : rawBytes);
       const lines = text.split(/\r?\n/).filter(line => line.trim());
 
       if (lines.length === 0) {
         return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
       }
 
-      // Función para parsear una línea CSV manejando comas dentro de comillas
-      const parseCSVLine = (line: string): string[] => {
+      // Detectar delimitador: Excel en español/locales europeos suele usar ; en lugar de ,
+      const detectDelimiter = (firstLines: string[]): string => {
+        const firstLine = firstLines[0] || '';
+        const countComma = (s: string) => (s.match(/,/g) || []).length;
+        const countSemicolon = (s: string) => (s.match(/;/g) || []).length;
+        const countTab = (s: string) => (s.match(/\t/g) || []).length;
+        const commas = countComma(firstLine);
+        const semicolons = countSemicolon(firstLine);
+        const tabs = countTab(firstLine);
+        if (tabs > 0 && tabs >= commas && tabs >= semicolons) return '\t';
+        if (semicolons > 0 && semicolons >= commas) return ';';
+        return ',';
+      };
+      const delimiter = detectDelimiter(lines);
+
+      // Parsear línea CSV con delimitador configurable y comillas
+      const parseCSVLine = (line: string, sep: string = delimiter): string[] => {
         const values: string[] = [];
         let current = '';
         let inQuotes = false;
@@ -126,32 +147,26 @@ export async function POST(request: Request) {
 
           if (char === '"') {
             if (inQuotes && nextChar === '"') {
-              // Comilla escapada ("" dentro de comillas)
               current += '"';
-              i++; // Saltar la siguiente comilla
+              i++;
             } else {
-              // Toggle estado de comillas
               inQuotes = !inQuotes;
             }
-          } else if (char === ',' && !inQuotes) {
-            // Separador de campo (solo fuera de comillas)
+          } else if (char === sep && !inQuotes) {
             values.push(current.trim());
             current = '';
           } else {
             current += char;
           }
         }
-        // Agregar el último valor
         values.push(current.trim());
 
-        // Limpiar comillas de los valores
         return values.map(val => {
-          // Remover comillas externas si existen
           if (
             (val.startsWith('"') && val.endsWith('"')) ||
             (val.startsWith("'") && val.endsWith("'"))
           ) {
-            return val.slice(1, -1).replace(/""/g, '"'); // Reemplazar comillas escapadas
+            return val.slice(1, -1).replace(/""/g, '"');
           }
           return val;
         });
