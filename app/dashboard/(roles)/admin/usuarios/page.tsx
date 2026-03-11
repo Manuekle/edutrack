@@ -1,11 +1,13 @@
 'use client';
 
 import { CreateUserModal } from '@/components/modals/create-user-modal';
+import { EditUserModal } from '@/components/modals/edit-user-modal';
 import { EditUserRoleModal } from '@/components/modals/edit-user-role-modal';
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,9 +36,10 @@ import { useUsers } from '@/hooks/use-users';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal, Search, UserCheck, UserCog, UserX, Users } from 'lucide-react';
+import { Loader2, MoreHorizontal, Search, Trash2, UserCheck, UserCog, UserPen, UserX, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { sileo } from 'sileo';
 
 const ITEMS_PER_PAGE = [5, 10, 20, 50, 100] as const;
 
@@ -47,7 +50,10 @@ export default function GestionUsuariosPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditDataModalOpen, setIsEditDataModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
 
   // Paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,6 +89,44 @@ export default function GestionUsuariosPage() {
 
   const handleToggleActive = async (user: User) => {
     toggleActive({ userId: user.id, isActive: !user.isActive });
+  };
+
+  const toggleSelectUser = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === users.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(users.map((u) => u.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setIsDeletingBulk(true);
+    let ok = 0;
+    let err = 0;
+    for (const id of selectedIds) {
+      try {
+        const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+        if (res.ok) ok++;
+        else err++;
+      } catch {
+        err++;
+      }
+    }
+    queryClient.invalidateQueries({ queryKey: ['users'] });
+    setSelectedIds(new Set());
+    setIsDeletingBulk(false);
+    if (ok) sileo.success({ title: `${ok} usuario(s) eliminado(s) correctamente.` });
+    if (err) sileo.error({ title: `No se pudo eliminar ${err} usuario(s).` });
   };
 
   // Resetear a la primera página cuando cambian los filtros
@@ -153,7 +197,7 @@ export default function GestionUsuariosPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 w-full md:w-auto">
+              <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
                   <SelectTrigger className="w-full md:w-32 h-9 text-xs bg-background">
                     <SelectValue placeholder="Rol" />
@@ -176,6 +220,23 @@ export default function GestionUsuariosPage() {
                     <SelectItem value="false" className="text-xs">Inactivo</SelectItem>
                   </SelectContent>
                 </Select>
+
+                {selectedIds.size > 0 && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="h-9 text-xs gap-1.5"
+                    onClick={handleBulkDelete}
+                    disabled={isDeletingBulk}
+                  >
+                    {isDeletingBulk ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                    Eliminar ({selectedIds.size})
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -188,6 +249,13 @@ export default function GestionUsuariosPage() {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-xs font-normal px-2 py-2 text-muted-foreground w-10">
+                      <Checkbox
+                        checked={users.length > 0 && selectedIds.size === users.length}
+                        onCheckedChange={toggleSelectAll}
+                        aria-label="Seleccionar todos"
+                      />
+                    </TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Usuario</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Documento</TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Correo</TableHead>
@@ -203,6 +271,9 @@ export default function GestionUsuariosPage() {
                   {isLoading ? (
                     Array.from({ length: itemsPerPage }).map((_, index) => (
                       <TableRow key={index} className="hover:bg-muted/50 group">
+                        <TableCell className="px-2 py-3 w-10">
+                          <Skeleton className="h-4 w-4 rounded" />
+                        </TableCell>
                         <TableCell className="px-4 py-3">
                           <div className="space-y-1.5">
                             <Skeleton className="h-4 w-[120px]" />
@@ -234,7 +305,7 @@ export default function GestionUsuariosPage() {
                     ))
                   ) : users.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="h-24 text-center">
+                      <TableCell colSpan={8} className="h-24 text-center">
                         {searchTerm ? (
                           <div className="flex flex-col items-center justify-center py-6">
                             <Search className="h-8 w-8 text-muted-foreground mb-2" />
@@ -254,6 +325,13 @@ export default function GestionUsuariosPage() {
                   ) : (
                     users.map(user => (
                       <TableRow key={user.id} className="hover:bg-muted/50 group transition-colors">
+                        <TableCell className="px-2 py-3 w-10">
+                          <Checkbox
+                            checked={selectedIds.has(user.id)}
+                            onCheckedChange={() => toggleSelectUser(user.id)}
+                            aria-label={`Seleccionar ${user.name || user.id}`}
+                          />
+                        </TableCell>
                         <TableCell className="px-4 py-3">
                           <span className="font-semibold text-foreground text-xs">
                             {user.name || 'Usuario sin nombre'}
@@ -318,6 +396,16 @@ export default function GestionUsuariosPage() {
                                 <DropdownMenuLabel className="text-xs font-sans">
                                   Acciones
                                 </DropdownMenuLabel>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsEditDataModalOpen(true);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <UserPen className="mr-2 h-4 w-4" />
+                                  <span className="text-xs font-sans">Editar datos</span>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
                                     setSelectedUser(user);
@@ -393,6 +481,12 @@ export default function GestionUsuariosPage() {
         </div>
       </div>
 
+      <EditUserModal
+        user={selectedUser}
+        isOpen={isEditDataModalOpen}
+        onClose={() => setIsEditDataModalOpen(false)}
+        onUserUpdate={handleUserUpdate}
+      />
       <EditUserRoleModal
         user={selectedUser}
         isOpen={isEditModalOpen}

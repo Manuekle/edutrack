@@ -1,7 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 import { Role } from '@/lib/roles';
+import { Prisma } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -30,8 +30,13 @@ export async function PATCH(
       codigoDocente,
     } = body;
 
-    // Validar que al menos un correo esté presente
-    if (body.correoPersonal === '' && body.correoInstitucional === '') {
+    // Validar que al menos un correo esté presente solo si se envían campos de correo
+    const sendingEmails = 'correoPersonal' in body || 'correoInstitucional' in body;
+    if (
+      sendingEmails &&
+      (body.correoPersonal === '' || body.correoPersonal == null) &&
+      (body.correoInstitucional === '' || body.correoInstitucional == null)
+    ) {
       return NextResponse.json(
         { message: 'El usuario debe tener al menos un correo electrónico.' },
         { status: 400 }
@@ -58,19 +63,20 @@ export async function PATCH(
       }
     }
 
+    const updateData: Record<string, unknown> = {};
+    if (name !== undefined) updateData.name = name;
+    if (role !== undefined) updateData.role = role;
+    if (isActive !== undefined) updateData.isActive = isActive;
+    if (document !== undefined) updateData.document = document;
+    if (telefono !== undefined) updateData.telefono = telefono;
+    if (correoPersonal !== undefined) updateData.correoPersonal = correoPersonal;
+    if (correoInstitucional !== undefined) updateData.correoInstitucional = correoInstitucional;
+    if (codigoEstudiantil !== undefined) updateData.codigoEstudiantil = codigoEstudiantil;
+    if (codigoDocente !== undefined) updateData.codigoDocente = codigoDocente;
+
     const updatedUser = await db.user.update({
       where: { id: userId },
-      data: {
-        name,
-        role,
-        isActive,
-        document,
-        telefono,
-        correoPersonal,
-        correoInstitucional,
-        codigoEstudiantil,
-        codigoDocente,
-      },
+      data: updateData as Prisma.UserUpdateInput,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

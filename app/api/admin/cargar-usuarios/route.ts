@@ -205,15 +205,25 @@ export async function POST(request: Request) {
       const processedDocuments = new Set<string>();
       const processedEmails = new Set<string>();
 
-      // Normalizar headers para búsqueda flexible (case-insensitive, espacios)
+      // Normalizar headers para búsqueda flexible (conserva ñ y acentos)
       const normalizeHeader = (header: string): string => {
         return header
           .toString()
           .trim()
           .toLowerCase()
           .replace(/\s+/g, ' ')
-          .replace(/[^\w\s]/g, '');
+          .replace(/[^\p{L}\p{N}\s]/gu, '');
       };
+
+      // Validar nombre (permite ñ, tildes, espacios; mínimo 2 caracteres)
+      const isValidName = (s: string): boolean =>
+        /^[\p{L}\s]+$/u.test(s.trim()) && s.trim().length >= 2;
+      // Validar documento (alfanumérico y algunos símbolos habituales)
+      const isValidDocument = (s: string): boolean =>
+        /^[\p{L}\p{N}\s\-\.]+$/u.test(String(s).trim()) && String(s).trim().length >= 1;
+      // Validar email
+      const isValidEmail = (s: string): boolean =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s || '').trim());
 
       // Obtener headers del primer row si es CSV, o usar las claves disponibles
       const availableHeaders = rows.length > 0 ? Object.keys(rows[0] || {}) : [];
@@ -362,11 +372,59 @@ export async function POST(request: Request) {
           role: ((mappedRow.role as string) || '').trim().toUpperCase(),
         };
 
-        if (!userData.name || !userData.document || !userData.correoPersonal || !userData.role) {
+        if (!userData.role) {
           previewResults.push({
             data: userData,
             status: 'error',
-            message: 'Faltan campos requeridos (nombre, documento, correo, rol).',
+            message: 'Falta el rol del usuario.',
+          });
+          continue;
+        }
+        if (!userData.name || !userData.name.trim()) {
+          previewResults.push({
+            data: userData,
+            status: 'error',
+            message: 'El nombre es obligatorio.',
+          });
+          continue;
+        }
+        if (!isValidName(userData.name)) {
+          previewResults.push({
+            data: userData,
+            status: 'error',
+            message: 'El nombre debe estar completo (mín. 2 letras; se permiten ñ y tildes).',
+          });
+          continue;
+        }
+        if (!userData.document || !String(userData.document).trim()) {
+          previewResults.push({
+            data: userData,
+            status: 'error',
+            message: 'El documento es obligatorio.',
+          });
+          continue;
+        }
+        if (!isValidDocument(userData.document)) {
+          previewResults.push({
+            data: userData,
+            status: 'error',
+            message: 'El documento no es válido (solo letras, números, guiones o puntos).',
+          });
+          continue;
+        }
+        if (!userData.correoPersonal || !userData.correoPersonal.trim()) {
+          previewResults.push({
+            data: userData,
+            status: 'error',
+            message: 'El correo electrónico es obligatorio.',
+          });
+          continue;
+        }
+        if (!isValidEmail(userData.correoPersonal)) {
+          previewResults.push({
+            data: userData,
+            status: 'error',
+            message: 'El correo electrónico no tiene un formato válido.',
           });
           continue;
         }

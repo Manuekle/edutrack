@@ -37,6 +37,7 @@ import {
   X,
 } from 'lucide-react';
 
+import { getAvailableAcademicPeriods } from '@/lib/academic-period';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -143,13 +144,6 @@ export default function MatriculaPage() {
   const uniqueGroupNames = Array.from(
     new Set(groupInfoList.map(g => g.group).filter((g): g is string => Boolean(g)))
   ).sort();
-
-  const uniquePeriods = Array.from(
-    new Set([
-      ...groupInfoList.map(g => g.periodoAcademico).filter((p): p is string => Boolean(p)),
-      ...enrolledGroups.map(g => g.periodoAcademico),
-    ])
-  ).sort().reverse();
 
   const handleFileSelect = (selectedFile: File | null) => {
     setFile(selectedFile);
@@ -422,16 +416,9 @@ export default function MatriculaPage() {
                           <SelectValue placeholder="Selecciona un periodo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {uniquePeriods.length > 0 ? (
-                            uniquePeriods.map(p => (
-                              <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
-                            ))
-                          ) : (
-                            <>
-                              <SelectItem value="2025-1" className="text-xs">2025-1</SelectItem>
-                              <SelectItem value="2025-2" className="text-xs">2025-2</SelectItem>
-                            </>
-                          )}
+                          {getAvailableAcademicPeriods().map(p => (
+                            <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>

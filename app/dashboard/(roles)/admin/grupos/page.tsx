@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TimePicker } from '@/components/ui/time-picker';
+import { getAvailableAcademicPeriods } from '@/lib/academic-period';
 import {
   AlertTriangle,
   Calendar,
@@ -609,7 +610,7 @@ export default function GruposHorariosPage() {
                     </Select>
                   </div>
 
-                  {/* Periodo */}
+                  {/* Periodo: solo año actual y semestre según el mes (ene-jun: X-1, jul-dic: X-2) */}
                   <div className="space-y-1.5">
                     <Label className="text-xs font-semibold">Periodo Académico</Label>
                     <Select
@@ -620,24 +621,11 @@ export default function GruposHorariosPage() {
                         <SelectValue placeholder="Selecciona un periodo" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Array.from(
-                          new Set(
-                            subjects
-                              .map(s => s.periodoAcademico)
-                              .filter((p): p is string => Boolean(p))
-                          )
-                        )
-                          .sort()
-                          .reverse()
-                          .map(p => (
-                            <SelectItem key={p} value={p} className="text-xs">
-                              {p}
-                            </SelectItem>
-                          ))}
-                        {/* Allow free-form if no periods exist */}
-                        {subjects.filter(s => s.periodoAcademico).length === 0 && (
-                          <SelectItem value="2025-1" className="text-xs">2025-1</SelectItem>
-                        )}
+                        {getAvailableAcademicPeriods().map(p => (
+                          <SelectItem key={p} value={p} className="text-xs">
+                            {p}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -967,13 +955,15 @@ export default function GruposHorariosPage() {
                                 </TableCell>
                                 <TableCell className="px-4 py-3">
                                   {item.schedule && item.schedule.length > 0 ? (
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="text-xs font-semibold text-foreground">
-                                        {item.schedule[0].dia}
-                                      </span>
-                                      <span className="text-[10px] text-muted-foreground">
-                                        {item.schedule[0].horaInicio} - {item.schedule[0].horaFin} ({item.schedule[0].salon})
-                                      </span>
+                                    <div className="flex flex-col gap-1">
+                                      {item.schedule.map((slot, idx) => (
+                                        <div key={idx} className="text-[10px]">
+                                          <span className="font-semibold text-foreground">{slot.dia}</span>
+                                          <span className="text-muted-foreground">
+                                            {' '}{slot.horaInicio} - {slot.horaFin} ({slot.salon})
+                                          </span>
+                                        </div>
+                                      ))}
                                     </div>
                                   ) : (
                                     <span className="text-[10px] text-muted-foreground italic">
@@ -1210,12 +1200,27 @@ export default function GruposHorariosPage() {
                                       </div>
                                       <div className="space-y-1">
                                         <Label className="text-[10px] font-semibold">Periodo</Label>
-                                        <Input
-                                          className="h-8 text-xs w-24"
+                                        <Select
                                           value={editGroupForm.periodoAcademico}
-                                          onChange={e => setEditGroupForm({ ...editGroupForm, periodoAcademico: e.target.value })}
-                                          placeholder="Ej: 2025-1"
-                                        />
+                                          onValueChange={v => setEditGroupForm({ ...editGroupForm, periodoAcademico: v })}
+                                        >
+                                          <SelectTrigger className="h-8 text-xs w-24">
+                                            <SelectValue placeholder="Periodo" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {Array.from(
+                                              new Set([
+                                                ...getAvailableAcademicPeriods(),
+                                                editGroupForm.periodoAcademico,
+                                              ].filter(Boolean))
+                                            )
+                                              .sort()
+                                              .reverse()
+                                              .map(p => (
+                                                <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
+                                              ))}
+                                          </SelectContent>
+                                        </Select>
                                       </div>
                                     </div>
                                   </TableCell>

@@ -5,12 +5,19 @@ import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
 interface GroupScheduleRow {
+  codigo: string;
   grupo: string;
   jornada: string;
   dia: string;
   horaInicio: string;
   horaFin: string;
   salon: string;
+}
+
+/** Detecta delimitador: tab si la línea tiene tab, si no coma/punto y coma */
+function detectDelimiter(line: string): RegExp {
+  if (line.includes('\t')) return /\t/;
+  return /[,;]/;
 }
 
 interface ScheduleEntry {
@@ -106,10 +113,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'El archivo CSV está vacío' }, { status: 400 });
     }
 
+    const delimiter = detectDelimiter(lines[0]);
     const headers = lines[0]
       .toLowerCase()
-      .split(/[,;]/)
+      .split(delimiter)
       .map(h => h.trim());
+    const codigoIdx = headers.findIndex(
+      h =>
+        h.includes('codigo') ||
+        h.includes('código') ||
+        h.includes('code') ||
+        h.includes('asignatura')
+    );
     const grupoIdx = headers.findIndex(h => h.includes('grupo'));
     const jornadaIdx = headers.findIndex(h => h.includes('jornada') || h.includes('turno'));
     const diaIdx = headers.findIndex(
@@ -121,11 +136,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       h => h.includes('salon') || h.includes('sala') || h.includes('aula')
     );
 
+    const subjectCodeNormalized = subject.code.trim().toUpperCase();
+
     const rawRows: GroupScheduleRow[] = [];
     for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(/[,;]/).map(c => c.trim());
+      const cols = lines[i].split(delimiter).map(c => c.trim());
       if (cols.some(v => v)) {
+        const codigo = codigoIdx !== -1 ? (cols[codigoIdx] ?? '') : '';
         rawRows.push({
+          codigo,
           grupo: grupoIdx !== -1 ? cols[grupoIdx] : 'A',
           jornada: jornadaIdx !== -1 ? cols[jornadaIdx] : 'DIURNO',
           dia: diaIdx !== -1 ? cols[diaIdx] : '',
@@ -135,6 +154,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         });
       }
     }
+
+    // Si el archivo trae codigo_asignatura, solo procesar filas de la asignatura seleccionada
+    const rowsToProcess =
+      codigoIdx !== -1
+        ? rawRows.filter(row => row.codigo.trim().toUpperCase() === subjectCodeNormalized)
+        : rawRows;
 
     const groupsMap = new Map<string, GroupData>();
 
@@ -147,7 +172,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       existingSubjectsWithCode.map(s => s.group).filter((g): g is string => g != null)
     );
 
-    for (const row of rawRows) {
+    for (const row of rowsToProcess) {
       const group = row.grupo?.trim() || 'A';
       const jornada = normalizeJornada(row.jornada) || 'DIURNO';
       const key = `${group}-${jornada}`;
