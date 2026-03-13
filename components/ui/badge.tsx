@@ -4,21 +4,21 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
+        default: 'border-transparent bg-primary/90 text-primary-foreground hover:bg-primary/80',
         secondary:
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
         destructive:
-          'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
-        outline: 'text-foreground',
+          'border-transparent bg-destructive/90 text-destructive-foreground hover:bg-destructive/80',
+        outline: 'text-foreground border-border/40',
         success: 'border-transparent bg-success text-success-foreground hover:bg-success/80',
-        successSoft: 'border-success/20 bg-success/10 text-success hover:bg-success/20',
+        successSoft: 'border-success/15 bg-success/10 text-success hover:bg-success/20',
         warning: 'border-transparent bg-warning text-warning-foreground hover:bg-warning/80',
-        warningSoft: 'border-warning/20 bg-warning/10 text-warning hover:bg-warning/20',
-        info: 'border-transparent bg-info text-info-foreground hover:bg-info/80',
+        warningSoft: 'border-warning/15 bg-warning/10 text-warning hover:bg-warning/20',
+        info: 'border-transparent bg-info/90 text-info-foreground hover:bg-info/80',
       },
     },
     defaultVariants: {
@@ -28,7 +28,7 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> { }
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ variant }), className)} {...props} />;

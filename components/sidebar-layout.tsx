@@ -112,7 +112,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).catch(() => { }); // No bloqueamos si falla
+      }).catch(() => {}); // No bloqueamos si falla
 
       // Cerrar sesión en NextAuth
       await signOut({
@@ -174,20 +174,20 @@ function AppSidebar({ homePath }: { homePath: string }) {
   return (
     <Sidebar
       variant="inset"
-      className="h-screen fixed font-sans bg-sidebar pt-[env(safe-area-inset-top)]"
+      className="h-screen fixed font-sans bg-sidebar/80 backdrop-blur-2xl pt-[env(safe-area-inset-top)]"
     >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="sm" asChild className="h-auto py-3">
+            <SidebarMenuButton size="sm" asChild className="h-auto py-4">
               <Link href={homePath}>
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-lg overflow-hidden shadow-sm bg-background flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
                     <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
                   </div>
                   <div className="grid flex-1 text-left">
-                    <span className="truncate font-semibold text-sm">SIRA</span>
-                    <span className="truncate text-xs text-muted-foreground">
+                    <span className="truncate font-semibold text-sm tracking-card">SIRA</span>
+                    <span className="truncate text-[11px] text-muted-foreground">
                       Facultad de Ingeniería
                     </span>
                   </div>
@@ -214,10 +214,10 @@ function AppSidebar({ homePath }: { homePath: string }) {
           <SidebarMenu>
             {accessibleNavGroups.map(group => (
               <SidebarGroup key={group.title}>
-                <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold  text-muted-foreground/70">
+                <SidebarGroupLabel className="px-3 py-2 text-[11px] font-semibold uppercase tracking-card text-muted-foreground/50">
                   {group.title}
                 </SidebarGroupLabel>
-                <SidebarGroupContent className="flex flex-col gap-1 px-2">
+                <SidebarGroupContent className="flex flex-col gap-0.5 px-2">
                   {group.links.map(link => {
                     const Icon = link.icon;
                     const isActive = isLinkActive(link.href);
@@ -226,19 +226,21 @@ function AppSidebar({ homePath }: { homePath: string }) {
                         <SidebarMenuButton
                           asChild
                           isActive={isActive}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] ${isActive
-                            ? 'bg-primary/10 text-primary font-semibold shadow-sm'
-                            : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
-                            }`}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ease-out active:scale-[0.97] ${
+                            isActive
+                              ? 'bg-primary/10 text-primary font-medium'
+                              : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+                          }`}
                         >
                           <Link href={link.href} className="flex items-center gap-3 w-full">
                             {Icon && (
                               <Icon
-                                className={`h-4 w-4 shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'
-                                  }`}
+                                className={`h-[18px] w-[18px] shrink-0 ${
+                                  isActive ? 'text-primary' : 'text-muted-foreground'
+                                }`}
                               />
                             )}
-                            <span className="text-sm">{link.label}</span>
+                            <span className="text-[13px]">{link.label}</span>
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -251,14 +253,12 @@ function AppSidebar({ homePath }: { homePath: string }) {
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border">
+      <SidebarFooter className="border-t border-border/20">
         <SidebarMenu>
           <SidebarMenuItem>
             {mounted ? (
               <DropdownMenu modal={false}>
-                <DropdownMenuTrigger
-                  className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center data-[state=open]:bg-sidebar-accent"
-                >
+                <DropdownMenuTrigger className="w-full flex items-center p-2 sm:p-3 rounded-xl hover:bg-sidebar-accent transition-all duration-200 active:scale-[0.97] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center data-[state=open]:bg-sidebar-accent">
                   <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {session?.user?.name?.charAt(0) || 'U'}
@@ -283,7 +283,9 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   collisionPadding={16}
                 >
                   <div className="px-4 py-1.5 my-1">
-                    <p className="text-xs font-semibold truncate">{session?.user?.name || 'Usuario'}</p>
+                    <p className="text-xs font-semibold truncate">
+                      {session?.user?.name || 'Usuario'}
+                    </p>
                     <p className="text-xs text-muted-foreground truncate">
                       {session?.user?.correoInstitucional || getRoleDisplayName(userRole as Role)}
                     </p>
@@ -318,18 +320,18 @@ function AppSidebar({ homePath }: { homePath: string }) {
                     className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
                   >
                     {theme === 'dark' ||
-                      (theme === 'system' &&
-                        typeof window !== 'undefined' &&
-                        window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
+                    (theme === 'system' &&
+                      typeof window !== 'undefined' &&
+                      window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
                       <Sun className="mr-3 h-4 w-4 shrink-0" />
                     ) : (
                       <Moon className="mr-3 h-4 w-4 shrink-0" />
                     )}
                     <span className="font-sans">
                       {theme === 'dark' ||
-                        (theme === 'system' &&
-                          typeof window !== 'undefined' &&
-                          window.matchMedia('(prefers-color-scheme: dark)').matches)
+                      (theme === 'system' &&
+                        typeof window !== 'undefined' &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches)
                         ? 'Modo Claro'
                         : 'Modo Oscuro'}
                     </span>
@@ -477,23 +479,23 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <SidebarProvider>
         <AppSidebar homePath={homePath} />
         <SidebarInset>
-          <header className="flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 px-3 sm:px-4 font-sans pt-[env(safe-area-inset-top)] transition-all duration-200">
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <SidebarTrigger className="-ml-1 hover:bg-accent hover:scale-105 active:scale-95 transition-transform" />
+          <header className="flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 px-4 sm:px-6 font-sans pt-[env(safe-area-inset-top)] transition-all duration-200">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <SidebarTrigger className="-ml-1 rounded-xl hover:bg-accent/60 active:scale-95 transition-all" />
               <Breadcrumb className="flex-1 mt-0.5 truncate">
                 <BreadcrumbList className="flex-nowrap">
                   {breadcrumbLinks.map((link, index) => (
                     <React.Fragment key={link.href}>
                       <BreadcrumbItem>
                         {index === breadcrumbLinks.length - 1 ? (
-                          <BreadcrumbPage className="text-sm sm:text-base font-semibold">
+                          <BreadcrumbPage className="text-sm sm:text-base font-semibold tracking-card">
                             {link.label}
                           </BreadcrumbPage>
                         ) : (
                           <BreadcrumbLink asChild>
                             <Link
                               href={link.href}
-                              className="text-sm sm:text-base hover:text-primary transition-colors"
+                              className="text-sm sm:text-base text-muted-foreground hover:text-primary transition-colors"
                             >
                               {link.label}
                             </Link>
@@ -510,7 +512,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               <TutorialButton />
             </div>
           </header>
-          <main className="flex-1 p-3 sm:p-4 md:p-6 font-sans">{children}</main>
+          <main className="flex-1 p-4 sm:p-5 md:p-8 font-sans">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

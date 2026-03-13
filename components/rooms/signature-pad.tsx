@@ -60,7 +60,8 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
             maxWidth={4}
             throttle={16}
             canvasProps={{
-              className: 'signature-canvas w-full h-full cursor-crosshair touch-none bg-transparent',
+              className:
+                'signature-canvas w-full h-full cursor-crosshair touch-none bg-transparent',
               style: { width: '100%', height: '100%', touchAction: 'none' },
             }}
           />

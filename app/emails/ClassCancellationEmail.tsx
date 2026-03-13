@@ -1,5 +1,6 @@
 import {
   Body,
+  Button,
   Container,
   Font,
   Head,
@@ -20,14 +21,17 @@ interface ClassCancellationEmailProps {
   classDate: string;
   reason: string;
   supportEmail: string;
+  loginUrl?: string;
 }
 
 const ClassCancellationEmail = ({
+  studentName,
   subjectName,
   teacherName,
   classDate,
   reason,
   supportEmail,
+  loginUrl,
 }: ClassCancellationEmailProps) => {
   const previewText = `Cancelación de clase: ${subjectName}`;
 
@@ -62,7 +66,8 @@ const ClassCancellationEmail = ({
             {/* Content */}
             <Section className="px-[32px] py-[32px]">
               <Text className="text-[#7AAACE] text-xs leading-[24px] m-0 mb-[24px]">
-                Hola, te informamos que la siguiente clase ha sido cancelada:
+                {studentName ? `Hola, ${studentName}. ` : 'Hola, '}te informamos que la siguiente
+                clase ha sido cancelada:
               </Text>
 
               {/* Class Details Card */}
@@ -107,6 +112,17 @@ const ClassCancellationEmail = ({
                   "{reason}"
                 </Text>
               </Section>
+
+              {loginUrl && (
+                <Section className="mb-[24px] text-center">
+                  <Button
+                    href={loginUrl}
+                    className="bg-[#355872] text-white text-xs font-semibold px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
+                  >
+                    Ir al sistema
+                  </Button>
+                </Section>
+              )}
 
               <Hr className="border-[#7AAACE] my-[24px]" />
 

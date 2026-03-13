@@ -1,9 +1,18 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { CHART_COLORS } from '@/lib/chart-colors';
-import { AlertCircle, BookOpen, TrendingUp, Users } from 'lucide-react';
+import {
+  AlertCircle,
+  BookOpen,
+  BookText,
+  CalendarDays,
+  Layout,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import {
   Area,
@@ -138,20 +147,27 @@ const AdminDashboardComponent = () => {
   const PIE_COLORS = CHART_COLORS.primary;
   const BAR_COLORS = CHART_COLORS.primary;
 
-  const axisStyle = { fontSize: '0.75rem', fill: 'var(--foreground)', fontFamily: 'var(--font-sans)', fontWeight: 400 } as const;
+  const axisStyle = {
+    fontSize: '0.75rem',
+    fill: 'var(--foreground)',
+    fontFamily: 'var(--font-sans)',
+    fontWeight: 400,
+  } as const;
   const gridStyle = { stroke: 'var(--border)', strokeOpacity: 0.1 } as const;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-        <CardHeader className="p-0 w-full" id="tour-admin-title">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-            Mi Panel
-          </CardTitle>
-          <CardDescription className="text-xs">Resumen y gestión académica</CardDescription>
-        </CardHeader>
+        <div id="tour-admin-title">
+          <h1 className="text-2xl font-semibold flex items-center gap-2.5 tracking-card">
+            Panel de administración
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1.5">
+            Estado general del sistema académico.
+          </p>
+        </div>
         <div className="flex items-center gap-2 w-full justify-start sm:justify-end">
-          <Badge variant="outline" className="text-xs font-normal">
+          <Badge variant="outline" className="text-xs font-normal px-3 py-1">
             {new Date().toLocaleDateString('es-ES', {
               weekday: 'long',
               year: 'numeric',
@@ -161,19 +177,69 @@ const AdminDashboardComponent = () => {
           </Badge>
         </div>
       </div>
+
+      {/* Accesos rápidos */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          {
+            href: '/dashboard/admin/microcurriculo',
+            icon: BookText,
+            label: 'Microcurrículo',
+            desc: 'Cargar asignaturas',
+          },
+          {
+            href: '/dashboard/admin/planeador',
+            icon: CalendarDays,
+            label: 'Planeador',
+            desc: 'Configurar semestre',
+          },
+          {
+            href: '/dashboard/admin/salas',
+            icon: Layout,
+            label: 'Salas',
+            desc: 'Gestionar espacios',
+          },
+          {
+            href: '/dashboard/admin/reportes',
+            icon: TrendingUp,
+            label: 'Reportes',
+            desc: 'Ver avance docentes',
+          },
+        ].map(({ href, icon: Icon, label, desc }) => (
+          <Link key={href} href={href}>
+            <Card className="h-full transition-all hover:bg-accent/40 dark:hover:bg-white/[0.04] hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-border/20 dark:border-white/[0.06]">
+              <CardContent className="py-3.5 px-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium leading-none">{label}</p>
+                  <p className="text-xs text-muted-foreground mt-1 truncate">{desc}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="tour-admin-metrics">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="tour-admin-metrics">
         {data.cards.map((card, index) => (
-          <Card key={index}>
+          <Card key={index} className="overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-semibold">{card.title}</CardTitle>
-              <div className="text-muted-foreground">{getCardIcon(index)}</div>
+              <CardTitle className="text-xs font-medium text-muted-foreground">
+                {card.title}
+              </CardTitle>
+              <div className="h-8 w-8 rounded-xl bg-primary/8 flex items-center justify-center text-primary">
+                {getCardIcon(index)}
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="sm:text-sm text-xs font-semibold">{card.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">{card.subtitle}</p>
-              <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                <span className={card.trend.includes('+') ? 'text-primary' : 'text-destructive'}>
+              <div className="text-2xl font-semibold tracking-card">{card.value}</div>
+              <p className="text-xs text-muted-foreground mt-1.5">{card.subtitle}</p>
+              <div className="mt-2.5 flex items-center text-xs">
+                <span
+                  className={`font-medium ${card.trend.includes('+') ? 'text-accent-green' : 'text-destructive'}`}
+                >
                   {card.trend}
                 </span>
               </div>
@@ -183,7 +249,7 @@ const AdminDashboardComponent = () => {
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Distribución por Roles */}
         <Card id="tour-admin-users-chart">
           <CardHeader>
@@ -285,7 +351,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Estado de Asistencias */}
-        <Card >
+        <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
@@ -324,7 +390,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Ocupación de Salones */}
-        <Card >
+        <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
@@ -369,7 +435,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Top Materias */}
-        <Card >
+        <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
               <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
@@ -378,11 +444,11 @@ const AdminDashboardComponent = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-1">
               {data.charts.topSubjects.slice(0, 6).map((subject, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between py-2.5 last:pb-0"
+                  className="flex items-center justify-between py-3 px-3 rounded-xl hover:bg-muted/40 transition-colors"
                 >
                   <div className="flex-1">
                     <p className="text-xs font-semibold">{subject.code}</p>

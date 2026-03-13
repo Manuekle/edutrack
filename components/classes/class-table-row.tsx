@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { TableCell, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Ban, MoreHorizontal, Signature, UserCheck } from 'lucide-react';
@@ -94,67 +93,96 @@ export function ClassTableRow({
   };
 
   return (
-    <TableRow
-      className={cn('hover:bg-muted/50 group', cls.status === 'CANCELADA' && 'opacity-70 bg-muted/30')}
+    <div
+      className={cn(
+        'flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group',
+        cls.status === 'CANCELADA' && 'opacity-70 bg-muted/20'
+      )}
       data-state={cls.status === 'CANCELADA' ? 'cancelled' : undefined}
     >
-      <TableCell className="text-xs px-4 py-3">
-        <div className="flex flex-col">
-          <span>{dateUtils.formatDisplayDate(classDate)}</span>
-          {cls.startTime && (
-            <span className="text-xs text-muted-foreground">
-              {formatTimeString(cls.startTime)}
-              {cls.endTime ? ` - ${formatTimeString(cls.endTime)}` : ''}
-            </span>
-          )}
-        </div>
-      </TableCell>
-      <TableCell className="text-xs px-4 py-3 font-sans">{cls.classroom || 'N/A'}</TableCell>
-      <TableCell className="text-xs px-4 py-3">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {canTakeAttendance ? (
-                <Link
-                  href={`/dashboard/docente/asignaturas/${subjectId}/clase/${cls.id}/asistencia`}
-                  className="hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
-                  aria-label={`Registrar asistencia para ${cls.topic || 'Sin tema'}`}
-                >
-                  {cls.topic || 'Sin tema'}
-                </Link>
-              ) : (
-                <span>{cls.topic || 'N/A'}</span>
+      <div className="flex items-start gap-4 flex-1 min-w-0">
+        <div className="flex flex-col min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {canTakeAttendance ? (
+                    <Link
+                      href={`/dashboard/docente/asignaturas/${subjectId}/clase/${cls.id}/asistencia`}
+                      className="text-[15px] font-semibold text-foreground tracking-card hover:text-primary transition-colors truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      aria-label={`Registrar asistencia para ${cls.topic || 'Sin tema'}`}
+                    >
+                      {cls.topic || 'Sin tema'}
+                    </Link>
+                  ) : (
+                    <span className="text-[15px] font-semibold text-foreground tracking-card truncate">
+                      {cls.topic || 'Sin tema evaluado'}
+                    </span>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-center">{getTooltipMessage()}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <Badge
+              variant="outline"
+              className={cn(
+                'font-medium text-[10px] uppercase tracking-card px-2 py-0 h-5',
+                statusColor
               )}
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-center">{getTooltipMessage()}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </TableCell>
-      <TableCell className="text-xs px-4 py-3 text-center">
-        <Badge variant="outline" className={cn('font-light text-xs', statusColor)}>
-          {statusLabel}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-xs text-right px-4 py-3 font-sans">
+            >
+              {statusLabel}
+            </Badge>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-muted-foreground">
+            <span className="font-medium text-foreground/80">
+              {dateUtils.formatDisplayDate(classDate)}
+            </span>
+            {cls.startTime && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-border" />
+                <span>
+                  {formatTimeString(cls.startTime)}
+                  {cls.endTime ? ` - ${formatTimeString(cls.endTime)}` : ''}
+                </span>
+              </>
+            )}
+            {cls.classroom && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-border" />
+                <span className="font-sans">Salón {cls.classroom}</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end shrink-0 sm:pl-0 pl-14">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 rounded-full text-muted-foreground/50 hover:text-foreground shrink-0 transition-colors"
               aria-label={`Acciones para clase ${cls.topic || 'sin tema'}`}
             >
               <span className="sr-only">Abrir menú</span>
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreHorizontal className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-44">
-            <DropdownMenuLabel className="font-sans font-semibold">Acciones</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="min-w-44 rounded-xl">
+            <DropdownMenuLabel className="font-sans font-semibold text-xs">
+              Acciones
+            </DropdownMenuLabel>
             <DropdownMenuItem
               asChild
               disabled={!canTakeAttendance}
-              className={!canTakeAttendance ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              className={cn(
+                'rounded-lg cursor-pointer text-[13px]',
+                !canTakeAttendance && 'opacity-50 cursor-not-allowed'
+              )}
             >
               <Link
                 href={`/dashboard/docente/asignaturas/${subjectId}/clase/${cls.id}/asistencia`}
@@ -173,9 +201,12 @@ export function ClassTableRow({
                 e.preventDefault();
                 if (canCancel) onCancel();
               }}
-              className={
-                !canCancel ? 'opacity-50 cursor-not-allowed' : 'text-destructive cursor-pointer'
-              }
+              className={cn(
+                'rounded-lg text-[13px]',
+                !canCancel
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:bg-red-500/10 cursor-pointer'
+              )}
               aria-disabled={!canCancel}
             >
               <Ban className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -187,7 +218,10 @@ export function ClassTableRow({
                 e.preventDefault();
                 if (canMarkAsDone) onMarkAsDone();
               }}
-              className={!canMarkAsDone ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              className={cn(
+                'rounded-lg text-[13px] cursor-pointer',
+                !canMarkAsDone && 'opacity-50 cursor-not-allowed'
+              )}
               aria-disabled={!canMarkAsDone}
             >
               <Signature className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -195,7 +229,7 @@ export function ClassTableRow({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </TableCell>
-    </TableRow>
+      </div>
+    </div>
   );
 }

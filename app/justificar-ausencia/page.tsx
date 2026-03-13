@@ -16,7 +16,8 @@ import {
 } from '@/components/ui/form';
 import { LoadingPage } from '@/components/ui/loading';
 import { Textarea } from '@/components/ui/textarea';
-import { Link, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -87,7 +88,7 @@ function JustificarAusenciaContent() {
       } finally {
         setIsLoading(false);
       }
-      return () => { };
+      return () => {};
     };
 
     let cleanup: (() => void) | undefined;
@@ -151,7 +152,10 @@ function JustificarAusenciaContent() {
       setIsJustificationSubmitted(true);
       handleSuccessfulSubmission();
     } catch (error) {
-      sileo.error({ title: error instanceof Error ? error.message : 'Ocurrió un error al enviar la justificación' });
+      sileo.error({
+        title:
+          error instanceof Error ? error.message : 'Ocurrió un error al enviar la justificación',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -164,9 +168,9 @@ function JustificarAusenciaContent() {
   if (isJustificationSubmitted) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
-        <Card className="w-full max-w-sm mx-auto">
+        <Card className="w-full max-w-md mx-auto">
           <CardHeader>
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
+            <CardTitle className="text-2xl font-semibold tracking-card text-center">
               Justificación Enviada
             </CardTitle>
             <CardDescription className="text-center text-muted-foreground">
@@ -191,9 +195,7 @@ function JustificarAusenciaContent() {
       <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-              Enlace inválido
-            </CardTitle>
+            <CardTitle className="text-2xl font-semibold tracking-card">Enlace inválido</CardTitle>
             <CardDescription className="text-muted-foreground">
               El enlace de justificación no es válido o ha expirado.
             </CardDescription>
@@ -210,9 +212,9 @@ function JustificarAusenciaContent() {
 
   return (
     <div className="flex items-center justify-center min-h-dvh p-4 font-sans">
-      <Card className="w-full max-w-sm mx-auto my-auto">
+      <Card className="w-full max-w-md mx-auto my-auto">
         <CardHeader>
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
+          <CardTitle className="text-2xl font-semibold tracking-card text-center">
             Justificar ausencia
           </CardTitle>
           <CardDescription className="text-center">
@@ -227,11 +229,11 @@ function JustificarAusenciaContent() {
                 name="reason"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Motivo de la ausencia</FormLabel>
+                    <FormLabel>Motivo de la ausencia</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Describe el motivo de tu ausencia..."
-                        className="min-h-[120px] text-xs resize-none"
+                        className="min-h-[120px] resize-none"
                         disabled={isSubmitting}
                         rows={4}
                         {...field}
@@ -242,7 +244,7 @@ function JustificarAusenciaContent() {
                 )}
               />
 
-              <Button type="submit" className="w-full text-xs" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -207,11 +207,15 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       generateReportMutation.mutate(subjectId, {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ['report-exists', subjectId] });
-          sileo.success({ title: 'El reporte se está generando. Recibirás un correo cuando esté listo.' });
+          sileo.success({
+            title: 'El reporte se está generando. Recibirás un correo cuando esté listo.',
+          });
           options?.onSuccess?.();
         },
         onError: error => {
-          sileo.error({ title: error instanceof Error ? error.message : 'Error al generar el reporte' });
+          sileo.error({
+            title: error instanceof Error ? error.message : 'Error al generar el reporte',
+          });
         },
       });
     },
@@ -227,7 +231,12 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
           options?.onSuccess?.();
         },
         onError: error => {
-          sileo.error({ title: error instanceof Error ? error.message : 'Error al enviar la solicitud de desmatriculación' });
+          sileo.error({
+            title:
+              error instanceof Error
+                ? error.message
+                : 'Error al enviar la solicitud de desmatriculación',
+          });
         },
       });
     },

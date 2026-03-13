@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, Mail } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
     <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
+          <CardTitle className="text-2xl font-semibold tracking-card text-center">
             ¿Olvidaste tu contraseña?
           </CardTitle>
           <CardDescription className="text-center">
@@ -91,7 +91,11 @@ export default function ForgotPasswordPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {message && (
                 <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
-                  <AlertCircle className="h-4 w-4" />
+                  {message.type === 'error' ? (
+                    <AlertCircle className="h-4 w-4" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
                   <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
               )}
@@ -108,7 +112,7 @@ export default function ForgotPasswordPage() {
                         <Input
                           type="email"
                           placeholder="tu@correo.com"
-                          className="pl-10 text-xs"
+                          className="pl-10"
                           disabled={isLoading}
                           {...field}
                         />

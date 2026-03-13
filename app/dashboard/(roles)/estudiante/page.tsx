@@ -17,16 +17,16 @@ export default function EstudianteDashboard() {
 
   return (
     <div className="mx-auto">
-      <div className="p-0 w-full mb-8">
-        <h1 className="sm:text-2xl text-xs font-semibold tracking-card mb-1">Mi Panel</h1>
-        <p className="text-xs text-muted-foreground">Resumen de tu progreso académico</p>
+      <div className="p-0 w-full mb-10">
+        <h1 className="sm:text-2xl text-lg font-semibold tracking-card mb-1.5">Mi Panel</h1>
+        <p className="text-sm text-muted-foreground">Resumen de tu progreso académico</p>
       </div>
 
       {/* Live Class Card */}
       {liveClass && <LiveClassCard liveClass={liveClass} />}
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-10">
         <StatCard
           title="Asistencia global"
           value={`${stats.globalAttendancePercentage}%`}

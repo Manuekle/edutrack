@@ -53,7 +53,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
             <SelectValue placeholder="HH" />
           </SelectTrigger>
           <SelectContent className="h-64">
-            {hours.map((h) => (
+            {hours.map(h => (
               <SelectItem key={h} value={h} className="justify-center">
                 {h}
               </SelectItem>
@@ -66,7 +66,7 @@ export function TimePicker({ value, onChange, className }: TimePickerProps) {
             <SelectValue placeholder="MM" />
           </SelectTrigger>
           <SelectContent className="h-64">
-            {minutes.map((m) => (
+            {minutes.map(m => (
               <SelectItem key={m} value={m} className="justify-center">
                 {m}
               </SelectItem>

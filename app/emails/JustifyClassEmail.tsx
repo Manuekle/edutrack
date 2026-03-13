@@ -45,21 +45,21 @@ const JustifyClassEmail = ({
 
   const formattedSubmissionDate = submissionDate
     ? new Date(submissionDate).toLocaleDateString('es-CO', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
     : new Date().toLocaleDateString('es-CO', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
 
   return (
     <Html lang="es" dir="ltr">
@@ -82,7 +82,7 @@ const JustifyClassEmail = ({
           <Container className="mx-auto max-w-[580px] bg-white border border-[#7AAACE] rounded-[12px] overflow-hidden">
             {/* Header */}
             <Section className="bg-[#355872] px-[32px] py-[24px]">
-              <Heading className="sm:text-2xl text-xs font-semibold text-white m-0 leading-[28px]">
+              <Heading className="text-[20px] font-semibold text-white m-0 leading-[28px]">
                 Justificación Recibida
               </Heading>
               <Text className="text-[#9CD5FF] text-xs m-0 mt-[4px] leading-[20px]">
@@ -94,7 +94,7 @@ const JustifyClassEmail = ({
             <Section className="px-[32px] py-[32px]">
               {/* Status Message */}
               <Section className="mb-[32px] text-center">
-                <Heading className="sm:text-2xl text-xs font-semibold text-[#355872] m-0 mb-[8px] leading-[32px]">
+                <Heading className="text-[20px] font-semibold text-[#355872] m-0 mb-[8px] leading-[32px]">
                   Justificación Registrada
                 </Heading>
                 <Text className="text-[#7AAACE] text-xs leading-[24px] m-0">

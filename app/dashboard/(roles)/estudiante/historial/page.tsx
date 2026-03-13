@@ -1,22 +1,13 @@
 'use client';
 
 import { TablePagination } from '@/components/shared/table-pagination';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { RefreshCw, XCircle } from 'lucide-react';
+import { Bookmark, CalendarDays, History, RefreshCw, XCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -90,129 +81,157 @@ export default function HistorialAsistenciasPage() {
   }
 
   return (
-    <div>
-      <div className="pb-4">
-        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-          Historial de Asistencias
-        </CardTitle>
-        <CardDescription className="text-xs">Listado de tus asistencias</CardDescription>
+    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
+          <div className="p-2 bg-blue-500/10 rounded-xl">
+            <History className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          </div>
+          Mi Historial de Asistencia
+        </h1>
+        <p className="text-muted-foreground text-[15px] mt-2 max-w-2xl">
+          Registro de tus asistencias durante el período académico actual.
+        </p>
       </div>
-      <Card className="p-0">
-        <CardContent className="p-0">
-          {error ? (
-            <div className="rounded-md bg-destructive/10 p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
+
+      <div className="space-y-4">
+        {error ? (
+          <div className="rounded-2xl bg-destructive/10 p-5 border border-destructive/20 shadow-sm">
+            <div className="flex">
+              <div className="shrink-0">
+                <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-[15px] font-medium text-destructive">
+                  Error al cargar el historial
+                </h3>
+                <div className="mt-2 text-[14px] text-destructive/90">
+                  <p>{error}</p>
                 </div>
-                <div className="ml-3">
-                  <h3 className="text-xs font-normal text-destructive">
-                    Error al cargar el historial
-                  </h3>
-                  <div className="mt-2 text-xs text-destructive/90">
-                    <p>{error}</p>
-                  </div>
-                  <div className="mt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="border-destructive/50 text-destructive hover:bg-destructive/10 focus-visible:ring-destructive"
-                      onClick={() => {
-                        setIsLoading(true);
-                        setError(null);
-                        const fetchAttendances = async () => {
-                          try {
-                            const response = await fetch('/api/estudiante/historial');
-                            if (!response.ok) {
-                              const errorData = await response.json();
-                              throw new Error(
-                                errorData.message || 'No se pudieron cargar las asistencias.'
-                              );
-                            }
-                            const responseData = await response.json();
-                            setAttendances(responseData.data || []);
-                          } catch (err: unknown) {
-                            const errorMessage =
-                              err instanceof Error
-                                ? err.message
-                                : 'Error al cargar el historial de asistencias';
-                            setError(errorMessage);
-                          } finally {
-                            setIsLoading(false);
+                <div className="mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full"
+                    onClick={() => {
+                      setIsLoading(true);
+                      setError(null);
+                      const fetchAttendances = async () => {
+                        try {
+                          const response = await fetch('/api/estudiante/historial');
+                          if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(
+                              errorData.message || 'No se pudieron cargar las asistencias.'
+                            );
                           }
-                        };
-                        fetchAttendances();
-                      }}
-                    >
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Reintentar
-                    </Button>
-                  </div>
+                          const responseData = await response.json();
+                          setAttendances(responseData.data || []);
+                        } catch (err: unknown) {
+                          const errorMessage =
+                            err instanceof Error
+                              ? err.message
+                              : 'Error al cargar el historial de asistencias';
+                          setError(errorMessage);
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      };
+                      fetchAttendances();
+                    }}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Reintentar
+                  </Button>
                 </div>
               </div>
             </div>
-          ) : attendances.length === 0 ? (
-            <div className="p-4">
-              <Alert>
-                <AlertDescription>No tienes asistencias registradas.</AlertDescription>
-              </Alert>
-            </div>
-          ) : (
-            <div className="bg-card border rounded-md overflow-hidden shadow-sm">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Asignatura</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tema</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Estado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedAttendances.map(attendance => (
-                    <TableRow key={attendance.id} className="hover:bg-muted/50 group">
-                      <TableCell className="text-xs px-4 py-3">
+          </div>
+        ) : attendances.length === 0 ? (
+          <Card className="rounded-3xl border-dashed shadow-sm">
+            <CardContent className="py-20 flex flex-col items-center text-center">
+              <div className="h-20 w-20 bg-muted/50 rounded-full flex items-center justify-center mb-6">
+                <History className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <p className="text-lg font-medium text-foreground">
+                Aún no hay asistencias registradas
+              </p>
+              <p className="text-sm text-muted-foreground mt-2 max-w-md">
+                No tienes asistencias registradas para este período académico todavía.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="rounded-2xl border-border/50 shadow-sm overflow-hidden bg-card">
+            <div className="divide-y divide-border/50">
+              {paginatedAttendances.map(attendance => (
+                <div
+                  key={attendance.id}
+                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex bg-blue-500/10 h-11 w-11 shrink-0 items-center justify-center rounded-xl">
+                    <Bookmark className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <p className="text-[16px] font-semibold text-foreground truncate">
                         {attendance.class.subject.name}
-                      </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <div
-                          className="max-w-xs truncate"
-                          title={attendance.class.topic || 'Clase general'}
+                      </p>
+                      {attendance.status === 'PRESENTE' ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
                         >
-                          {attendance.class.topic || 'Clase general'}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <div className="flex flex-col">
-                          <span>
-                            {format(new Date(attendance.class.date), 'PPP', { locale: es })}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs text-right px-4 py-3">
-                        <Badge variant="outline" className="lowercase font-normal">
+                          Presente
+                        </Badge>
+                      ) : attendance.status === 'AUSENTE' ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
+                        >
+                          Ausente
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
+                        >
                           {attendance.status}
                         </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                      )}
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 text-[13px] text-muted-foreground">
+                      <div className="flex items-center gap-1.5 line-clamp-1">
+                        <span className="truncate">
+                          {attendance.class.topic || 'Clase general'}
+                        </span>
+                      </div>
+                      <div className="hidden sm:block text-border/60">•</div>
+                      <div className="flex items-center gap-1.5">
+                        <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          {format(new Date(attendance.class.date), 'PPPP', { locale: es })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
-        </CardContent>
-        {attendances.length > 0 && (
-          <div className="p-4 border-t">
-            <TablePagination
-              currentPage={currentPage}
-              totalItems={totalItems}
-              itemsPerPage={ITEMS_PER_PAGE}
-              onPageChange={handlePageChange}
-            />
-          </div>
+
+            {attendances.length > 0 && (
+              <div className="p-4 border-t border-border/50 bg-muted/10">
+                <TablePagination
+                  currentPage={currentPage}
+                  totalItems={totalItems}
+                  itemsPerPage={ITEMS_PER_PAGE}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </Card>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

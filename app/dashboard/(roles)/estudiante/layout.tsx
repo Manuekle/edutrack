@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Panel del Estudiante',
   description:
-    'Consulta tu asistencia, scanear códigos QR, ver historial académico y estadísticas de tus asignaturas',
+    'Consulta tus asignaturas, grupo y horario, registra tu asistencia y revisa tu historial académico.',
   robots: { index: false, follow: false },
 };
 

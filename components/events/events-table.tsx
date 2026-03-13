@@ -21,14 +21,6 @@ import {
 } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { type EventType, type SubjectEvent, getErrorMessage } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -223,110 +215,103 @@ export function EventsTable({ subjectId }: EventsTableProps) {
             </DialogContent>
           </Dialog>
         </div>
-        <div className='mt-4'>
+        <div className="mt-4">
           {isLoadingEvents ? (
-            <div className="bg-card border rounded-lg overflow-hidden shadow-sm">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Título</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tipo</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
-                      Acciones
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[1, 2, 3, 4].map((i) => (
-                    <TableRow key={i}>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-32" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-5 w-20 rounded-md" /></TableCell>
-                      <TableCell className="px-4 py-3 text-right"><Skeleton className="h-8 w-16 ml-auto rounded-md" /></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1">
+              <div className="divide-y divide-border/40">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="flex items-center justify-between gap-4 py-4 px-5">
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-40" />
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                      <Skeleton className="h-8 w-16 rounded-lg" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : events.length > 0 ? (
-            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Título</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tipo</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
-                      Acciones
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {events.map(event => (
-                    <TableRow key={event.id} className="hover:bg-muted/50 group">
-                      <TableCell className="text-xs font-normal px-4 py-3">{event.title}</TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        {format(new Date(event.date), 'PPP', { locale: es })}
-                      </TableCell>
-                      <TableCell className="text-xs px-4 py-3">
-                        <EventTypeBadge type={event.type} />
-                      </TableCell>
-                      <TableCell className="text-xs px-4 py-3 text-right">
+            <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 relative">
+              <div className="divide-y divide-border/40">
+                {events.map(event => (
+                  <div
+                    key={event.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group"
+                  >
+                    <div className="flex items-start gap-4 flex-1 min-w-0">
+                      <div className="flex flex-col min-w-0 gap-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[15px] font-semibold text-foreground tracking-card truncate">
+                            {event.title}
+                          </span>
+                          <EventTypeBadge type={event.type} />
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+                          <CalendarDays className="h-3.5 w-3.5 opacity-70" />
+                          <span className="font-medium text-foreground/80">
+                            {format(new Date(event.date), 'PPP', { locale: es })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end shrink-0 sm:pl-0 pl-14 items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full text-muted-foreground/50 hover:text-foreground shrink-0 transition-colors"
+                        aria-label="Editar evento"
+                        onClick={() => openEditEventDialog(event)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog
+                        open={eventToDelete?.id === event.id}
+                        onOpenChange={open => !open && setEventToDelete(null)}
+                      >
                         <Button
+                          type="button"
                           variant="ghost"
                           size="icon"
-                          className="text-muted-foreground hover:text-foreground"
-                          aria-label="Editar evento"
-                          onClick={() => openEditEventDialog(event)}
+                          className="h-8 w-8 rounded-full text-muted-foreground/50 hover:text-red-600 hover:bg-red-500/10 dark:hover:text-red-400 dark:hover:bg-red-500/20 shrink-0 transition-colors"
+                          aria-label="Eliminar evento"
+                          onClick={() => setEventToDelete(event)}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                        <AlertDialog
-                          open={eventToDelete?.id === event.id}
-                          onOpenChange={open => !open && setEventToDelete(null)}
-                        >
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            aria-label="Eliminar evento"
-                            onClick={() => setEventToDelete(event)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                          <AlertDialogContent className="rounded-2xl border border-border">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle className="text-lg font-semibold tracking-card">
-                                ¿Eliminar evento?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription className="text-xs text-muted-foreground">
-                                Esta acción no se puede deshacer. El evento se eliminará
-                                permanentemente.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="gap-2 ">
-                              <AlertDialogCancel
-                                className="rounded-full text-xs"
-                                onClick={() => setEventToDelete(null)}
-                              >
-                                Cancelar
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                className="rounded-full text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => event.id && handleDeleteEvent(event.id)}
-                              >
-                                Eliminar
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                        <AlertDialogContent className="rounded-2xl border border-border">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-lg font-semibold tracking-card">
+                              ¿Eliminar evento?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-xs text-muted-foreground">
+                              Esta acción no se puede deshacer. El evento se eliminará
+                              permanentemente.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter className="gap-2 ">
+                            <AlertDialogCancel
+                              className="rounded-full text-xs"
+                              onClick={() => setEventToDelete(null)}
+                            >
+                              Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              className="rounded-full text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                              onClick={() => event.id && handleDeleteEvent(event.id)}
+                            >
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <EmptyState

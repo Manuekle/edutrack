@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,6 +9,10 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+// ============================================================
+// ENUMS
+// ============================================================
 
 enum Jornada {
   DIURNO
@@ -38,143 +39,6 @@ enum AttendanceStatus {
   JUSTIFICADO
 }
 
-model Attendance {
-  id            String           @id @default(auto()) @map("_id") @db.ObjectId
-  status        AttendanceStatus
-  justification String? // Justificación para ausencias/tardanzas
-  student       User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  studentId     String           @db.ObjectId
-  class         Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
-  classId       String           @db.ObjectId
-  recordedAt    DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-
-  @@unique([studentId, classId])
-  @@index([studentId, status])
-  @@index([classId, status])
-}
-
-model User {
-  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
-  name                String?
-  document            String?   @unique
-  emailVerified       DateTime?
-  // Información de contacto y códigos
-  correoPersonal      String?   @unique
-  correoInstitucional String?   @unique
-  telefono            String?
-  codigoEstudiantil   String? // Removed @unique as it's optional
-  codigoDocente       String? // Removed @unique as it's optional
-
-  signatureUrl     String? // URL de la imagen de la firma del docente
-  password         String?
-  resetToken       String?
-  resetTokenExpiry DateTime?
-  role             Role      @default(ESTUDIANTE)
-  isActive         Boolean   @default(true)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  // Relaciones como Docente
-  subjectsAsTeacherIds String[]     @db.ObjectId
-  subjectsAsTeacher    Subject[]    @relation("TeacherSubjects", fields: [subjectsAsTeacherIds], references: [id])
-  createdEvents     SubjectEvent[]
-  generatedReports  Report[]
-
-  // Relaciones como Estudiante
-  enrolledSubjectIds String[]     @db.ObjectId
-  attendances        Attendance[]
-
-  // Relaciones con solicitudes de desmatriculación
-  requestedUnenrolls UnenrollRequest[] @relation("RequestedUnenrolls")
-  unenrollRequests   UnenrollRequest[] @relation("StudentUnenrolls")
-  reviewedUnenrolls  UnenrollRequest[] @relation("ReviewedUnenrolls")
-
-  // Relaciones con gestión de salas
-  roomBookings RoomBooking[] @relation("TeacherBookings")
-
-  // Relaciones nuevas — Flujo Administrador
-  groupAssignments GroupAssignment[] @relation("StudentGroupAssignments")
-  enrollments      Enrollment[]      @relation("StudentEnrollments")
-}
-
-model Subject {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  code             String
-  group            String?
-  jornada          Jornada?
-  program          String?
-  semester         Int?
-  credits          Int?
-  directHours     Int?
-  description      String?
-  periodoAcademico String?           // e.g. "2025-1"
-  teachers         User[]            @relation("TeacherSubjects", fields: [teacherIds], references: [id])
-  teacherIds       String[]          @db.ObjectId
-  studentIds       String[]          @db.ObjectId
-  classroom        String?
-  classes          Class[]
-  events           SubjectEvent[]
-  reports          Report[]
-  unenrollRequests UnenrollRequest[]
-  contents         SubjectContent[]
-  enrollments      Enrollment[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-
-  @@index([teacherIds])
-  @@unique([code, group])
-}
-
-model SubjectContent {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  subjectId   String   @db.ObjectId
-  type        String   // TIPO: RAP, RAC, TEMA, ESTRATEGIA
-  title       String   // Título del contenido
-  description String?  // Descripción o subtema
-  order       Int      @default(0) // Orden de presentación
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([subjectId])
-}
-
-model Class {
-  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
-  date               DateTime
-  startTime          DateTime? // Hora de inicio opcional
-  endTime            DateTime? // Hora de fin opcional
-  topic              String?
-  description        String?
-  status             ClassStatus  @default(PROGRAMADA)
-  cancellationReason String? // Motivo de la cancelación
-  subject            Subject      @relation(fields: [subjectId], references: [id])
-  subjectId          String       @db.ObjectId
-  classroom          String? // Aula o ubicación física
-  jornada            Jornada?      // DIURNO o NOCTURNO
-  attendances        Attendance[]
-  qrToken            String? // Token QR para la clase
-  qrTokenExpiresAt   DateTime? // Fecha de expiración del token QR
-  notificationSentAt DateTime?    // Fecha en que se envió la notificación de inicio de clase
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-
-  // Métricas de asistencia (cached para mejor rendimiento)
-  totalStudents  Int @default(0)
-  presentCount   Int @default(0)
-  absentCount    Int @default(0)
-  lateCount      Int @default(0)
-  justifiedCount Int @default(0)
-
-  @@index([subjectId, status, date])
-  @@index([subjectId, date])
-  @@index([status, date])
-  @@index([qrToken])
-  @@index([classroom, date])
-}
-
 enum ClassStatus {
   PROGRAMADA
   REALIZADA
@@ -191,26 +55,6 @@ enum ReportStatus {
 enum ReportFormat {
   PDF
   CSV
-}
-
-model Report {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  subject       Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  subjectId     String       @db.ObjectId
-  requestedBy   User         @relation(fields: [requestedById], references: [id], onDelete: Cascade)
-  requestedById String       @db.ObjectId
-  status        ReportStatus @default(PENDIENTE)
-  format        ReportFormat @default(PDF)
-  period        Int          @default(1) // 1: Jan-Jun, 2: Jul-Dec
-  year          Int          @default(2023) // Year of the report
-  fileUrl       String?
-  fileName      String?
-  error         String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-
-  @@index([subjectId])
-  @@index([requestedById])
 }
 
 enum DayOfWeek {
@@ -231,25 +75,6 @@ enum EventType {
   INFO
 }
 
-model SubjectEvent {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String?
-  date        DateTime
-  type        EventType @default(INFO)
-
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  subjectId String  @db.ObjectId
-
-  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  createdById String @db.ObjectId
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([subjectId, date])
-}
-
 enum RoomType {
   SALA_COMPUTO
   SALON
@@ -262,6 +87,433 @@ enum BookingStatus {
   RECHAZADO
 }
 
+enum EnrollmentStatus {
+  ACTIVA
+  CANCELADA
+  APLAZADA
+  FINALIZADA
+}
+
+enum Periodicidad {
+  SEMANAL
+  QUINCENAL
+}
+
+enum TipoCompetencia {
+  RAP
+  RAC
+  COMPETENCIA
+}
+
+enum EstadoClase {
+  PROGRAMADA
+  REALIZADA
+  CANCELADA
+}
+
+// ============================================================
+// USUARIOS
+// ============================================================
+
+model User {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                String?
+  document            String?   @unique
+  emailVerified       DateTime?
+  correoPersonal      String?   @unique
+  correoInstitucional String?   @unique
+  telefono            String?
+  codigoEstudiantil   String?
+  codigoDocente       String?
+  signatureUrl        String?
+  password            String?
+  resetToken          String?
+  resetTokenExpiry    DateTime?
+  role                Role      @default(ESTUDIANTE)
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Relaciones como Docente (asignaturas antiguas)
+  subjectsAsTeacherIds String[]     @db.ObjectId
+  subjectsAsTeacher    Subject[]    @relation("TeacherSubjects", fields: [subjectsAsTeacherIds], references: [id])
+  createdEvents        SubjectEvent[]
+  generatedReports     Report[]
+
+  // Relaciones como Estudiante (antiguo)
+  enrolledSubjectIds String[]     @db.ObjectId
+  attendances        Attendance[]
+
+  // Solicitudes desmatriculación
+  requestedUnenrolls UnenrollRequest[] @relation("RequestedUnenrolls")
+  unenrollRequests   UnenrollRequest[] @relation("StudentUnenrolls")
+  reviewedUnenrolls  UnenrollRequest[] @relation("ReviewedUnenrolls")
+
+  // Salas
+  roomBookings RoomBooking[] @relation("TeacherBookings")
+
+  // Flujo administrativo antiguo
+  groupAssignments GroupAssignment[] @relation("StudentGroupAssignments")
+  enrollments      Enrollment[]      @relation("StudentEnrollments")
+
+  // Nuevos: Grupos académicos
+  gruposComoDocenteIds    String[]  @db.ObjectId
+  gruposComoDocente       Grupo[]   @relation("DocenteGrupos", fields: [gruposComoDocenteIds], references: [id])
+  gruposComoEstudianteIds String[]  @db.ObjectId
+  gruposComoEstudiante    Grupo[]   @relation("EstudiantesGrupo", fields: [gruposComoEstudianteIds], references: [id])
+}
+
+// ============================================================
+// ASIGNATURAS
+// ============================================================
+
+model Subject {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  code             String
+  group            String?
+  jornada          Jornada?
+  program          String?
+  semester         Int?
+  credits          Int?
+  directHours      Int?
+  description      String?
+  periodoAcademico String?
+  teachers         User[]            @relation("TeacherSubjects", fields: [teacherIds], references: [id])
+  teacherIds       String[]          @db.ObjectId
+  studentIds       String[]          @db.ObjectId
+  classroom        String?
+  classes          Class[]
+  events           SubjectEvent[]
+  reports          Report[]
+  unenrollRequests UnenrollRequest[]
+  contents         SubjectContent[]
+  enrollments      Enrollment[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  // Nuevas relaciones
+  microcurriculo   Microcurriculo?
+  grupos           Grupo[]
+  horarios         Horario[]
+
+  @@index([teacherIds])
+  @@unique([code, group])
+}
+
+// ============================================================
+// MÓDULO 1: MICROCURRÍCULO
+// ============================================================
+
+model Microcurriculo {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  subject         Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId       String        @unique @db.ObjectId
+
+  // Datos generales
+  objetivoGeneral           String?
+  descripcionAsignatura     String?
+  horasTrabajIndependiente  Int?
+  habilitable               Boolean  @default(false)
+  conocimientosPrevios      String[] // materias previas requeridas
+  estrategiasAprendizaje    String[] // metodologías seleccionadas
+
+  // Contenido académico
+  temas           Tema[]
+  competencias    Competencia[]  // RAPs y RACs
+  bibliografias   Bibliografia[]
+  cibergrafia     Cibergrafia[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Tema {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  microcurriculo   Microcurriculo @relation(fields: [microcurriculoId], references: [id], onDelete: Cascade)
+  microcurriculoId String         @db.ObjectId
+  titulo           String         // "1. PRINCIPIOS DE SEGURIDAD DE LA INFORMACIÓN"
+  orden            Int            @default(0)
+  subtemas         Subtema[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([microcurriculoId])
+}
+
+model Subtema {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  tema     Tema     @relation(fields: [temaId], references: [id], onDelete: Cascade)
+  temaId   String   @db.ObjectId
+  titulo   String   // "1.1 Definición y conceptos de seguridad..."
+  orden    Int      @default(0)
+
+  @@index([temaId])
+}
+
+model Competencia {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  microcurriculo   Microcurriculo  @relation(fields: [microcurriculoId], references: [id], onDelete: Cascade)
+  microcurriculoId String          @db.ObjectId
+  descripcion      String
+  tipo             TipoCompetencia @default(RAP)
+  codigo           String?         // "RAP 1", "RAP 2", "RAC 1"
+  aplica           Boolean         @default(true) // checkbox si este RAP aplica
+  orden            Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([microcurriculoId])
+}
+
+model Bibliografia {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  microcurriculo   Microcurriculo @relation(fields: [microcurriculoId], references: [id], onDelete: Cascade)
+  microcurriculoId String         @db.ObjectId
+  autores          String
+  titulo           String
+  editorial        String?
+  anio             Int?
+  orden            Int            @default(0)
+
+  @@index([microcurriculoId])
+}
+
+model Cibergrafia {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  microcurriculo   Microcurriculo @relation(fields: [microcurriculoId], references: [id], onDelete: Cascade)
+  microcurriculoId String         @db.ObjectId
+  autores          String?
+  titulo           String
+  url              String?
+  anio             Int?
+  orden            Int            @default(0)
+
+  @@index([microcurriculoId])
+}
+
+// ============================================================
+// MÓDULO 2: PLANEADOR
+// ============================================================
+
+model Horario {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  diaSemana    DayOfWeek
+  horaInicio   String       // "HH:MM" formato 24h
+  horaFin      String       // "HH:MM" formato 24h
+  periodicidad Periodicidad @default(SEMANAL)
+  subjectId    String?      @db.ObjectId
+  subject      Subject?     @relation(fields: [subjectId], references: [id])
+  salaId       String?      @db.ObjectId
+  sala         Room?        @relation(fields: [salaId], references: [id])
+  grupos       Grupo[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([diaSemana])
+  @@index([subjectId])
+  @@index([salaId])
+}
+
+model Grupo {
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  codigo           String
+  subject          Subject     @relation(fields: [subjectId], references: [id])
+  subjectId        String      @db.ObjectId
+  periodoAcademico String
+
+  // Docente asignado
+  docenteIds  String[] @db.ObjectId
+  docentes    User[]   @relation("DocenteGrupos", fields: [docenteIds], references: [id])
+
+  // Horario asignado
+  horario   Horario? @relation(fields: [horarioId], references: [id])
+  horarioId String?  @db.ObjectId
+
+  // Sala asignada
+  sala   Room?   @relation(fields: [salaId], references: [id])
+  salaId String? @db.ObjectId
+
+  // Estudiantes
+  estudianteIds String[] @db.ObjectId
+  estudiantes   User[]   @relation("EstudiantesGrupo", fields: [estudianteIds], references: [id])
+
+  // Planeación y clases
+  planeacion Planeacion?
+  clases     Class[]     @relation("GrupoClases")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([codigo, subjectId, periodoAcademico])
+  @@index([subjectId])
+  @@index([docenteIds])
+}
+
+model Planeacion {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  grupo       Grupo             @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  grupoId     String            @unique @db.ObjectId
+  fechaInicio DateTime
+  fechaFin    DateTime?
+  semanas     SemanaAcademica[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model SemanaAcademica {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  planeacion   Planeacion @relation(fields: [planeacionId], references: [id], onDelete: Cascade)
+  planeacionId String     @db.ObjectId
+  numero       Int        // 1-16
+  fechaInicio  DateTime
+  fechaFin     DateTime
+  clases       Class[]    @relation("SemanaClases")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([planeacionId])
+}
+
+// ============================================================
+// MÓDULO 3: CLASES Y BITÁCORA
+// ============================================================
+
+model Class {
+  id                 String           @id @default(auto()) @map("_id") @db.ObjectId
+  date               DateTime
+  startTime          DateTime?
+  endTime            DateTime?
+  topic              String?
+  description        String?
+  status             ClassStatus      @default(PROGRAMADA)
+  cancellationReason String?
+  subject            Subject          @relation(fields: [subjectId], references: [id])
+  subjectId          String           @db.ObjectId
+  classroom          String?
+  jornada            Jornada?
+  attendances        Attendance[]
+  qrToken            String?
+  qrTokenExpiresAt   DateTime?
+  notificationSentAt DateTime?
+
+  // Métricas de asistencia (cached)
+  totalStudents  Int @default(0)
+  presentCount   Int @default(0)
+  absentCount    Int @default(0)
+  lateCount      Int @default(0)
+  justifiedCount Int @default(0)
+
+  // Nuevas relaciones: Planeador y Bitácora
+  grupo    Grupo?           @relation("GrupoClases", fields: [grupoId], references: [id])
+  grupoId  String?          @db.ObjectId
+  semana   SemanaAcademica? @relation("SemanaClases", fields: [semanaId], references: [id])
+  semanaId String?          @db.ObjectId
+  bitacora Bitacora?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId, status, date])
+  @@index([subjectId, date])
+  @@index([status, date])
+  @@index([qrToken])
+  @@index([classroom, date])
+  @@index([grupoId])
+  @@index([semanaId])
+}
+
+model Bitacora {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  class          Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId        String   @unique @db.ObjectId
+  temaPlaneado   String?
+  temaEjecutado  String?
+  actividades    String?
+  observaciones  String?
+  evidencias     String[] // URLs de archivos subidos
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ============================================================
+// ASISTENCIA
+// ============================================================
+
+model Attendance {
+  id            String           @id @default(auto()) @map("_id") @db.ObjectId
+  status        AttendanceStatus
+  justification String?
+  student       User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId     String           @db.ObjectId
+  class         Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
+  classId       String           @db.ObjectId
+  recordedAt    DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([studentId, classId])
+  @@index([studentId, status])
+  @@index([classId, status])
+}
+
+// ============================================================
+// REPORTES Y EVENTOS
+// ============================================================
+
+model Report {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  subject       Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId     String       @db.ObjectId
+  requestedBy   User         @relation(fields: [requestedById], references: [id], onDelete: Cascade)
+  requestedById String       @db.ObjectId
+  status        ReportStatus @default(PENDIENTE)
+  format        ReportFormat @default(PDF)
+  period        Int          @default(1)
+  year          Int          @default(2025)
+  fileUrl       String?
+  fileName      String?
+  error         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([subjectId])
+  @@index([requestedById])
+}
+
+model SubjectEvent {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  date        DateTime
+  type        EventType @default(INFO)
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId   String    @db.ObjectId
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([subjectId, date])
+}
+
+model SubjectContent {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId   String   @db.ObjectId
+  type        String
+  title       String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([subjectId])
+}
+
+// ============================================================
+// SALAS
+// ============================================================
+
 model Room {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
@@ -270,6 +522,8 @@ model Room {
   description String?
   isActive    Boolean       @default(true)
   bookings    RoomBooking[]
+  grupos      Grupo[]
+  horarios    Horario[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -286,7 +540,7 @@ model RoomBooking {
   endTime       DateTime
   reason        String
   status        BookingStatus @default(PENDIENTE)
-  signatureUrl  String? // URL de la firma base64 o storage
+  signatureUrl  String?
   reviewComment String?
   reviewedAt    DateTime?
   createdAt     DateTime      @default(now())
@@ -296,6 +550,10 @@ model RoomBooking {
   @@index([teacherId])
   @@index([status])
 }
+
+// ============================================================
+// MATRÍCULAS Y GRUPOS (legacy + nuevo flujo)
+// ============================================================
 
 model UnenrollRequest {
   id            String                @id @default(auto()) @map("_id") @db.ObjectId
@@ -317,30 +575,17 @@ model UnenrollRequest {
   @@index([studentId, subjectId, status])
 }
 
-// ==============================================================
-// Flujo Administrador — Nuevos modelos (Paso 6 y Paso 7)
-// ==============================================================
-
-// Paso 6: Asignación de estudiante a grupo organizativo (previo a matrícula)
 model GroupAssignment {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
   student          User     @relation("StudentGroupAssignments", fields: [studentId], references: [id], onDelete: Cascade)
   studentId        String   @db.ObjectId
-  grupoNombre      String   // e.g. "6A", "Fisica-01"
-  periodoAcademico String   // e.g. "2025-1"
+  grupoNombre      String
+  periodoAcademico String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   @@unique([studentId, grupoNombre, periodoAcademico])
   @@index([grupoNombre, periodoAcademico])
-}
-
-// Paso 7: Matrícula formal con estado y periodo académico
-enum EnrollmentStatus {
-  ACTIVA
-  CANCELADA
-  APLAZADA
-  FINALIZADA
 }
 
 model Enrollment {
@@ -349,7 +594,7 @@ model Enrollment {
   studentId        String           @db.ObjectId
   subject          Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   subjectId        String           @db.ObjectId
-  periodoAcademico String           // e.g. "2025-1"
+  periodoAcademico String
   status           EnrollmentStatus @default(ACTIVA)
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt

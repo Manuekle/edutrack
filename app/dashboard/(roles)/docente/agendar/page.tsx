@@ -15,14 +15,6 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Loading } from '@/components/ui/loading';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Room } from '@prisma/client';
@@ -60,7 +52,8 @@ export default function DocenteAgendarPage() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         sileo.error({
-          title: (data && typeof data.error === 'string' ? data.error : null) || 'Error al cargar salas',
+          title:
+            (data && typeof data.error === 'string' ? data.error : null) || 'Error al cargar salas',
         });
         setRooms([]);
         setLoading(false);
@@ -247,80 +240,68 @@ export default function DocenteAgendarPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="px-4 pb-4 pt-0">
-                  <div className="bg-muted/20 border border-border rounded-lg overflow-hidden">
-                    <Table>
-                      <TableHeader className="bg-muted/30">
-                        <TableRow className="hover:bg-transparent">
-                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                            Horario
-                          </TableHead>
-                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                            Motivo / Clase
-                          </TableHead>
-                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
-                            Estado
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {roomBookings.length === 0 ? (
-                          <TableRow>
-                            <TableCell
-                              colSpan={3}
-                              className="text-center py-12 text-xs px-4"
-                            >
-                              <div className="flex flex-col items-center gap-3">
-                                <CalendarIcon className="h-10 w-10 text-muted-foreground/30" />
-                                <p className="text-muted-foreground font-medium">
-                                  No hay ocupación programada
-                                </p>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          roomBookings.map(booking => (
-                            <TableRow
-                              key={booking.id}
-                              className="hover:bg-muted/50 group"
-                            >
-                              <TableCell className="text-xs px-4 py-3">
-                                <div className="flex flex-col gap-0.5">
-                                  <div className="flex items-center gap-1.5 text-foreground font-medium">
-                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                  <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1">
+                    <div className="divide-y divide-border/40">
+                      {roomBookings.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center p-8 gap-3 text-center">
+                          <div className="h-12 w-12 rounded-full bg-muted/50 flex items-center justify-center">
+                            <CalendarIcon className="h-6 w-6 text-muted-foreground/50" />
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-[14px] font-semibold text-foreground tracking-card">
+                              No hay ocupación
+                            </p>
+                            <p className="text-[12px] text-muted-foreground">
+                              Espacio disponible para reservar
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        roomBookings.map(booking => (
+                          <div
+                            key={booking.id}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group"
+                          >
+                            <div className="flex items-start gap-4 flex-1 min-w-0">
+                              <div className="flex flex-col min-w-0 gap-1.5">
+                                <span className="text-[14px] font-semibold text-foreground tracking-card truncate group-hover:text-primary transition-colors">
+                                  {booking.reason}
+                                </span>
+                                <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground font-medium">
+                                  <Clock className="h-3.5 w-3.5 opacity-70" />
+                                  <span>
                                     {format(new Date(booking.startTime), 'hh:mm a')} -{' '}
                                     {format(new Date(booking.endTime), 'hh:mm a')}
-                                  </div>
-                                  <span className="text-muted-foreground capitalize">
-                                    {format(new Date(booking.startTime), "EEEE dd 'de' MMMM", {
+                                  </span>
+                                  <span className="w-1 h-1 rounded-full bg-border" />
+                                  <span className="capitalize text-muted-foreground/80">
+                                    {format(new Date(booking.startTime), "EEEE dd 'de' MMM", {
                                       locale: es,
                                     })}
                                   </span>
                                 </div>
-                              </TableCell>
-                              <TableCell className="text-xs px-4 py-3 text-muted-foreground group-hover:text-foreground">
-                                {booking.reason}
-                              </TableCell>
-                              <TableCell className="text-xs px-4 py-3 text-right">
-                                <Badge
-                                  variant="secondary"
-                                  className={cn(
-                                    'text-xs font-medium px-2 py-0.5 border-0',
-                                    booking.status === 'APROBADO' &&
-                                    'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400',
-                                    booking.status === 'RECHAZADO' &&
-                                    'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400',
-                                    booking.status === 'PENDIENTE' &&
-                                    'bg-warning/10 text-warning border border-warning/20'
-                                  )}
-                                >
-                                  {booking.status}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
+                              </div>
+                            </div>
+                            <div className="flex justify-end shrink-0 sm:pl-0 pl-14 items-center">
+                              <Badge
+                                variant="secondary"
+                                className={cn(
+                                  'text-[10px] uppercase tracking-card font-bold px-2 py-0 h-5 border-0 shadow-none',
+                                  booking.status === 'APROBADO' &&
+                                    'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400',
+                                  booking.status === 'RECHAZADO' &&
+                                    'bg-rose-500/10 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400',
+                                  booking.status === 'PENDIENTE' &&
+                                    'bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400'
+                                )}
+                              >
+                                {booking.status}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -344,9 +325,7 @@ export default function DocenteAgendarPage() {
       <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>
         <DialogContent className="sm:max-w-lg rounded-2xl border-border">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">
-              Nueva Solicitud de Reserva
-            </DialogTitle>
+            <DialogTitle className="text-lg font-semibold">Nueva Solicitud de Reserva</DialogTitle>
             <DialogDescription className="text-xs">
               Completa los detalles para reservar {getSelectedRoomName()}
             </DialogDescription>
@@ -371,9 +350,7 @@ export default function DocenteAgendarPage() {
                 </Label>
                 <DateTimePicker
                   value={bookingForm.endTime}
-                  onChange={date =>
-                    setBookingForm({ ...bookingForm, endTime: date ?? new Date() })
-                  }
+                  onChange={date => setBookingForm({ ...bookingForm, endTime: date ?? new Date() })}
                 />
               </div>
             </div>

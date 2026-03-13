@@ -1,7 +1,7 @@
 export const metadata = {
-  title: 'Estudiante - Asistencia - FUP',
-  description: 'Panel de control para gestionar tus datos',
-  keywords: 'estudiante, panel de control, asistencia, FUP',
+  title: 'Registrar Asistencia - FUP',
+  description: 'Registra tu asistencia escaneando el código QR o ingresando el código manualmente.',
+  keywords: 'estudiante, asistencia, QR, código, FUP',
 };
 
 export default function EstudianteAsistenciaLayout({ children }: { children: React.ReactNode }) {

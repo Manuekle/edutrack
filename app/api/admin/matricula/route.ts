@@ -35,11 +35,20 @@ export async function GET(request: NextRequest) {
     });
 
     // Group by grupoNombre + periodoAcademico
-    const groupMap = new Map<string, {
-      grupoNombre: string;
-      periodoAcademico: string;
-      students: { id: string; name: string | null; document: string | null; correoInstitucional: string | null; codigoEstudiantil: string | null }[];
-    }>();
+    const groupMap = new Map<
+      string,
+      {
+        grupoNombre: string;
+        periodoAcademico: string;
+        students: {
+          id: string;
+          name: string | null;
+          document: string | null;
+          correoInstitucional: string | null;
+          codigoEstudiantil: string | null;
+        }[];
+      }
+    >();
 
     for (const a of assignments) {
       const key = `${a.grupoNombre}|${a.periodoAcademico}`;
@@ -133,17 +142,26 @@ export async function POST(request: Request) {
       const lines = text.split(/\r?\n/).filter(l => l.trim());
 
       if (lines.length < 2) {
-        return NextResponse.json({ error: 'El archivo CSV está vacío o solo tiene encabezados' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'El archivo CSV está vacío o solo tiene encabezados' },
+          { status: 400 }
+        );
       }
 
-      const headers = lines[0].toLowerCase().split(/[,;]/).map(h => h.trim());
+      const headers = lines[0]
+        .toLowerCase()
+        .split(/[,;]/)
+        .map(h => h.trim());
       const docIdx = headers.findIndex(h => h.includes('documento') || h.includes('cedula'));
       const grupoIdx = headers.findIndex(h => h.includes('grupo') || h.includes('destino'));
       const periodoIdx = headers.findIndex(h => h.includes('periodo') || h.includes('academico'));
 
       if (docIdx === -1 || grupoIdx === -1) {
         return NextResponse.json(
-          { error: 'El archivo debe tener columnas: documento_estudiante, grupo_destino, periodo_academico' },
+          {
+            error:
+              'El archivo debe tener columnas: documento_estudiante, grupo_destino, periodo_academico',
+          },
           { status: 400 }
         );
       }

@@ -65,7 +65,9 @@ export function useClassManagement({
       await fetchClasses();
     } catch (error) {
       setClasses(originalClasses);
-      sileo.error({ title: error instanceof Error ? error.message : 'Ocurrió un error inesperado.' });
+      sileo.error({
+        title: error instanceof Error ? error.message : 'Ocurrió un error inesperado.',
+      });
     } finally {
       setIsSubmitting(false);
     }

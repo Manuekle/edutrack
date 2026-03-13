@@ -65,10 +65,10 @@ export default function DocenteDashboard() {
               ...subject,
               nextClass: subject.nextClass
                 ? {
-                  ...subject.nextClass,
-                  date: new Date(subject.nextClass.date),
-                  classroom: subject.nextClass.classroom,
-                }
+                    ...subject.nextClass,
+                    date: new Date(subject.nextClass.date),
+                    classroom: subject.nextClass.classroom,
+                  }
                 : undefined,
             }));
             setSubjects(transformedSubjects);
@@ -113,35 +113,32 @@ export default function DocenteDashboard() {
   const nextClass =
     upcomingClasses.length > 0
       ? {
-        id: upcomingClasses[0].id,
-        subjectName: upcomingClasses[0].subjectName,
-        date: upcomingClasses[0].date,
-        topic: upcomingClasses[0].topic || 'Sin tema',
-        classroom: upcomingClasses[0].classroom || '',
-      }
+          id: upcomingClasses[0].id,
+          subjectName: upcomingClasses[0].subjectName,
+          date: upcomingClasses[0].date,
+          topic: upcomingClasses[0].topic || 'Sin tema',
+          classroom: upcomingClasses[0].classroom || '',
+        }
       : undefined;
 
   return (
-    <div className="mx-auto">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
-        <CardHeader className="p-0 w-full">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-            Mi Panel
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Gestiona tus asignaturas y clases en vivo.
-          </CardDescription>
-        </CardHeader>
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push('/dashboard/docente/asignaturas')}
-            >
-              Ver todas las asignaturas
-            </Button>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Resumen del día — clases activas, próximas clases y estadísticas generales.
+          </p>
+        </div>
+        <div className="flex w-full sm:w-auto">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto rounded-xl h-10 px-4 shadow-none bg-muted/40 border-transparent hover:bg-muted/60 transition-colors text-sm font-medium"
+            onClick={() => router.push('/dashboard/docente/asignaturas')}
+          >
+            Ver todas las asignaturas
+          </Button>
         </div>
       </div>
 
@@ -157,7 +154,7 @@ export default function DocenteDashboard() {
         nextClass={nextClass}
       />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2">
         {/* Próximas Clases */}
         <UpcomingClassesCard classes={upcomingClasses} />
 

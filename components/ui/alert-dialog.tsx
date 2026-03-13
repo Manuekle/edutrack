@@ -107,8 +107,7 @@ function AlertDialogAction({
   variant,
   size,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Action> &
-  VariantProps<typeof buttonVariants>) {
+}: React.ComponentProps<typeof AlertDialogPrimitive.Action> & VariantProps<typeof buttonVariants>) {
   return (
     <AlertDialogPrimitive.Action
       className={cn(buttonVariants({ variant, size }), className)}
@@ -140,6 +139,5 @@ export {
   AlertDialogOverlay,
   AlertDialogPortal,
   AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTrigger,
 };
-

@@ -21,34 +21,36 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
   const router = useRouter();
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
+      <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+          <CardTitle className="sm:text-lg text-base font-semibold tracking-card text-foreground">
             Próximas Clases
           </CardTitle>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6 pb-6">
         {classes.length > 0 ? (
           <div className="space-y-3">
             {classes.map(cls => (
               <div
                 key={cls.id}
-                className="group relative rounded-lg border transition-colors duration-200 hover:border-border hover:shadow-sm cursor-pointer bg-card p-4"
+                className="group relative rounded-2xl border-0 transition-all duration-300 hover:bg-card hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_2px_12px_rgba(0,0,0,0.2)] dark:hover:bg-[#1C1C1E] cursor-pointer bg-muted/40 p-4"
                 onClick={() => router.push(`/dashboard/docente/asignaturas/${cls.subjectId}`)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-xs font-semibold truncate">{cls.subjectName}</h4>
+                      <h4 className="text-sm font-semibold truncate text-foreground">
+                        {cls.subjectName}
+                      </h4>
                     </div>
-                    <span className="flex flex-col">
-                      <p className="text-xs text-muted-foreground line-clamp-1">
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-[13px] text-muted-foreground line-clamp-1">
                         {cls.topic || 'Sin tema definido'}
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
+                      <div className="flex items-center gap-2 text-[12px] text-muted-foreground font-medium">
+                        <span className="flex items-center gap-1 text-primary">
                           <Calendar className="h-3 w-3" />
                           {new Date(cls.date).toLocaleDateString('es-ES', {
                             weekday: 'short',
@@ -56,32 +58,27 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                             month: 'short',
                           })}
                         </span>
-                        {'-'}
+                        <span className="w-1 h-1 rounded-full bg-border" />
                         <span>
                           {cls.date
                             ? new Date(cls.date)
-                              .toLocaleTimeString('es-ES', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true,
-                              })
-                              .replace(/a\.\s*m\./i, 'AM')
-                              .replace(/p\.\s*m\./i, 'PM')
+                                .toLocaleTimeString('es-ES', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: true,
+                                })
+                                .replace(/a\.\s*m\./i, 'AM')
+                                .replace(/p\.\s*m\./i, 'PM')
                             : 'Sin hora definida'}
                         </span>
-                        {cls.classroom ? (
+                        {cls.classroom && (
                           <>
-                            {'-'}
-                            <span className="font-sans">{cls.classroom}</span>
-                          </>
-                        ) : (
-                          <>
-                            {'-'}
-                            <span className="text-muted-foreground/50">N/A</span>
+                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span className="font-semibold text-foreground">{cls.classroom}</span>
                           </>
                         )}
                       </div>
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -43,10 +43,7 @@ export async function GET(request: Request) {
       startTime: { not: null },
       endTime: { not: null },
       status: { not: 'CANCELADA' },
-      AND: [
-        { classroom: { not: null } },
-        { classroom: { not: 'Por asignar' } }
-      ]
+      AND: [{ classroom: { not: null } }, { classroom: { not: 'Por asignar' } }],
     };
 
     if (start && end) {
@@ -69,45 +66,50 @@ export async function GET(request: Request) {
         subject: {
           include: {
             teachers: {
-              select: { name: true, correoInstitucional: true }
-            }
-          }
-        }
+              select: { name: true, correoInstitucional: true },
+            },
+          },
+        },
       },
-      orderBy: { startTime: 'asc' }
+      orderBy: { startTime: 'asc' },
     });
 
     // Mapear clases para que el frontend las entienda como "RoomBookings aprobados"
-    const mappedClasses = await Promise.all(classes.map(async (cls) => {
-      // Necesitamos el "room" object simulado. Si tenemos el classroom, buscamos la sala real o creamos una simulada.
-      return {
-        id: `class-${cls.id}`,
-        roomId: 'simulated-room-id',
-        teacherId: 'simulated-teacher-id',
-        startTime: cls.startTime,
-        endTime: cls.endTime,
-        reason: `Clase Regular: ${cls.subject.name} - Grp. ${cls.subject.group || 'A'}`,
-        status: 'APROBADO',
-        signatureUrl: null,
-        reviewComment: null,
-        reviewedAt: null,
-        createdAt: cls.createdAt,
-        updatedAt: cls.updatedAt,
-        room: {
-          id: 'simulated-room-id',
-          name: cls.classroom,
-          type: 'SALON',
-          capacity: null,
-          description: null,
-          isActive: true
-        },
-        teacher: {
-          name: cls.subject.teachers.length > 0 ? cls.subject.teachers.map(t => t.name).join(', ') : 'Docente Asignado',
-          correoInstitucional: cls.subject.teachers[0]?.correoInstitucional || ''
-        },
-        isClass: true // flag para el frontend si lo necesita
-      };
-    }));
+    const mappedClasses = await Promise.all(
+      classes.map(async cls => {
+        // Necesitamos el "room" object simulado. Si tenemos el classroom, buscamos la sala real o creamos una simulada.
+        return {
+          id: `class-${cls.id}`,
+          roomId: 'simulated-room-id',
+          teacherId: 'simulated-teacher-id',
+          startTime: cls.startTime,
+          endTime: cls.endTime,
+          reason: `Clase Regular: ${cls.subject.name} - Grp. ${cls.subject.group || 'A'}`,
+          status: 'APROBADO',
+          signatureUrl: null,
+          reviewComment: null,
+          reviewedAt: null,
+          createdAt: cls.createdAt,
+          updatedAt: cls.updatedAt,
+          room: {
+            id: 'simulated-room-id',
+            name: cls.classroom,
+            type: 'SALON',
+            capacity: null,
+            description: null,
+            isActive: true,
+          },
+          teacher: {
+            name:
+              cls.subject.teachers.length > 0
+                ? cls.subject.teachers.map(t => t.name).join(', ')
+                : 'Docente Asignado',
+            correoInstitucional: cls.subject.teachers[0]?.correoInstitucional || '',
+          },
+          isClass: true, // flag para el frontend si lo necesita
+        };
+      })
+    );
 
     // Combinar y ordenar por fecha de inicio
     const combinedData = [...bookings, ...mappedClasses].sort(
@@ -120,7 +122,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Error al obtener reservaciones y clases' }, { status: 500 });
   }
 }
-
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -174,12 +175,14 @@ export async function POST(request: Request) {
         },
         include: {
           subject: true,
-        }
+        },
       });
 
       if (classOverlap) {
         return NextResponse.json(
-          { error: `El horario seleccionado ya está ocupado por la clase regular: ${classOverlap.subject.name}` },
+          {
+            error: `El horario seleccionado ya está ocupado por la clase regular: ${classOverlap.subject.name}`,
+          },
           { status: 400 }
         );
       }

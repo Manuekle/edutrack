@@ -87,7 +87,9 @@ export default function SubjectDetailPage() {
     if (!subject) return;
 
     if (hasScheduledClasses) {
-      sileo.error({ title: 'No se puede generar el reporte porque hay clases programadas pendientes' });
+      sileo.error({
+        title: 'No se puede generar el reporte porque hay clases programadas pendientes',
+      });
       return;
     }
 
@@ -156,18 +158,19 @@ export default function SubjectDetailPage() {
         isLoading={isGeneratingReport}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
-        <CardHeader className="p-0 w-full">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground flex items-center gap-2">
             Mis Clases
-          </CardTitle>
-          <CardDescription className="text-xs">
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
             Gestiona tus clases y eventos para esta asignatura.
-          </CardDescription>
-        </CardHeader>
-        <div className="flex gap-2 shrink-0">
+          </p>
+        </div>
+        <div className="flex w-full sm:w-auto items-center gap-3">
           <Button
             variant="outline"
+            className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium"
             onClick={() => setIsReportModalOpen(true)}
             disabled={hasScheduledClasses || reportExistsForCurrentPeriod}
             title={
@@ -182,6 +185,7 @@ export default function SubjectDetailPage() {
           </Button>
           <Button
             variant="default"
+            className="w-full sm:w-auto rounded-xl shadow-none h-10 px-6 text-sm font-medium transition-all"
             onClick={() => router.push(`/dashboard/docente/asignaturas/${subject?.id}/preview`)}
             aria-label="Ver vista previa de la asignatura"
           >

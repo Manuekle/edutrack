@@ -46,7 +46,7 @@ export function useUsers(options: UseUsersOptions = {}) {
       if (role && role !== 'all') {
         params.append('role', role);
       }
-      
+
       if (isActive && isActive !== 'all') {
         params.append('isActive', isActive);
       }
@@ -78,10 +78,14 @@ export function useUsers(options: UseUsersOptions = {}) {
     onSuccess: data => {
       // Invalidar la query para refrescar los datos
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      sileo.success({ title: `Usuario ${data.name} ${data.isActive ? 'activado' : 'desactivado'} correctamente.` });
+      sileo.success({
+        title: `Usuario ${data.name} ${data.isActive ? 'activado' : 'desactivado'} correctamente.`,
+      });
     },
     onError: error => {
-      sileo.error({ title: error instanceof Error ? error.message : 'Error al actualizar el usuario' });
+      sileo.error({
+        title: error instanceof Error ? error.message : 'Error al actualizar el usuario',
+      });
     },
   });
 

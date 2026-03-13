@@ -3,6 +3,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect } from 'react';
 
 export default function Error({
@@ -22,12 +23,20 @@ export default function Error({
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Algo salió mal</AlertTitle>
         <AlertDescription>
-          {error.message || 'Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.'}
+          Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.
+          {error.digest && (
+            <span className="mt-1 block text-xs opacity-70">Código: {error.digest}</span>
+          )}
         </AlertDescription>
       </Alert>
-      <Button onClick={reset} variant="outline" size="lg">
-        Reintentar
-      </Button>
+      <div className="flex gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link href="/">Volver al inicio</Link>
+        </Button>
+        <Button onClick={reset} size="lg">
+          Reintentar
+        </Button>
+      </div>
     </div>
   );
 }

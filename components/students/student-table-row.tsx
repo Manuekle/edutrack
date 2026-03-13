@@ -2,8 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { DialogTrigger } from '@/components/ui/dialog';
-import { TableCell, TableRow } from '@/components/ui/table';
-import { UserX } from 'lucide-react';
+import { Hash, Mail, Phone, UserX } from 'lucide-react';
 import type { Student } from './students-table';
 
 interface StudentTableRowProps {
@@ -13,49 +12,71 @@ interface StudentTableRowProps {
 
 export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowProps) {
   return (
-    <TableRow className="hover:bg-muted/50 group">
-      <TableCell className="text-xs px-4 py-3">{student.name || 'N/A'}</TableCell>
-      <TableCell className="text-xs px-4 py-3">{student.document || 'N/A'}</TableCell>
-      <TableCell className="text-xs px-4 py-3">
-        {student.correoInstitucional ? (
-          <a
-            href={`mailto:${student.correoInstitucional}`}
-            title="Enviar correo"
-            className="hover:underline"
-          >
-            {student.correoInstitucional}
-          </a>
-        ) : (
-          'N/A'
-        )}
-      </TableCell>
-      <TableCell className="text-xs px-4 py-3">
-        {student.correoPersonal ? (
-          <a
-            href={`mailto:${student.correoPersonal}`}
-            title="Enviar correo"
-            className="hover:underline"
-          >
-            {student.correoPersonal}
-          </a>
-        ) : (
-          'N/A'
-        )}
-      </TableCell>
-      <TableCell className="text-xs px-4 py-3">
-        {student.telefono ? (
-          <a href={`tel:${student.telefono}`} className="hover:underline" title="Llamar">
-            {student.telefono}
-          </a>
-        ) : (
-          'N/A'
-        )}
-      </TableCell>
-      <TableCell className="text-xs tracking-card text-right px-4 py-3">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3.5 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group">
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+          {student.name ? student.name.charAt(0).toUpperCase() : '?'}
+        </div>
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <span className="text-[14px] font-semibold text-foreground truncate">
+            {student.name || 'Estudiante sin nombre'}
+          </span>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-muted-foreground">
+            {student.document && (
+              <span className="flex items-center gap-1 font-mono text-[10px] uppercase font-bold tracking-card">
+                <Hash className="h-3 w-3 opacity-70" />
+                {student.document}
+              </span>
+            )}
+            {student.document && (student.correoInstitucional || student.telefono) && (
+              <span className="w-1 h-1 rounded-full bg-border" />
+            )}
+            {student.correoInstitucional && (
+              <a
+                href={`mailto:${student.correoInstitucional}`}
+                title="Enviar correo"
+                className="flex items-center gap-1 hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-[200px]"
+              >
+                <Mail className="h-3 w-3 opacity-70" />
+                <span className="truncate">{student.correoInstitucional}</span>
+              </a>
+            )}
+            {student.correoInstitucional && student.telefono && (
+              <span className="w-1 h-1 rounded-full bg-border md:block hidden" />
+            )}
+            {student.telefono && (
+              <a
+                href={`tel:${student.telefono}`}
+                className="md:flex hidden items-center gap-1 hover:text-foreground transition-colors shrink-0"
+                title="Llamar"
+              >
+                <Phone className="h-3 w-3 opacity-70" />
+                {student.telefono}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pl-14 sm:pl-0">
+        {/* Mobile only phone view */}
+        <div className="sm:hidden block">
+          {student.telefono && (
+            <a
+              href={`tel:${student.telefono}`}
+              className="flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground"
+              title="Llamar"
+            >
+              <Phone className="h-3 w-3 opacity-70" />
+              {student.telefono}
+            </a>
+          )}
+        </div>
         <DialogTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
+            className="h-8 w-8 rounded-full text-muted-foreground/50 hover:text-red-600 hover:bg-red-500/10 dark:hover:text-red-400 dark:hover:bg-red-500/20 shrink-0 transition-colors"
             aria-label="Solicitar desmatrícula"
             title="Solicitar desmatrícula"
             onClick={() =>
@@ -65,10 +86,10 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
               })
             }
           >
-            <UserX className="h-4 w-4 text-warning" />
+            <UserX className="h-4 w-4" />
           </Button>
         </DialogTrigger>
-      </TableCell>
-    </TableRow>
+      </div>
+    </div>
   );
 }

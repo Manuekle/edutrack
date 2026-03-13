@@ -4,14 +4,6 @@ import { CardDescription, CardTitle } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Users } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
@@ -94,70 +86,43 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
             </CardDescription>
           </div>
         </div>
-        <div className='mt-4'>
+        <div className="mt-4">
           {isLoading ? (
-            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando estudiantes">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Nombre</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Documento</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Correo Institucional</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Correo Personal</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Teléfono</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <TableRow key={i}>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-36" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-40" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-32" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-24" /></TableCell>
-                      <TableCell className="px-4 py-3 text-right"><Skeleton className="h-8 w-20 ml-auto rounded-md" /></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div
+              className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1"
+              role="status"
+              aria-label="Cargando estudiantes"
+            >
+              <div className="divide-y divide-border/40">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="flex items-center justify-between gap-4 py-4 px-5">
+                    <div className="flex items-center gap-3 w-full">
+                      <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                      <div className="flex flex-col gap-1.5 w-full">
+                        <Skeleton className="h-4 w-36" />
+                        <div className="flex gap-2">
+                          <Skeleton className="h-3 w-24" />
+                          <Skeleton className="h-3 w-32" />
+                        </div>
+                      </div>
+                    </div>
+                    <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                  </div>
+                ))}
+              </div>
             </div>
           ) : allStudents.length > 0 ? (
-            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+            <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 relative">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <Table>
-                  <TableHeader className="bg-muted/30">
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                        Nombre
-                      </TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                        Documento
-                      </TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                        Correo Institucional
-                      </TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                        Correo Personal
-                      </TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                        Teléfono
-                      </TableHead>
-                      <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
-                        Acciones
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentStudents.map(student => (
-                      <StudentTableRow
-                        key={student.id}
-                        student={student}
-                        onUnenrollClick={handleUnenrollClick}
-                      />
-                    ))}
-                  </TableBody>
-                </Table>
+                <div className="divide-y divide-border/40">
+                  {currentStudents.map(student => (
+                    <StudentTableRow
+                      key={student.id}
+                      student={student}
+                      onUnenrollClick={handleUnenrollClick}
+                    />
+                  ))}
+                </div>
               </Dialog>
               <TablePagination
                 currentPage={currentPage}

@@ -88,20 +88,21 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-sm mx-auto my-auto">
-      <CardHeader>
-        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
-          Iniciar Sesión
-        </CardTitle>
-        <CardDescription className="text-center">
+    <Card className="w-full max-w-md mx-auto my-auto border-border/20 dark:border-white/[0.08] shadow-xl dark:shadow-2xl backdrop-blur-2xl">
+      <CardHeader className="text-center pb-2">
+        <div className="mx-auto mb-4 h-16 w-16 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
+          <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
+        </div>
+        <CardTitle className="text-2xl font-semibold tracking-card">Bienvenido</CardTitle>
+        <CardDescription className="text-sm mt-1">
           Ingresa tus credenciales para acceder al sistema.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="grid gap-4">
+          <CardContent className="grid gap-5 pt-2">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="rounded-xl">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -111,13 +112,13 @@ function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm font-medium">Correo electrónico</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="tu@email.com"
-                      className="text-xs"
+                      placeholder="tu@correo.com"
                       disabled={isLoading}
+                      className="h-11"
                       {...field}
                     />
                   </FormControl>
@@ -130,14 +131,14 @@ function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contraseña</FormLabel>
+                  <FormLabel className="text-sm font-medium">Contraseña</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Ingresa tu contraseña"
                         disabled={isLoading}
-                        className="pr-10 text-xs"
+                        className="pr-10 h-11"
                         autoComplete="current-password"
                         autoCorrect="off"
                         autoCapitalize="off"
@@ -146,7 +147,7 @@ function LoginForm() {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                         aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                         disabled={isLoading}
@@ -164,18 +165,19 @@ function LoginForm() {
               )}
             />
           </CardContent>
-          <CardFooter className="pt-4">
-            <Button className="w-full" type="submit" disabled={isLoading}>
+          <CardFooter className="flex flex-col gap-4 pt-6 pb-2">
+            <Button className="w-full h-11 text-sm font-medium" type="submit" disabled={isLoading}>
               {isLoading ? 'Ingresando...' : 'Ingresar'}
             </Button>
+            <div className="text-center text-sm">
+              <Link
+                href="/forgot-password"
+                className="text-primary hover:text-primary/80 transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </CardFooter>
-          {/* olvidateste tu password */}
-
-          <div className="text-center text-xs pt-4">
-            <Link href="/forgot-password" className="text-primary hover:underline">
-              Olvidaste tu contraseña?
-            </Link>
-          </div>
         </form>
       </Form>
     </Card>
@@ -185,10 +187,10 @@ function LoginForm() {
 // Main page component with Suspense boundary
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-dvh p-4 font-sans">
+    <div className="flex items-center justify-center min-h-dvh p-4 font-sans bg-gradient-to-br from-background via-accent/30 to-primary/10">
       <Suspense
         fallback={
-          <Card className="w-full max-w-sm mx-auto my-auto p-8">
+          <Card className="w-full max-w-md mx-auto my-auto p-8 backdrop-blur-2xl">
             <div className="text-center text-sm text-muted-foreground">Cargando...</div>
           </Card>
         }

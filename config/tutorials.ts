@@ -9,7 +9,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-dashboard-title',
       popover: {
         title: 'Panel Principal',
-        description: 'Bienvenido al centro de mando de SIRA. Aquí tienes una visión general de la institución.',
+        description:
+          'Bienvenido al centro de mando de SIRA. Aquí tienes una visión general de la institución.',
         side: 'bottom',
         align: 'start',
       },
@@ -18,7 +19,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-dashboard-metrics',
       popover: {
         title: 'Métricas en Tiempo Real',
-        description: 'Vigila el total de estudiantes, docentes y salas activas en el sistema de un vistazo.',
+        description:
+          'Vigila el total de estudiantes, docentes y salas activas en el sistema de un vistazo.',
         side: 'bottom',
       },
     },
@@ -26,7 +28,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-dashboard-users-chart',
       popover: {
         title: 'Distribución de Usuarios',
-        description: 'Visualiza la proporción de estudiantes y docentes registrados en la plataforma.',
+        description:
+          'Visualiza la proporción de estudiantes y docentes registrados en la plataforma.',
         side: 'right',
       },
     },
@@ -34,7 +37,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-dashboard-classes-chart',
       popover: {
         title: 'Actividad Académica',
-        description: 'Monitorea el número de clases impartidas mes a mes para medir el uso del sistema.',
+        description:
+          'Monitorea el número de clases impartidas mes a mes para medir el uso del sistema.',
         side: 'left',
       },
     },
@@ -61,7 +65,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-asignaturas-actions',
       popover: {
         title: 'Acciones en Bloque',
-        description: 'Selecciona una o varias materias para eliminarlas o realizar cambios masivos.',
+        description:
+          'Selecciona una o varias materias para eliminarlas o realizar cambios masivos.',
         side: 'bottom',
       },
     },
@@ -79,7 +84,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-matricula-title',
       popover: {
         title: 'Gestión de Matrículas',
-        description: 'En esta sección podrás agregar estudiantes a los diferentes grupos operativos o cohortes.',
+        description:
+          'En esta sección podrás agregar estudiantes a los diferentes grupos operativos o cohortes.',
         side: 'bottom',
         align: 'start',
       },
@@ -88,7 +94,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-mode-toggle',
       popover: {
         title: 'Modos de Carga',
-        description: 'Puedes elegir entre subir un archivo CSV para múltiples asignaciones, o hacer una asignación manual uno a uno.',
+        description:
+          'Puedes elegir entre subir un archivo CSV para múltiples asignaciones, o hacer una asignación manual uno a uno.',
         side: 'bottom',
       },
     },
@@ -96,7 +103,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-instructions',
       popover: {
         title: 'Instrucciones y Plantilla',
-        description: 'Si eliges carga masiva, descarga nuestra plantilla CSV y asegúrate de llenar las columnas requeridas (documento, grupo y periodo).',
+        description:
+          'Si eliges carga masiva, descarga nuestra plantilla CSV y asegúrate de llenar las columnas requeridas (documento, grupo y periodo).',
         side: 'right',
       },
     },
@@ -104,7 +112,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-upload-panel',
       popover: {
         title: 'Panel de Carga',
-        description: 'Sube tu archivo CSV o busca manualmente a los estudiantes aquí. Una vez listos, genera la vista previa.',
+        description:
+          'Sube tu archivo CSV o busca manualmente a los estudiantes aquí. Una vez listos, genera la vista previa.',
         side: 'right',
       },
     },
@@ -112,7 +121,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-preview',
       popover: {
         title: 'Vista Previa de Asignación',
-        description: 'Revisa qué estudiantes se vincularán exitosamente, quiénes ya estaban agregados y qué filas tienen errores. Solo los correctos serán procesados al confirmar.',
+        description:
+          'Revisa qué estudiantes se vincularán exitosamente, quiénes ya estaban agregados y qué filas tienen errores. Solo los correctos serán procesados al confirmar.',
         side: 'left',
       },
     },
@@ -122,7 +132,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-users-title',
       popover: {
         title: 'Gestión de Usuarios',
-        description: 'Administra todos los estudiantes, docentes y administradores del sistema SIRA.',
+        description:
+          'Administra todos los estudiantes, docentes y administradores del sistema SIRA.',
         side: 'bottom',
         align: 'start',
       },
@@ -131,7 +142,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-users-filters',
       popover: {
         title: 'Filtros y Búsqueda',
-        description: 'Utiliza esta barra para buscar por nombre o documento, y filtra por el rol específico del usuario.',
+        description:
+          'Utiliza esta barra para buscar por nombre o documento, y filtra por el rol específico del usuario.',
         side: 'bottom',
       },
     },
@@ -139,7 +151,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-users-create',
       popover: {
         title: 'Crear Usuario',
-        description: 'Si necesitas registrar un usuario manualmente, usa este botón para abrir el formulario de creación.',
+        description:
+          'Si necesitas registrar un usuario manualmente, usa este botón para abrir el formulario de creación.',
         side: 'left',
       },
     },
@@ -147,7 +160,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-users-table',
       popover: {
         title: 'Tabla de Usuarios',
-        description: 'Aquí verás el listado de usuarios. Puedes editar su información básica (excepto correos institucionales) desde el menú de acciones al final de cada fila.',
+        description:
+          'Aquí verás el listado de usuarios. Puedes editar su información básica (excepto correos institucionales) desde el menú de acciones al final de cada fila.',
         side: 'top',
       },
     },
@@ -166,7 +180,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-grupos-mode',
       popover: {
         title: 'Modos de Entrada',
-        description: 'Elige entre cargar un conjunto de horarios vía CSV o configurarlos manualmente uno por uno.',
+        description:
+          'Elige entre cargar un conjunto de horarios vía CSV o configurarlos manualmente uno por uno.',
         side: 'bottom',
       },
     },
@@ -182,7 +197,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-grupos-preview',
       popover: {
         title: 'Vista Previa de Horarios',
-        description: 'Verifica los cruces y disponibilidad antes de confirmar la creación de los grupos.',
+        description:
+          'Verifica los cruces y disponibilidad antes de confirmar la creación de los grupos.',
         side: 'top',
       },
     },
@@ -201,7 +217,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-salas-tabs',
       popover: {
         title: 'Categorías de Salas',
-        description: 'Navega entre salas activas, inactivas o el listado completo de espacios físicos.',
+        description:
+          'Navega entre salas activas, inactivas o el listado completo de espacios físicos.',
         side: 'bottom',
       },
     },
@@ -209,7 +226,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-salas-actions',
       popover: {
         title: 'Crear y Subir',
-        description: 'Agrega una nueva sala individualmente o importa múltiples espacios usando un archivo CSV.',
+        description:
+          'Agrega una nueva sala individualmente o importa múltiples espacios usando un archivo CSV.',
         side: 'left',
       },
     },
@@ -228,7 +246,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-microcurriculo-mode',
       popover: {
         title: 'Importación de Temas',
-        description: 'Carga el microcurrículo completo desde un archivo o escríbelo directamente en el sistema.',
+        description:
+          'Carga el microcurrículo completo desde un archivo o escríbelo directamente en el sistema.',
         side: 'bottom',
       },
     },
@@ -236,7 +255,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-microcurriculo-preview',
       popover: {
         title: 'Estructura Jerárquica',
-        description: 'Revisa las unidades y temas resultantes antes de que los docentes comiencen a llamarlos a lista.',
+        description:
+          'Revisa las unidades y temas resultantes antes de que los docentes comiencen a llamarlos a lista.',
         side: 'top',
       },
     },
@@ -263,7 +283,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-reportes-filters',
       popover: {
         title: 'Filtros de Tiempo',
-        description: 'Ajusta el periodo académico y la asignatura específica para ver datos precisos.',
+        description:
+          'Ajusta el periodo académico y la asignatura específica para ver datos precisos.',
         side: 'bottom',
       },
     },
@@ -271,7 +292,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-reportes-chart',
       popover: {
         title: 'Tendencia de Asistencia',
-        description: 'Visualiza la evolución de la asistencia en el tiempo para detectar irregularidades.',
+        description:
+          'Visualiza la evolución de la asistencia en el tiempo para detectar irregularidades.',
         side: 'top',
       },
     },
@@ -290,7 +312,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-cargar-estudiantes-mode',
       popover: {
         title: 'Flexibilidad de Entrada',
-        description: '¿Uno solo o cientos? Elige Carga Masiva para subir un CSV o Crear Manual para registros individuales.',
+        description:
+          '¿Uno solo o cientos? Elige Carga Masiva para subir un CSV o Crear Manual para registros individuales.',
         side: 'bottom',
       },
     },
@@ -306,7 +329,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-cargar-estudiantes-preview',
       popover: {
         title: 'Validación de Datos',
-        description: 'SIRA verificará si el estudiante ya existe o si hay errores en el formato antes de crearlo.',
+        description:
+          'SIRA verificará si el estudiante ya existe o si hay errores en el formato antes de crearlo.',
         side: 'left',
       },
     },
@@ -325,7 +349,8 @@ export const adminTutorials: Record<string, TutorialSteps> = {
       element: '#tour-cargar-docentes-mode',
       popover: {
         title: 'Selección de Método',
-        description: 'Usa la carga masiva para el inicio de semestre o el manual para incorporaciones tardías.',
+        description:
+          'Usa la carga masiva para el inicio de semestre o el manual para incorporaciones tardías.',
         side: 'bottom',
       },
     },

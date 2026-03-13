@@ -39,7 +39,10 @@ export default function HomePageMobile() {
   return (
     <div className="flex flex-col h-dvh bg-background text-foreground font-sans overflow-hidden relative">
       {/* Subtle Background Pattern (Optional, but using primary/5 or just empty) */}
-      <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom" style={{ maskImage: 'linear-gradient(to bottom, transparent, black)' }} />
+      <div
+        className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[bottom_1px_center] dark:bg-grid-slate-400/[0.05] dark:bg-bottom"
+        style={{ maskImage: 'linear-gradient(to bottom, transparent, black)' }}
+      />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-md mx-auto">
@@ -73,7 +76,7 @@ export default function HomePageMobile() {
               <div className="mb-4 p-4 bg-muted/30 rounded-full border border-border/50">
                 {features[currentFeature].icon}
               </div>
-              <h2 className="text-md tracking-card font-semibold mb-2">
+              <h2 className="text-base tracking-card font-semibold mb-2">
                 {features[currentFeature].title}
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -84,12 +87,15 @@ export default function HomePageMobile() {
         </div>
 
         {/* Pagination Dots */}
-        <div className="flex gap-2 mt-4 mb-8">
+        <div className="flex gap-2 mt-4 mb-8" role="tablist" aria-label="Características">
           {features.map((_, idx) => (
-            <div
+            <button
               key={idx}
-              className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30'
-                }`}
+              role="tab"
+              aria-selected={idx === currentFeature}
+              aria-label={`Característica ${idx + 1}: ${features[idx].title}`}
+              onClick={() => setCurrentFeature(idx)}
+              className={`h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${idx === currentFeature ? 'w-6 bg-primary' : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`}
             />
           ))}
         </div>
@@ -107,7 +113,7 @@ export default function HomePageMobile() {
           </Button>
 
           <p className="text-center text-xs text-muted-foreground mt-4">
-            Sistema de Gestión FUP v1.0.0
+            SIRA · Sistema Integral de Registro Académico · FUP
           </p>
         </div>
       </footer>

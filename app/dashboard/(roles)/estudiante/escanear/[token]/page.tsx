@@ -112,10 +112,10 @@ export default function ScanPage() {
 
       const attendanceRecord = data.attendance
         ? {
-          ...data.attendance,
-          subjectName: data.subjectName,
-          className: data.className,
-        }
+            ...data.attendance,
+            subjectName: data.subjectName,
+            className: data.className,
+          }
         : undefined;
 
       let status: ScanStatus = 'error';

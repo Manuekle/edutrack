@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, QrCode } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -85,68 +85,95 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4">
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="sm:text-2xl text-xs font-semibold tracking-card">Registrar Asistencia</h1>
-          <p className="text-muted-foreground text-xs mt-2">
-            Escanea el código QR mostrado por tu docente para registrar tu asistencia
-          </p>
+    <div className="max-w-md mx-auto p-4 space-y-6 pt-10 pb-12">
+      <div className="text-center space-y-2">
+        <div className="mx-auto w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-3">
+          <QrCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
         </div>
+        <h1 className="text-2xl font-semibold tracking-card text-foreground">
+          Escanear Asistencia
+        </h1>
+        <p className="text-[15px] text-muted-foreground max-w-[280px] mx-auto leading-snug">
+          Apunta tu cámara al código QR generado por el docente
+        </p>
+      </div>
 
-        {/* Success Message */}
+      <div className="mt-6 space-y-5">
         {success && attendanceData ? (
-          <Card className="border-success/50 bg-success/5">
-            <CardHeader className="text-center pb-3">
-              <div className="flex justify-center mb-2">
-                <CheckCircle2 className="h-16 w-16 text-success" />
+          <Card className="rounded-3xl border-emerald-500/20 bg-emerald-500/5 shadow-sm overflow-hidden">
+            <CardHeader className="text-center pb-4 pt-8">
+              <div className="flex justify-center mb-4">
+                <div className="h-20 w-20 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                  <CheckCircle2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+                </div>
               </div>
-              <CardTitle className="text-success">
+              <CardTitle className="text-emerald-700 dark:text-emerald-400 text-xl">
                 ¡Asistencia Registrada!
               </CardTitle>
-              <CardDescription>Tu asistencia ha sido registrada correctamente</CardDescription>
+              <CardDescription className="text-[15px]">
+                Tu asistencia ha sido registrada correctamente
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="bg-muted rounded-lg p-4 space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Asignatura:</span>
-                  <span className="font-semibold">{attendanceData.subject}</span>
+            <CardContent className="space-y-5 px-6 pb-8">
+              <div className="bg-background rounded-2xl p-5 border border-border/40 shadow-sm space-y-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[13px] font-medium text-muted-foreground">Asignatura</span>
+                  <span className="font-semibold text-[15px]">{attendanceData.subject}</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Clase:</span>
-                  <span className="font-semibold">{attendanceData.class}</span>
+                <div className="h-px bg-border/40 my-2" />
+                <div className="flex justify-between items-center text-[15px]">
+                  <span className="text-muted-foreground">Clase</span>
+                  <span className="font-medium">{attendanceData.class}</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Hora de registro:</span>
-                  <span className="font-semibold">{attendanceData.recordedAt}</span>
+                <div className="h-px bg-border/40 my-2" />
+                <div className="flex justify-between items-center text-[15px]">
+                  <span className="text-muted-foreground">Hora</span>
+                  <span className="font-medium">{attendanceData.recordedAt}</span>
                 </div>
               </div>
-              <div className="flex gap-2 pt-2">
-                <Button onClick={handleReset} variant="outline" className="flex-1">
-                  Escanear otro código
+              <div className="flex gap-3 pt-2">
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  className="flex-1 rounded-full h-12 text-[14px] shadow-sm hover:bg-muted/50"
+                >
+                  Otro código
                 </Button>
-                <Button onClick={handleGoBack} className="flex-1">
-                  Volver al inicio
+                <Button
+                  onClick={handleGoBack}
+                  className="flex-1 rounded-full h-12 text-[14px] bg-blue-600 hover:bg-blue-700 shadow-sm"
+                >
+                  Inicio
                 </Button>
               </div>
             </CardContent>
           </Card>
         ) : (
           <>
-            {/* Scanner */}
-            <QRScanner onScan={handleScan} onError={handleError} isLoading={isProcessing} />
+            <div className="rounded-3xl overflow-hidden shadow-sm border border-border/50 bg-card">
+              <QRScanner onScan={handleScan} onError={handleError} isLoading={isProcessing} />
+            </div>
 
-            {/* Help Text */}
-            <Card className="p-0">
-              <CardContent className="pt-6">
-                <div className="space-y-3 text-xs text-muted-foreground">
-                  <p className="font-semibold text-foreground">Instrucciones:</p>
-                  <ul className="space-y-2 list-disc list-inside">
-                    <li>Asegúrate de estar en la clase correspondiente</li>
-                    <li>Solicita al docente que muestre el código QR</li>
-                    <li>Apunta tu cámara hacia el código QR</li>
-                    <li>Espera a que se procese automáticamente</li>
+            <Card className="rounded-2xl border-border/40 bg-muted/20 shadow-none">
+              <CardContent className="p-5">
+                <div className="space-y-3 text-[14px] text-muted-foreground">
+                  <p className="font-semibold text-foreground flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    Instrucciones
+                  </p>
+                  <ul className="space-y-2.5 list-none pl-1">
+                    <li className="flex gap-2 items-start">
+                      <span className="text-muted-foreground/50 mt-0.5">•</span> Asegúrate de estar
+                      en la clase correspondiente
+                    </li>
+                    <li className="flex gap-2 items-start">
+                      <span className="text-muted-foreground/50 mt-0.5">•</span> Solicita al docente
+                      que muestre el código QR
+                    </li>
+                    <li className="flex gap-2 items-start">
+                      <span className="text-muted-foreground/50 mt-0.5">•</span> Apunta tu cámara
+                      hacia el código QR
+                    </li>
                   </ul>
                 </div>
               </CardContent>

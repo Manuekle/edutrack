@@ -37,7 +37,10 @@ export async function POST(request: Request) {
     });
 
     if (subjects.length === 0) {
-      return NextResponse.json({ error: 'No se encontraron asignaturas para este grupo' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'No se encontraron asignaturas para este grupo' },
+        { status: 404 }
+      );
     }
 
     const subjectIds = subjects.map(s => s.id);
@@ -54,9 +57,9 @@ export async function POST(request: Request) {
       // de esas asignaturas que no hayan pasado o simplemente todas.
       // Generalmente se prefiere actualizar las PROGRAMADAS.
       db.class.updateMany({
-        where: { 
+        where: {
           subjectId: { in: subjectIds },
-          status: 'PROGRAMADA' 
+          status: 'PROGRAMADA',
         },
         data: { classroom: room.name },
       }),
@@ -67,7 +70,6 @@ export async function POST(request: Request) {
       message: `Sala ${room.name} asignada exitosamente al grupo ${groupName}`,
       affectedSubjects: subjectIds.length,
     });
-
   } catch (error) {
     console.error('Error assigning room to group:', error);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });

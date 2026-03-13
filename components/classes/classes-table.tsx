@@ -3,14 +3,6 @@
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { CalendarRange } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
@@ -101,77 +93,61 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
             </CardDescription>
           </div>
         </div>
-        <div className='mt-4'>
+        <div className="mt-4">
           {isLoading ? (
-            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm" role="status" aria-label="Cargando clases">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha y Hora</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Salón</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tema</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">Estado</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <TableRow key={i}>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-28" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-20" /></TableCell>
-                      <TableCell className="px-4 py-3"><Skeleton className="h-4 w-40" /></TableCell>
-                      <TableCell className="px-4 py-3 flex justify-center"><Skeleton className="h-5 w-24 rounded-md" /></TableCell>
-                      <TableCell className="px-4 py-3 text-right"><Skeleton className="h-8 w-20 ml-auto rounded-md" /></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div
+              className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1"
+              role="status"
+              aria-label="Cargando clases"
+            >
+              <div className="divide-y divide-border/40">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="flex items-center justify-between gap-4 py-4 px-5">
+                    <div className="flex flex-col gap-1.5 w-full">
+                      <Skeleton className="h-4 w-40" />
+                      <div className="flex gap-2">
+                        <Skeleton className="h-3 w-28" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <Skeleton className="h-5 w-24 rounded-full" />
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : allClasses.length > 0 ? (
-            <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Fecha y Hora</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Salón</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">Tema</TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-center">
-                      Estado
-                    </TableHead>
-                    <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
-                      Acciones
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentItems.map(cls => {
-                    const statusInfo = calculateClassStatus(cls, dateUtils);
-                    // Asegurar que visualStatus esté en el classStatusMap
-                    const statusKey = statusInfo.visualStatus as keyof typeof classStatusMap;
-                    const statusConfig = classStatusMap[statusKey] || classStatusMap.PROGRAMADA;
+            <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 relative">
+              <div className="divide-y divide-border/40">
+                {currentItems.map(cls => {
+                  const statusInfo = calculateClassStatus(cls, dateUtils);
+                  // Asegurar que visualStatus esté en el classStatusMap
+                  const statusKey = statusInfo.visualStatus as keyof typeof classStatusMap;
+                  const statusConfig = classStatusMap[statusKey] || classStatusMap.PROGRAMADA;
 
-                    return (
-                      <ClassTableRow
-                        key={cls.id}
-                        cls={cls}
-                        subjectId={subjectId}
-                        statusInfo={statusInfo}
-                        statusLabel={statusConfig.label}
-                        statusColor={statusConfig.color}
-                        dateUtils={dateUtils}
-                        onCancel={() => handleCancel(cls)}
-                        onMarkAsDone={() => handleMarkAsDone(cls.id)}
-                      />
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                  return (
+                    <ClassTableRow
+                      key={cls.id}
+                      cls={cls}
+                      subjectId={subjectId}
+                      statusInfo={statusInfo}
+                      statusLabel={statusConfig.label}
+                      statusColor={statusConfig.color}
+                      dateUtils={dateUtils}
+                      onCancel={() => handleCancel(cls)}
+                      onMarkAsDone={() => handleMarkAsDone(cls.id)}
+                    />
+                  );
+                })}
+              </div>
               <TablePagination
                 currentPage={currentPage}
                 totalItems={totalItems}
                 itemsPerPage={itemsPerPage}
                 onPageChange={setCurrentPage}
-                className="border-t"
+                className="border-t border-border/40 mt-1"
               />
             </div>
           ) : (

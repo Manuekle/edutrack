@@ -1,19 +1,19 @@
 'use client';
 
 import { TeacherReport } from '@/components/teacher-report';
-import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AdminReportesPage() {
   return (
-    <div className="space-y-6">
-      <CardHeader className="p-0 w-full" id="tour-reportes-title">
-        <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-          Reportes Docentes
-        </CardTitle>
-        <CardDescription className="text-xs">
-          Selecciona un docente para ver los reportes detallados de sus asignaturas.
-        </CardDescription>
-      </CardHeader>
+    <div className="space-y-6 pb-12">
+      <div id="tour-reportes-title">
+        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
+          Reportes docentes
+        </h1>
+        <p className="text-muted-foreground text-[15px] mt-2 max-w-2xl">
+          Selecciona un docente para ver el detalle de sus asignaturas, bitácoras y avance por
+          semana.
+        </p>
+      </div>
 
       <TeacherReport />
     </div>

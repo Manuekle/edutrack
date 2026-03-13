@@ -3,7 +3,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CHART_COLORS } from '@/lib/chart-colors';
-import { Loader2 } from 'lucide-react';
+import { Loader2, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CartesianGrid, Cell, Line, LineChart, Pie, PieChart, Tooltip, XAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
@@ -88,10 +88,7 @@ const ATTENDANCE_RISK_THRESHOLD = 75; // Menos de 75% es riesgo
 const getRiskBadge = (percentage: number) => {
   if (percentage < ATTENDANCE_RISK_THRESHOLD) {
     return (
-      <Badge
-        variant="destructive"
-        className="ml-2 text-xs h-5 px-1.5 font-semibold animate-pulse"
-      >
+      <Badge variant="destructive" className="ml-2 text-xs h-5 px-1.5 font-semibold animate-pulse">
         RIESGO DE PÉRDIDA
       </Badge>
     );
@@ -256,8 +253,7 @@ function SubjectDetailsPanel({
                               variant="outline"
                               className="h-5 px-1.5 text-xs font-mono border-muted-foreground/30 bg-muted/50"
                             >
-                              <span className="text-success">P:</span>{' '}
-                              {cls.attendanceStats.present}
+                              <span className="text-success">P:</span> {cls.attendanceStats.present}
                             </Badge>
                             <Badge
                               variant="outline"
@@ -557,87 +553,104 @@ export function TeacherReport() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-background">
-      {/* Sidebar - Only sticky on desktop */}
-      <Card className="w-full md:w-96 shadow-sm rounded-xl flex flex-col self-start md:sticky md:top-0 h-auto md:h-[53dvh] z-10 overflow-y-auto" id="tour-reportes-list">
-        <CardHeader className="p-0">
-          <div className="relative p-0 px-3 pt-4">
-            <Input
-              placeholder="Buscar..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="text-xs"
-            />
-          </div>
-        </CardHeader>
-        <CardContent className="p-0 overflow-y-auto relative [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar-track]:hidden [&::-webkit-scrollbar-thumb]:hidden">
+    <div className="flex flex-col md:flex-row gap-6 items-start">
+      {/* Sidebar */}
+      <Card
+        className="w-full md:w-80 py-0 shrink-0 rounded-2xl border-border/50 shadow-sm flex flex-col self-start md:sticky md:top-0 h-auto md:max-h-[80dvh] overflow-hidden"
+        id="tour-reportes-list"
+      >
+        <div className="px-4 pt-4 pb-3 border-b border-border/40">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-card mb-2">
+            Docentes
+          </p>
+          <Input
+            placeholder="Buscar docente..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="text-sm h-9 rounded-xl"
+          />
+        </div>
+        <div className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:hidden">
           {loadingTeachers ? (
-            <div className="space-y-2 p-2">
+            <div className="space-y-2 p-3">
               {Array.from({ length: TEACHERS_PER_PAGE }).map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full rounded-lg" />
+                <Skeleton key={i} className="h-14 w-full rounded-xl" />
               ))}
             </div>
           ) : (
-            <div className="space-y-1 px-3 sm:pb-2 pb-4">
-              {paginatedTeachers.map(teacher => (
-                <Button
-                  key={teacher.id}
-                  variant={selectedTeacher?.id === teacher.id ? 'secondary' : 'ghost'}
-                  className="w-full justify-start h-auto p-3 rounded-lg"
-                  onClick={() => setSelectedTeacher(teacher)}
-                >
-                  <div className="flex items-center gap-3 w-full">
-                    <div className="h-8 w-8 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground">
-                      {teacher.name.charAt(0).toUpperCase()}
+            <div className="divide-y divide-border/40">
+              {paginatedTeachers.map(teacher => {
+                const isSelected = selectedTeacher?.id === teacher.id;
+                const initials = teacher.name
+                  .split(' ')
+                  .map(n => n[0])
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase();
+                return (
+                  <button
+                    key={teacher.id}
+                    onClick={() => setSelectedTeacher(teacher)}
+                    className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 ${isSelected ? 'bg-blue-500/5' : ''
+                      }`}
+                  >
+                    <div
+                      className={`h-9 w-9 rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 ${isSelected
+                          ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400'
+                          : 'bg-muted text-muted-foreground'
+                        }`}
+                    >
+                      {initials}
                     </div>
-                    <div className="flex-1 text-left">
-                      <div className="font-semibold text-xs tracking-card truncate">
+                    <div className="flex-1 min-w-0">
+                      <p
+                        className={`text-[14px] font-medium truncate ${isSelected ? 'text-blue-700 dark:text-blue-400' : 'text-foreground'
+                          }`}
+                      >
                         {teacher.name}
-                      </div>
+                      </p>
                       {teacher.codigoDocente && (
-                        <div className="text-xs text-muted-foreground/80 font-mono truncate">
+                        <p className="text-[12px] text-muted-foreground font-mono truncate">
                           {teacher.codigoDocente}
-                        </div>
+                        </p>
                       )}
                     </div>
-                  </div>
-                </Button>
-              ))}
+                    {isSelected && <div className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />}
+                  </button>
+                );
+              })}
             </div>
           )}
-          {/* {loadingData && <LoadingPage />} */}
-        </CardContent>
+        </div>
         {totalPages > 1 && (
-          <CardFooter className="p-2 border-t">
-            <div className="flex items-center justify-between w-full">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                disabled={currentPage === 1}
-                className="h-8 px-3"
-              >
-                Ant.
-              </Button>
-              <span className="text-xs font-mono text-muted-foreground">
-                {currentPage}/{totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="h-8 px-3"
-              >
-                Sig.
-              </Button>
-            </div>
-          </CardFooter>
+          <div className="flex items-center justify-between p-3 border-t border-border/40 bg-muted/10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="h-8 px-3 text-xs rounded-full"
+            >
+              ← Ant.
+            </Button>
+            <span className="text-[12px] text-muted-foreground">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="h-8 px-3 text-xs rounded-full"
+            >
+              Sig. →
+            </Button>
+          </div>
         )}
       </Card>
 
       {/* Main Content */}
-      <div className="flex-1 w-full overflow-auto md:pl-6 pt-4 md:pt-0 [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar-track]:hidden [&::-webkit-scrollbar-thumb]:hidden">
+      <div className="flex-1 min-w-0">
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertTitle>Error</AlertTitle>
@@ -647,11 +660,11 @@ export function TeacherReport() {
         {selectedTeacher ? (
           <div className="space-y-6">
             {/* Header */}
-            <Card className="">
-              <CardHeader>
+            <Card className="rounded-2xl border-border/50 shadow-sm overflow-hidden">
+              <CardContent className="p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-[15px] font-bold text-blue-700 dark:text-blue-400 shrink-0">
                       {selectedTeacher.name
                         .split(' ')
                         .map(n => n[0])
@@ -660,55 +673,52 @@ export function TeacherReport() {
                         .toUpperCase()}
                     </div>
                     <div>
-                      <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
+                      <p className="text-[18px] font-semibold tracking-card text-foreground">
                         {selectedTeacher.name}
-                      </CardTitle>
+                      </p>
                       {selectedTeacher.codigoDocente && (
-                        <p className="text-xs text-muted-foreground font-mono">
+                        <p className="text-[13px] text-muted-foreground font-mono">
                           {selectedTeacher.codigoDocente}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full md:w-auto" id="tour-reportes-filters">
-                    <div className="flex items-center gap-2 font-sans w-full sm:w-auto">
-                      <Select value={period} onValueChange={setPeriod}>
-                        <SelectTrigger className="w-full sm:w-40">
-                          <SelectValue placeholder="Selecciona un periodo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {periodOptions.map(p => (
-                            <SelectItem key={p} value={p} className="font-sans">
-                              {p}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex items-center gap-2 font-sans w-full sm:w-auto">
-                      <Select
-                        value={selectedSubjectId}
-                        onValueChange={setSelectedSubjectId}
-                        disabled={!subjects.length}
-                      >
-                        <SelectTrigger className="w-full sm:w-48">
-                          <SelectValue placeholder="Todas las asignaturas" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all" className="font-sans">
-                            Todas las asignaturas
+                  <div
+                    className="flex flex-col gap-2 sm:flex-row sm:gap-3 w-full md:w-auto"
+                    id="tour-reportes-filters"
+                  >
+                    <Select value={period} onValueChange={setPeriod}>
+                      <SelectTrigger className="w-full sm:w-36 h-9 rounded-xl text-sm">
+                        <SelectValue placeholder="Periodo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {periodOptions.map(p => (
+                          <SelectItem key={p} value={p}>
+                            {p}
                           </SelectItem>
-                          {subjects.map(s => (
-                            <SelectItem key={s.id} value={s.id} className="font-sans">
-                              {s.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={selectedSubjectId}
+                      onValueChange={setSelectedSubjectId}
+                      disabled={!subjects.length}
+                    >
+                      <SelectTrigger className="w-full sm:w-52 h-9 rounded-xl text-sm">
+                        <SelectValue placeholder="Todas las asignaturas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas las asignaturas</SelectItem>
+                        {subjects.map(s => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </CardHeader>
+              </CardContent>
             </Card>
 
             {/* Chart */}
@@ -721,10 +731,7 @@ export function TeacherReport() {
                     </div>
                   )}
                   {chartData.length > 0 ? (
-                    <ChartContainer
-                      config={{}}
-                      className="h-full min-h-0 w-full min-w-0"
-                    >
+                    <ChartContainer config={{}} className="h-full min-h-0 w-full min-w-0">
                       <LineChart
                         accessibilityLayer
                         data={chartData}
@@ -798,16 +805,19 @@ export function TeacherReport() {
             )}
           </div>
         ) : (
-          <Card className="flex items-center justify-center h-56 sm:h-[calc(65vh-7rem)] border p-0 m-0">
-            <div className="p-8">
-              <div className="text-center">
-                <h3 className="text-xs text-muted-foreground">Selecciona un docente</h3>
-                <p className="text-xs text-muted-foreground/70 max-w-md">
-                  Elige un docente de la lista para ver su historial de asistencia y estadísticas
-                  detalladas
-                </p>
+          <Card className="rounded-3xl border-dashed border-border/50 shadow-sm">
+            <CardContent className="py-24 flex flex-col items-center text-center">
+              <div className="h-20 w-20 bg-muted/50 rounded-full flex items-center justify-center mb-6">
+                <TrendingUp className="h-10 w-10 text-muted-foreground/40" />
               </div>
-            </div>
+              <p className="text-[17px] font-semibold tracking-card text-foreground">
+                Selecciona un docente
+              </p>
+              <p className="text-[14px] text-muted-foreground mt-2 max-w-sm leading-relaxed">
+                Elige un docente de la lista izquierda para ver su historial de asistencia y
+                estadísticas.
+              </p>
+            </CardContent>
           </Card>
         )}
       </div>

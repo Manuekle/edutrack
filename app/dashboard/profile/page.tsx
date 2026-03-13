@@ -94,7 +94,8 @@ export default function ProfilePage() {
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
-    const apply = () => setSignaturePenColor(root.classList.contains('dark') ? '#e5e5e5' : '#171717');
+    const apply = () =>
+      setSignaturePenColor(root.classList.contains('dark') ? '#e5e5e5' : '#171717');
     apply();
     const obs = new MutationObserver(apply);
     obs.observe(root, { attributes: true, attributeFilter: ['class'] });
@@ -440,12 +441,21 @@ export default function ProfilePage() {
     <div className="space-y-6">
       <div>
         <CardHeader className="p-0">
-          <CardTitle className="sm:text-2xl text-xl font-semibold tracking-card">Mi Perfil</CardTitle>
-          <CardDescription className="text-xs">Gestiona tu información personal, seguridad y firma digital.</CardDescription>
+          <CardTitle className="sm:text-2xl text-xl font-semibold tracking-card">
+            Mi Perfil
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Gestiona tu información personal, seguridad y firma digital.
+          </CardDescription>
         </CardHeader>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6" onValueChange={setActiveTab} value={activeTab}>
+      <Tabs
+        defaultValue="profile"
+        className="space-y-6"
+        onValueChange={setActiveTab}
+        value={activeTab}
+      >
         <TabsList
           className="inline-flex h-9 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground shadow-sm border border-border/50"
           style={{
@@ -454,16 +464,25 @@ export default function ProfilePage() {
             width: 'fit-content',
           }}
         >
-          <TabsTrigger value="profile" className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
+          <TabsTrigger
+            value="profile"
+            className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+          >
             <User className="h-3.5 w-3.5 mr-1.5" />
             Perfil
           </TabsTrigger>
-          <TabsTrigger value="security" className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
+          <TabsTrigger
+            value="security"
+            className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+          >
             <Lock className="h-3.5 w-3.5 mr-1.5" />
             Seguridad
           </TabsTrigger>
           {session?.user?.role === 'DOCENTE' && (
-            <TabsTrigger value="signature" className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all">
+            <TabsTrigger
+              value="signature"
+              className="rounded-full px-4 text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+            >
               <PenLine className="h-3.5 w-3.5 mr-1.5" />
               Firma
             </TabsTrigger>
@@ -488,10 +507,12 @@ export default function ProfilePage() {
 
           <Form {...profileForm}>
             <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
-              <Card className='p-0'>
+              <Card className="p-0">
                 <CardHeader className="border-b px-5 py-4">
                   <CardTitle className="text-sm font-semibold">Información de Perfil</CardTitle>
-                  <CardDescription className="text-xs">Actualiza los datos de tu cuenta.</CardDescription>
+                  <CardDescription className="text-xs">
+                    Actualiza los datos de tu cuenta.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="px-5 py-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -500,7 +521,9 @@ export default function ProfilePage() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">Nombre completo</FormLabel>
+                          <FormLabel className="text-xs text-muted-foreground">
+                            Nombre completo
+                          </FormLabel>
                           <FormControl>
                             <Input disabled placeholder="Tu nombre completo" {...field} />
                           </FormControl>
@@ -513,7 +536,9 @@ export default function ProfilePage() {
                       name="correoInstitucional"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">Correo Institucional</FormLabel>
+                          <FormLabel className="text-xs text-muted-foreground">
+                            Correo Institucional
+                          </FormLabel>
                           <FormControl>
                             <Input type="email" placeholder="correo@institucion.edu" {...field} />
                           </FormControl>
@@ -526,7 +551,9 @@ export default function ProfilePage() {
                       name="correoPersonal"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">Correo Personal</FormLabel>
+                          <FormLabel className="text-xs text-muted-foreground">
+                            Correo Personal
+                          </FormLabel>
                           <FormControl>
                             <Input type="email" placeholder="correo@personal.com" {...field} />
                           </FormControl>
@@ -539,7 +566,9 @@ export default function ProfilePage() {
                       name="telefono"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">Teléfono / WhatsApp</FormLabel>
+                          <FormLabel className="text-xs text-muted-foreground">
+                            Teléfono / WhatsApp
+                          </FormLabel>
                           <FormControl>
                             <Input type="tel" placeholder="+57 312 312 312" {...field} />
                           </FormControl>
@@ -553,7 +582,9 @@ export default function ProfilePage() {
                         name="codigoEstudiantil"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs text-muted-foreground">Código Estudiantil</FormLabel>
+                            <FormLabel className="text-xs text-muted-foreground">
+                              Código Estudiantil
+                            </FormLabel>
                             <FormControl>
                               <Input placeholder="Ingrese su código" {...field} />
                             </FormControl>
@@ -568,7 +599,9 @@ export default function ProfilePage() {
                         name="codigoDocente"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs text-muted-foreground">Código Docente</FormLabel>
+                            <FormLabel className="text-xs text-muted-foreground">
+                              Código Docente
+                            </FormLabel>
                             <FormControl>
                               <Input disabled placeholder="Su código docente" {...field} />
                             </FormControl>
@@ -582,7 +615,10 @@ export default function ProfilePage() {
                 <CardFooter className="px-5 py-4 border-t bg-muted/30">
                   <Button type="submit" disabled={isProfileLoading} className="w-full sm:w-auto">
                     {isProfileLoading ? (
-                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Guardando...</>
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Guardando...
+                      </>
                     ) : (
                       'Guardar Cambios'
                     )}
@@ -599,7 +635,9 @@ export default function ProfilePage() {
               <Card className="p-0">
                 <CardHeader className="border-b px-5 py-4">
                   <CardTitle className="text-sm font-semibold">Cambiar Contraseña</CardTitle>
-                  <CardDescription className="text-xs">Recomendamos cambiar tu contraseña periódicamente.</CardDescription>
+                  <CardDescription className="text-xs">
+                    Recomendamos cambiar tu contraseña periódicamente.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="px-5 py-5">
                   <div className="max-w-md space-y-5">
@@ -608,7 +646,9 @@ export default function ProfilePage() {
                       name="currentPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">Contraseña actual</FormLabel>
+                          <FormLabel className="text-xs text-muted-foreground">
+                            Contraseña actual
+                          </FormLabel>
                           <FormControl>
                             <Input type="password" placeholder="••••••••" {...field} />
                           </FormControl>
@@ -622,7 +662,9 @@ export default function ProfilePage() {
                         name="newPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs text-muted-foreground">Nueva contraseña</FormLabel>
+                            <FormLabel className="text-xs text-muted-foreground">
+                              Nueva contraseña
+                            </FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
@@ -635,7 +677,9 @@ export default function ProfilePage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs text-muted-foreground">Confirmar contraseña</FormLabel>
+                            <FormLabel className="text-xs text-muted-foreground">
+                              Confirmar contraseña
+                            </FormLabel>
                             <FormControl>
                               <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
@@ -652,7 +696,10 @@ export default function ProfilePage() {
                 <CardFooter className="px-5 py-4 border-t bg-muted/30">
                   <Button type="submit" disabled={isPasswordLoading} className="w-full sm:w-auto">
                     {isPasswordLoading ? (
-                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Actualizando...</>
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Actualizando...
+                      </>
                     ) : (
                       'Actualizar Contraseña'
                     )}
@@ -679,7 +726,9 @@ export default function ProfilePage() {
                     <div className="rounded-xl overflow-hidden border border-dashed border-border">
                       <SignatureFileUpload onFileSelect={handleFileSelect} file={signatureFile} />
                     </div>
-                    <p className="text-[11px] text-muted-foreground">PNG con fondo transparente o blanco. Máximo 2 MB.</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      PNG con fondo transparente o blanco. Máximo 2 MB.
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -693,7 +742,7 @@ export default function ProfilePage() {
                         penColor={signaturePenColor}
                         canvasProps={{
                           className: 'w-full h-full rounded-xl touch-none cursor-crosshair',
-                          style: { touchAction: 'none', display: 'block' }
+                          style: { touchAction: 'none', display: 'block' },
                         }}
                         velocityFilterWeight={0.7}
                         minWidth={2}
@@ -702,8 +751,22 @@ export default function ProfilePage() {
                       />
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={clearCanvas} className="flex-1 text-xs">Limpiar</Button>
-                      <Button variant="secondary" size="sm" onClick={saveCanvas} className="flex-1 text-xs">Capturar trazo</Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={clearCanvas}
+                        className="flex-1 text-xs"
+                      >
+                        Limpiar
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={saveCanvas}
+                        className="flex-1 text-xs"
+                      >
+                        Capturar trazo
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -728,7 +791,9 @@ export default function ProfilePage() {
                             <PenLine className="h-5 w-5 opacity-60" />
                           </div>
                           <span className="text-xs font-medium">Sin firma</span>
-                          <span className="text-[11px] text-muted-foreground/90">Aparecerá aquí</span>
+                          <span className="text-[11px] text-muted-foreground/90">
+                            Aparecerá aquí
+                          </span>
                         </div>
                       )}
                     </div>
@@ -738,7 +803,9 @@ export default function ProfilePage() {
                       ) : signaturePreview ? (
                         <p className="text-xs text-success font-medium">Firma guardada</p>
                       ) : (
-                        <p className="text-xs text-muted-foreground">Sube una imagen o dibuja y pulsa «Capturar trazo».</p>
+                        <p className="text-xs text-muted-foreground">
+                          Sube una imagen o dibuja y pulsa «Capturar trazo».
+                        </p>
                       )}
                       <div className="flex gap-2 flex-wrap">
                         <Button
@@ -748,13 +815,23 @@ export default function ProfilePage() {
                           className="text-xs h-8"
                         >
                           {isSignatureLoading ? (
-                            <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />Guardando...</>
+                            <>
+                              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                              Guardando...
+                            </>
                           ) : (
                             'Guardar Firma'
                           )}
                         </Button>
                         {signatureFile && (
-                          <Button onClick={handleCancelSignature} variant="ghost" size="sm" className="text-xs h-8 text-muted-foreground">Cancelar</Button>
+                          <Button
+                            onClick={handleCancelSignature}
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs h-8 text-muted-foreground"
+                          >
+                            Cancelar
+                          </Button>
                         )}
                       </div>
                     </div>

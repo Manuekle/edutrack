@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LoadingPage } from '@/components/ui/loading';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -147,9 +147,7 @@ function ResetPasswordContent() {
       <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-              Enlace inválido
-            </CardTitle>
+            <CardTitle className="text-2xl font-semibold tracking-card">Enlace inválido</CardTitle>
             <CardDescription className="text-muted-foreground">
               El enlace de restablecimiento no es válido o ha expirado.
             </CardDescription>
@@ -168,7 +166,7 @@ function ResetPasswordContent() {
     <div className="flex flex-col items-center justify-center min-h-dvh p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-center">
+          <CardTitle className="text-2xl font-semibold tracking-card text-center">
             Restablecer contraseña
           </CardTitle>
           <CardDescription className="text-center">Ingresa tu nueva contraseña</CardDescription>
@@ -178,7 +176,11 @@ function ResetPasswordContent() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {message && (
                 <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
-                  <AlertCircle className="h-4 w-4" />
+                  {message.type === 'error' ? (
+                    <AlertCircle className="h-4 w-4" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
+                  )}
                   <AlertDescription>{message.text}</AlertDescription>
                 </Alert>
               )}
@@ -190,7 +192,6 @@ function ResetPasswordContent() {
                   placeholder="Ingresa tu correo electrónico"
                   value={userEmail}
                   disabled
-                  className="text-xs"
                 />
               </div>
 
@@ -205,7 +206,7 @@ function ResetPasswordContent() {
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Ingresa tu nueva contraseña"
-                          className="pr-10 text-xs"
+                          className="pr-10"
                           disabled={isSubmitting}
                           {...field}
                         />
@@ -240,7 +241,7 @@ function ResetPasswordContent() {
                         <Input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="Confirma tu nueva contraseña"
-                          className="pr-10 text-xs"
+                          className="pr-10"
                           disabled={isSubmitting}
                           {...field}
                         />

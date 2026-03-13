@@ -35,8 +35,9 @@ export function SignatureFileUpload({ onFileSelect }: SignatureFileUploadProps) 
     >
       <input {...getInputProps()} />
       <div
-        className={`mx-auto flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${isDragActive ? 'bg-primary/15 text-primary' : 'bg-muted/80 text-muted-foreground'
-          }`}
+        className={`mx-auto flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${
+          isDragActive ? 'bg-primary/15 text-primary' : 'bg-muted/80 text-muted-foreground'
+        }`}
       >
         <UploadCloud className="h-7 w-7" />
       </div>

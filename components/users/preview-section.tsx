@@ -151,8 +151,9 @@ export function UsersPreviewSection({
                                   ? 'outline'
                                   : 'destructive'
                             }
-                            className={`text-xs ${item.status === 'warning' ? 'text-yellow-600 border-yellow-600' : ''
-                              }`}
+                            className={`text-xs ${
+                              item.status === 'warning' ? 'text-yellow-600 border-yellow-600' : ''
+                            }`}
                           >
                             {item.status === 'success'
                               ? 'Listo'
@@ -176,12 +177,13 @@ export function UsersPreviewSection({
                         </div>
                         {(item.message || item.status !== 'success') && (
                           <p
-                            className={`text-xs mt-1 ${item.status === 'error'
-                              ? 'text-destructive'
-                              : item.status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-muted-foreground'
-                              }`}
+                            className={`text-xs mt-1 ${
+                              item.status === 'error'
+                                ? 'text-destructive'
+                                : item.status === 'warning'
+                                  ? 'text-yellow-600'
+                                  : 'text-muted-foreground'
+                            }`}
                           >
                             {item.message}
                           </p>

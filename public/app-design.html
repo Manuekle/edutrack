@@ -1,0 +1,2033 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIRA — University App Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #f7f6f2;
+        --surface: #ffffff;
+        --surface-2: #f2f0ec;
+        --blue: #7ba7c4;
+        --blue-light: #d8e9f4;
+        --blue-dim: #4e7e9b;
+        --green: #9fc4af;
+        --green-light: #ddf0e6;
+        --lavender: #b8aedd;
+        --lavender-light: #eae5f7;
+        --peach: #e8b09a;
+        --peach-light: #faeae3;
+        --yellow: #edd98a;
+        --yellow-light: #fdf5d6;
+        --text: #2c2c35;
+        --text-2: #6a6a7a;
+        --text-3: #a8a8b5;
+        --border: #eceae4;
+        --shadow-sm: 0 2px 8px rgba(44, 44, 53, 0.06);
+        --shadow-md: 0 4px 20px rgba(44, 44, 53, 0.09);
+        --shadow-lg: 0 8px 40px rgba(44, 44, 53, 0.12);
+        --r-sm: 10px;
+        --r-md: 16px;
+        --r-lg: 24px;
+        --r-xl: 32px;
+      }
+
+      body {
+        font-family: 'Outfit', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px 80px;
+        color: var(--text);
+      }
+
+      /* ── page header ── */
+      .page-header {
+        text-align: center;
+        margin-bottom: 56px;
+        animation: fadeUp 0.7s ease both;
+      }
+      .page-header .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--lavender-light);
+        color: var(--lavender);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 99px;
+        margin-bottom: 18px;
+      }
+      .page-header h1 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(36px, 5vw, 58px);
+        font-weight: 600;
+        line-height: 1.1;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+      .page-header h1 em {
+        font-style: italic;
+        color: var(--blue-dim);
+      }
+      .page-header p {
+        margin-top: 12px;
+        font-size: 15px;
+        color: var(--text-2);
+        font-weight: 400;
+        max-width: 380px;
+      }
+
+      /* ── showcase grid ── */
+      .showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 32px;
+        width: 100%;
+        max-width: 1100px;
+        align-items: start;
+      }
+
+      /* ── phone shell ── */
+      .phone-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .phone-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-3);
+      }
+      .phone {
+        width: 320px;
+        background: var(--surface);
+        border-radius: 44px;
+        box-shadow:
+          0 0 0 1.5px var(--border),
+          var(--shadow-lg),
+          0 32px 80px rgba(44, 44, 53, 0.14);
+        overflow: hidden;
+        position: relative;
+      }
+      .phone::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 30px;
+        background: var(--bg);
+        border-radius: 0 0 20px 20px;
+        z-index: 10;
+      }
+
+      .screen {
+        width: 100%;
+        background: var(--bg);
+        min-height: 680px;
+        padding-bottom: 72px;
+      }
+
+      /* ── status bar ── */
+      .status-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-2);
+      }
+      .status-bar .time {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .status-icons {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .status-icons svg {
+        width: 14px;
+        height: 14px;
+        fill: var(--text-2);
+      }
+
+      /* ── content area ── */
+      .content {
+        padding: 4px 20px 0;
+      }
+
+      /* ── greeting header ── */
+      .greeting-area {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding-top: 6px;
+      }
+      .greeting-text .sup {
+        font-size: 11.5px;
+        color: var(--text-3);
+        font-weight: 400;
+        letter-spacing: 0.04em;
+      }
+      .greeting-text h2 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        margin-top: 1px;
+      }
+      .greeting-text h2 em {
+        font-style: italic;
+        color: var(--blue-dim);
+      }
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue) 0%, var(--lavender) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 600;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: 0 2px 10px rgba(123, 167, 196, 0.35);
+      }
+
+      /* ── stats row ── */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+      .stat-card {
+        background: var(--surface);
+        border-radius: var(--r-md);
+        padding: 13px 12px;
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+      }
+      .stat-card .val {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+      .stat-card .lbl {
+        font-size: 10px;
+        color: var(--text-3);
+        margin-top: 3px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+      }
+      .stat-card.blue .val {
+        color: var(--blue-dim);
+      }
+      .stat-card.green .val {
+        color: #5a9e7b;
+      }
+      .stat-card.peach .val {
+        color: #c4765e;
+      }
+
+      /* ── section title ── */
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .section-title h3 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      .section-title a {
+        font-size: 11px;
+        color: var(--blue);
+        font-weight: 500;
+        text-decoration: none;
+      }
+
+      /* ── today card (hero) ── */
+      .today-card {
+        background: linear-gradient(135deg, #7ba7c4 0%, #9fbbe8 100%);
+        border-radius: var(--r-lg);
+        padding: 20px;
+        margin-bottom: 22px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 6px 24px rgba(123, 167, 196, 0.38);
+      }
+      .today-card::after {
+        content: '';
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        width: 130px;
+        height: 130px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+      }
+      .today-card .tag {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 99px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: white;
+        padding: 3px 10px;
+        margin-bottom: 10px;
+      }
+      .today-card .course-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 20px;
+        font-weight: 600;
+        color: white;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        margin-bottom: 6px;
+      }
+      .today-card .course-meta {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      .today-card .course-meta span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .today-card .progress-bar {
+        margin-top: 16px;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 99px;
+        height: 5px;
+        overflow: hidden;
+      }
+      .today-card .progress-fill {
+        background: white;
+        border-radius: 99px;
+        height: 100%;
+        width: 65%;
+      }
+
+      /* ── schedule list ── */
+      .schedule-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+      .sched-item {
+        background: var(--surface);
+        border-radius: var(--r-md);
+        padding: 13px 15px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .sched-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .sched-dot svg {
+        width: 16px;
+        height: 16px;
+      }
+      .sched-dot.blue {
+        background: var(--blue-light);
+      }
+      .sched-dot.green {
+        background: var(--green-light);
+      }
+      .sched-dot.lav {
+        background: var(--lavender-light);
+      }
+      .sched-dot.peach {
+        background: var(--peach-light);
+      }
+      .sched-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .sched-info .name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .sched-info .room {
+        font-size: 11px;
+        color: var(--text-3);
+        margin-top: 1px;
+      }
+      .sched-time {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-2);
+        flex-shrink: 0;
+        text-align: right;
+      }
+
+      /* ── course grid ── */
+      .course-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+      .course-card {
+        border-radius: var(--r-md);
+        padding: 16px 14px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+      }
+      .course-card::before {
+        content: '';
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.35);
+      }
+      .course-card.c1 {
+        background: var(--blue-light);
+      }
+      .course-card.c2 {
+        background: var(--green-light);
+      }
+      .course-card.c3 {
+        background: var(--lavender-light);
+      }
+      .course-card.c4 {
+        background: var(--peach-light);
+      }
+      .course-card.c5 {
+        background: var(--yellow-light);
+      }
+      .course-card .icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .course-card .icon svg {
+        width: 16px;
+        height: 16px;
+      }
+      .course-card .cname {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.3;
+        margin-bottom: 4px;
+      }
+      .course-card .ccode {
+        font-size: 10px;
+        color: var(--text-2);
+        font-weight: 400;
+      }
+      .course-card .cprog {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .course-card .cprog-bar {
+        flex: 1;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .course-card .cprog-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: rgba(44, 44, 53, 0.25);
+      }
+      .course-card .cprog-pct {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-2);
+      }
+
+      /* ── calendar strip ── */
+      .cal-strip {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 22px;
+        overflow: hidden;
+      }
+      .cal-day {
+        flex: 1;
+        background: var(--surface);
+        border-radius: var(--r-md);
+        padding: 10px 0;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+      }
+      .cal-day .dow {
+        font-size: 9.5px;
+        font-weight: 500;
+        color: var(--text-3);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .cal-day .num {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-top: 4px;
+        line-height: 1;
+      }
+      .cal-day .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: transparent;
+        margin: 5px auto 0;
+      }
+      .cal-day.has-event .dot {
+        background: var(--peach);
+      }
+      .cal-day.today {
+        background: var(--blue);
+        box-shadow: 0 4px 16px rgba(123, 167, 196, 0.4);
+      }
+      .cal-day.today .dow {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .cal-day.today .num {
+        color: white;
+      }
+      .cal-day.today .dot {
+        background: rgba(255, 255, 255, 0.6);
+      }
+
+      /* ── notification cards ── */
+      .notif-list {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .notif-item {
+        background: var(--surface);
+        border-radius: var(--r-md);
+        padding: 13px 15px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .notif-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+      .notif-icon svg {
+        width: 15px;
+        height: 15px;
+      }
+      .notif-icon.blue {
+        background: var(--blue-light);
+      }
+      .notif-icon.green {
+        background: var(--green-light);
+      }
+      .notif-icon.peach {
+        background: var(--peach-light);
+      }
+      .notif-body .title {
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--text);
+        line-height: 1.3;
+      }
+      .notif-body .sub {
+        font-size: 11px;
+        color: var(--text-3);
+        margin-top: 3px;
+      }
+      .notif-item .unread {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--blue);
+        flex-shrink: 0;
+        margin-top: 5px;
+        margin-left: auto;
+      }
+
+      /* ── profile screen ── */
+      .profile-header {
+        background: linear-gradient(160deg, var(--lavender-light) 0%, var(--blue-light) 100%);
+        padding: 32px 20px 24px;
+        text-align: center;
+        margin-bottom: 0;
+      }
+      .profile-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue) 0%, var(--lavender) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 600;
+        color: white;
+        margin: 0 auto 12px;
+        box-shadow: 0 4px 20px rgba(123, 167, 196, 0.45);
+      }
+      .profile-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      .profile-id {
+        font-size: 12px;
+        color: var(--text-2);
+        margin-top: 4px;
+      }
+      .profile-tags {
+        display: flex;
+        gap: 7px;
+        justify-content: center;
+        margin-top: 12px;
+      }
+      .profile-tag {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 99px;
+        padding: 4px 12px;
+        font-size: 10.5px;
+        font-weight: 500;
+        color: var(--text-2);
+      }
+      .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .prof-stat {
+        padding: 16px 0;
+        text-align: center;
+      }
+      .prof-stat + .prof-stat {
+        border-left: 1px solid var(--border);
+      }
+      .prof-stat .v {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+      }
+      .prof-stat .l {
+        font-size: 10px;
+        color: var(--text-3);
+        margin-top: 3px;
+      }
+      .menu-list {
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .menu-item {
+        background: var(--surface);
+        border-radius: var(--r-md);
+        padding: 14px 16px;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .menu-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .menu-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+      .menu-icon.blue {
+        background: var(--blue-light);
+      }
+      .menu-icon.green {
+        background: var(--green-light);
+      }
+      .menu-icon.lav {
+        background: var(--lavender-light);
+      }
+      .menu-icon.peach {
+        background: var(--peach-light);
+      }
+      .menu-label {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text);
+      }
+      .menu-chevron {
+        color: var(--text-3);
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      /* ── bottom nav ── */
+      .bottom-nav {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        display: flex;
+        padding: 10px 6px 18px;
+        box-shadow: 0 -4px 20px rgba(44, 44, 53, 0.07);
+      }
+      .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+      }
+      .nav-item .ni-icon {
+        width: 36px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+      }
+      .nav-item.active .ni-icon {
+        background: var(--blue-light);
+      }
+      .nav-item svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--text-3);
+        stroke-width: 1.6;
+        fill: none;
+      }
+      .nav-item.active svg {
+        stroke: var(--blue-dim);
+      }
+      .nav-item .ni-label {
+        font-size: 9.5px;
+        font-weight: 500;
+        color: var(--text-3);
+        letter-spacing: 0.04em;
+      }
+      .nav-item.active .ni-label {
+        color: var(--blue-dim);
+        font-weight: 600;
+      }
+
+      /* ── component showcase ── */
+      .comp-showcase {
+        width: 100%;
+        max-width: 1100px;
+        margin-top: 56px;
+        animation: fadeUp 0.8s 0.2s ease both;
+      }
+      .comp-title {
+        text-align: center;
+        margin-bottom: 32px;
+      }
+      .comp-title h2 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 30px;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+      .comp-title p {
+        font-size: 13px;
+        color: var(--text-2);
+        margin-top: 6px;
+      }
+      .comp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+      }
+      .comp-card {
+        background: var(--surface);
+        border-radius: var(--r-lg);
+        padding: 24px;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border);
+      }
+      .comp-card h4 {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-3);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      /* buttons */
+      .btn-row {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .btn {
+        padding: 12px 20px;
+        border-radius: 99px;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: 'Outfit', sans-serif;
+        border: none;
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn-primary {
+        background: var(--blue);
+        color: white;
+        box-shadow: 0 4px 16px rgba(123, 167, 196, 0.45);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 6px 22px rgba(123, 167, 196, 0.55);
+      }
+      .btn-secondary {
+        background: var(--blue-light);
+        color: var(--blue-dim);
+      }
+      .btn-green {
+        background: var(--green);
+        color: #3b7359;
+        box-shadow: 0 4px 16px rgba(159, 196, 175, 0.45);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-2);
+        border: 1.5px solid var(--border);
+      }
+      .btn-peach {
+        background: var(--peach-light);
+        color: #b05c42;
+      }
+
+      /* chips */
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .chip {
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 11.5px;
+        font-weight: 500;
+        font-family: 'Outfit', sans-serif;
+        cursor: pointer;
+        transition: transform 0.12s;
+      }
+      .chip:hover {
+        transform: scale(1.03);
+      }
+      .chip.blue {
+        background: var(--blue-light);
+        color: var(--blue-dim);
+      }
+      .chip.green {
+        background: var(--green-light);
+        color: #3b7359;
+      }
+      .chip.lav {
+        background: var(--lavender-light);
+        color: #7762b6;
+      }
+      .chip.peach {
+        background: var(--peach-light);
+        color: #b05c42;
+      }
+      .chip.yellow {
+        background: var(--yellow-light);
+        color: #8a6e18;
+      }
+      .chip.active {
+        box-shadow: inset 0 0 0 1.5px currentColor;
+      }
+
+      /* progress */
+      .prog-list {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+      }
+      .prog-item .prog-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+      .prog-item .prog-label {
+        font-weight: 500;
+        color: var(--text);
+      }
+      .prog-item .prog-val {
+        font-weight: 600;
+        color: var(--text-2);
+      }
+      .prog-track {
+        height: 7px;
+        background: var(--surface-2);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .prog-fill {
+        height: 100%;
+        border-radius: 99px;
+      }
+      .prog-fill.blue {
+        background: var(--blue);
+      }
+      .prog-fill.green {
+        background: var(--green);
+      }
+      .prog-fill.lav {
+        background: var(--lavender);
+      }
+      .prog-fill.peach {
+        background: var(--peach);
+      }
+
+      /* color palette */
+      .palette {
+        display: flex;
+        gap: 8px;
+      }
+      .swatch {
+        flex: 1;
+        height: 48px;
+        border-radius: var(--r-sm);
+        box-shadow: var(--shadow-sm);
+        position: relative;
+      }
+      .swatch::after {
+        content: attr(data-name);
+        position: absolute;
+        bottom: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 9px;
+        color: var(--text-3);
+        white-space: nowrap;
+        font-weight: 500;
+      }
+      .swatches-wrap {
+        padding-bottom: 24px;
+      }
+
+      /* input */
+      .input-demo {
+        padding: 13px 16px;
+        background: var(--bg);
+        border-radius: var(--r-md);
+        border: 1.5px solid var(--border);
+        font-family: 'Outfit', sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        width: 100%;
+        margin-bottom: 10px;
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .input-demo:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px var(--blue-light);
+      }
+      .input-demo::placeholder {
+        color: var(--text-3);
+      }
+
+      /* badge / tag */
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .bdg {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px 5px 8px;
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 500;
+        font-family: 'Outfit', sans-serif;
+      }
+      .bdg .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .bdg.blue {
+        background: var(--blue-light);
+        color: var(--blue-dim);
+      }
+      .bdg.blue .dot {
+        background: var(--blue);
+      }
+      .bdg.green {
+        background: var(--green-light);
+        color: #3b7359;
+      }
+      .bdg.green .dot {
+        background: var(--green);
+      }
+      .bdg.lav {
+        background: var(--lavender-light);
+        color: #7762b6;
+      }
+      .bdg.lav .dot {
+        background: var(--lavender);
+      }
+      .bdg.peach {
+        background: var(--peach-light);
+        color: #b05c42;
+      }
+      .bdg.peach .dot {
+        background: var(--peach);
+      }
+
+      /* ── animations ── */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .phone-wrap:nth-child(1) {
+        animation: fadeUp 0.7s 0.05s ease both;
+      }
+      .phone-wrap:nth-child(2) {
+        animation: fadeUp 0.7s 0.15s ease both;
+      }
+      .phone-wrap:nth-child(3) {
+        animation: fadeUp 0.7s 0.25s ease both;
+      }
+
+      /* noise overlay on phones */
+      .phone::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 5;
+        border-radius: 44px;
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ───────────────────────────────── PAGE HEADER ───────────────────────────────── -->
+    <header class="page-header">
+      <div class="badge">
+        <svg width="8" height="8" viewBox="0 0 8 8">
+          <circle cx="4" cy="4" r="4" fill="currentColor" />
+        </svg>
+        University App · Design System
+      </div>
+      <h1>SIRA — <em>Serene</em> Academic<br />Interface</h1>
+      <p>A calm, minimal university productivity app designed for clarity and academic focus.</p>
+    </header>
+
+    <!-- ───────────────────────────────── PHONE SCREENS ───────────────────────────────── -->
+    <div class="showcase">
+      <!-- ── Screen 1: Home / Dashboard ── -->
+      <div class="phone-wrap">
+        <span class="phone-label">Home</span>
+        <div class="phone">
+          <div class="screen" style="position: relative">
+            <!-- status bar -->
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="status-icons">
+                <svg viewBox="0 0 16 16">
+                  <path
+                    d="M2 11l3-3 2 2 4-4 3 3"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg viewBox="0 0 16 16">
+                  <rect x="1" y="5" width="12" height="7" rx="2" />
+                  <path d="M13 8h2" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="content">
+              <!-- greeting -->
+              <div class="greeting-area">
+                <div class="greeting-text">
+                  <div class="sup">Jueves, 12 de Marzo</div>
+                  <h2>Hola, <em>Sofía</em> 👋</h2>
+                </div>
+                <div class="avatar">S</div>
+              </div>
+
+              <!-- stats row -->
+              <div class="stats-row">
+                <div class="stat-card blue">
+                  <div class="val">5</div>
+                  <div class="lbl">Materias</div>
+                </div>
+                <div class="stat-card green">
+                  <div class="val">92%</div>
+                  <div class="lbl">Asistencia</div>
+                </div>
+                <div class="stat-card peach">
+                  <div class="val">3.8</div>
+                  <div class="lbl">Promedio</div>
+                </div>
+              </div>
+
+              <!-- today's class hero card -->
+              <div class="today-card">
+                <div class="tag">📍 Ahora en curso</div>
+                <div class="course-name">Cálculo Diferencial</div>
+                <div class="course-meta">
+                  <span>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    >
+                      <rect x="2" y="3" width="12" height="11" rx="2" />
+                      <path d="M5 1v4M11 1v4M2 7h12" />
+                    </svg>
+                    Aula B-204
+                  </span>
+                  <span>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    >
+                      <circle cx="8" cy="8" r="6" />
+                      <path d="M8 5v3l2 2" />
+                    </svg>
+                    08:00 – 10:00
+                  </span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+              </div>
+
+              <!-- schedule -->
+              <div class="section-title">
+                <h3>Horario de hoy</h3>
+                <a href="#">Ver semana →</a>
+              </div>
+              <div class="schedule-list">
+                <div class="sched-item">
+                  <div class="sched-dot green">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#5A9E7B"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    >
+                      <path d="M8 2v4l3 2M2 8a6 6 0 1 0 12 0 6 6 0 0 0-12 0z" />
+                    </svg>
+                  </div>
+                  <div class="sched-info">
+                    <div class="name">Álgebra Lineal</div>
+                    <div class="room">Sala A-101</div>
+                  </div>
+                  <div class="sched-time">10:30<br />12:30</div>
+                </div>
+                <div class="sched-item">
+                  <div class="sched-dot lav">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#7762B6"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    >
+                      <rect x="2" y="4" width="12" height="9" rx="2" />
+                      <path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" />
+                    </svg>
+                  </div>
+                  <div class="sched-info">
+                    <div class="name">Programación III</div>
+                    <div class="room">Lab 3 · Virtual</div>
+                  </div>
+                  <div class="sched-time">14:00<br />16:00</div>
+                </div>
+                <div class="sched-item">
+                  <div class="sched-dot peach">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#C4765E"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    >
+                      <path d="M3 3h10v10H3zM6 8h4M8 6v4" />
+                    </svg>
+                  </div>
+                  <div class="sched-info">
+                    <div class="name">Física General</div>
+                    <div class="room">Aula C-305</div>
+                  </div>
+                  <div class="sched-time">16:30<br />18:30</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- bottom nav -->
+            <div class="bottom-nav">
+              <div class="nav-item active">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                </div>
+                <span class="ni-label">Inicio</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                <span class="ni-label">Horario</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                </div>
+                <span class="ni-label">Materias</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
+                </div>
+                <span class="ni-label">Reportes</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span class="ni-label">Perfil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Screen 2: Courses ── -->
+      <div class="phone-wrap">
+        <span class="phone-label">Materias</span>
+        <div class="phone">
+          <div class="screen" style="position: relative">
+            <div class="status-bar">
+              <span class="time">9:41</span>
+              <div class="status-icons">
+                <svg viewBox="0 0 16 16">
+                  <path
+                    d="M2 11l3-3 2 2 4-4 3 3"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg viewBox="0 0 16 16">
+                  <rect x="1" y="5" width="12" height="7" rx="2" />
+                  <path d="M13 8h2" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="content">
+              <!-- heading -->
+              <div style="margin-bottom: 18px">
+                <div style="font-size: 11.5px; color: var(--text-3); letter-spacing: 0.04em">
+                  Semestre 2026-1
+                </div>
+                <h2
+                  style="
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 26px;
+                    font-weight: 600;
+                    color: var(--text);
+                    letter-spacing: -0.01em;
+                    line-height: 1.15;
+                    margin-top: 2px;
+                  "
+                >
+                  Mis <em style="font-style: italic; color: var(--blue-dim)">Materias</em>
+                </h2>
+              </div>
+
+              <!-- search bar -->
+              <div style="position: relative; margin-bottom: 18px">
+                <svg
+                  style="
+                    position: absolute;
+                    left: 13px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 15px;
+                    height: 15px;
+                    stroke: var(--text-3);
+                    fill: none;
+                    stroke-width: 2;
+                  "
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                <input
+                  class="input-demo"
+                  placeholder="Buscar materia..."
+                  style="padding-left: 38px; margin-bottom: 0"
+                />
+              </div>
+
+              <!-- filter chips -->
+              <div class="chip-row" style="margin-bottom: 18px">
+                <div class="chip blue active">Todas</div>
+                <div class="chip green">Activas</div>
+                <div class="chip lav">Teóricas</div>
+                <div class="chip peach">Lab</div>
+              </div>
+
+              <!-- course grid -->
+              <div class="section-title">
+                <h3>5 materias inscritas</h3>
+              </div>
+              <div class="course-grid">
+                <div class="course-card c1">
+                  <div class="icon">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="var(--blue-dim)"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                    >
+                      <path d="M2 12 8 2l6 10H2z" />
+                      <path d="M8 7v3" />
+                    </svg>
+                  </div>
+                  <div class="cname">Cálculo Diferencial</div>
+                  <div class="ccode">MAT-201 · Prof. García</div>
+                  <div class="cprog">
+                    <div class="cprog-bar"><div class="cprog-fill" style="width: 65%"></div></div>
+                    <span class="cprog-pct">65%</span>
+                  </div>
+                </div>
+                <div class="course-card c2">
+                  <div class="icon">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#5A9E7B"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                    >
+                      <rect x="2" y="2" width="5" height="5" rx="1" />
+                      <rect x="9" y="2" width="5" height="5" rx="1" />
+                      <rect x="2" y="9" width="5" height="5" rx="1" />
+                      <rect x="9" y="9" width="5" height="5" rx="1" />
+                    </svg>
+                  </div>
+                  <div class="cname">Álgebra Lineal</div>
+                  <div class="ccode">MAT-202 · Prof. Luna</div>
+                  <div class="cprog">
+                    <div class="cprog-bar"><div class="cprog-fill" style="width: 80%"></div></div>
+                    <span class="cprog-pct">80%</span>
+                  </div>
+                </div>
+                <div class="course-card c3">
+                  <div class="icon">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#7762B6"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                    >
+                      <path d="M5 3h8v9H5z" />
+                      <path d="M3 5H1v9h8v-2" />
+                    </svg>
+                  </div>
+                  <div class="cname">Programación III</div>
+                  <div class="ccode">ING-301 · Prof. Ruíz</div>
+                  <div class="cprog">
+                    <div class="cprog-bar"><div class="cprog-fill" style="width: 50%"></div></div>
+                    <span class="cprog-pct">50%</span>
+                  </div>
+                </div>
+                <div class="course-card c4">
+                  <div class="icon">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="#C4765E"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                    >
+                      <circle cx="8" cy="8" r="5" />
+                      <path d="M8 5v3l2 2" />
+                    </svg>
+                  </div>
+                  <div class="cname">Física General</div>
+                  <div class="ccode">FIS-101 · Prof. Torres</div>
+                  <div class="cprog">
+                    <div class="cprog-bar"><div class="cprog-fill" style="width: 72%"></div></div>
+                    <span class="cprog-pct">72%</span>
+                  </div>
+                </div>
+                <div class="course-card c5" style="grid-column: span 2">
+                  <div style="display: flex; align-items: center; gap: 12px">
+                    <div class="icon">
+                      <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="#8A6E18"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                      >
+                        <path d="M2 4h12v8H2zM6 8h4" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="cname">Humanidades y Sociedad</div>
+                      <div class="ccode">HUM-110 · Prof. Medina</div>
+                    </div>
+                    <div style="margin-left: auto" class="cprog-pct" style="">88%</div>
+                  </div>
+                  <div class="cprog" style="margin-top: 10px">
+                    <div class="cprog-bar" style="flex: 1">
+                      <div class="cprog-fill" style="width: 88%"></div>
+                    </div>
+                    <span class="cprog-pct">88%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- bottom nav -->
+            <div class="bottom-nav">
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                </div>
+                <span class="ni-label">Inicio</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                <span class="ni-label">Horario</span>
+              </div>
+              <div class="nav-item active">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                </div>
+                <span class="ni-label">Materias</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
+                </div>
+                <span class="ni-label">Reportes</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span class="ni-label">Perfil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Screen 3: Profile ── -->
+      <div class="phone-wrap">
+        <span class="phone-label">Perfil</span>
+        <div class="phone">
+          <div class="screen" style="position: relative; background: var(--bg)">
+            <div class="status-bar" style="position: relative; z-index: 2; background: transparent">
+              <span class="time">9:41</span>
+              <div class="status-icons">
+                <svg viewBox="0 0 16 16">
+                  <path
+                    d="M2 11l3-3 2 2 4-4 3 3"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <svg viewBox="0 0 16 16">
+                  <rect x="1" y="5" width="12" height="7" rx="2" />
+                  <path d="M13 8h2" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- profile header -->
+            <div class="profile-header">
+              <div class="profile-avatar">SC</div>
+              <div class="profile-name">Sofía Castellanos</div>
+              <div class="profile-id">ID: 2023-0047 · Ingeniería de Sistemas</div>
+              <div class="profile-tags">
+                <span class="profile-tag">Semestre 4</span>
+                <span class="profile-tag">Jornada Diurna</span>
+                <span class="profile-tag">Activo</span>
+              </div>
+            </div>
+
+            <!-- profile stats -->
+            <div class="profile-stats">
+              <div class="prof-stat">
+                <div class="v">3.8</div>
+                <div class="l">Promedio</div>
+              </div>
+              <div class="prof-stat">
+                <div class="v">92%</div>
+                <div class="l">Asistencia</div>
+              </div>
+              <div class="prof-stat">
+                <div class="v">68</div>
+                <div class="l">Créditos</div>
+              </div>
+            </div>
+
+            <!-- menu items -->
+            <div class="menu-list">
+              <div class="menu-item">
+                <div class="menu-icon blue">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--blue-dim)"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span class="menu-label">Información personal</span>
+                <span class="menu-chevron">›</span>
+              </div>
+              <div class="menu-item">
+                <div class="menu-icon green">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#5A9E7B"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                </div>
+                <span class="menu-label">Historial académico</span>
+                <span class="menu-chevron">›</span>
+              </div>
+              <div class="menu-item">
+                <div class="menu-icon lav">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#7762B6"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M18 20V10M12 20V4M6 20v-6" />
+                  </svg>
+                </div>
+                <span class="menu-label">Notas y reportes</span>
+                <span class="menu-chevron">›</span>
+              </div>
+              <div class="menu-item">
+                <div class="menu-icon peach">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#C4765E"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                </div>
+                <span class="menu-label">Notificaciones</span>
+                <span class="menu-chevron">›</span>
+              </div>
+              <div class="menu-item" style="background: var(--peach-light)">
+                <div class="menu-icon" style="background: rgba(255, 255, 255, 0.6)">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#C4765E"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </div>
+                <span class="menu-label" style="color: #b05c42">Cerrar sesión</span>
+              </div>
+            </div>
+
+            <!-- bottom nav -->
+            <div class="bottom-nav">
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                </div>
+                <span class="ni-label">Inicio</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                <span class="ni-label">Horario</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                </div>
+                <span class="ni-label">Materias</span>
+              </div>
+              <div class="nav-item">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
+                </div>
+                <span class="ni-label">Reportes</span>
+              </div>
+              <div class="nav-item active">
+                <div class="ni-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
+                <span class="ni-label">Perfil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /showcase -->
+
+    <!-- ───────────────────────────────── COMPONENT SHOWCASE ───────────────────────────────── -->
+    <div class="comp-showcase">
+      <div class="comp-title">
+        <h2>
+          Design <em style="font-style: italic; color: var(--blue-dim)">Tokens</em> & Components
+        </h2>
+        <p>Atoms and building blocks of the SIRA design system</p>
+      </div>
+      <div class="comp-grid">
+        <!-- Palette -->
+        <div class="comp-card">
+          <h4>Color Palette</h4>
+          <div class="swatches-wrap">
+            <div class="palette">
+              <div class="swatch" style="background: #7ba7c4" data-name="Blue"></div>
+              <div class="swatch" style="background: #9fc4af" data-name="Green"></div>
+              <div class="swatch" style="background: #b8aedd" data-name="Lavender"></div>
+              <div class="swatch" style="background: #e8b09a" data-name="Peach"></div>
+              <div class="swatch" style="background: #edd98a" data-name="Yellow"></div>
+            </div>
+          </div>
+          <div class="palette" style="margin-top: 6px">
+            <div class="swatch" style="background: #d8e9f4" data-name=""></div>
+            <div class="swatch" style="background: #ddf0e6" data-name=""></div>
+            <div class="swatch" style="background: #eae5f7" data-name=""></div>
+            <div class="swatch" style="background: #faeae3" data-name=""></div>
+            <div class="swatch" style="background: #fdf5d6" data-name=""></div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="comp-card">
+          <h4>Buttons</h4>
+          <div class="btn-row">
+            <button class="btn btn-primary">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+              >
+                <circle cx="12" cy="7" r="4" />
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              </svg>
+              Iniciar sesión
+            </button>
+            <button class="btn btn-secondary">Ver horario completo</button>
+            <button class="btn btn-green">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Confirmar asistencia
+            </button>
+            <button class="btn btn-ghost">Cancelar</button>
+          </div>
+        </div>
+
+        <!-- Chips -->
+        <div class="comp-card">
+          <h4>Filter Chips</h4>
+          <div class="chip-row">
+            <div class="chip blue active">Todas</div>
+            <div class="chip green">Activas</div>
+            <div class="chip lav">Teoría</div>
+            <div class="chip peach">Lab</div>
+            <div class="chip yellow">Electiva</div>
+            <div class="chip blue">Semestre 4</div>
+            <div class="chip green active">En curso</div>
+          </div>
+        </div>
+
+        <!-- Status Badges -->
+        <div class="comp-card">
+          <h4>Status Badges</h4>
+          <div class="badge-row">
+            <span class="bdg blue"><span class="dot"></span>En curso</span>
+            <span class="bdg green"><span class="dot"></span>Aprobada</span>
+            <span class="bdg lav"><span class="dot"></span>Inscrita</span>
+            <span class="bdg peach"><span class="dot"></span>Pendiente</span>
+            <span class="bdg blue"><span class="dot"></span>Virtual</span>
+            <span class="bdg green"><span class="dot"></span>Presencial</span>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="comp-card">
+          <h4>Progress Indicators</h4>
+          <div class="prog-list">
+            <div class="prog-item">
+              <div class="prog-meta">
+                <span class="prog-label">Cálculo Diferencial</span><span class="prog-val">65%</span>
+              </div>
+              <div class="prog-track"><div class="prog-fill blue" style="width: 65%"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-meta">
+                <span class="prog-label">Álgebra Lineal</span><span class="prog-val">80%</span>
+              </div>
+              <div class="prog-track"><div class="prog-fill green" style="width: 80%"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-meta">
+                <span class="prog-label">Programación III</span><span class="prog-val">50%</span>
+              </div>
+              <div class="prog-track"><div class="prog-fill lav" style="width: 50%"></div></div>
+            </div>
+            <div class="prog-item">
+              <div class="prog-meta">
+                <span class="prog-label">Física General</span><span class="prog-val">72%</span>
+              </div>
+              <div class="prog-track"><div class="prog-fill peach" style="width: 72%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="comp-card">
+          <h4>Inputs</h4>
+          <input class="input-demo" type="text" placeholder="Buscar materia, docente..." />
+          <input
+            class="input-demo"
+            type="text"
+            placeholder="Código de materia (ej. MAT-201)"
+            style="margin-bottom: 10px"
+          />
+          <button class="btn btn-primary" style="width: 100%">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            Buscar
+          </button>
+        </div>
+
+        <!-- Week Calendar -->
+        <div class="comp-card" style="grid-column: span 2">
+          <h4>Weekly Calendar Strip</h4>
+          <div class="cal-strip">
+            <div class="cal-day">
+              <div class="dow">LUN</div>
+              <div class="num">10</div>
+              <div class="dot"></div>
+            </div>
+            <div class="cal-day has-event">
+              <div class="dow">MAR</div>
+              <div class="num">11</div>
+              <div class="dot"></div>
+            </div>
+            <div class="cal-day today">
+              <div class="dow">MIÉ</div>
+              <div class="num">12</div>
+              <div class="dot"></div>
+            </div>
+            <div class="cal-day has-event">
+              <div class="dow">JUE</div>
+              <div class="num">13</div>
+              <div class="dot"></div>
+            </div>
+            <div class="cal-day">
+              <div class="dow">VIE</div>
+              <div class="num">14</div>
+              <div class="dot"></div>
+            </div>
+            <div class="cal-day" style="opacity: 0.45">
+              <div class="dow">SÁB</div>
+              <div class="num">15</div>
+              <div class="dot"></div>
+            </div>
+            <div class="cal-day" style="opacity: 0.35">
+              <div class="dow">DOM</div>
+              <div class="num">16</div>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="comp-card" style="grid-column: span 2">
+          <h4>Notification Cards</h4>
+          <div class="notif-list">
+            <div class="notif-item">
+              <div class="notif-icon blue">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--blue-dim)"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+              <div class="notif-body">
+                <div class="title">Parcial de Cálculo — Viernes 14</div>
+                <div class="sub">Recuerda repasar temas 5 al 9 · hace 2 horas</div>
+              </div>
+              <div class="unread"></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon green">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#5A9E7B"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="notif-body">
+                <div class="title">Nota publicada — Álgebra Lineal</div>
+                <div class="sub">Parcial 2: 4.2 / 5.0 · ayer</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon peach">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#C4765E"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                >
+                  <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </div>
+              <div class="notif-body">
+                <div class="title">Clase cancelada — Física General</div>
+                <div class="sub">Lunes 10 · Prof. Torres · hace 3 días</div>
+              </div>
+              <div class="unread" style="background: var(--peach)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

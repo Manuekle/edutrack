@@ -1,29 +1,36 @@
 import type { NavLinkGroup } from '@/types/navigation';
 import {
-    BookMarked,
-    BookOpen,
-    Calendar,
-    GraduationCap,
-    Home,
-    Layout,
-    QrCode,
-    Settings,
-    TrendingUp,
-    User,
-    Users
+  BookMarked,
+  BookOpen,
+  BookText,
+  CalendarDays,
+  ClipboardList,
+  GraduationCap,
+  History,
+  Home,
+  Layout,
+  LayoutDashboard,
+  NotebookPen,
+  QrCode,
+  TrendingUp,
+  User,
+  Users,
 } from 'lucide-react';
-// Navigation configuration for the educational tracking tool
+
 export const navLinkGroups: NavLinkGroup[] = [
+  // ─────────────────────────────────────────
+  // Panel Principal (todos los roles)
+  // ─────────────────────────────────────────
   {
     title: 'Panel Principal',
     icon: Home,
     links: [
       {
         href: '/dashboard',
-        icon: Home,
+        icon: LayoutDashboard,
         label: 'Inicio',
         roles: ['ADMIN', 'DOCENTE', 'ESTUDIANTE'],
-        description: 'Vista general del sistema',
+        description: 'Métricas y estado general del sistema',
       },
       {
         href: '/dashboard/profile',
@@ -32,38 +39,114 @@ export const navLinkGroups: NavLinkGroup[] = [
         roles: ['ADMIN', 'DOCENTE', 'ESTUDIANTE'],
         description: 'Gestiona tu información personal',
       },
+      {
+        href: '/dashboard/admin/usuarios',
+        icon: Users,
+        label: 'Usuarios',
+        roles: ['ADMIN'],
+        description: 'Administrar usuarios del sistema',
+      },
     ],
   },
+
+  // ─────────────────────────────────────────
+  // MICROCURRÍCULO (Admin)
+  // ─────────────────────────────────────────
   {
-    title: 'Área Estudiantil',
-    roles: ['ESTUDIANTE'],
-    icon: GraduationCap,
+    title: 'Microcurrículo',
+    roles: ['ADMIN'],
+    icon: BookText,
     links: [
       {
-        href: '/dashboard/estudiante/asistencia',
-        icon: QrCode,
-        label: 'Asistencia',
-        roles: ['ESTUDIANTE'],
-        description: 'Escanear código QR para asistencia',
-      },
-      {
-        href: '/dashboard/estudiante/historial',
-        icon: TrendingUp,
-        label: 'Historial de Asistencias',
-        roles: ['ESTUDIANTE'],
-        description: 'Consulta tus asistencias',
-      },
-      {
-        href: '/dashboard/estudiante/escanear',
-        icon: QrCode,
-        label: 'Escanear',
-        roles: ['ESTUDIANTE'],
-        description: 'Escanear código QR para asistencia',
+        href: '/dashboard/admin/microcurriculo',
+        icon: BookText,
+        label: 'Microcurrículo',
+        roles: ['ADMIN'],
+        description: 'Cargar y gestionar el catálogo de asignaturas',
       },
     ],
   },
+
+  // ─────────────────────────────────────────
+  // PLANEADOR ACADÉMICO (Admin) — Orden: Inicio → 1 Horarios → 2 Grupos → 3 Asignación → 4 Planeación
+  // ─────────────────────────────────────────
   {
-    title: 'Área Docente',
+    title: 'Planeador académico',
+    roles: ['ADMIN'],
+    icon: CalendarDays,
+    links: [
+      {
+        href: '/dashboard/admin/planeador/horarios',
+        icon: CalendarDays,
+        label: 'Horarios',
+        roles: ['ADMIN'],
+        description: 'Definir franjas horarias (día, hora y periodicidad)',
+      },
+      {
+        href: '/dashboard/admin/planeador/grupos',
+        icon: Users,
+        label: 'Grupos',
+        roles: ['ADMIN'],
+        description: 'Crear grupos por asignatura y periodo académico',
+      },
+      {
+        href: '/dashboard/admin/planeador/asignacion',
+        icon: ClipboardList,
+        label: 'Asignación',
+        roles: ['ADMIN'],
+        description: 'Asignar sala, docentes y estudiantes a cada grupo',
+      },
+      {
+        href: '/dashboard/admin/planeador/planeacion',
+        icon: LayoutDashboard,
+        label: 'Planeación',
+        roles: ['ADMIN'],
+        description: 'Generar el calendario de 16 semanas para cada grupo',
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // SALAS Y RESERVAS (Admin)
+  // ─────────────────────────────────────────
+  {
+    title: 'Salas',
+    roles: ['ADMIN'],
+    icon: Layout,
+    links: [
+      {
+        href: '/dashboard/admin/salas',
+        icon: Layout,
+        label: 'Salas',
+        roles: ['ADMIN'],
+        description: 'Administrar salas y ver reservas en el calendario',
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // REPORTES (Admin)
+  // ─────────────────────────────────────────
+  {
+    title: 'Reportes',
+    roles: ['ADMIN'],
+    icon: TrendingUp,
+    links: [
+      {
+        href: '/dashboard/admin/reportes',
+        icon: TrendingUp,
+        label: 'Reportes',
+        roles: ['ADMIN'],
+        description: 'Ver reportes de avance por docente y asignatura',
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // PANEL DOCENTE
+  // ─────────────────────────────────────────
+  {
+    title: 'Panel Docente',
     roles: ['DOCENTE'],
     icon: BookOpen,
     links: [
@@ -72,113 +155,81 @@ export const navLinkGroups: NavLinkGroup[] = [
         icon: BookMarked,
         label: 'Mis Asignaturas',
         roles: ['DOCENTE'],
-        description: 'Gestiona tus asignaturas y estudiantes',
-        subLinks: [
-          {
-            href: '/dashboard/docente/asignaturas/[id]',
-            label: 'Mis Clases',
-            description: 'Gestiona tus clases y eventos.',
-            roles: ['DOCENTE'],
-            isSubLink: true,
-            parentHref: '/dashboard/docente/asignaturas/[id]',
-            icon: BookMarked,
-          },
-          {
-            href: '/dashboard/docente/asignaturas/[id]/clase/[classId]/asistencia',
-            label: 'Asistencia',
-            description: 'Gestiona la asistencia de tus estudiantes.',
-            roles: ['DOCENTE'],
-            isSubLink: true,
-            parentHref: '/dashboard/docente/asignaturas/[id]/clase/[classId]/asistencia',
-            icon: QrCode,
-          },
-        ],
+        description: 'Asignaturas asignadas por período académico',
       },
-
+      {
+        href: '/dashboard/docente/grupos',
+        icon: Users,
+        label: 'Mis Grupos',
+        roles: ['DOCENTE'],
+        description: 'Grupos activos — accede a la bitácora desde aquí',
+      },
+      {
+        href: '/dashboard/docente/horario',
+        icon: CalendarDays,
+        label: 'Mi Horario',
+        roles: ['DOCENTE'],
+        description: 'Vista semanal de clases programadas',
+      },
+      {
+        href: '/dashboard/docente/bitacora',
+        icon: NotebookPen,
+        label: 'Bitácora de Clases',
+        roles: ['DOCENTE'],
+        description: 'Registrar y consultar clases semana a semana',
+      },
       {
         href: '/dashboard/docente/reportes',
         icon: TrendingUp,
         label: 'Mis Reportes',
         roles: ['DOCENTE'],
-        description: 'Ver y generar reportes de asistencia',
-      },
-      {
-        href: '/dashboard/docente/agendar',
-        icon: Calendar,
-        label: 'Agendar Sala',
-        roles: ['DOCENTE'],
-        description: 'Solicitar reserva de una sala o auditorio',
+        description: 'Solicitar reportes y ver el historial de generados',
       },
     ],
   },
+
+  // ─────────────────────────────────────────
+  // ÁREA ESTUDIANTIL
+  // ─────────────────────────────────────────
   {
-    title: 'Administración',
-    roles: ['ADMIN'],
-    icon: Settings,
+    title: 'Área Estudiantil',
+    roles: ['ESTUDIANTE'],
+    icon: GraduationCap,
     links: [
       {
-        href: '/dashboard/admin/usuarios',
+        href: '/dashboard/estudiante/asignaturas',
+        icon: BookMarked,
+        label: 'Mis Asignaturas',
+        roles: ['ESTUDIANTE'],
+        description: 'Materias en las que estás matriculado',
+      },
+      {
+        href: '/dashboard/estudiante/mi-grupo',
         icon: Users,
-        label: 'Gestión de Usuarios',
-        roles: ['ADMIN'],
-        description: 'Administrar cuentas de usuario',
-        subLinks: [
-          {
-            href: '/dashboard/admin/docentes/cargar',
-            label: 'Cargar Docentes',
-            description: 'Cargar docentes desde archivo Excel',
-            roles: ['ADMIN'],
-            isSubLink: true,
-            parentHref: '/dashboard/admin/docentes/cargar',
-            icon: BookOpen,
-          },
-          {
-            href: '/dashboard/admin/estudiantes/cargar',
-            label: 'Cargar Estudiantes',
-            description: 'Cargar estudiantes desde archivo Excel',
-            roles: ['ADMIN'],
-            isSubLink: true,
-            parentHref: '/dashboard/admin/estudiantes/cargar',
-            icon: GraduationCap,
-          },
-        ],
-      },
-
-      {
-        href: '/dashboard/admin/asignaturas',
-        icon: BookOpen,
-        label: 'Gestión de Asignaturas',
-        roles: ['ADMIN'],
-        description: 'Ver y administrar asignaturas existentes',
+        label: 'Mi Grupo',
+        roles: ['ESTUDIANTE'],
+        description: 'Compañeros y docente de tus grupos',
       },
       {
-        href: '/dashboard/admin/grupos',
-        icon: Calendar,
-        label: 'Grupos y Horarios',
-        roles: ['ADMIN'],
-        description: 'Crear grupos y horarios de asignaturas',
-      },
-
-      {
-        href: '/dashboard/admin/matricula',
-        icon: GraduationCap,
-        label: 'Matrícula',
-        roles: ['ADMIN'],
-        description: 'Matricular estudiantes en grupos',
+        href: '/dashboard/estudiante/horario',
+        icon: CalendarDays,
+        label: 'Mi Horario',
+        roles: ['ESTUDIANTE'],
+        description: 'Vista semanal de tus clases',
       },
       {
-        href: '/dashboard/admin/salas',
-        icon: Layout,
-        label: 'Gestión de Salas',
-        roles: ['ADMIN'],
-        description: 'Administrar salas, salones y auditorios',
+        href: '/dashboard/estudiante/asistencia',
+        icon: QrCode,
+        label: 'Registrar Asistencia',
+        roles: ['ESTUDIANTE'],
+        description: 'Registra con QR o código manual',
       },
       {
-        href: '/dashboard/admin/reportes',
-        icon: TrendingUp,
-        label: 'Reportes Docentes',
-        roles: ['ADMIN'],
-        description: 'Reportes generales de asistencia y docentes',
+        href: '/dashboard/estudiante/historial',
+        icon: History,
+        label: 'Mi Historial',
+        roles: ['ESTUDIANTE'],
+        description: 'Consulta el registro de tus asistencias',
       },
     ],
   },

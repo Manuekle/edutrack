@@ -23,7 +23,8 @@ export default function DashboardError({
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error en el panel</AlertTitle>
         <AlertDescription>
-          {error.message || 'No se pudo cargar esta sección. Revisa tu conexión e inténtalo de nuevo.'}
+          {error.message ||
+            'No se pudo cargar esta sección. Revisa tu conexión e inténtalo de nuevo.'}
         </AlertDescription>
       </Alert>
       <div className="flex flex-wrap items-center justify-center gap-3">
