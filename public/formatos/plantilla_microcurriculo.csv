@@ -1,2 +1,2 @@
-codigo_asignatura,nombre_asignatura,programa,semestre,creditos,horas,temas
-718004,Electiva Profesional III,Ingenieria de Sistemas,VIII,3,4,Principios de seguridad;Introduccion a SGSI;Dimensiones de la seguridad;Seguridad pasiva y activa;Copias de seguridad;Planes de riesgo;Certificados y claves;VPN y monitoreo;Servidores web;Firewall;SIEM;IDS e IPS;Gestion de incidentes;Vulnerabilidades web;OWASP
+codigo_asignatura,nombre_asignatura,programa,semestre,horas
+718004,Electiva Profesional III,Ingenieria de Sistemas,VIII,4

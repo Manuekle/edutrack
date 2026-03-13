@@ -17,7 +17,6 @@ export async function GET() {
         code: true,
         program: true,
         semester: true,
-        periodoAcademico: true,
       },
       orderBy: { name: 'asc' },
     });
@@ -35,6 +34,43 @@ interface PreviewResult {
   horas: number;
   status: 'success' | 'error' | 'existing';
   message: string;
+}
+
+function parseSemester(val: string): number {
+  if (!val) return 1;
+  const trimmed = val.trim().toUpperCase();
+  if (!trimmed) return 1;
+  
+  // Handle numeric format (e.g., "5", "05", "5to", "5°")
+  const matchNum = trimmed.match(/^0*(\d+)/);
+  if (matchNum) {
+    return parseInt(matchNum[1], 10) || 1;
+  }
+  
+  // Extract potential Roman numeral letters from the start (e.g., "VIII", "V Semestre")
+  const matchRoman = trimmed.match(/^([IVXLCDM]+)/);
+  if (!matchRoman) return 1;
+  
+  const romanStr = matchRoman[1];
+  const romanMap: Record<string, number> = {
+    I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000
+  };
+  
+  let result = 0;
+  for (let i = 0; i < romanStr.length; i++) {
+    const current = romanMap[romanStr[i]];
+    if (!current) return 1; // Invalid Roman numeral
+    
+    const next = romanMap[romanStr[i + 1]];
+    if (next && current < next) {
+      result += next - current;
+      i++;
+    } else {
+      result += current;
+    }
+  }
+  
+  return result > 0 ? result : 1;
 }
 
 export async function POST(request: Request) {
@@ -205,7 +241,7 @@ export async function POST(request: Request) {
       const semestreStr = getValue(row, findHeader(headerMap.semestre)).trim();
       const horasStr = getValue(row, findHeader(headerMap.horas)).trim();
 
-      const semestre = parseInt(semestreStr) || 1;
+      const semestre = parseSemester(semestreStr);
       const horas = parseInt(horasStr) || 0;
 
       if (!codigo || !nombre) {

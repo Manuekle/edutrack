@@ -14,7 +14,14 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useEffect, useState, useMemo } from 'react';
 
 interface SubjectRow {
   id: string;
@@ -22,13 +29,13 @@ interface SubjectRow {
   code: string;
   program: string | null;
   semester: number | null;
-  periodoAcademico: string | null;
 }
 
 export default function MicrocurriculoPage() {
   const [subjects, setSubjects] = useState<SubjectRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [semesterFilter, setSemesterFilter] = useState('all');
 
   useEffect(() => {
     fetch('/api/admin/microcurriculo')
@@ -38,10 +45,18 @@ export default function MicrocurriculoPage() {
   }, []);
 
   const filtered = subjects.filter(
-    s =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.code.toLowerCase().includes(search.toLowerCase())
+    s => {
+      const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
+                            s.code.toLowerCase().includes(search.toLowerCase());
+      const matchesSemester = semesterFilter === 'all' || s.semester?.toString() === semesterFilter;
+      return matchesSearch && matchesSemester;
+    }
   );
+
+  const uniqueSemesters = useMemo(() => {
+    const sems = new Set(subjects.map(s => s.semester).filter((s): s is number => s !== null));
+    return Array.from(sems).sort((a, b) => a - b);
+  }, [subjects]);
 
   return (
     <div className="space-y-6">
@@ -117,6 +132,19 @@ export default function MicrocurriculoPage() {
                     className="pl-9"
                   />
                 </div>
+                <Select value={semesterFilter} onValueChange={setSemesterFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filtrar por semestre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos los semestres</SelectItem>
+                    {uniqueSemesters.map(sem => (
+                      <SelectItem key={sem} value={sem.toString()}>
+                        Semestre {sem}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -126,7 +154,6 @@ export default function MicrocurriculoPage() {
                     <TableHead>Asignatura</TableHead>
                     <TableHead>Código</TableHead>
                     <TableHead>Programa</TableHead>
-                    <TableHead>Periodo</TableHead>
                     <TableHead className="text-right">Semestre</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -143,7 +170,7 @@ export default function MicrocurriculoPage() {
                     ))
                   ) : filtered.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="py-10">
+                      <TableCell colSpan={4} className="py-10">
                         <div className="flex flex-col items-center justify-center text-center gap-2">
                           <p className="text-sm font-medium text-foreground">
                             {search
@@ -171,7 +198,6 @@ export default function MicrocurriculoPage() {
                         <TableCell className="text-sm text-muted-foreground">
                           {subject.program ?? '—'}
                         </TableCell>
-                        <TableCell>{subject.periodoAcademico ?? '—'}</TableCell>
                         <TableCell className="text-right">{subject.semester ?? '—'}</TableCell>
                       </TableRow>
                     ))
