@@ -19,25 +19,40 @@ export async function GET(request: Request) {
       { status: 400 }
     );
   }
-  // Verificar que el usuario autenticado es el propietario de la asignatura
-  const subject = await db.subject.findFirst({
+  // Verificar si el ID es de una Asignatura o un Grupo
+  let studentIds: string[] = [];
+  let subject = await db.subject.findFirst({
     where: { id: subjectId, teacherIds: { has: session.user.id } },
     select: { studentIds: true },
   });
-  if (!subject) {
-    return NextResponse.json(
-      {
-        message: 'Asignatura no encontrada o no pertenece al docente',
-        data: [],
-      },
-      { status: 404 }
-    );
+
+  if (subject) {
+    studentIds = subject.studentIds;
+  } else {
+    // Si no es asignatura, probar con Grupo
+    const grupo = await db.grupo.findFirst({
+      where: { id: subjectId, docenteIds: { has: session.user.id } },
+      select: { estudianteIds: true },
+    });
+
+    if (grupo) {
+      studentIds = grupo.estudianteIds;
+    } else {
+      return NextResponse.json(
+        {
+          message: 'Asignatura o Grupo no encontrado o no pertenece al docente',
+          data: [],
+        },
+        { status: 404 }
+      );
+    }
   }
+
   // Obtener los datos completos de los estudiantes matriculados
   const students = await db.user.findMany({
     where: {
       id: {
-        in: subject.studentIds,
+        in: studentIds,
       },
     },
     select: {

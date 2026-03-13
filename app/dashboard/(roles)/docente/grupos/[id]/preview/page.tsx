@@ -56,33 +56,52 @@ export default async function PreviewPage({ params }: PageProps) {
 
   const { id } = await params;
 
-  const subject = await db.subject.findUnique({
+  let subject = await db.subject.findUnique({
     where: { id },
     include: {
       teachers: {
-        select: {
-          id: true,
-          name: true,
-          signatureUrl: true,
-        },
+        select: { id: true, name: true, signatureUrl: true },
       },
-      classes: {
-        orderBy: { date: 'asc' },
-      },
+      classes: { orderBy: { date: 'asc' } },
     },
   });
+
+  if (!subject) {
+    // Probar si es un Grupo
+    const grupo = await db.grupo.findUnique({
+      where: { id },
+      include: {
+        subject: {
+          include: {
+            teachers: {
+              select: { id: true, name: true, signatureUrl: true },
+            },
+            classes: { orderBy: { date: 'asc' } },
+          },
+        },
+      },
+    });
+
+    if (grupo && grupo.subject) {
+      subject = grupo.subject;
+    }
+  }
 
   if (!subject) {
     return (
       <div className="p-6">
         <h1 className="sm:text-2xl text-xs font-semibold text-red-600 dark:text-red-400">
-          Asignatura no encontrada
+          Asignatura o Grupo no encontrado
         </h1>
       </div>
     );
   }
 
-  if (!subject.teacherIds.includes(session.user.id)) {
+  // Verificar autorización (en Subject o en Grupo)
+  const isAuthorized = subject.teacherIds.includes(session.user.id) || 
+                       await db.grupo.findFirst({ where: { id, docenteIds: { has: session.user.id } } });
+
+  if (!isAuthorized) {
     return (
       <div className="p-6">
         <h1 className="sm:text-2xl text-xs font-semibold text-red-600 dark:text-red-400">

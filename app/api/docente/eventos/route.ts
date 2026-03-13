@@ -40,7 +40,8 @@ export async function GET(request: Request) {
 
     const { subjectId, sortBy, sortOrder } = query.data;
 
-    const subject = await db.subject.findFirst({
+    let finalSubjectId = subjectId;
+    let subject = await db.subject.findFirst({
       where: {
         id: subjectId,
         teacherIds: { has: session.user.id },
@@ -48,14 +49,24 @@ export async function GET(request: Request) {
     });
 
     if (!subject) {
+      const grupo = await db.grupo.findFirst({
+        where: { id: subjectId, docenteIds: { has: session.user.id } },
+      });
+      if (grupo) {
+        finalSubjectId = grupo.subjectId;
+        subject = await db.subject.findUnique({ where: { id: finalSubjectId } });
+      }
+    }
+
+    if (!subject) {
       return NextResponse.json(
-        { message: 'Asignatura no encontrada o no tienes permiso' },
+        { message: 'Asignatura o Grupo no encontrado o no tienes permiso' },
         { status: 404 }
       );
     }
 
     const events = await db.subjectEvent.findMany({
-      where: { subjectId },
+      where: { subjectId: finalSubjectId },
       orderBy: { [sortBy]: sortOrder },
     });
 
@@ -88,8 +99,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verificar que el docente es el profesor de la asignatura
-    const subject = await db.subject.findFirst({
+    // Verificar que el docente es el profesor de la asignatura (probar por subjectId o grupoId)
+    let finalSubjectId = subjectId;
+    let subject = await db.subject.findFirst({
       where: {
         id: subjectId,
         teacherIds: { has: session.user.id },
@@ -97,9 +109,19 @@ export async function POST(request: Request) {
     });
 
     if (!subject) {
+      const grupo = await db.grupo.findFirst({
+        where: { id: subjectId, docenteIds: { has: session.user.id } },
+      });
+      if (grupo) {
+        finalSubjectId = grupo.subjectId;
+        subject = await db.subject.findUnique({ where: { id: finalSubjectId } });
+      }
+    }
+
+    if (!subject) {
       return NextResponse.json(
         {
-          error: 'Asignatura no encontrada o no tienes permiso para añadir eventos',
+          error: 'Asignatura o Grupo no encontrado o no tienes permiso para añadir eventos',
         },
         { status: 404 }
       );
@@ -115,13 +137,13 @@ export async function POST(request: Request) {
         description,
         date: eventDate,
         type,
-        subject: { connect: { id: subjectId } },
+        subject: { connect: { id: finalSubjectId } },
         createdBy: { connect: { id: session.user.id } },
       },
     });
 
     // CACHE: Invalidate cache for this subject (affects students and teacher)
-    await clearSubjectCache(subjectId);
+    await clearSubjectCache(finalSubjectId);
 
     return NextResponse.json(
       { data: newEvent, message: 'Evento creado correctamente' },

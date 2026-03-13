@@ -40,23 +40,44 @@ export async function GET(request: Request) {
       sortBy: clean(searchParams.get('sortBy')),
       sortOrder: clean(searchParams.get('sortOrder')),
     });
-    // Security check: Verify the teacher owns the subject
-    const subject = await db.subject.findFirst({
+    // Security check: Verify the teacher owns the subject or the group
+    let subjectIdRef = query.subjectId;
+    let grupoIdRef: string | undefined = undefined;
+
+    let subject = await db.subject.findFirst({
       where: {
         id: query.subjectId,
         teacherIds: { has: session.user.id },
       },
     });
+
+    if (!subject) {
+      // Si no es asignatura, probar con Grupo
+      const grupo = await db.grupo.findFirst({
+        where: {
+          id: query.subjectId,
+          docenteIds: { has: session.user.id },
+        },
+        include: { subject: true },
+      });
+
+      if (grupo && grupo.subject) {
+        subject = grupo.subject;
+        subjectIdRef = grupo.subject.id;
+        grupoIdRef = grupo.id;
+      }
+    }
+
     if (!subject) {
       return NextResponse.json(
-        { message: 'Asignatura no encontrada o no pertenece al docente' },
+        { message: 'Asignatura o Grupo no encontrado o no pertenece al docente' },
         { status: 404 }
       );
     }
     // Eventos: ordenamiento
     if (query.fetch === 'events') {
       const events = await db.subjectEvent.findMany({
-        where: { subjectId: query.subjectId },
+        where: { subjectId: subjectIdRef },
         orderBy: { date: query.sortOrder },
       });
       const validados = z.array(DocenteEventoSchema).safeParse(events);
@@ -73,9 +94,12 @@ export async function GET(request: Request) {
         data: validados.data,
       });
     }
-    // Clases: ordenamiento
+    // Clases: filtrado por grupo si es aplicable
     const classes = await db.class.findMany({
-      where: { subjectId: query.subjectId },
+      where: {
+        subjectId: subjectIdRef,
+        ...(grupoIdRef ? { grupoId: grupoIdRef } : {}),
+      },
       orderBy: [
         { date: 'asc' }, // Ordenar por fecha ascendente (más cercana primero)
         { startTime: 'asc' }, // Si hay varias clases el mismo día, ordenar por hora de inicio
@@ -210,12 +234,29 @@ export async function POST(request: Request) {
       );
     } else {
       const data = DocenteClaseCreateSchema.parse(body);
-      const subject = await db.subject.findFirst({
+      
+      let subjectIdToUse = data.subjectId;
+      let grupoIdToUse: string | null = null;
+
+      let subject = await db.subject.findFirst({
         where: { id: data.subjectId, teacherIds: { has: session.user.id } },
       });
+
+      if (!subject) {
+        const grupo = await db.grupo.findFirst({
+          where: { id: data.subjectId, docenteIds: { has: session.user.id } },
+        });
+        if (grupo) {
+          subjectIdToUse = grupo.subjectId;
+          grupoIdToUse = grupo.id;
+          // Volver a buscar subject por su ID real para metadatos
+          subject = await db.subject.findUnique({ where: { id: subjectIdToUse } });
+        }
+      }
+
       if (!subject) {
         return NextResponse.json(
-          { message: 'Asignatura no encontrada o no pertenece al docente' },
+          { message: 'Asignatura o Grupo no encontrado o no pertenece al docente' },
           { status: 404 }
         );
       }
@@ -292,7 +333,8 @@ export async function POST(request: Request) {
 
       const newClass = await db.class.create({
         data: {
-          subjectId: data.subjectId,
+          subjectId: subjectIdToUse,
+          grupoId: grupoIdToUse,
           date: data.date,
           startTime: data.startTime,
           endTime: data.endTime,

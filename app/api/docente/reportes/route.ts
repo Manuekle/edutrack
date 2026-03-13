@@ -62,28 +62,51 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { subjectId, format } = createReportSchema.parse(body);
 
-    // Verificar que la asignatura existe y pertenece al docente
-    const subject = await db.subject.findFirst({
+    // Verificar que la asignatura existe y pertenece al docente (probar por subjectId o grupoId)
+    let finalSubjectId = subjectId;
+    let subject = await db.subject.findFirst({
       where: {
         id: subjectId,
         teacherIds: { has: session.user.id },
       },
       include: {
         classes: {
-          select: {
-            date: true,
-          },
-          orderBy: {
-            date: 'desc',
-          },
+          select: { date: true },
+          orderBy: { date: 'desc' },
           take: 1,
         },
       },
     });
 
     if (!subject) {
+      // Probar si es un Grupo
+      const grupo = await db.grupo.findFirst({
+        where: {
+          id: subjectId,
+          docenteIds: { has: session.user.id },
+        },
+        include: {
+          subject: {
+            include: {
+              classes: {
+                select: { date: true },
+                orderBy: { date: 'desc' },
+                take: 1,
+              },
+            },
+          },
+        },
+      });
+
+      if (grupo && grupo.subject) {
+        subject = grupo.subject;
+        finalSubjectId = grupo.subject.id;
+      }
+    }
+
+    if (!subject) {
       return NextResponse.json(
-        { error: 'Asignatura no encontrada o no pertenece al docente' },
+        { error: 'Asignatura o Grupo no encontrado o no pertenece al docente' },
         { status: 404 }
       );
     }
@@ -135,7 +158,7 @@ export async function POST(request: Request) {
       });
 
       const { buffer: pdfBuffer, fileName } = await generateAttendanceReportPDF(
-        subjectId,
+        finalSubjectId,
         session.user.id,
         currentPeriod,
         currentYear
