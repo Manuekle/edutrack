@@ -49,7 +49,7 @@ function formatTimeString(timeString: string): string {
   return date.toLocaleTimeString('es-ES', {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true,
+    hour12: false,
   });
 }
 
@@ -181,7 +181,9 @@ export function ClassTableRow({
               disabled={!canTakeAttendance}
               className={cn(
                 'rounded-lg cursor-pointer text-[13px]',
-                !canTakeAttendance && 'opacity-50 cursor-not-allowed'
+                !canTakeAttendance
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:text-blue-400 dark:focus:bg-blue-500/10'
               )}
             >
               <Link
@@ -190,7 +192,13 @@ export function ClassTableRow({
                 onClick={e => !canTakeAttendance && e.preventDefault()}
                 aria-disabled={!canTakeAttendance}
               >
-                <UserCheck className="mr-2 h-4 w-4" aria-hidden="true" />
+                <UserCheck
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    !canTakeAttendance ? 'text-muted-foreground' : 'text-blue-500 dark:text-blue-400'
+                  )}
+                  aria-hidden="true"
+                />
                 <span>Asistencia</span>
               </Link>
             </DropdownMenuItem>
@@ -209,7 +217,7 @@ export function ClassTableRow({
               )}
               aria-disabled={!canCancel}
             >
-              <Ban className="mr-2 h-4 w-4" aria-hidden="true" />
+              <Ban className={cn("mr-2 h-4 w-4", !canCancel ? 'text-muted-foreground' : 'text-red-400 dark:text-red-400')} aria-hidden="true" />
               <span>Cancelar Clase</span>
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -220,11 +228,19 @@ export function ClassTableRow({
               }}
               className={cn(
                 'rounded-lg text-[13px] cursor-pointer',
-                !canMarkAsDone && 'opacity-50 cursor-not-allowed'
+                !canMarkAsDone
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'text-green-600 focus:text-green-600 focus:bg-green-50 dark:text-green-400 dark:focus:bg-green-500/10'
               )}
               aria-disabled={!canMarkAsDone}
             >
-              <Signature className="mr-2 h-4 w-4" aria-hidden="true" />
+              <Signature
+                className={cn(
+                  'mr-2 h-4 w-4',
+                  !canMarkAsDone ? 'text-muted-foreground' : 'text-green-500 dark:text-green-400'
+                )}
+                aria-hidden="true"
+              />
               <span>Firmar Clase</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

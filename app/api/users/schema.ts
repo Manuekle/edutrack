@@ -4,8 +4,8 @@ import { Role } from '@prisma/client';
 export const UserSchema = z.object({
   id: z.string(),
   name: z.string().nullable(),
-  correoInstitucional: z.string().email().nullable(),
-  correoPersonal: z.string().email().nullable().optional(),
+  institutionalEmail: z.string().email().nullable(),
+  personalEmail: z.string().email().nullable().optional(),
   role: z.nativeEnum(Role),
 });
 
@@ -15,7 +15,7 @@ export const UserSearchQuerySchema = z.object({
   search: z.string().min(1),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
-  sortBy: z.enum(['name', 'correoInstitucional', 'correoPersonal']).default('name'),
+  sortBy: z.enum(['name', 'institutionalEmail', 'personalEmail']).default('name'),
   sortOrder: z.enum(['asc', 'desc']).default('asc'),
 });
 
@@ -24,18 +24,18 @@ export type UserSearchQuery = z.infer<typeof UserSearchQuerySchema>;
 export const UserCreateSchema = z
   .object({
     name: z.string().min(1),
-    correoInstitucional: z.string().email(),
-    correoPersonal: z.string().email().optional(),
+    institutionalEmail: z.string().email(),
+    personalEmail: z.string().email().optional(),
     password: z.string().min(6),
     role: z.nativeEnum(Role),
     document: z.string().optional(),
-    telefono: z.string().optional(),
-    codigoEstudiantil: z.string().optional(),
-    codigoDocente: z.string().optional(),
+    phone: z.string().optional(),
+    studentCode: z.string().optional(),
+    teacherCode: z.string().optional(),
   })
-  .refine(data => data.correoInstitucional || data.correoPersonal, {
+  .refine(data => data.institutionalEmail || data.personalEmail, {
     message: 'Al menos un correo debe ser proporcionado',
-    path: ['correoInstitucional'],
+    path: ['institutionalEmail'],
   });
 
 export type UserCreate = z.infer<typeof UserCreateSchema>;
@@ -43,14 +43,14 @@ export type UserCreate = z.infer<typeof UserCreateSchema>;
 export const UserUpdateSchema = z.object({
   id: z.string().min(1),
   name: z.string().optional(),
-  correoInstitucional: z.string().email().optional(),
-  correoPersonal: z.string().email().optional().nullable(),
+  institutionalEmail: z.string().email().optional(),
+  personalEmail: z.string().email().optional().nullable(),
   password: z.string().min(6).optional(),
   role: z.nativeEnum(Role).optional(),
   document: z.string().optional().nullable(),
-  telefono: z.string().optional().nullable(),
-  codigoEstudiantil: z.string().optional().nullable(),
-  codigoDocente: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  studentCode: z.string().optional().nullable(),
+  teacherCode: z.string().optional().nullable(),
 });
 
 export type UserUpdate = z.infer<typeof UserUpdateSchema>;

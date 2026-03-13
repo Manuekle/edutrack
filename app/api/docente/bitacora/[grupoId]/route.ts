@@ -4,35 +4,39 @@ import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ grupoId: string }> }) {
-  const { grupoId } = await params;
+  const { grupoId: groupId } = await params;
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== 'DOCENTE') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    const grupo = await db.grupo.findUnique({
-      where: { id: grupoId },
+    const group = await db.group.findFirst({
+      where: {
+        id: groupId,
+        teacherIds: { has: session.user.id },
+      },
       include: {
         subject: { select: { name: true, code: true } },
-        horario: { select: { diaSemana: true, horaInicio: true, horaFin: true } },
-        sala: { select: { name: true } },
-        planeacion: {
+        schedule: { select: { dayOfWeek: true, startTime: true, endTime: true } },
+        room: { select: { name: true } },
+        teachers: { select: { name: true, institutionalEmail: true } },
+        planning: {
           include: {
-            semanas: {
+            weeks: {
               include: {
-                clases: {
-                  include: { bitacora: true },
+                classes: {
+                  include: { logbook: true },
                   orderBy: { date: 'asc' },
                 },
               },
-              orderBy: { numero: 'asc' },
+              orderBy: { number: 'asc' },
             },
           },
         },
       },
     });
-    if (!grupo) return NextResponse.json({ error: 'Grupo no encontrado' }, { status: 404 });
-    return NextResponse.json(grupo);
+    if (!group) return NextResponse.json({ error: 'Grupo no encontrado o no autorizado' }, { status: 404 });
+    return NextResponse.json(group);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

@@ -1,9 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
-import Link from 'next/link';
 
 import { ClassesTable } from '@/components/classes/classes-table';
 import { StudentsTable } from '@/components/students/students-table';
@@ -15,7 +15,8 @@ import { useSubjectDetail } from '@/hooks/use-subject-detail';
 import { toTableClass } from '@/lib/class-converters';
 import { classStatusMap } from '@/lib/class-utils';
 import * as dateUtils from '@/lib/time-utils';
-import { ArrowLeft, NotebookPen } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ArrowLeft, AlertCircle, Eye, NotebookPen } from 'lucide-react';
 
 export default function GrupoDetailPage() {
   const router = useRouter();
@@ -107,20 +108,19 @@ export default function GrupoDetailPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-        <div className="p-6 rounded-lg max-w-md w-full flex flex-col justify-center items-center bg-destructive border border-destructive">
-          <h2 className="sm:text-2xl text-xs text-white text-center font-semibold tracking-card pb-2">
-            No disponible
-          </h2>
-          <p className="text-white text-center mb-4 text-xs">{error}</p>
-          <Button
-            onClick={() => router.push('/dashboard/docente/grupos')}
-            variant="default"
-            className="w-full sm:w-auto"
-          >
-            Volver a la lista de grupos
-          </Button>
-        </div>
+      <div className="flex min-h-[50vh] flex-col items-center justify-center p-6 text-center">
+        <Alert variant="destructive" className="max-w-md rounded-2xl border-destructive/50">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>No disponible</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <Button
+          onClick={() => router.push('/dashboard/docente/grupos')}
+          variant="outline"
+          className="mt-6 rounded-xl"
+        >
+          Volver a la lista de grupos
+        </Button>
       </div>
     );
   }
@@ -158,8 +158,16 @@ export default function GrupoDetailPage() {
             className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
             onClick={() => router.push(`/dashboard/docente/bitacora/${grupoId}`)}
           >
-            <NotebookPen className="h-4 w-4" />
             Planear Temas y Bitácora
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium gap-2"
+            onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/preview`)}
+          >
+            <Eye className="h-4 w-4" />
+            Vista previa
           </Button>
 
           <Button

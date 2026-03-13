@@ -23,19 +23,19 @@ export async function PATCH(
       role,
       isActive,
       document,
-      telefono,
-      correoPersonal,
-      correoInstitucional,
-      codigoEstudiantil,
-      codigoDocente,
+      phone,
+      personalEmail,
+      institutionalEmail,
+      studentCode,
+      teacherCode,
     } = body;
 
     // Validar que al menos un correo esté presente solo si se envían campos de correo
-    const sendingEmails = 'correoPersonal' in body || 'correoInstitucional' in body;
+    const sendingEmails = 'personalEmail' in body || 'institutionalEmail' in body;
     if (
       sendingEmails &&
-      (body.correoPersonal === '' || body.correoPersonal == null) &&
-      (body.correoInstitucional === '' || body.correoInstitucional == null)
+      (body.personalEmail === '' || body.personalEmail == null) &&
+      (body.institutionalEmail === '' || body.institutionalEmail == null)
     ) {
       return NextResponse.json(
         { message: 'El usuario debe tener al menos un correo electrónico.' },
@@ -45,8 +45,8 @@ export async function PATCH(
 
     // Verificar unicidad de los correos si se proporcionan
     const orConditions = [];
-    if (correoPersonal) orConditions.push({ correoPersonal });
-    if (correoInstitucional) orConditions.push({ correoInstitucional });
+    if (personalEmail) orConditions.push({ personalEmail });
+    if (institutionalEmail) orConditions.push({ institutionalEmail });
 
     if (orConditions.length > 0) {
       const existingUser = await db.user.findFirst({
@@ -68,11 +68,11 @@ export async function PATCH(
     if (role !== undefined) updateData.role = role;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (document !== undefined) updateData.document = document;
-    if (telefono !== undefined) updateData.telefono = telefono;
-    if (correoPersonal !== undefined) updateData.correoPersonal = correoPersonal;
-    if (correoInstitucional !== undefined) updateData.correoInstitucional = correoInstitucional;
-    if (codigoEstudiantil !== undefined) updateData.codigoEstudiantil = codigoEstudiantil;
-    if (codigoDocente !== undefined) updateData.codigoDocente = codigoDocente;
+    if (phone !== undefined) updateData.phone = phone;
+    if (personalEmail !== undefined) updateData.personalEmail = personalEmail;
+    if (institutionalEmail !== undefined) updateData.institutionalEmail = institutionalEmail;
+    if (studentCode !== undefined) updateData.studentCode = studentCode;
+    if (teacherCode !== undefined) updateData.teacherCode = teacherCode;
 
     const updatedUser = await db.user.update({
       where: { id: userId },

@@ -15,8 +15,8 @@ interface ExcelRow {
 interface UserData {
   name: string;
   document: string;
-  correoPersonal: string;
-  correoInstitucional?: string;
+  personalEmail: string;
+  institutionalEmail?: string;
   password?: string;
   role: string;
 }
@@ -196,10 +196,10 @@ export async function POST(request: Request) {
       const previewResults: PreviewResult[] = [];
 
       const allUsers = await db.user.findMany({
-        select: { document: true, correoPersonal: true },
+        select: { document: true, personalEmail: true },
       });
       const existingDocuments = new Set(allUsers.map(u => u.document));
-      const existingEmails = new Set(allUsers.map(u => u.correoPersonal));
+      const existingEmails = new Set(allUsers.map(u => u.personalEmail));
 
       // Set para detectar duplicados en el mismo archivo
       const processedDocuments = new Set<string>();
@@ -276,8 +276,10 @@ export async function POST(request: Request) {
             normalizeHeader(h).includes('dni')
         );
 
-      const correoPersonalHeader =
+      const personalEmailHeader =
         findHeader([
+          'personal email',
+          'personalemail',
           'correo personal',
           'correopersonal',
           'correo',
@@ -289,8 +291,10 @@ export async function POST(request: Request) {
           h => normalizeHeader(h).includes('correo') || normalizeHeader(h).includes('email')
         );
 
-      const correoInstitucionalHeader =
+      const institutionalEmailHeader =
         findHeader([
+          'institutional email',
+          'institutionalemail',
           'correo institucional',
           'correoinstitucional',
           'correo institucion',
@@ -337,14 +341,18 @@ export async function POST(request: Request) {
             row.Document ||
             row.documento ||
             row.Documento,
-          correoPersonal:
-            (correoPersonalHeader ? row[correoPersonalHeader] : undefined) ||
+          personalEmail:
+            (personalEmailHeader ? row[personalEmailHeader] : undefined) ||
+            row.personalEmail ||
+            row['Personal Email'] ||
             row.correoPersonal ||
             row['Correo Personal'] ||
             row.correo ||
             row.Correo,
-          correoInstitucional:
-            (correoInstitucionalHeader ? row[correoInstitucionalHeader] : undefined) ||
+          institutionalEmail:
+            (institutionalEmailHeader ? row[institutionalEmailHeader] : undefined) ||
+            row.institutionalEmail ||
+            row['Institutional Email'] ||
             row.correoInstitucional ||
             row['Correo Institucional'] ||
             row['CorreoInstitucional'],
@@ -366,8 +374,8 @@ export async function POST(request: Request) {
         const userData: UserData = {
           name: (mappedRow.name as string)?.trim() || '',
           document: String(mappedRow.document || '').trim(),
-          correoPersonal: (mappedRow.correoPersonal as string)?.trim() || '',
-          correoInstitucional: (mappedRow.correoInstitucional as string)?.trim() || undefined,
+          personalEmail: (mappedRow.personalEmail as string)?.trim() || '',
+          institutionalEmail: (mappedRow.institutionalEmail as string)?.trim() || undefined,
           password: (mappedRow.password as string)?.trim() || '',
           role: ((mappedRow.role as string) || '').trim().toUpperCase(),
         };
@@ -412,7 +420,7 @@ export async function POST(request: Request) {
           });
           continue;
         }
-        if (!userData.correoPersonal || !userData.correoPersonal.trim()) {
+        if (!userData.personalEmail || !userData.personalEmail.trim()) {
           previewResults.push({
             data: userData,
             status: 'error',
@@ -420,7 +428,7 @@ export async function POST(request: Request) {
           });
           continue;
         }
-        if (!isValidEmail(userData.correoPersonal)) {
+        if (!isValidEmail(userData.personalEmail)) {
           previewResults.push({
             data: userData,
             status: 'error',
@@ -441,7 +449,7 @@ export async function POST(request: Request) {
         // Verificar duplicados en el archivo
         if (
           processedDocuments.has(userData.document) ||
-          processedEmails.has(userData.correoPersonal)
+          processedEmails.has(userData.personalEmail)
         ) {
           previewResults.push({
             data: userData,
@@ -454,7 +462,7 @@ export async function POST(request: Request) {
         // Verificar si existe en la base de datos
         if (
           existingDocuments.has(userData.document) ||
-          existingEmails.has(userData.correoPersonal)
+          existingEmails.has(userData.personalEmail)
         ) {
           previewResults.push({
             data: userData,
@@ -466,7 +474,7 @@ export async function POST(request: Request) {
 
         // Agregar a los sets de procesados
         processedDocuments.add(userData.document);
-        processedEmails.add(userData.correoPersonal);
+        processedEmails.add(userData.personalEmail);
 
         // Si pasa todas las validaciones
         previewResults.push({
@@ -519,28 +527,28 @@ export async function POST(request: Request) {
 
     // Extraer datos únicos para verificación masiva
     const uniqueDocuments = [...new Set(validUsers.map(u => u.data?.document).filter(Boolean))];
-    const uniqueEmails = [...new Set(validUsers.map(u => u.data?.correoPersonal).filter(Boolean))];
+    const uniqueEmails = [...new Set(validUsers.map(u => u.data?.personalEmail).filter(Boolean))];
 
     // Verificación masiva de usuarios existentes
     const existingUsers = await db.user.findMany({
       where: {
-        OR: [{ document: { in: uniqueDocuments } }, { correoPersonal: { in: uniqueEmails } }],
+        OR: [{ document: { in: uniqueDocuments } }, { personalEmail: { in: uniqueEmails } }],
       },
-      select: { document: true, correoPersonal: true, correoInstitucional: true },
+      select: { document: true, personalEmail: true, institutionalEmail: true },
     });
 
     const existingDocs = new Set(existingUsers.map(u => u.document));
     const existingEmailsSet = new Set([
-      ...existingUsers.map(u => u.correoPersonal),
-      ...existingUsers.map(u => u.correoInstitucional).filter(Boolean),
+      ...existingUsers.map(u => u.personalEmail),
+      ...existingUsers.map(u => u.institutionalEmail).filter(Boolean),
     ]);
 
     // Preparar usuarios válidos para creación masiva
     const usersToCreate: Array<{
       name: string;
       document: string;
-      correoPersonal: string;
-      correoInstitucional: string;
+      personalEmail: string;
+      institutionalEmail: string;
       password: string;
       role: Role;
       emailVerified: Date;
@@ -550,7 +558,7 @@ export async function POST(request: Request) {
 
     // Validar y preparar cada usuario
     for (const item of validUsers) {
-      const { name, document, correoPersonal, correoInstitucional, role } = item.data || {};
+      const { name, document, personalEmail, institutionalEmail, role } = item.data || {};
 
       // Validar rol
       if (!validRoles.includes(role as Role)) {
@@ -566,12 +574,12 @@ export async function POST(request: Request) {
       // Verificar si ya existe
       if (
         existingDocs.has(document) ||
-        existingEmailsSet.has(correoPersonal) ||
-        (correoInstitucional && existingEmailsSet.has(correoInstitucional))
+        existingEmailsSet.has(personalEmail) ||
+        (institutionalEmail && existingEmailsSet.has(institutionalEmail))
       ) {
         let conflictField = 'registro';
         if (existingDocs.has(document)) conflictField = 'documento';
-        else if (existingEmailsSet.has(correoPersonal)) conflictField = 'correo personal';
+        else if (existingEmailsSet.has(personalEmail)) conflictField = 'correo personal';
         else conflictField = 'correo institucional';
 
         finalResults.push({
@@ -591,21 +599,21 @@ export async function POST(request: Request) {
       usersToCreate.push({
         name,
         document,
-        correoPersonal,
-        correoInstitucional: correoInstitucional || correoPersonal,
+        personalEmail,
+        institutionalEmail: institutionalEmail || personalEmail,
         password: hashedPassword,
         role: role as Role,
         emailVerified: new Date(),
       });
 
       // Agregar a colas
-      const emailToSend = correoInstitucional || correoPersonal;
+      const emailToSend = institutionalEmail || personalEmail;
       emailQueue.push({ email: emailToSend, name, password: plainPassword });
 
       // Marcar como existente para evitar duplicados en el mismo batch
       existingDocs.add(document);
-      existingEmailsSet.add(correoPersonal);
-      if (correoInstitucional) existingEmailsSet.add(correoInstitucional);
+      existingEmailsSet.add(personalEmail);
+      if (institutionalEmail) existingEmailsSet.add(institutionalEmail);
     }
 
     // Creación masiva usando transacción
@@ -622,7 +630,7 @@ export async function POST(request: Request) {
             // Verificar si ya existe dentro de la transacción
             const existing = await tx.user.findFirst({
               where: {
-                OR: [{ document: user.document }, { correoPersonal: user.correoPersonal }],
+                OR: [{ document: user.document }, { personalEmail: user.personalEmail }],
               },
               select: { document: true },
             });

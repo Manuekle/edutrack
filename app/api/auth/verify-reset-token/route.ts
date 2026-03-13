@@ -32,8 +32,8 @@ export async function GET(request: Request) {
       {
         valid: true,
         message: 'Token válido',
-        correoInstitucional: user.correoInstitucional || user.correoPersonal || '', // Devolver el correo institucional o personal
-        correoPersonal: user.correoPersonal,
+        institutionalEmail: user.institutionalEmail || user.personalEmail || '', // Devolver el correo institucional o personal
+        personalEmail: user.personalEmail,
       },
       { status: 200 }
     );

@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 
     // Security check: Verify the teacher owns the subject or the group
     let subjectIdRef = query.subjectId;
-    let grupoIdRef: string | undefined = undefined;
+    let groupIdRef: string | undefined = undefined;
 
     let subject = await db.subject.findFirst({
       where: {
@@ -51,18 +51,18 @@ export async function GET(request: Request) {
 
     if (!subject) {
       // Si no es asignatura, probar con Grupo
-      const grupo = await db.grupo.findFirst({
+      const group = await db.group.findFirst({
         where: {
           id: query.subjectId,
-          docenteIds: { has: session.user.id },
+          teacherIds: { has: session.user.id },
         },
         include: { subject: true },
       });
 
-      if (grupo && grupo.subject) {
-        subject = grupo.subject;
-        subjectIdRef = grupo.subject.id;
-        grupoIdRef = grupo.id;
+      if (group && group.subject) {
+        subject = group.subject;
+        subjectIdRef = group.subject.id;
+        groupIdRef = group.id;
       }
     }
 
@@ -74,10 +74,20 @@ export async function GET(request: Request) {
     }
 
     // Clases: filtrado por grupo si es aplicable
+    // Usamos el filtro de semana -> planeacion para evitar duplicados huérfanos
     const classes = await db.class.findMany({
       where: {
-        subjectId: subjectIdRef,
-        ...(grupoIdRef ? { grupoId: grupoIdRef } : {}),
+        ...(groupIdRef 
+          ? { 
+              groupId: groupIdRef,
+              week: {
+                planning: {
+                  groupId: groupIdRef
+                }
+              }
+            } 
+          : { subjectId: subjectIdRef }
+        ),
       },
       orderBy: [
         { date: 'asc' }, 
@@ -85,6 +95,7 @@ export async function GET(request: Request) {
       ],
       include: {
         subject: { select: { name: true, code: true } },
+        group: { include: { schedule: true } }, // Include group schedule
       },
     });
     const now = new Date();
@@ -98,16 +109,43 @@ export async function GET(request: Request) {
         classesToUpdate.push(cls.id);
       }
 
+      // Fallback logic for uninitialized times (midnight UTC)
+      let finalStartTime = cls.startTime;
+      let finalEndTime = cls.endTime;
+
+      // Check if startTime is exactly at midnight UTC
+      const isStartTimeMidnight = cls.startTime && 
+        cls.startTime.getUTCHours() === 0 && 
+        cls.startTime.getUTCMinutes() === 0;
+      
+      const isEndTimeMidnight = cls.endTime && 
+        cls.endTime.getUTCHours() === 0 && 
+        cls.endTime.getUTCMinutes() === 0;
+
+      if ((!finalStartTime || isStartTimeMidnight) && cls.group?.schedule?.startTime) {
+        const fallback = new Date(cls.date);
+        const [h, m] = cls.group.schedule.startTime.split(':').map(Number);
+        fallback.setUTCHours(h, m, 0, 0);
+        finalStartTime = fallback;
+      }
+
+      if ((!finalEndTime || isEndTimeMidnight) && cls.group?.schedule?.endTime) {
+        const fallback = new Date(cls.date);
+        const [h, m] = cls.group.schedule.endTime.split(':').map(Number);
+        fallback.setUTCHours(h, m, 0, 0);
+        finalEndTime = fallback;
+      }
+
       return {
         id: cls.id,
         subjectId: cls.subjectId,
         date: cls.date,
-        startTime: cls.startTime,
-        endTime: cls.endTime,
+        startTime: finalStartTime,
+        endTime: finalEndTime,
         topic: cls.topic,
         description: cls.description,
         classroom: cls.classroom,
-        status: (isPast && !cls.status ? 'REALIZADA' : cls.status) || 'PROGRAMADA',
+        status: (isPast && !cls.status ? 'COMPLETED' : cls.status) || 'SCHEDULED',
         cancellationReason: cls.cancellationReason,
         totalStudents: cls.totalStudents,
         presentCount: cls.presentCount,
@@ -124,7 +162,7 @@ export async function GET(request: Request) {
     if (classesToUpdate.length > 0) {
       await db.class.updateMany({
         where: { id: { in: classesToUpdate } },
-        data: { status: 'REALIZADA' },
+        data: { status: 'COMPLETED' as any },
       });
     }
 
@@ -158,19 +196,19 @@ export async function POST(request: Request) {
     const data = DocenteClaseCreateSchema.parse(body);
 
     let subjectIdToUse = data.subjectId;
-    let grupoIdToUse: string | null = null;
+    let groupIdToUse: string | null = null;
 
     let subject = await db.subject.findFirst({
       where: { id: data.subjectId, teacherIds: { has: session.user.id } },
     });
 
     if (!subject) {
-      const grupo = await db.grupo.findFirst({
-        where: { id: data.subjectId, docenteIds: { has: session.user.id } },
+      const group = await db.group.findFirst({
+        where: { id: data.subjectId, teacherIds: { has: session.user.id } },
       });
-      if (grupo) {
-        subjectIdToUse = grupo.subjectId;
-        grupoIdToUse = grupo.id;
+      if (group) {
+        subjectIdToUse = group.subjectId;
+        groupIdToUse = group.id;
         subject = await db.subject.findUnique({ where: { id: subjectIdToUse } });
       }
     }
@@ -191,7 +229,7 @@ export async function POST(request: Request) {
     const existingClasses = await db.class.findMany({
       where: {
         date: { gte: dayStart, lte: dayEnd },
-        status: 'PROGRAMADA',
+        status: 'SCHEDULED' as any,
         OR: [
           { startTime: { lte: data.startTime }, endTime: { gt: data.startTime } },
           { startTime: { lt: data.endTime }, endTime: { gte: data.endTime } },
@@ -228,7 +266,7 @@ export async function POST(request: Request) {
     const newClass = await db.class.create({
       data: {
         subjectId: subjectIdToUse,
-        grupoId: grupoIdToUse,
+        groupId: groupIdToUse,
         date: data.date,
         startTime: data.startTime,
         endTime: data.endTime,

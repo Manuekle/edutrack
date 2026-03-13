@@ -108,8 +108,7 @@ export async function POST(request: Request) {
       });
     }
     // 5. Buscar la clase asociada al token QR
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const classRecord = await (db as any).class.findFirst({
+    const classRecord = await db.class.findFirst({
       where: {
         qrToken: qrToken,
         qrTokenExpiresAt: { gt: new Date() },
@@ -120,9 +119,8 @@ export async function POST(request: Request) {
     }
 
     // 5b. Buscar el grupo y la asignatura para obtener los IDs de los estudiantes
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const group = await (db as any).subjectGroup.findUnique({
-      where: { id: classRecord.groupId },
+    const group = await db.group.findUnique({
+      where: { id: classRecord.groupId! },
       include: {
         subject: { select: { id: true, name: true } },
       },
@@ -172,8 +170,8 @@ export async function POST(request: Request) {
       data: {
         classId: classRecord.id,
         studentId: session.user.id,
-        status: 'PRESENTE',
-        recordedAt: new Date(),
+        status: 'PRESENT' as any,
+        createdAt: new Date(),
       },
     });
 
@@ -185,7 +183,7 @@ export async function POST(request: Request) {
     const attendanceResponse = {
       id: newAttendance.id,
       status: newAttendance.status,
-      recordedAt: newAttendance.recordedAt,
+      createdAt: newAttendance.createdAt,
       subject: subject.name,
       class: classRecord.topic || classRecord.date.toISOString().split('T')[0],
     };

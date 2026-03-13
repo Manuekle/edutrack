@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const EstudianteHistorialItemSchema = z.object({
   id: z.string(),
   status: z.string(),
-  recordedAt: z.coerce.date(),
+  createdAt: z.coerce.date(),
   class: z.object({
     id: z.string(),
     topic: z.string().nullable(),

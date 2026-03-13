@@ -17,8 +17,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const { name, code, program, semester, credits, directHours, teacherId } = body;
 
     // Verificar que la asignatura existe
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const existingSubject = await (db as any).subject.findUnique({
+    const existingSubject = await db.subject.findUnique({
       where: { id },
     });
 
@@ -28,9 +27,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     // Si se está actualizando el código, verificar que no exista
     if (code && code !== existingSubject.code) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const subjectWithCode = await (db as any).subject.findUnique({
-        where: { code },
+      const subjectWithCode = await db.subject.findUnique({
+        where: { code_group: { code, group: existingSubject.group || '' } },
       });
 
       if (subjectWithCode && subjectWithCode.id !== id) {
@@ -69,16 +67,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       ...(directHours !== undefined && { directHours: directHours ? parseInt(directHours) : null }),
       // Group fields
       ...(body.group !== undefined && { group: body.group }),
-      ...(body.jornada !== undefined && { jornada: body.jornada }),
-      ...(body.periodoAcademico !== undefined && { periodoAcademico: body.periodoAcademico }),
+      ...(body.shift !== undefined && { shift: body.shift }),
+      ...(body.academicPeriod !== undefined && { academicPeriod: body.academicPeriod }),
       // Un solo docente por asignatura
       ...(teacherId !== undefined && {
         teacherIds: teacherId ? [teacherId] : [],
       }),
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatedSubject = await (db as any).subject.update({
+    const updatedSubject = await db.subject.update({
       where: { id },
       data: updateData,
       include: {
@@ -86,8 +83,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           select: {
             id: true,
             name: true,
-            correoInstitucional: true,
-            codigoDocente: true,
+            institutionalEmail: true,
+            teacherCode: true,
           },
         },
       },
@@ -140,11 +137,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     // Eliminar primero las clases asociadas
     await db.class.deleteMany({
-      where: { subjectId: id },
-    });
-
-    // Eliminar los contenidos/temas
-    await db.subjectContent.deleteMany({
       where: { subjectId: id },
     });
 

@@ -12,26 +12,26 @@ async function main() {
   // Orden respetando relaciones: hijos primero
   await prisma.attendance.deleteMany();
   console.log('   ✓ Attendance');
-  await prisma.enrollment.deleteMany();
-  console.log('   ✓ Enrollment');
-  await prisma.groupAssignment.deleteMany();
-  console.log('   ✓ GroupAssignment');
+  await prisma.logbook.deleteMany();
+  console.log('   ✓ Logbook');
   await prisma.class.deleteMany();
   console.log('   ✓ Class');
-  await prisma.subjectEvent.deleteMany();
-  console.log('   ✓ SubjectEvent');
+  await prisma.academicWeek.deleteMany();
+  console.log('   ✓ AcademicWeek');
+  await prisma.planning.deleteMany();
+  console.log('   ✓ Planning');
+  await prisma.group.deleteMany();
+  console.log('   ✓ Group');
+  await prisma.schedule.deleteMany();
+  console.log('   ✓ Schedule');
   await prisma.report.deleteMany();
   console.log('   ✓ Report');
-  await prisma.unenrollRequest.deleteMany();
-  console.log('   ✓ UnenrollRequest');
-  await prisma.subjectContent.deleteMany();
-  console.log('   ✓ SubjectContent');
   await prisma.subject.deleteMany();
   console.log('   ✓ Subject');
-  await prisma.roomBooking.deleteMany();
-  console.log('   ✓ RoomBooking');
   await prisma.room.deleteMany();
   console.log('   ✓ Room');
+  await prisma.academicPeriod.deleteMany();
+  console.log('   ✓ AcademicPeriod');
 
   // Eliminar todos los usuarios que NO son admin
   const deleted = await prisma.user.deleteMany({
@@ -41,11 +41,11 @@ async function main() {
 
   const admins = await prisma.user.findMany({
     where: { role: Role.ADMIN },
-    select: { id: true, name: true, correoInstitucional: true, correoPersonal: true },
+    select: { id: true, name: true, institutionalEmail: true, personalEmail: true },
   });
   console.log('👤 Usuarios admin restantes:', admins.length);
   admins.forEach(u =>
-    console.log('   -', u.name ?? u.correoInstitucional ?? u.correoPersonal ?? u.id)
+    console.log('   -', u.name ?? u.institutionalEmail ?? u.personalEmail ?? u.id)
   );
   console.log('\n✅ Base de datos resetada. Solo quedan usuarios con rol ADMIN.');
 }

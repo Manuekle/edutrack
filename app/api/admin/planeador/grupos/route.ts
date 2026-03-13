@@ -11,27 +11,33 @@ export async function GET(req: NextRequest) {
     }
     const includePlaneacion = req.nextUrl.searchParams.get('includePlaneacion') === 'true';
 
-    const grupos = await db.grupo.findMany({
+    const groups = await db.group.findMany({
       include: {
         subject: { select: { id: true, name: true, code: true } },
-        docentes: { select: { id: true, name: true } },
-        horario: {
+        teachers: { select: { id: true, name: true } },
+        schedule: {
           select: {
             id: true,
-            diaSemana: true,
-            horaInicio: true,
-            horaFin: true,
-            sala: { select: { id: true, name: true } },
+            dayOfWeek: true,
+            startTime: true,
+            endTime: true,
+            room: { select: { id: true, name: true } },
           },
         },
-        sala: { select: { id: true, name: true } },
-        _count: { select: { estudiantes: true } },
+        room: { select: { id: true, name: true } },
+        _count: { select: { students: true } },
         ...(includePlaneacion
           ? {
-              planeacion: {
+              planning: {
                 include: {
-                  semanas: {
-                    select: { id: true, numero: true, fechaInicio: true, fechaFin: true },
+                  weeks: {
+                    select: {
+                      id: true,
+                      number: true,
+                      startDate: true,
+                      endDate: true,
+                      classes: { select: { id: true, status: true } },
+                    },
                   },
                 },
               },
@@ -40,7 +46,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json({ grupos });
+    return NextResponse.json({ grupos: groups });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
@@ -53,17 +59,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const body = await req.json();
-    const grupo = await db.grupo.create({
+    const group = await db.group.create({
       data: {
-        codigo: body.codigo,
+        code: body.codigo,
         subjectId: body.subjectId,
-        periodoAcademico: body.periodoAcademico,
-        docenteIds: body.docenteIds ?? [],
-        horarioId: body.horarioId ?? null,
-        salaId: body.salaId ?? null,
+        academicPeriod: body.periodoAcademico,
+        teacherIds: body.docenteIds ?? [],
+        scheduleId: body.horarioId ?? null,
+        roomId: body.salaId ?? null,
       },
     });
-    return NextResponse.json(grupo);
+    return NextResponse.json(group);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

@@ -80,10 +80,10 @@ export async function POST(request: Request) {
 
     if (!subject) {
       // Probar si es un Grupo
-      const grupo = await db.grupo.findFirst({
+      const group = await db.group.findFirst({
         where: {
           id: subjectId,
-          docenteIds: { has: session.user.id },
+          teacherIds: { has: session.user.id },
         },
         include: {
           subject: {
@@ -98,9 +98,9 @@ export async function POST(request: Request) {
         },
       });
 
-      if (grupo && grupo.subject) {
-        subject = grupo.subject;
-        finalSubjectId = grupo.subject.id;
+      if (group && group.subject) {
+        subject = group.subject;
+        finalSubjectId = group.subject.id;
       }
     }
 
@@ -126,21 +126,21 @@ export async function POST(request: Request) {
       },
     });
 
-    if (existingReport && existingReport.status !== 'FALLIDO') {
+    if (existingReport && existingReport.status !== 'FAILED') {
       return NextResponse.json(
         { error: 'Ya se ha generado un reporte para este período' },
         { status: 400 }
       );
     }
 
-    // Crear el reporte en estado PENDIENTE
+    // Crear el reporte en estado PENDING
     let newReport;
     try {
       newReport = await db.report.create({
         data: {
           subjectId,
           requestedById: session.user.id,
-          status: 'PENDIENTE',
+          status: 'PENDING',
           format,
           period: currentPeriod,
           year: currentYear,
@@ -151,10 +151,10 @@ export async function POST(request: Request) {
     }
 
     try {
-      // Actualizar estado a EN_PROCESO
+      // Actualizar estado a PROCESSING
       await db.report.update({
         where: { id: newReport.id },
-        data: { status: 'EN_PROCESO' },
+        data: { status: 'PROCESSING' },
       });
 
       const { buffer: pdfBuffer, fileName } = await generateAttendanceReportPDF(
@@ -173,7 +173,7 @@ export async function POST(request: Request) {
       const completedReport = await db.report.update({
         where: { id: newReport.id },
         data: {
-          status: 'COMPLETADO',
+          status: 'COMPLETED',
           fileUrl: blob.url,
           fileName: fileName,
         },
@@ -189,12 +189,12 @@ export async function POST(request: Request) {
 
       return NextResponse.json(completedReport, { status: 201 });
     } catch (pdfError) {
-      // Actualizar estado del reporte a FALLIDO
+      // Actualizar estado del reporte a FAILED
       try {
         await db.report.update({
           where: { id: newReport.id },
           data: {
-            status: 'FALLIDO',
+            status: 'FAILED',
             error: pdfError instanceof Error ? pdfError.message : 'Error desconocido',
           },
         });

@@ -89,7 +89,14 @@ export function getTodayWithoutTime(): Date {
  * @returns Date object in local timezone
  */
 export function createLocalDate(dateString: string): Date {
-  const [year, month, day] = dateString.split('-').map(Number);
+  if (!dateString) return new Date();
+  // Safe extraction of YYYY-MM-DD even if it's a full ISO string
+  const cleanDate = dateString.split('T')[0];
+  const [year, month, day] = cleanDate.split('-').map(Number);
+  
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+    return new Date();
+  }
   return new Date(year, month - 1, day);
 }
 
@@ -113,6 +120,8 @@ export function isSameDay(date1: Date, date2: Date): boolean {
  * @returns Formatted date string (e.g., "27 octubre del 2025")
  */
 export function formatDisplayDate(date: Date): string {
+  if (!date || isNaN(date.getTime())) return 'Fecha no definida';
+  
   const day = date.getDate();
   const monthNames = [
     'enero',

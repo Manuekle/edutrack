@@ -1,10 +1,11 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays, Clock, Layout } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CalendarEvent, CustomCalendar } from '@/components/calendar/custom-calendar';
+import { Card, CardContent } from '@/components/ui/card';
+import { LoadingPage } from '@/components/ui/loading';
+import { addDays, addMonths, setHours, setMinutes, startOfWeek, subDays, subMonths } from 'date-fns';
+import { CalendarDays } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface HorarioClase {
   grupoId: string;
@@ -18,20 +19,21 @@ interface HorarioClase {
   periodoAcademico: string;
 }
 
-const DIAS_ORDER = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
-const DIA_LABELS: Record<string, string> = {
-  LUNES: 'Lunes',
-  MARTES: 'Martes',
-  MIERCOLES: 'Miércoles',
-  JUEVES: 'Jueves',
-  VIERNES: 'Viernes',
-  SABADO: 'Sábado',
-  DOMINGO: 'Domingo',
+const DIA_MAP: Record<string, number> = {
+  LUNES: 1,
+  MARTES: 2,
+  MIERCOLES: 3,
+  JUEVES: 4,
+  VIERNES: 5,
+  SABADO: 6,
+  DOMINGO: 0,
 };
 
 export default function MiHorarioPage() {
   const [horarios, setHorarios] = useState<HorarioClase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentView, setCurrentView] = useState<string>('week');
 
   useEffect(() => {
     fetch('/api/docente/horario')
@@ -40,87 +42,86 @@ export default function MiHorarioPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const horariosPorDia = DIAS_ORDER.reduce(
-    (acc, dia) => {
-      const clasesDelDia = horarios.filter(h => h.diaSemana === dia);
-      if (clasesDelDia.length > 0) acc[dia] = clasesDelDia;
-      return acc;
-    },
-    {} as Record<string, HorarioClase[]>
-  );
+  const calendarEvents = useMemo(() => {
+    const monday = startOfWeek(currentDate, { weekStartsOn: 1 });
+    const events: CalendarEvent[] = [];
 
-  const diasConClases = DIAS_ORDER.filter(d => horariosPorDia[d]);
+    horarios.forEach((h, idx) => {
+      const dayOffset = (DIA_MAP[h.diaSemana] || 1) - 1; // 0 for Monday
+      const eventDate = addDays(monday, dayOffset);
+
+      const [startH, startM] = h.horaInicio.split(':').map(Number);
+      const [endH, endM] = h.horaFin.split(':').map(Number);
+
+      const start = setMinutes(setHours(eventDate, startH), startM);
+      const end = setMinutes(setHours(eventDate, endH), endM);
+
+      events.push({
+        id: `${h.grupoId}-${idx}`,
+        title: h.subjectName,
+        subject: h.subjectName,
+        start,
+        end,
+        room: h.salaName || 'Aula por asignar',
+        reason: `${h.grupoCodigo}`,
+        type: 'CLASE',
+      });
+    });
+
+    return events;
+  }, [horarios, currentDate]);
+
+  const handleNavigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+    if (action === 'TODAY') {
+      setCurrentDate(new Date());
+    } else if (action === 'PREV') {
+      if (currentView === 'month') setCurrentDate(subMonths(currentDate, 1));
+      else if (currentView === 'week') setCurrentDate(subDays(currentDate, 7));
+      else setCurrentDate(subDays(currentDate, 1));
+    } else if (action === 'NEXT') {
+      if (currentView === 'month') setCurrentDate(addMonths(currentDate, 1));
+      else if (currentView === 'week') setCurrentDate(addDays(currentDate, 7));
+      else setCurrentDate(addDays(currentDate, 1));
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold flex items-center gap-2">
-          <CalendarDays className="h-6 w-6 text-primary" />
-          Mi Horario
-        </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Vista semanal de tu programación de clases.
-        </p>
+    <div className="space-y-8 pb-20">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-card text-foreground">
+            Mi Horario
+          </h1>
+          <p className="text-muted-foreground text-sm max-w-md">
+            Consulta tu programación académica semanal y aulas asignadas.
+          </p>
+        </div>
       </div>
 
       {loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-24" />
-          ))}
-        </div>
-      ) : diasConClases.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <CalendarDays className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No hay clases programadas para este período.</p>
+        <LoadingPage />
+      ) : horarios.length === 0 ? (
+        <Card className="border shadow-none rounded-3xl overflow-hidden bg-muted/20">
+          <CardContent className="py-24 text-center flex flex-col items-center justify-center">
+            <div className="bg-background p-6 rounded-full shadow-lg mb-6 ring-1 ring-border/50">
+              <CalendarDays className="h-12 w-12 text-primary/40" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground">Sin programación disponible</h3>
+            <p className="text-muted-foreground mt-2 max-w-xs">
+              No se han encontrado clases registradas para este periodo académico en tu perfil docente.
+            </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
-          {diasConClases.map(dia => (
-            <Card key={dia}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-card">
-                  {DIA_LABELS[dia]}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {(horariosPorDia[dia] ?? [])
-                    .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
-                    .map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-4 p-3 rounded-lg border bg-card hover:bg-accent/30 transition-colors"
-                      >
-                        <div className="flex items-center gap-1.5 text-sm font-medium w-32 shrink-0">
-                          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                          {h.horaInicio} – {h.horaFin}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{h.subjectName}</p>
-                          <code className="text-xs text-muted-foreground">{h.subjectCode}</code>
-                        </div>
-                        <Badge variant="outline" className="font-mono shrink-0">
-                          {h.grupoCodigo}
-                        </Badge>
-                        {h.salaName && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                            <Layout className="h-3 w-3" />
-                            {h.salaName}
-                          </div>
-                        )}
-                        <Badge variant="secondary" className="text-xs shrink-0">
-                          {h.periodoAcademico}
-                        </Badge>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <CustomCalendar
+          date={currentDate}
+          view={currentView}
+          events={calendarEvents}
+          onNavigate={handleNavigate}
+          onView={setCurrentView}
+          label="Horario Académico"
+        />
       )}
     </div>
   );

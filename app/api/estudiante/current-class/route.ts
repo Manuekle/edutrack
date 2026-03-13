@@ -17,7 +17,7 @@ export async function GET() {
     // Find the current class for the student
     const currentClass = await prisma.class.findFirst({
       where: {
-        status: 'PROGRAMADA',
+        status: 'SCHEDULED' as any,
         subject: {
           studentIds: {
             has: session.user.id,
@@ -89,19 +89,19 @@ export async function GET() {
     const stats = {
       present:
         attendanceStats.find(
-          (s: { status: string; _count: { status: number } }) => s.status === 'PRESENTE'
+          (s: { status: string; _count: { status: number } }) => s.status === 'PRESENT'
         )?._count.status || 0,
       absent:
         attendanceStats.find(
-          (s: { status: string; _count: { status: number } }) => s.status === 'AUSENTE'
+          (s: { status: string; _count: { status: number } }) => s.status === 'ABSENT'
         )?._count.status || 0,
       late:
         attendanceStats.find(
-          (s: { status: string; _count: { status: number } }) => s.status === 'TARDANZA'
+          (s: { status: string; _count: { status: number } }) => s.status === 'LATE'
         )?._count.status || 0,
       justified:
         attendanceStats.find(
-          (s: { status: string; _count: { status: number } }) => s.status === 'JUSTIFICADO'
+          (s: { status: string; _count: { status: number } }) => s.status === 'JUSTIFIED'
         )?._count.status || 0,
     };
 
@@ -113,8 +113,8 @@ export async function GET() {
 
     const response = {
       id: currentClass.id,
-      subjectName: currentClass.subject.name,
-      teacherName: currentClass.subject.teachers[0]?.name || 'Sin docente',
+      subjectName: (currentClass as any).subject.name,
+      teacherName: (currentClass as any).subject.teachers[0]?.name || 'Sin docente',
       topic: currentClass.topic || 'Clase en curso',
       date: currentClass.date,
       startTime: currentClass.startTime,
@@ -122,7 +122,7 @@ export async function GET() {
       qrToken: currentClass.qrToken,
       attendanceStats: stats,
       totalStudents: subject?.studentIds.length || 0,
-      myStatus: currentClass.attendances[0]?.status || 'AUSENTE',
+      myStatus: (currentClass as any).attendances[0]?.status || 'ABSENT',
       classroom: currentClass.classroom,
     };
 

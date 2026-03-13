@@ -9,32 +9,32 @@ export async function GET() {
     if (!session || session.user?.role !== 'ESTUDIANTE') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    const grupos = await db.grupo.findMany({
-      where: { estudianteIds: { has: session.user.id }, horarioId: { not: null } },
+    const groups = await db.group.findMany({
+      where: { studentIds: { has: session.user.id }, scheduleId: { not: null } },
       include: {
         subject: { select: { name: true, code: true } },
-        horario: true,
-        sala: { select: { name: true } },
-        docentes: { select: { name: true } },
+        schedule: true,
+        room: { select: { name: true } },
+        teachers: { select: { name: true } },
       },
     });
 
-    const horarios = grupos
-      .filter(g => g.horario)
+    const schedules = groups
+      .filter(g => g.schedule)
       .map(g => ({
-        grupoId: g.id,
-        grupoCodigo: g.codigo,
+        groupId: g.id,
+        groupCode: g.code,
         subjectName: g.subject.name,
         subjectCode: g.subject.code,
-        diaSemana: g.horario!.diaSemana,
-        horaInicio: g.horario!.horaInicio,
-        horaFin: g.horario!.horaFin,
-        salaName: g.sala?.name ?? null,
-        docenteName: g.docentes[0]?.name ?? null,
-        periodoAcademico: g.periodoAcademico,
+        dayOfWeek: g.schedule!.dayOfWeek,
+        startTime: g.schedule!.startTime,
+        endTime: g.schedule!.endTime,
+        roomName: g.room?.name ?? null,
+        teacherName: g.teachers[0]?.name ?? null,
+        academicPeriod: g.academicPeriod,
       }));
 
-    return NextResponse.json({ horarios });
+    return NextResponse.json({ schedules });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

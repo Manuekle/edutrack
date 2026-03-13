@@ -9,17 +9,17 @@ export async function GET() {
     if (!session || session.user?.role !== 'DOCENTE') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    const grupos = await db.grupo.findMany({
-      where: { docenteIds: { has: session.user.id } },
+    const groups = await db.group.findMany({
+      where: { teacherIds: { has: session.user.id } },
       include: {
         subject: { select: { id: true, name: true, code: true, credits: true } },
-        horario: { select: { diaSemana: true, horaInicio: true, horaFin: true } },
-        sala: { select: { name: true, type: true } },
-        planeacion: { select: { id: true, semanas: { select: { numero: true } } } },
+        schedule: { select: { dayOfWeek: true, startTime: true, endTime: true } },
+        room: { select: { name: true, type: true } },
+        planning: { select: { id: true, weeks: { select: { number: true } } } },
       },
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json({ grupos });
+    return NextResponse.json({ groups });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

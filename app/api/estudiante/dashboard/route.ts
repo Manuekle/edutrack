@@ -1,7 +1,7 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { redis } from '@/lib/redis';
-import { ClassStatus, EventType } from '@prisma/client';
+import { ClassStatus } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
@@ -27,21 +27,6 @@ type CardsResponse = {
   globalAttendancePercentage: number;
   subjectsAtRisk: number;
   weeklyAttendanceAverage: number;
-};
-
-type EventResponse = {
-  id: string;
-  title: string;
-  code: string;
-  type: EventType;
-  date: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  teacher: string;
-  subjectName: string;
-  description: string;
-  isEvent: boolean;
 };
 
 export async function GET() {
@@ -102,7 +87,7 @@ export async function GET() {
         subjectId: {
           in: subjectIds,
         },
-        status: 'PROGRAMADA',
+        status: 'SCHEDULED' as any,
       },
       select: {
         id: true,
@@ -124,7 +109,7 @@ export async function GET() {
           subjectId: {
             in: subjectIds,
           },
-          status: { not: ClassStatus.CANCELADA },
+          status: { not: 'CANCELLED' as any },
         },
       },
       select: {
@@ -151,7 +136,7 @@ export async function GET() {
           gte: fourWeeksAgo,
           lte: now,
         },
-        status: 'PROGRAMADA',
+        status: 'SCHEDULED' as any,
       },
       select: {
         id: true,
@@ -171,7 +156,7 @@ export async function GET() {
             gte: fourWeeksAgo,
             lte: now,
           },
-          status: 'PROGRAMADA',
+          status: 'SCHEDULED' as any,
         },
       },
       select: {
@@ -186,7 +171,7 @@ export async function GET() {
           in: subjectIds,
         },
         date: { gte: now },
-        status: { not: ClassStatus.CANCELADA },
+        status: { not: 'CANCELLED' as any },
       },
       select: {
         id: true,
@@ -208,7 +193,7 @@ export async function GET() {
 
     const attendancesBySubject = new Map<string, typeof allAttendances>();
     allAttendances.forEach(att => {
-      const subjectId = att.class.subjectId;
+      const subjectId = (att as any).class.subjectId;
       if (!attendancesBySubject.has(subjectId)) {
         attendancesBySubject.set(subjectId, []);
       }
@@ -247,7 +232,7 @@ export async function GET() {
 
       // Count attended classes (PRESENTE + TARDANZA) from attendance records
       const attendedClasses = subjectAttendances.filter(
-        att => att.status === 'PRESENTE' || att.status === 'TARDANZA'
+        att => (att.status as string) === 'PRESENT' || (att.status as string) === 'LATE'
       ).length;
 
       // Calcular porcentaje de asistencia
@@ -309,85 +294,6 @@ export async function GET() {
     weeklyAttendedClasses = weeklyAttendedCount;
     weeklyTotalClasses = weeklyClasses.length;
 
-    // Process events
-    // Obtener todos los eventos de las asignaturas del estudiante y filtrar en memoria
-    // Esto evita problemas de zona horaria al comparar fechas
-    const upcomingEvents: EventResponse[] = [];
-
-    // Solo buscar eventos si el estudiante tiene asignaturas
-    if (subjectIds.length > 0) {
-      // Obtener todos los eventos de las asignaturas del estudiante
-      const allEvents = await db.subjectEvent.findMany({
-        where: {
-          subjectId: {
-            in: subjectIds,
-          },
-        },
-        include: {
-          subject: {
-            select: {
-              id: true,
-              name: true,
-              code: true,
-              teachers: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          date: 'asc',
-        },
-      });
-
-      // Normalizar la fecha actual al inicio del día para comparar
-      const startOfToday = new Date(now);
-      startOfToday.setHours(0, 0, 0, 0);
-
-      // Filtrar eventos en memoria para incluir solo eventos de hoy en adelante
-      for (const event of allEvents) {
-        const eventDate = new Date(event.date);
-        // Normalizar la fecha del evento al inicio del día para comparar
-        const eventDateNormalized = new Date(eventDate);
-        eventDateNormalized.setHours(0, 0, 0, 0);
-
-        // Solo incluir eventos que sean de hoy o futuros (comparando fechas normalizadas)
-        if (eventDateNormalized.getTime() >= startOfToday.getTime()) {
-          // Get date in YYYY-MM-DD format using local time
-          const year = eventDate.getFullYear();
-          const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-          const day = String(eventDate.getDate()).padStart(2, '0');
-          const dateStr = `${year}-${month}-${day}`;
-
-          // Events are stored normalized to midnight, so startTime is 00:00
-          const startTime = '00:00';
-          const endTime = '23:59';
-
-          upcomingEvents.push({
-            id: event.id,
-            title: event.title || 'Evento sin título',
-            code: event.subject.code,
-            type: event.type,
-            date: dateStr,
-            startTime,
-            endTime,
-            location: 'No especificada',
-            teacher: event.subject.teachers[0]?.name || 'Docente no asignado',
-            subjectName: event.subject.name,
-            description: event.description || 'Sin descripción',
-            isEvent: true,
-          });
-        }
-      }
-
-      // Limitar a 50 eventos después del filtrado
-      if (upcomingEvents.length > 50) {
-        upcomingEvents.splice(50);
-      }
-    }
-
     // Calculate global attendance percentage
     const globalAttendancePercentage =
       globalTotalClasses > 0 ? Math.round((globalAttendedClasses / globalTotalClasses) * 100) : 0;
@@ -408,7 +314,7 @@ export async function GET() {
     const response = {
       cards,
       subjects: processedSubjects,
-      upcomingItems: upcomingEvents,
+      upcomingItems: [],
     };
 
     // CACHE: Store in cache for 5 minutes (300 seconds)

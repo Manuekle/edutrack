@@ -28,7 +28,7 @@ export async function GET() {
           },
         },
       },
-      orderBy: { recordedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
     const validated = EstudianteHistorialArraySchema.safeParse(attendances);
     if (!validated.success) {

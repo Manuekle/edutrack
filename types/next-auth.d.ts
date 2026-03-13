@@ -7,12 +7,12 @@ declare module 'next-auth' {
     user: {
       id: string;
       role: Role;
-      correoPersonal?: string | null;
-      correoInstitucional?: string | null;
+      personalEmail?: string | null;
+      institutionalEmail?: string | null;
       signatureUrl?: string | null;
-      codigoDocente?: string | null;
-      codigoEstudiantil?: string | null;
-      telefono?: string | null;
+      teacherCode?: string | null;
+      studentCode?: string | null;
+      phone?: string | null;
       document?: string | null;
       isActive: boolean;
     } & DefaultSession['user'];
@@ -23,12 +23,12 @@ declare module 'next-auth' {
     id: string;
     name: string | null;
     role: Role;
-    correoPersonal?: string | null;
-    correoInstitucional?: string | null;
+    personalEmail?: string | null;
+    institutionalEmail?: string | null;
     signatureUrl?: string | null;
-    codigoDocente?: string | null;
-    codigoEstudiantil?: string | null;
-    telefono?: string | null;
+    teacherCode?: string | null;
+    studentCode?: string | null;
+    phone?: string | null;
     document?: string | null;
     isActive: boolean;
   }
@@ -38,12 +38,12 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
     role: Role;
-    correoPersonal?: string | null;
-    correoInstitucional?: string | null;
+    personalEmail?: string | null;
+    institutionalEmail?: string | null;
     signatureUrl?: string | null;
-    codigoDocente?: string | null;
-    codigoEstudiantil?: string | null;
-    telefono?: string | null;
+    teacherCode?: string | null;
+    studentCode?: string | null;
+    phone?: string | null;
     document?: string | null;
     isActive: boolean;
     accessToken?: string;

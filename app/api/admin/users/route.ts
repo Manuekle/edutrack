@@ -39,8 +39,8 @@ export async function GET(req: NextRequest) {
     if (search) {
       whereClause.OR = [
         { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
-        { correoPersonal: { contains: search, mode: Prisma.QueryMode.insensitive } },
-        { correoInstitucional: { contains: search, mode: Prisma.QueryMode.insensitive } },
+        { personalEmail: { contains: search, mode: Prisma.QueryMode.insensitive } },
+        { institutionalEmail: { contains: search, mode: Prisma.QueryMode.insensitive } },
         { document: { contains: search, mode: Prisma.QueryMode.insensitive } },
       ];
     }
@@ -52,15 +52,15 @@ export async function GET(req: NextRequest) {
         select: {
           id: true,
           name: true,
-          correoPersonal: true,
-          correoInstitucional: true,
+          personalEmail: true,
+          institutionalEmail: true,
           role: true,
           isActive: true,
           createdAt: true,
           document: true,
-          telefono: true,
-          codigoEstudiantil: true,
-          codigoDocente: true,
+          phone: true,
+          studentCode: true,
+          teacherCode: true,
         },
         orderBy: {
           createdAt: 'desc',
@@ -103,11 +103,11 @@ export async function POST(req: NextRequest) {
       password,
       role,
       document,
-      telefono,
-      correoPersonal,
-      correoInstitucional,
-      codigoEstudiantil,
-      codigoDocente,
+      phone,
+      personalEmail,
+      institutionalEmail,
+      studentCode,
+      teacherCode,
     } = body;
 
     if (!name || !password || !role) {
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!correoPersonal && !correoInstitucional) {
+    if (!personalEmail && !institutionalEmail) {
       return NextResponse.json(
         {
           message:
@@ -129,8 +129,8 @@ export async function POST(req: NextRequest) {
 
     // Verificar unicidad de los correos
     const orConditions = [];
-    if (correoPersonal) orConditions.push({ correoPersonal });
-    if (correoInstitucional) orConditions.push({ correoInstitucional });
+    if (personalEmail) orConditions.push({ personalEmail });
+    if (institutionalEmail) orConditions.push({ institutionalEmail });
 
     if (orConditions.length > 0) {
       const existingUser = await db.user.findFirst({
@@ -153,11 +153,11 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role,
         document,
-        telefono,
-        correoPersonal,
-        correoInstitucional,
-        codigoEstudiantil,
-        codigoDocente,
+        phone,
+        personalEmail,
+        institutionalEmail,
+        studentCode,
+        teacherCode,
         isActive: true,
       },
     });

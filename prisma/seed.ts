@@ -1,12 +1,14 @@
 import {
-  BookingStatus,
+  AttendanceStatus,
   ClassStatus,
-  EnrollmentStatus,
-  EventType,
+  DayOfWeek,
   Jornada,
   PrismaClient,
+  ReportFormat,
+  ReportStatus,
   Role,
   RoomType,
+  Subject,
 } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
@@ -106,17 +108,17 @@ async function main() {
   console.log('🗑️  Deep cleaning database...');
 
   await prisma.attendance.deleteMany();
-  await prisma.enrollment.deleteMany();
-  await prisma.groupAssignment.deleteMany();
+  await prisma.logbook.deleteMany();
   await prisma.class.deleteMany();
-  await prisma.subjectEvent.deleteMany();
+  await prisma.academicWeek.deleteMany();
+  await prisma.planning.deleteMany();
+  await prisma.group.deleteMany();
+  await prisma.schedule.deleteMany();
   await prisma.report.deleteMany();
-  await prisma.unenrollRequest.deleteMany();
-  await prisma.subjectContent.deleteMany();
   await prisma.subject.deleteMany();
-  await prisma.roomBooking.deleteMany();
   await prisma.room.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.academicPeriod.deleteMany();
 
   console.log('👤 Creating specialized users...');
   const commonPassword = await hashPassword('password123');
@@ -125,8 +127,8 @@ async function main() {
     data: {
       name: 'Jorge Admin',
       document: '1000',
-      correoInstitucional: 'admin@fup.edu.co',
-      correoPersonal: 'jorge.admin@test.com',
+      institutionalEmail: 'admin@fup.edu.co',
+      personalEmail: 'jorge.admin@test.com',
       password: commonPassword,
       role: Role.ADMIN,
       isActive: true,
@@ -137,10 +139,10 @@ async function main() {
     data: {
       name: 'Patricia Coordinadora',
       document: '1500',
-      correoInstitucional: 'coordinacion@fup.edu.co',
-      correoPersonal: 'patricia@test.com',
+      institutionalEmail: 'coordinacion@fup.edu.co',
+      personalEmail: 'patricia@test.com',
       password: commonPassword,
-      role: Role.COORDINADOR,
+      role: Role.ADMIN, // Assuming COORDINADOR was merged or ADMIN is fine for now
       isActive: true,
     },
   });
@@ -149,8 +151,8 @@ async function main() {
     data: {
       name: 'Luis Alfonso Vejarano Sanchez',
       document: 'DOC001',
-      correoInstitucional: 'luis.vejarano@docente.fup.edu.co',
-      correoPersonal: 'luis.vejarano@test.com',
+      institutionalEmail: 'luis.vejarano@docente.fup.edu.co',
+      personalEmail: 'luis.vejarano@test.com',
       password: commonPassword,
       role: Role.DOCENTE,
       isActive: true,
@@ -162,8 +164,8 @@ async function main() {
     data: {
       name: 'Daniela Iboth Gutierrez Idrobo',
       document: 'DOC002',
-      correoInstitucional: 'daniela.gutierrez@docente.fup.edu.co',
-      correoPersonal: 'daniela.gutierrez@test.com',
+      institutionalEmail: 'daniela.gutierrez@docente.fup.edu.co',
+      personalEmail: 'daniela.gutierrez@test.com',
       password: commonPassword,
       role: Role.DOCENTE,
       isActive: true,
@@ -174,12 +176,12 @@ async function main() {
     data: {
       name: 'Manuel Esteban Erazo Medina',
       document: '3001',
-      correoInstitucional: 'manuel.erazo@estudiante.fup.edu.co',
-      correoPersonal: 'manuel.erazo@test.com',
+      institutionalEmail: 'manuel.erazo@estudiante.fup.edu.co',
+      personalEmail: 'manuel.erazo@test.com',
       password: commonPassword,
       role: Role.ESTUDIANTE,
       isActive: true,
-      codigoEstudiantil: 'COD-ME-001',
+      studentCode: 'COD-ME-001',
     },
   });
 
@@ -187,31 +189,31 @@ async function main() {
     data: {
       name: 'Andres Mauricio Peña Guasca',
       document: '3002',
-      correoInstitucional: 'andres.pena@estudiante.fup.edu.co',
-      correoPersonal: 'andres.pena@test.com',
+      institutionalEmail: 'andres.pena@estudiante.fup.edu.co',
+      personalEmail: 'andres.pena@test.com',
       password: commonPassword,
       role: Role.ESTUDIANTE,
       isActive: true,
-      codigoEstudiantil: 'COD-AP-002',
+      studentCode: 'COD-AP-002',
     },
   });
   console.log('🏫 Creating institutional spaces (SJ & SC)...');
   const roomData: { name: string; type: RoomType; capacity: number }[] = [
-    { name: 'Sala 101 SJ', type: RoomType.SALA_COMPUTO, capacity: 25 },
-    { name: 'Sala 102 SJ', type: RoomType.SALA_COMPUTO, capacity: 25 },
-    { name: 'Salón 201 SJ', type: RoomType.SALON, capacity: 40 },
-    { name: 'Salón 202 SJ', type: RoomType.SALON, capacity: 35 },
+    { name: 'Sala 101 SJ', type: RoomType.LABORATORIO, capacity: 25 },
+    { name: 'Sala 102 SJ', type: RoomType.LABORATORIO, capacity: 25 },
+    { name: 'Salón 201 SJ', type: RoomType.SALA_CLASE, capacity: 40 },
+    { name: 'Salón 202 SJ', type: RoomType.SALA_CLASE, capacity: 35 },
     { name: 'Auditorio Principal SJ', type: RoomType.AUDITORIO, capacity: 120 },
-    { name: 'Sala 101 SC', type: RoomType.SALA_COMPUTO, capacity: 20 },
-    { name: 'Sala 102 SC', type: RoomType.SALA_COMPUTO, capacity: 20 },
-    { name: 'Salón 301 SC', type: RoomType.SALON, capacity: 30 },
-    { name: 'Salón 302 SC', type: RoomType.SALON, capacity: 30 },
+    { name: 'Sala 101 SC', type: RoomType.LABORATORIO, capacity: 20 },
+    { name: 'Sala 102 SC', type: RoomType.LABORATORIO, capacity: 20 },
+    { name: 'Salón 301 SC', type: RoomType.SALA_CLASE, capacity: 30 },
+    { name: 'Salón 302 SC', type: RoomType.SALA_CLASE, capacity: 30 },
     { name: 'Auditorio San Camilo SC', type: RoomType.AUDITORIO, capacity: 80 },
   ];
   const rooms = await Promise.all(roomData.map(r => prisma.room.create({ data: r })));
 
-  console.log('📚 Creating 46 subjects with 16+ topics each...');
-  const createdSubjectIds: string[] = [];
+  console.log('📚 Creating 46 subjects...');
+  const createdSubjects: Subject[] = [];
   for (const a of ASIGNATURAS) {
     const subject = await prisma.subject.create({
       data: {
@@ -220,111 +222,96 @@ async function main() {
         group: null,
         credits: a.credits,
         directHours: 4,
-        periodoAcademico: periodoToStr(a.periodo),
+        academicPeriod: periodoToStr(a.periodo),
         teacherIds: [],
         studentIds: [],
       },
     });
-    createdSubjectIds.push(subject.id);
-    const temas = generarTemas(a.name, 16);
-    await prisma.subjectContent.createMany({
-      data: temas.map(t => ({
-        subjectId: subject.id,
-        type: 'TEMA',
-        title: t.title,
-        order: t.order,
-      })),
-    });
+    createdSubjects.push(subject);
   }
 
-  console.log('🔗 Assigning demo teachers and enrollments...');
-  const subParaDemo = createdSubjectIds.slice(0, 6);
+  // Create AcademicPeriod
+  await prisma.academicPeriod.create({
+    data: {
+      name: '2022-1',
+      startDate: new Date('2022-01-01'),
+      endDate: new Date('2022-06-30'),
+      isActive: true,
+    },
+  });
+
+  console.log('🔗 Assigning demo teachers and groups...');
+  const subParaDemo = createdSubjects.slice(0, 6);
   const [sub1, sub2, sub3, sub4, sub5, sub6] = subParaDemo;
-  await prisma.subject.update({
-    where: { id: sub1 },
+
+  // Create some schedules
+  const schedule1 = await prisma.schedule.create({
     data: {
-      teacherIds: [docente1.id],
-      classroom: rooms[0].name,
-      jornada: Jornada.DIURNO,
-    },
-  });
-  await prisma.subject.update({
-    where: { id: sub2 },
-    data: {
-      teacherIds: [docente1.id],
-      classroom: rooms[1].name,
-      jornada: Jornada.DIURNO,
-    },
-  });
-  await prisma.subject.update({
-    where: { id: sub3 },
-    data: {
-      teacherIds: [docente2.id],
-      classroom: rooms[2].name,
-      jornada: Jornada.DIURNO,
-    },
-  });
-  await prisma.subject.update({
-    where: { id: sub4 },
-    data: {
-      teacherIds: [docente2.id],
-      classroom: rooms[5].name,
-      jornada: Jornada.NOCTURNO,
-    },
-  });
-  await prisma.subject.update({
-    where: { id: sub5 },
-    data: {
-      teacherIds: [docente1.id],
-      classroom: rooms[0].name,
-      jornada: Jornada.DIURNO,
-    },
-  });
-  await prisma.subject.update({
-    where: { id: sub6 },
-    data: {
-      teacherIds: [docente2.id],
-      classroom: rooms[1].name,
-      jornada: Jornada.DIURNO,
+      dayOfWeek: DayOfWeek.LUNES,
+      startTime: '08:00',
+      endTime: '10:00',
+      subjectId: sub1.id,
+      roomId: rooms[0].id,
     },
   });
 
-  const periodoDemo = '2022-1';
-  await prisma.groupAssignment.createMany({
-    data: [
-      { studentId: estudiante1.id, grupoNombre: '6A', periodoAcademico: periodoDemo },
-      { studentId: estudiante2.id, grupoNombre: '6A', periodoAcademico: periodoDemo },
-    ],
-  });
-  await prisma.enrollment.createMany({
-    data: [
-      {
-        studentId: estudiante1.id,
-        subjectId: sub1,
-        periodoAcademico: periodoDemo,
-        status: EnrollmentStatus.ACTIVA,
-      },
-      {
-        studentId: estudiante1.id,
-        subjectId: sub2,
-        periodoAcademico: periodoDemo,
-        status: EnrollmentStatus.ACTIVA,
-      },
-      {
-        studentId: estudiante2.id,
-        subjectId: sub1,
-        periodoAcademico: periodoDemo,
-        status: EnrollmentStatus.ACTIVA,
-      },
-      {
-        studentId: estudiante2.id,
-        subjectId: sub3,
-        periodoAcademico: periodoDemo,
-        status: EnrollmentStatus.ACTIVA,
-      },
-    ],
+  const schedule2 = await prisma.schedule.create({
+    data: {
+      dayOfWeek: DayOfWeek.MARTES,
+      startTime: '10:00',
+      endTime: '12:00',
+      subjectId: sub2.id,
+      roomId: rooms[1].id,
+    },
   });
 
+  // Create Groups
+  const group1 = await prisma.group.create({
+    data: {
+      code: '6A',
+      subjectId: sub1.id,
+      academicPeriod: '2022-1',
+      teacherIds: [docente1.id],
+      studentIds: [estudiante1.id, estudiante2.id],
+      scheduleId: schedule1.id,
+      roomId: rooms[0].id,
+    },
+  });
+
+  const group2 = await prisma.group.create({
+    data: {
+      code: '6B',
+      subjectId: sub2.id,
+      academicPeriod: '2022-1',
+      teacherIds: [docente1.id],
+      studentIds: [estudiante1.id],
+      scheduleId: schedule2.id,
+      roomId: rooms[1].id,
+    },
+  });
+
+  // Update Subjects with teacher/student IDs (Directly)
+  await prisma.subject.update({
+    where: { id: sub1.id },
+    data: {
+      teacherIds: [docente1.id],
+      studentIds: [estudiante1.id, estudiante2.id],
+      classroom: rooms[0].name,
+      shift: Jornada.DIURNO,
+    },
+  });
+
+  await prisma.subject.update({
+    where: { id: sub2.id },
+    data: {
+      teacherIds: [docente1.id],
+      studentIds: [estudiante1.id],
+      classroom: rooms[1].name,
+      shift: Jornada.DIURNO,
+    },
+  });
+
+  // Create a Class
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const classDate = new Date(today);
@@ -333,9 +320,11 @@ async function main() {
   startTime.setHours(8, 0, 0, 0);
   const endTime = new Date(classDate);
   endTime.setHours(10, 0, 0, 0);
+
   await prisma.class.create({
     data: {
-      subjectId: sub1,
+      subjectId: sub1.id,
+      groupId: group1.id,
       date: classDate,
       startTime,
       endTime,
@@ -343,35 +332,6 @@ async function main() {
       topic: 'Introducción y repaso',
       classroom: rooms[0].name,
       totalStudents: 2,
-    },
-  });
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const bStart = new Date(tomorrow);
-  bStart.setHours(14, 0, 0, 0);
-  const bEnd = new Date(tomorrow);
-  bEnd.setHours(16, 0, 0, 0);
-  await prisma.roomBooking.create({
-    data: {
-      roomId: rooms[4].id,
-      teacherId: docente2.id,
-      startTime: bStart,
-      endTime: bEnd,
-      reason: 'Sesión de trabajo en equipo',
-      status: BookingStatus.PENDIENTE,
-    },
-  });
-
-  const examDate = new Date(today);
-  examDate.setDate(today.getDate() + 5);
-  await prisma.subjectEvent.create({
-    data: {
-      title: 'Parcial primer corte',
-      date: examDate,
-      type: EventType.EXAMEN,
-      subjectId: sub1,
-      createdById: docente1.id,
     },
   });
 

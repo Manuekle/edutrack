@@ -9,31 +9,25 @@ async function main() {
   console.log('🗑️  Wiping database...');
   // Delete in order to satisfy foreign key constraints if they existed
   await prisma.attendance.deleteMany();
-  await prisma.enrollment.deleteMany();
-  await prisma.groupAssignment.deleteMany();
+  await prisma.logbook.deleteMany();
   await prisma.class.deleteMany();
-  await prisma.bitacora.deleteMany();
-  await prisma.semanaAcademica.deleteMany();
-  await prisma.planeacion.deleteMany();
-  await prisma.grupo.deleteMany();
-  await prisma.horario.deleteMany();
-  await prisma.subjectEvent.deleteMany();
+  await prisma.academicWeek.deleteMany();
+  await prisma.planning.deleteMany();
+  await prisma.group.deleteMany();
+  await prisma.schedule.deleteMany();
   await prisma.report.deleteMany();
-  await prisma.unenrollRequest.deleteMany();
-  await prisma.subjectContent.deleteMany();
-  await prisma.microcurriculo.deleteMany();
   await prisma.subject.deleteMany();
-  await prisma.roomBooking.deleteMany();
   await prisma.room.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.academicPeriod.deleteMany();
 
   console.log('👤 Creating 1 Admin...');
   await prisma.user.create({
     data: {
       name: 'Admin Principal',
       document: 'ADMIN001',
-      correoInstitucional: 'admin@test.com',
-      correoPersonal: 'admin.p@test.com',
+      institutionalEmail: 'admin@test.com',
+      personalEmail: 'admin.p@test.com',
       password,
       role: Role.ADMIN,
       isActive: true,
@@ -46,8 +40,8 @@ async function main() {
       data: {
         name: `Docente ${i}`,
         document: `DOC00${i}`,
-        correoInstitucional: `docente${i}@test.com`,
-        correoPersonal: `docente${i}.p@test.com`,
+        institutionalEmail: `docente${i}@test.com`,
+        personalEmail: `docente${i}.p@test.com`,
         password,
         role: Role.DOCENTE,
         isActive: true,
@@ -61,33 +55,33 @@ async function main() {
       data: {
         name: `Estudiante ${i}`,
         document: `EST00${i}`,
-        correoInstitucional: `estudiante${i}@test.com`,
-        correoPersonal: `estudiante${i}.p@test.com`,
+        institutionalEmail: `estudiante${i}@test.com`,
+        personalEmail: `estudiante${i}.p@test.com`,
         password,
         role: Role.ESTUDIANTE,
         isActive: true,
-        codigoEstudiantil: `COD${i.toString().padStart(3, '0')}`,
+        studentCode: `COD${i.toString().padStart(3, '0')}`,
       },
     });
   }
 
   console.log('🏫 Creating Rooms...');
-  // 3 salas (SALA_COMPUTO)
+  // 3 salas (LABORATORIO)
   for (let i = 1; i <= 3; i++) {
     await prisma.room.create({
       data: {
-        name: `Sala de Cómputo ${i}`,
-        type: RoomType.SALA_COMPUTO,
+        name: `Laboratorio ${i}`,
+        type: RoomType.LABORATORIO,
         capacity: 20,
       },
     });
   }
-  // 2 salones (SALON)
+  // 2 salones (SALA_CLASE)
   for (let i = 1; i <= 2; i++) {
     await prisma.room.create({
       data: {
         name: `Salón ${i}`,
-        type: RoomType.SALON,
+        type: RoomType.SALA_CLASE,
         capacity: 35,
       },
     });

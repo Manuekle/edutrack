@@ -52,7 +52,6 @@ interface DashboardData {
     roleDistribution: ChartData[];
     attendanceDistribution: ChartData[];
     classStatusDistribution: ChartData[];
-    unenrollDistribution: ChartData[];
     monthlyClasses: { month: string; count: number }[];
     topSubjects: Array<{
       name: string;
@@ -69,7 +68,6 @@ interface DashboardData {
     completedClasses: number;
     totalReports: number;
     activeTeachers: number;
-    pendingUnenrolls: number;
   };
 }
 
@@ -181,12 +179,6 @@ const AdminDashboardComponent = () => {
       {/* Accesos rápidos */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          {
-            href: '/dashboard/admin/microcurriculo',
-            icon: BookText,
-            label: 'Microcurrículo',
-            desc: 'Cargar asignaturas',
-          },
           {
             href: '/dashboard/admin/planeador',
             icon: CalendarDays,

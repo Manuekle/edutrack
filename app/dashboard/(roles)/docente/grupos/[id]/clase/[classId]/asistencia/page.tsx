@@ -12,8 +12,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, QrCode } from 'lucide-react';
+import { ArrowLeft, Loader2, QrCode } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -87,14 +88,14 @@ export default function AttendancePage() {
   const createLocalDate = (dateString: string) => {
     if (!dateString) return null;
     const date = new Date(dateString);
-    // Create a new date with the same local date/time values
+    // Use UTC values to avoid timezone shift errors
     return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds()
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate(),
+      date.getUTCHours(),
+      date.getUTCMinutes(),
+      date.getUTCSeconds()
     );
   };
 
@@ -149,7 +150,7 @@ export default function AttendancePage() {
             .toLocaleTimeString('es-ES', {
               hour: '2-digit',
               minute: '2-digit',
-              hour12: true,
+              hour12: false,
             })
             .replace(/^0/, ''); // Elimina el cero inicial si existe
           errorMessage = `La clase comenzará a las ${startTime}. Por favor, intente más tarde.`;
@@ -158,7 +159,7 @@ export default function AttendancePage() {
             .toLocaleTimeString('es-ES', {
               hour: '2-digit',
               minute: '2-digit',
-              hour12: true,
+              hour12: false,
             })
             .replace(/^0/, ''); // Elimina el cero inicial si existe
           errorMessage = `La clase finalizó a las ${endTime}.`;
@@ -274,23 +275,28 @@ export default function AttendancePage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-between items-start">
-        <div>
-          <CardTitle className="text-xl sm:text-2xl font-semibold tracking-card text-foreground">
-            Toma de Asistencia
-          </CardTitle>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
+              <Link href={`/dashboard/docente/grupos/${subjectId}`}>
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </Button>
+            <h1 className="text-2xl font-semibold tracking-card text-foreground">
+              Toma de Asistencia
+            </h1>
+          </div>
           {classInfo && (
-            <CardDescription className="text-sm text-muted-foreground mt-1">
-              {classInfo.subject.name} -{' '}
-              {new Date(classInfo.date).toLocaleDateString('es-ES', {
+            <p className="text-muted-foreground text-sm mt-1 ml-10">
+              {classInfo.subject.name} — {new Date(classInfo.date).toLocaleDateString('es-ES', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
-              })}
-              <br />
-              Tema: {classInfo.topic}
-            </CardDescription>
+                timeZone: 'UTC',
+              })} — {classInfo.topic}
+            </p>
           )}
         </div>
         {isClassPast && (

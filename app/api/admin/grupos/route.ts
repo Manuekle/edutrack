@@ -18,13 +18,13 @@ export async function GET() {
         code: true,
         name: true,
         group: true,
-        jornada: true,
-        periodoAcademico: true,
+        shift: true,
+        academicPeriod: true,
         program: true,
         teachers: { select: { id: true, name: true } },
         _count: { select: { classes: true } },
       },
-      orderBy: [{ periodoAcademico: 'desc' }, { code: 'asc' }],
+      orderBy: [{ academicPeriod: 'desc' }, { code: 'asc' }],
     });
 
     return NextResponse.json({ groups: subjects });

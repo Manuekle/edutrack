@@ -1,7 +1,7 @@
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { ArrowLeft, LayoutDashboard, NotebookPen } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,20 +12,19 @@ type PageProps = {
 };
 
 function formatDD(date: Date) {
-  return String(date.getDate()).padStart(2, '0');
+  return String(new Date(date).getUTCDate()).padStart(2, '0');
 }
 
 function formatMM(date: Date) {
-  return String(date.getMonth() + 1).padStart(2, '0');
+  return String(new Date(date).getUTCMonth() + 1).padStart(2, '0');
 }
 
 function formatTimeHHmm(date?: Date | null) {
   if (!date) return '--:--';
-  return new Date(date).toLocaleTimeString('es-CO', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  const d = new Date(date);
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
 }
 
 function calculateHours(start?: Date | null, end?: Date | null) {
@@ -35,14 +34,12 @@ function calculateHours(start?: Date | null, end?: Date | null) {
   return String(Math.max(0, hours));
 }
 
-// “Finalizada” = PROGRAMADA cuyo endTime ya pasó.
 function isFinalizada(status: string, endTime?: Date | null) {
   if (status !== 'PROGRAMADA') return false;
   if (!endTime) return false;
   return new Date(endTime).getTime() < Date.now();
 }
 
-// Mostrar firma solo en REALIZADA y CANCELADA
 function shouldShowSignature(status: string) {
   return status === 'REALIZADA' || status === 'CANCELADA';
 }
@@ -56,34 +53,57 @@ export default async function PreviewPage({ params }: PageProps) {
 
   const { id } = await params;
 
-  let subject = await db.subject.findUnique({
+  // Intentar cargar como Grupo primero para filtrar clases por planeación (evita duplicados)
+  const grupoData = await db.grupo.findUnique({
     where: { id },
     include: {
-      teachers: {
-        select: { id: true, name: true, signatureUrl: true },
-      },
-      classes: { orderBy: { date: 'asc' } },
-    },
-  });
-
-  if (!subject) {
-    // Probar si es un Grupo
-    const grupo = await db.grupo.findUnique({
-      where: { id },
-      include: {
-        subject: {
-          include: {
-            teachers: {
-              select: { id: true, name: true, signatureUrl: true },
-            },
-            classes: { orderBy: { date: 'asc' } },
+      subject: {
+        include: {
+          teachers: {
+            select: { id: true, name: true, signatureUrl: true },
           },
         },
       },
-    });
+      planeacion: {
+        include: {
+          semanas: {
+            include: {
+              clases: {
+                orderBy: { date: 'asc' },
+              }
+            },
+            orderBy: { numero: 'asc' }
+          }
+        }
+      }
+    }
+  });
 
-    if (grupo && grupo.subject) {
-      subject = grupo.subject;
+  let subject: any = null;
+  let classesToRender: any[] = [];
+
+  if (grupoData) {
+    subject = grupoData.subject;
+    // Aplanamos las clases de las semanas de la planeación activa
+    classesToRender = (grupoData.planeacion?.semanas ?? [])
+      .flatMap(s => s.clases)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  } else {
+    // Si no es grupo, intentar como asignatura (comportamiento base)
+    subject = await db.subject.findUnique({
+      where: { id },
+      include: {
+        teachers: {
+          select: { id: true, name: true, signatureUrl: true },
+        },
+        classes: { 
+          where: { semanaId: { not: null } },
+          orderBy: { date: 'asc' } 
+        },
+      },
+    });
+    if (subject) {
+      classesToRender = subject.classes;
     }
   }
 
@@ -97,7 +117,6 @@ export default async function PreviewPage({ params }: PageProps) {
     );
   }
 
-  // Verificar autorización (en Subject o en Grupo)
   const isAuthorized = subject.teacherIds.includes(session.user.id) || 
                        await db.grupo.findFirst({ where: { id, docenteIds: { has: session.user.id } } });
 
@@ -131,23 +150,20 @@ export default async function PreviewPage({ params }: PageProps) {
             <ArrowLeft className="h-5 w-5 text-muted-foreground" />
           </Link>
           <div>
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-foreground">
+            <h1 className="sm:text-2xl text-xs font-semibold tracking-card text-foreground">
               Bitácora Docente
-            </CardTitle>
+            </h1>
             <CardDescription className="text-xs dark:text-gray-300">
               Visualiza el reporte de asistencia para la asignatura {subject.name}
             </CardDescription>
           </div>
         </div>
-        {/* <DownloadPdfButton targetId="pdf-section" /> */}
       </div>
       <div
         id="pdf-section"
-        className="mx-auto px-4 sm:px-8 pb-6 bg-card rounded-md shadow-sm ring-1 ring-border"
+        className="mx-auto px-4 sm:px-8 pb-6 bg-white dark:bg-gray-800 rounded-md shadow-sm ring-1 ring-gray-200 dark:ring-gray-700"
       >
-        {/* Header estilo “PDF” */}
-        <div className="border-b border-primary p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Logo */}
+        <div className="border-b border-[#005a9c] dark:border-blue-500 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-start">
             <div className="relative h-24 w-24 sm:h-32 sm:w-32">
               <Image
@@ -162,22 +178,20 @@ export default async function PreviewPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Títulos */}
           <div className="w-full sm:w-1/2 text-center">
-            <div className="text-primary font-semibold sm:text-2xl text-xs">
+            <div className="text-[#003366] dark:text-blue-200 font-semibold sm:text-2xl text-xl">
               REGISTRO DE CLASES Y ASISTENCIA
             </div>
-            <div className="text-primary text-xs">DOCENCIA</div>
+            <div className="text-[#003366] dark:text-blue-200 text-xs uppercase">Docencia</div>
           </div>
 
-          {/* Meta info */}
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
-            <div className="text-xs border border-primary rounded text-foreground">
-              <div className="flex gap-1 border-b border-primary py-1 px-3">
+            <div className="text-xs border border-[#005a9c] dark:border-blue-400 rounded dark:text-gray-100">
+              <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
                 <span className="font-semibold">Código:</span>
                 <span>FO-DO-005</span>
               </div>
-              <div className="flex gap-1 border-b border-primary py-1 px-3">
+              <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
                 <span className="font-semibold">Versión:</span>
                 <span>08</span>
               </div>
@@ -189,8 +203,7 @@ export default async function PreviewPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Info Docente/Asignatura */}
-        <div className="bg-muted px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs border border-border my-4 rounded-md text-foreground">
+        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs border border-gray-200 dark:border-gray-700 my-4 rounded-md text-gray-900 dark:text-gray-100">
           <div className="flex gap-2">
             <span className="font-semibold">NOMBRE DEL DOCENTE:</span>
             <span>{teacherName}</span>
@@ -217,53 +230,44 @@ export default async function PreviewPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Tabla principal */}
-        <div className="text-xs text-foreground">
+        <div className="text-xs dark:text-gray-100">
           <div className="-mx-4 sm:mx-0 overflow-x-auto">
-            <div className="min-w-[720px] w-full border border-border">
-              {/* Header principal */}
+            <div className="min-w-[720px] w-full border border-[#ECEEDF] dark:border-gray-700">
               <div className="grid" style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}>
-                {/* No. */}
-                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80 h-full flex items-center justify-center p-2">
+                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] h-full flex items-center justify-center p-2">
                   No.
                 </div>
-                {/* Fecha */}
-                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80">
+                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0]">
                   <div className="p-1">FECHA</div>
-                  <div className="grid grid-cols-2 border-t border-primary/80">
+                  <div className="grid grid-cols-2 border-t border-[#24699be0]">
                     <div className="p-1 text-xs">DD</div>
                     <div className="p-1 text-xs">MM</div>
                   </div>
                 </div>
-                {/* Hora */}
-                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80">
+                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0]">
                   <div className="p-1">HORA</div>
-                  <div className="grid grid-cols-2 border-t border-primary/80">
+                  <div className="grid grid-cols-2 border-t border-[#24699be0]">
                     <div className="p-1 text-xs">INICIO</div>
                     <div className="p-1 text-xs">FINAL</div>
                   </div>
                 </div>
-                {/* Tema */}
-                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80 p-2 h-full flex items-center justify-center">
+                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] p-2 h-full flex items-center justify-center">
                   TEMA
                 </div>
-                {/* Total Horas */}
-                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs border-r border-primary/80 p-2 h-full flex items-center justify-center">
+                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] p-2 h-full flex items-center justify-center">
                   TOTAL
                   <br />
                   HORAS
                 </div>
-                {/* Firma */}
-                <div className="bg-primary text-primary-foreground text-center font-semibold text-xs p-2 h-full flex items-center justify-center">
+                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs p-2 h-full flex items-center justify-center">
                   FIRMA
                   <br />
                   DOCENTE
                 </div>
               </div>
 
-              {/* Filas */}
               <div>
-                {subject.classes.map((cls, idx) => {
+                {classesToRender.map((cls, idx) => {
                   const dateObj = new Date(cls.date);
                   const showSignature = shouldShowSignature(cls.status);
                   const finalizada = isFinalizada(cls.status, cls.endTime);
@@ -271,45 +275,39 @@ export default async function PreviewPage({ params }: PageProps) {
                   return (
                     <div
                       key={cls.id}
-                      className={`grid min-h-[48px] items-stretch border-t border-border ${idx % 2 === 1 ? 'bg-muted' : 'bg-card'}`}
+                      className={`grid min-h-[48px] items-stretch border-t border-[#ECEEDF] dark:border-gray-700 ${idx % 2 === 1 ? 'bg-[#f8f9fa] dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}
                       style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}
                     >
-                      {/* No. */}
-                      <div className="flex items-center justify-center border-r border-border text-xs">
+                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
                         {idx + 1}
                       </div>
 
-                      {/* Fecha DD/MM */}
-                      <div className="grid grid-cols-2 border-r border-border">
+                      <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
                         <div className="flex items-center justify-center text-xs">
                           {formatDD(dateObj)}
                         </div>
-                        <div className="flex items-center justify-center text-xs border-l border-border">
+                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
                           {formatMM(dateObj)}
                         </div>
                       </div>
 
-                      {/* Hora Inicio/Final */}
-                      <div className="grid grid-cols-2 border-r border-border">
+                      <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
                         <div className="flex items-center justify-center text-xs">
                           {formatTimeHHmm(cls.startTime as Date | null)}
                         </div>
-                        <div className="flex items-center justify-center text-xs border-l border-border">
+                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
                           {formatTimeHHmm(cls.endTime as Date | null)}
                         </div>
                       </div>
 
-                      {/* Tema */}
-                      <div className="flex items-center justify-center border-r border-border p-2 text-center text-xs">
+                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 p-2 text-center text-xs">
                         {cls.topic?.trim() || `Sesión ${idx + 1}`}
                       </div>
 
-                      {/* Total Horas */}
-                      <div className="flex items-center justify-center border-r border-border text-xs">
+                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
                         {calculateHours(cls.startTime as Date | null, cls.endTime as Date | null)}
                       </div>
 
-                      {/* Firma Docente */}
                       <div className="flex items-center justify-center p-1">
                         {showSignature && signatureUrl ? (
                           <Image
@@ -320,16 +318,15 @@ export default async function PreviewPage({ params }: PageProps) {
                             className="h-12 max-w-full object-contain my-1 dark:brightness-0 dark:invert"
                           />
                         ) : (
-                          // Nota: “finalizada” (PROGRAMADA con endTime pasado) NO muestra firma
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
                             {cls.status === 'PROGRAMADA'
                               ? finalizada
                                 ? 'Finalizada'
                                 : 'Programada'
                               : cls.status === 'REALIZADA'
-                                ? 'Realizada (sin firma)'
+                                ? 'Realizada'
                                 : cls.status === 'CANCELADA'
-                                  ? 'Cancelada (sin firma)'
+                                  ? 'Cancelada'
                                   : ''}
                           </span>
                         )}

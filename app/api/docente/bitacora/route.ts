@@ -11,21 +11,21 @@ export async function GET() {
     }
     const docenteId = session.user.id;
 
-    const grupos = await db.grupo.findMany({
-      where: { docenteIds: { has: docenteId } },
+    const groups = await db.group.findMany({
+      where: { teacherIds: { has: docenteId } },
       include: {
         subject: { select: { id: true, name: true, code: true, credits: true } },
-        horario: { select: { diaSemana: true, horaInicio: true, horaFin: true } },
-        sala: { select: { name: true } },
-        planeacion: {
+        schedule: { select: { dayOfWeek: true, startTime: true, endTime: true } },
+        room: { select: { name: true } },
+        planning: {
           include: {
-            semanas: {
+            weeks: {
               include: {
-                clases: {
-                  select: { id: true, status: true, bitacora: { select: { id: true } } },
+                classes: {
+                  select: { id: true, status: true, logbook: { select: { id: true } } },
                 },
               },
-              orderBy: { numero: 'asc' },
+              orderBy: { number: 'asc' },
             },
           },
         },
@@ -33,7 +33,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ grupos });
+    return NextResponse.json({ groups });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

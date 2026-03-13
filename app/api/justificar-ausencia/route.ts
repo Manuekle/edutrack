@@ -76,8 +76,8 @@ export async function POST(request: Request) {
         where: { id: studentId },
         select: {
           name: true,
-          correoInstitucional: true,
-          correoPersonal: true,
+          institutionalEmail: true,
+          personalEmail: true,
         },
       }),
       db.class.findUnique({
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
               name: true,
               teachers: {
                 select: {
-                  correoInstitucional: true,
+                  institutionalEmail: true,
                   name: true,
                 },
               },
@@ -118,13 +118,13 @@ export async function POST(request: Request) {
         },
       },
       update: {
-        status: 'JUSTIFICADO',
+        status: 'JUSTIFIED' as any,
         justification: reason,
       },
       create: {
         studentId,
         classId,
-        status: 'JUSTIFICADO',
+        status: 'JUSTIFIED' as any,
         justification: reason,
       },
     });
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
     await clearSubjectCache(classInfo.subjectId);
 
     // Enviar correo al profesor
-    const teacherEmail = classWithSubject.subject.teachers[0]?.correoInstitucional;
+    const teacherEmail = (classWithSubject.subject.teachers[0] as any)?.institutionalEmail;
     if (teacherEmail) {
       try {
         await sendEmail({

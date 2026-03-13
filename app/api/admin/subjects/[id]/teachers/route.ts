@@ -92,8 +92,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         id: true,
         name: true,
         document: true,
-        correoInstitucional: true,
-        correoPersonal: true,
+        institutionalEmail: true,
+        personalEmail: true,
       },
     });
 
@@ -122,8 +122,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       const docente = allDocentes.find(
         d =>
           d.document === documento ||
-          d.correoInstitucional?.toLowerCase() === documento.toLowerCase() ||
-          d.correoPersonal?.toLowerCase() === documento.toLowerCase()
+          d.institutionalEmail?.toLowerCase() === documento.toLowerCase() ||
+          d.personalEmail?.toLowerCase() === documento.toLowerCase()
       );
 
       if (!docente) {

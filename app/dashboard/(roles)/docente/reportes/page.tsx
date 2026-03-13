@@ -8,7 +8,7 @@ import { LoadingPage } from '@/components/ui/loading';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { AlertCircle, CheckCircle, Clock, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Download, FileText, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -144,8 +144,8 @@ export default function ReportsPage() {
 
   if (error) {
     return (
-      <div className="p-6">
-        <Alert variant="destructive">
+      <div className="flex min-h-[50vh] flex-col items-center justify-center p-6 text-center">
+        <Alert variant="destructive" className="max-w-md rounded-2xl border-destructive/50">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
@@ -156,110 +156,112 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-none shadow-none bg-transparent">
-        <CardHeader className="p-0 pb-6 w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="w-full">
-            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card">
-              Mis Reportes
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Historial de reportes de asistencia — solicítalos desde el detalle de una asignatura y
-              descárgalos aquí cuando estén listos
-            </CardDescription>
-          </div>
-        </CardHeader>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-card text-foreground">
+            Mis Reportes
+          </h1>
+          <p className="text-muted-foreground text-sm max-w-xl">
+            Historial de reportes de asistencia — solicítalos desde el detalle de una asignatura y
+            descárgalos aquí cuando estén listos.
+          </p>
+        </div>
+      </div>
 
-        <CardContent className="p-0">
-          <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1">
-            <div className="divide-y divide-border/40">
-              {reports.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-                  <div className="h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center">
-                    <AlertCircle className="h-7 w-7 text-muted-foreground/50" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[15px] font-semibold text-foreground tracking-card">
-                      Aún no has solicitado reportes
-                    </p>
-                    <p className="text-[13px] text-muted-foreground mx-auto max-w-sm">
-                      Ve al detalle de una asignatura y usa el botón «Generar Reporte» para
-                      solicitarlo
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                reports.map(report => (
-                  <div
-                    key={report.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group"
-                  >
-                    <div className="flex items-start gap-4 flex-1 min-w-0">
-                      <div className="flex flex-col min-w-0 gap-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[15px] font-semibold text-foreground tracking-card truncate">
-                            {report.subject?.name || 'Asignatura no disponible'}
-                          </span>
-                          <ReportStatusBadge status={report.status} />
-                        </div>
-                        <div className="flex items-center gap-2 text-[13px] text-muted-foreground font-medium">
-                          <span className="font-mono text-[11px] font-bold tracking-card uppercase bg-background px-1.5 py-0.5 rounded-md text-muted-foreground">
-                            {report.subject?.code || 'Código no disponible'}
-                          </span>
-                          <span className="w-1 h-1 rounded-full bg-border" />
-                          <span>{format(new Date(report.createdAt), 'PPP', { locale: es })}</span>
-                          <span className="w-1 h-1 rounded-full bg-border" />
-                          <span>
-                            {format(new Date(report.createdAt), 'h:mm a', {
-                              locale: es,
-                            }).toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end shrink-0 sm:pl-0 pl-14 items-center gap-2">
-                      {report.status === 'COMPLETADO' && report.fileUrl ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 rounded-full text-primary hover:text-primary hover:bg-primary/10 text-[13px] font-semibold"
-                          onClick={() => handleDownload(report)}
-                          disabled={downloadingReportId === report.id}
-                        >
-                          {downloadingReportId === report.id ? (
-                            <>
-                              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> Descargando...
-                            </>
-                          ) : (
-                            'Descargar'
-                          )}
-                        </Button>
-                      ) : report.status === 'FALLIDO' ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="inline-flex items-center text-[13px] font-medium text-destructive px-3 py-1 rounded-full bg-destructive/10">
-                              Error al generar
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="rounded-xl border-border">
-                            <p className="max-w-[200px] text-xs">
-                              {report.error || 'Error desconocido al generar el reporte'}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        <span className="text-[13px] font-medium text-muted-foreground px-3">
-                          {report.status === 'EN_PROCESO' ? 'Procesando...' : 'Pendiente'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {reports.length === 0 ? (
+          <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
+            <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <FileText className="h-7 w-7 text-muted-foreground/40" />
             </div>
+            <p className="text-[15px] font-semibold text-foreground tracking-card">
+              Aún no has solicitado reportes
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+              Ve al detalle de una asignatura y usa el botón «Generar Reporte» para
+              comenzar.
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        ) : (
+          reports.map(report => (
+            <Card key={report.id} className="hover:shadow-md transition-all duration-300 border-border/50 group overflow-hidden">
+              <CardHeader className="pb-3 bg-muted/5 group-hover:bg-muted/10 transition-colors">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="outline" className="font-mono text-[10px] py-0">
+                        {report.subject?.code}
+                      </Badge>
+                      <Badge variant="secondary" className="text-[10px] py-0">
+                        {report.format}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-base truncate group-hover:text-primary transition-colors">
+                      {report.subject?.name}
+                    </CardTitle>
+                  </div>
+                  <FileText className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary/40 transition-colors" />
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      <span>{format(new Date(report.createdAt), 'PPP', { locale: es })}</span>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground font-medium pl-4.5">
+                      {format(new Date(report.createdAt), 'h:mm a', { locale: es }).toUpperCase()}
+                    </div>
+                  </div>
+                  <ReportStatusBadge status={report.status} />
+                </div>
+
+                <div className="pt-2 border-t border-border/40 flex justify-end">
+                  {report.status === 'COMPLETADO' && report.fileUrl ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 rounded-xl bg-primary/5 hover:bg-primary hover:text-white border-primary/20 transition-all gap-2 text-xs font-semibold"
+                      onClick={() => handleDownload(report)}
+                      disabled={downloadingReportId === report.id}
+                    >
+                      {downloadingReportId === report.id ? (
+                        <>
+                          <Loader2 className="h-3 w-3 animate-spin" /> Descargando
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-3 w-3" /> Descargar
+                        </>
+                      )}
+                    </Button>
+                  ) : report.status === 'FALLIDO' ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 cursor-help text-destructive text-[11px] font-semibold bg-destructive/5 px-2 py-1 rounded-lg">
+                          <AlertCircle className="h-3 w-3" />
+                          Error en generación
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent className="rounded-xl border-border bg-popover/95 backdrop-blur-sm">
+                        <p className="max-w-[180px] text-[10px]">
+                          {report.error || 'Ocurrió un error inesperado al generar el archivo.'}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <div className="flex items-center gap-2 text-[11px] font-semibold text-muted-foreground animate-pulse px-2 py-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      {report.status === 'EN_PROCESO' ? 'Generando archivo...' : 'En cola...'}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
     </div>
   );
 }

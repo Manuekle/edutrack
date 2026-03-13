@@ -125,7 +125,7 @@ export default function DocenteDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
+          <h1 className="text-2xl font-bold tracking-card text-foreground">Inicio</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Resumen del día — clases activas, próximas clases y estadísticas generales.
           </p>

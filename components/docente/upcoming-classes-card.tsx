@@ -56,19 +56,13 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                             weekday: 'short',
                             day: 'numeric',
                             month: 'short',
+                            timeZone: 'UTC',
                           })}
                         </span>
                         <span className="w-1 h-1 rounded-full bg-border" />
                         <span>
                           {cls.date
-                            ? new Date(cls.date)
-                                .toLocaleTimeString('es-ES', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: true,
-                                })
-                                .replace(/a\.\s*m\./i, 'AM')
-                                .replace(/p\.\s*m\./i, 'PM')
+                            ? `${String(new Date(cls.date).getUTCHours()).padStart(2, '0')}:${String(new Date(cls.date).getUTCMinutes()).padStart(2, '0')}`
                             : 'Sin hora definida'}
                         </span>
                         {cls.classroom && (

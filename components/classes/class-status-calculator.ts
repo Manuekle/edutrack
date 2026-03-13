@@ -85,7 +85,7 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
   const canCancel = !!(isProgramada && (isFuture || isScheduledForToday));
   const canMarkAsDone = !!((isProgramada || isEnCurso) && (isToday || isPast));
   const canTakeAttendance = !!(
-    (isWithinClassTime || isWithinEarlyBuffer || isTodayFinished || isPast) &&
+    (isWithinClassTime || isWithinEarlyBuffer) &&
     (isProgramada || isEnCurso) &&
     cls.status !== 'REALIZADA' &&
     cls.status !== 'CANCELADA'

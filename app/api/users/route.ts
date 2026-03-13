@@ -46,8 +46,8 @@ export async function GET(req: NextRequest) {
       role: Role.ESTUDIANTE,
       OR: [
         { name: { contains: searchTerm, mode: 'insensitive' } },
-        { correoInstitucional: { contains: searchTerm, mode: 'insensitive' } },
-        { correoPersonal: { contains: searchTerm, mode: 'insensitive' } },
+        { institutionalEmail: { contains: searchTerm, mode: 'insensitive' } },
+        { personalEmail: { contains: searchTerm, mode: 'insensitive' } },
       ],
     };
 
@@ -56,8 +56,8 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         name: true,
-        correoInstitucional: true,
-        correoPersonal: true,
+        institutionalEmail: true,
+        personalEmail: true,
         role: true,
       },
       orderBy: { [query.data.sortBy]: query.data.sortOrder },
@@ -113,8 +113,8 @@ export async function POST(req: NextRequest) {
     const existingUser = await db.user.findFirst({
       where: {
         OR: [
-          { correoInstitucional: data.correoInstitucional },
-          { correoPersonal: data.correoPersonal },
+          { institutionalEmail: data.institutionalEmail },
+          { personalEmail: data.personalEmail },
         ],
       },
     });
@@ -131,8 +131,8 @@ export async function POST(req: NextRequest) {
     const newUser = await db.user.create({
       data: {
         name: data.name,
-        correoInstitucional: data.correoInstitucional,
-        correoPersonal: data.correoPersonal,
+        institutionalEmail: data.institutionalEmail,
+        personalEmail: data.personalEmail,
         password: hashedPassword,
         role: data.role,
       },
@@ -186,7 +186,7 @@ export async function PUT(req: NextRequest) {
     const targetUserIdStr = String(targetUserId);
 
     // Allow users to update their own profile or admins to update any profile
-    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'COORDINADOR';
+    const isAdmin = session.user.role === 'ADMIN';
     const isUpdatingOwnProfile = sessionUserId === targetUserIdStr;
 
     if (!isUpdatingOwnProfile && !isAdmin) {
@@ -205,25 +205,25 @@ export async function PUT(req: NextRequest) {
     const data = UserUpdateSchema.parse({ ...body, id: userId });
     const updateData: {
       name?: string;
-      correoInstitucional?: string;
-      correoPersonal?: string | null;
-      telefono?: string | null;
+      institutionalEmail?: string;
+      personalEmail?: string | null;
+      phone?: string | null;
       role?: Role;
       password?: string;
-      codigoEstudiantil?: string | null;
-      codigoDocente?: string | null;
+      studentCode?: string | null;
+      teacherCode?: string | null;
     } = {};
 
     if (data.name) updateData.name = data.name;
-    if (data.correoInstitucional) updateData.correoInstitucional = data.correoInstitucional;
-    if (data.correoPersonal !== undefined) updateData.correoPersonal = data.correoPersonal;
-    if (data.telefono !== undefined) updateData.telefono = data.telefono;
+    if (data.institutionalEmail) updateData.institutionalEmail = data.institutionalEmail;
+    if (data.personalEmail !== undefined) updateData.personalEmail = data.personalEmail;
+    if (data.phone !== undefined) updateData.phone = data.phone;
     if (data.role) updateData.role = data.role;
     if (data.password) {
       updateData.password = await bcrypt.hash(data.password, 10);
     }
-    if (data.codigoEstudiantil !== undefined) updateData.codigoEstudiantil = data.codigoEstudiantil;
-    if (data.codigoDocente !== undefined) updateData.codigoDocente = data.codigoDocente;
+    if (data.studentCode !== undefined) updateData.studentCode = data.studentCode;
+    if (data.teacherCode !== undefined) updateData.teacherCode = data.teacherCode;
     const updatedUser = await db.user.update({
       where: { id: data.id },
       data: updateData,

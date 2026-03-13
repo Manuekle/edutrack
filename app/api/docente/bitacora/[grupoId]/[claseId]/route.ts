@@ -16,11 +16,11 @@ export async function GET(
     const clase = await db.class.findUnique({
       where: { id: claseId },
       include: {
-        grupo: {
-          select: { id: true, codigo: true, subject: { select: { name: true, code: true } } },
+        group: {
+          select: { id: true, code: true, subject: { select: { name: true, code: true } } },
         },
-        semana: { select: { numero: true } },
-        bitacora: true,
+        week: { select: { number: true } },
+        logbook: true,
         attendances: {
           include: { student: { select: { id: true, name: true } } },
         },
@@ -28,17 +28,17 @@ export async function GET(
     });
     if (!clase) return NextResponse.json({ error: 'Clase no encontrada' }, { status: 404 });
 
-    // Get all students in grupo if no attendance records exist
-    const grupo = await db.grupo.findUnique({
+    // Get all students in group if no attendance records exist
+    const group = await db.group.findUnique({
       where: { id: grupoId },
       select: {
-        estudianteIds: true,
-        estudiantes: { select: { id: true, name: true } },
+        studentIds: true,
+        students: { select: { id: true, name: true } },
       },
     });
 
     const existingAttendanceIds = clase.attendances.map(a => a.studentId);
-    const allStudents = grupo?.estudiantes ?? [];
+    const allStudents = group?.students ?? [];
 
     const asistencias = allStudents.map(student => {
       const existing = clase.attendances.find(a => a.studentId === student.id);
@@ -46,7 +46,7 @@ export async function GET(
         id: existing?.id ?? null,
         studentId: student.id,
         studentName: student.name ?? 'Sin nombre',
-        status: existing?.status ?? 'AUSENTE',
+        status: existing?.status ?? 'ABSENT',
       };
     });
 
@@ -68,24 +68,45 @@ export async function POST(
     }
     const body = await req.json();
     const {
-      temaPlaneado,
-      temaEjecutado,
-      actividades,
-      observaciones,
-      estadoClase,
-      motivoCancelacion,
+      plannedTopic,
+      executedTopic,
+      activities,
+      observations,
+      classStatus, // 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+      cancellationReason,
       asistencias,
-      fecha, // New: allow changing the date
+      fecha, // ISO string
+      horaInicio, // "HH:MM"
+      horaFin, // "HH:MM"
     } = body;
 
-    // Update class status and date
+    // 1. Fetch current class data to have a base date
+    const currentClass = await db.class.findUnique({ where: { id: claseId } });
+    if (!currentClass) return NextResponse.json({ error: 'Clase no encontrada' }, { status: 404 });
+
+    // 2. Prepare class update data
     const updateData: any = {
-      status: estadoClase,
-      cancellationReason: motivoCancelacion ?? null,
+      status: classStatus || 'SCHEDULED',
+      cancellationReason: cancellationReason ?? null,
+      topic: executedTopic || plannedTopic || currentClass.topic, // Sync Class.topic with logbook
     };
 
-    if (fecha) {
-      updateData.date = new Date(fecha);
+    // 3. Handle Date and Time updates
+    const baseDate = fecha ? new Date(fecha) : new Date(currentClass.date);
+    updateData.date = baseDate;
+
+    if (horaInicio) {
+      const [h, m] = horaInicio.split(':').map(Number);
+      const start = new Date(baseDate);
+      start.setUTCHours(h, m, 0, 0);
+      updateData.startTime = start;
+    }
+
+    if (horaFin) {
+      const [h, m] = horaFin.split(':').map(Number);
+      const end = new Date(baseDate);
+      end.setUTCHours(h, m, 0, 0);
+      updateData.endTime = end;
     }
 
     await db.class.update({
@@ -93,26 +114,26 @@ export async function POST(
       data: updateData,
     });
 
-    // Upsert bitacora - Always update temaPlaneado if provided
-    const existingBitacora = await db.bitacora.findUnique({ where: { classId: claseId } });
-    if (existingBitacora) {
-      await db.bitacora.update({
+    // Upsert logbook - Always update plannedTopic if provided
+    const existingLogbook = await db.logbook.findUnique({ where: { classId: claseId } });
+    if (existingLogbook) {
+      await db.logbook.update({
         where: { classId: claseId },
         data: {
-          temaPlaneado: temaPlaneado ?? existingBitacora.temaPlaneado,
-          temaEjecutado: temaEjecutado ?? existingBitacora.temaEjecutado,
-          actividades: actividades ?? existingBitacora.actividades,
-          observaciones: observaciones ?? existingBitacora.observaciones,
+          plannedTopic: plannedTopic ?? existingLogbook.plannedTopic,
+          executedTopic: executedTopic ?? existingLogbook.executedTopic,
+          activities: activities ?? existingLogbook.activities,
+          observations: observations ?? existingLogbook.observations,
         },
       });
     } else {
-      await db.bitacora.create({
+      await db.logbook.create({
         data: {
           classId: claseId,
-          temaPlaneado: temaPlaneado ?? '',
-          temaEjecutado: temaEjecutado ?? '',
-          actividades: actividades ?? '',
-          observaciones: observaciones ?? '',
+          plannedTopic: plannedTopic ?? '',
+          executedTopic: executedTopic ?? '',
+          activities: activities ?? '',
+          observations: observations ?? '',
         },
       });
     }
@@ -138,10 +159,10 @@ export async function POST(
       // Update class attendance metrics
       const counts = (asistencias as { status: string }[]).reduce(
         (acc, a) => {
-          if (a.status === 'PRESENTE') acc.presente++;
-          else if (a.status === 'AUSENTE') acc.ausente++;
-          else if (a.status === 'TARDANZA') acc.tardanza++;
-          else if (a.status === 'JUSTIFICADO') acc.justificado++;
+          if (a.status === 'PRESENT') acc.presente++;
+          else if (a.status === 'ABSENT') acc.ausente++;
+          else if (a.status === 'LATE') acc.tardanza++;
+          else if (a.status === 'JUSTIFIED') acc.justificado++;
           return acc;
         },
         { presente: 0, ausente: 0, tardanza: 0, justificado: 0 }

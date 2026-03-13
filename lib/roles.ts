@@ -5,7 +5,6 @@ export enum Role {
   ADMIN = 'ADMIN',
   DOCENTE = 'DOCENTE',
   ESTUDIANTE = 'ESTUDIANTE',
-  COORDINADOR = 'COORDINADOR',
 }
 
 export const ROLES = Object.values(Role) as Role[];

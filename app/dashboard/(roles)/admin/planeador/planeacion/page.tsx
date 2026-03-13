@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
   AlertCircle,
@@ -30,22 +30,36 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { sileo } from 'sileo';
 
+interface Period {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
 interface Grupo {
   id: string;
-  codigo: string;
-  periodoAcademico: string;
+  code: string;
+  academicPeriod: string;
   subject: { name: string; code: string };
-  docentes: { name: string }[];
-  planeacion: {
+  teachers: { name: string }[];
+  planning: {
     id: string;
-    fechaInicio: string;
-    fechaFin: string | null;
-    semanas: { id: string; numero: number; fechaInicio: string; fechaFin: string }[];
+    startDate: string;
+    endDate: string | null;
+    weeks: {
+      id: string;
+      number: number;
+      startDate: string;
+      endDate: string;
+      classes: { id: string; status: string }[];
+    }[];
   } | null;
 }
 
 export default function PlaneacionPage() {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
+  const [periods, setPeriods] = useState<Period[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGrupo, setSelectedGrupo] = useState('');
   const [generating, setGenerating] = useState(false);
@@ -53,9 +67,15 @@ export default function PlaneacionPage() {
 
   const load = () => {
     setLoading(true);
-    fetch('/api/admin/planeador/grupos?includePlaneacion=true')
-      .then(r => r.json())
-      .then(d => setGrupos(d.grupos ?? []))
+    // Carga paralela de grupos y periodos
+    Promise.all([
+      fetch('/api/admin/planeador/grupos?includePlaneacion=true').then(r => r.json()),
+      fetch('/api/admin/periodos').then(r => r.json()),
+    ])
+      .then(([gData, pData]) => {
+        setGrupos(gData.grupos ?? []);
+        setPeriods(pData.periods ?? []);
+      })
       .finally(() => setLoading(false));
   };
 
@@ -67,11 +87,17 @@ export default function PlaneacionPage() {
     if (!selectedGrupo) return;
 
     // Determine the start date automatically based on the selected group's academic period
-    let finalFechaInicio = new Date();
-    if (currentGrupo?.periodoAcademico === '2025-1') {
-      finalFechaInicio = new Date('2025-02-03T00:00:00');
-    } else if (currentGrupo?.periodoAcademico === '2025-2') {
-      finalFechaInicio = new Date('2025-08-05T00:00:00');
+    let finalFechaInicio: Date;
+    const periodName = currentGrupo?.academicPeriod?.replace(/[-\s]/g, '') || '';
+
+    // Buscar en los periodos cargados de la BD
+    const matchingPeriod = periods.find(p => p.name.replace(/[-\s]/g, '') === periodName);
+
+    if (matchingPeriod) {
+      finalFechaInicio = new Date(matchingPeriod.startDate);
+    } else {
+      // Fallback to start of current week if period unknown
+      finalFechaInicio = startOfWeek(new Date(), { weekStartsOn: 1 });
     }
 
     setGenerating(true);
@@ -80,8 +106,8 @@ export default function PlaneacionPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          grupoId: selectedGrupo,
-          fechaInicio: finalFechaInicio.toISOString(),
+          groupId: selectedGrupo,
+          startDate: finalFechaInicio.toISOString(),
         }),
       });
       sileo.success({ description: 'Planeación de 16 semanas generada' });
@@ -105,13 +131,13 @@ export default function PlaneacionPage() {
     }
   }
 
-  const gruposConPlaneacion = grupos.filter(g => g.planeacion);
-  const gruposSinPlaneacion = grupos.filter(g => !g.planeacion);
+  const gruposConPlaneacion = grupos.filter(g => g.planning);
+  const gruposSinPlaneacion = grupos.filter(g => !g.planning);
 
   const gruposOrdenados = useMemo(
     () =>
       [...grupos].sort((a, b) => {
-        const cmpPeriodo = (b.periodoAcademico ?? '').localeCompare(a.periodoAcademico ?? '');
+        const cmpPeriodo = (b.academicPeriod ?? '').localeCompare(a.academicPeriod ?? '');
         if (cmpPeriodo !== 0) return cmpPeriodo;
         return (a.subject?.code ?? '').localeCompare(b.subject?.code ?? '');
       }),
@@ -243,13 +269,13 @@ export default function PlaneacionPage() {
                       className="py-2.5 px-3 rounded-lg mx-1 my-0.5 text-[14px]"
                     >
                       <span className="flex items-center gap-2">
-                        {g.planeacion ? (
+                        {g.planning ? (
                           <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
                         ) : (
                           <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
                         )}
                         <span className="font-mono text-muted-foreground mr-1 text-xs">
-                          [{g.codigo}]
+                          [{g.code}]
                         </span>
                         <span className="font-medium truncate text-sm">{g.subject.name}</span>
                       </span>
@@ -280,10 +306,10 @@ export default function PlaneacionPage() {
                       Cód: {currentGrupo.subject.code}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-muted-foreground/40"></span>
-                    <span>{currentGrupo.periodoAcademico}</span>
+                    <span>{currentGrupo.academicPeriod}</span>
                   </div>
                   <div className="mt-1">
-                    {currentGrupo.planeacion ? (
+                    {currentGrupo.planning ? (
                       <Badge className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-0 shadow-none px-1.5 py-0 rounded-sm">
                         Ya tiene planeación
                       </Badge>
@@ -305,29 +331,37 @@ export default function PlaneacionPage() {
               <Label className="text-xs font-semibold ml-0.5">Fechas del semestre</Label>
               <div className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/20 border border-muted flex items-center gap-3">
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                {currentGrupo ? (
-                  currentGrupo.periodoAcademico === '2025-1' ? (
-                    <span className="text-foreground font-medium">3 feb 2025 — 28 may 2025</span>
-                  ) : currentGrupo.periodoAcademico === '2025-2' ? (
-                    <span className="text-foreground font-medium">5 ago 2025 — 24 nov 2025</span>
-                  ) : (
+                {(() => {
+                  const pName = currentGrupo?.academicPeriod?.replace(/[-\s]/g, '') || '';
+                  const matching = periods.find(p => p.name.replace(/[-\s]/g, '') === pName);
+
+                  if (matching) {
+                    return (
+                      <span className="text-foreground font-medium">
+                        {format(new Date(matching.startDate), 'd MMM yyyy', { locale: es })} —{' '}
+                        {format(new Date(matching.endDate), 'd MMM yyyy', { locale: es })}
+                      </span>
+                    );
+                  }
+
+                  return currentGrupo ? (
                     <span className="text-muted-foreground">
-                      Periodo no configurado ({currentGrupo.periodoAcademico})
+                      Periodo no configurado ({currentGrupo.academicPeriod})
                     </span>
-                  )
-                ) : (
-                  <span className="text-muted-foreground">Selecciona un grupo primero</span>
-                )}
+                  ) : (
+                    <span className="text-muted-foreground">Selecciona un grupo primero</span>
+                  );
+                })()}
               </div>
               <p className="text-[11px] text-muted-foreground pl-1 leading-relaxed max-w-[90%]">
-                Las fechas se asignan automáticamente según el periodo académico del grupo (2025-1 o
-                2025-2).
+                Las fechas se asignan automáticamente según la configuración del periodo académico
+                (ajustable en el Paso 1).
               </p>
             </div>
           </div>
 
           {/* Aviso si ya tiene planeación */}
-          {currentGrupo?.planeacion && (
+          {currentGrupo?.planning && (
             <div className="flex items-start gap-4 rounded-xl border-0 bg-amber-50/80 dark:bg-amber-500/5 p-3 text-[12px] text-amber-800 dark:text-amber-300 mt-4">
               <div className="bg-amber-100 dark:bg-amber-500/20 p-1.5 rounded-lg shrink-0 mt-0.5">
                 <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
@@ -397,8 +431,15 @@ export default function PlaneacionPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-0 sm:ml-8">
             {gruposConPlaneacion.map(g => {
-              const semanas = g.planeacion!.semanas;
-              const progress = semanas.length > 0 ? (semanas.length / 16) * 100 : 0;
+              const semanas = g.planning!.weeks;
+              // Sumamos todas las clases de todas las semanas de la planeación
+              const todasLasClases = semanas.flatMap(s => s.classes);
+              const totalClases = todasLasClases.length || 16; // Fallback a 16 si no hay clases registradas aún
+              const clasesCompletadas = todasLasClases.filter(
+                c => c.status === 'REALIZADA' || c.status === 'CANCELADA'
+              ).length;
+
+              const progress = (clasesCompletadas / totalClases) * 100;
 
               return (
                 <div
@@ -417,7 +458,7 @@ export default function PlaneacionPage() {
                           variant="outline"
                           className="font-mono text-[9px] uppercase font-bold tracking-card rounded border-muted-foreground/20 text-muted-foreground px-1 py-0 w-fit"
                         >
-                          {g.codigo}
+                          {g.code}
                         </Badge>
                       </div>
 
@@ -426,11 +467,11 @@ export default function PlaneacionPage() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 rounded-full text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive shrink-0 opacity-0 group-hover:opacity-100 transition-all -mt-1 -mr-1"
-                        onClick={() => deletePlaneacion(g.planeacion!.id)}
-                        disabled={deletingId === g.planeacion!.id}
+                        onClick={() => deletePlaneacion(g.planning!.id)}
+                        disabled={deletingId === g.planning!.id}
                         title="Eliminar planeación"
                       >
-                        {deletingId === g.planeacion!.id ? (
+                        {deletingId === g.planning!.id ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : (
                           <Trash2 className="h-3.5 w-3.5" />
@@ -443,7 +484,7 @@ export default function PlaneacionPage() {
                       <p className="flex items-center gap-2">
                         <Users className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                         <span className="truncate max-w-[180px]">
-                          {g.docentes[0]?.name ?? (
+                          {g.teachers[0]?.name ?? (
                             <span className="text-amber-600 dark:text-amber-500 font-medium bg-amber-500/10 px-1.5 py-0.5 rounded text-[10px]">
                               Sin asignar
                             </span>
@@ -455,9 +496,9 @@ export default function PlaneacionPage() {
                       <p className="flex items-center gap-2">
                         <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                         <span>
-                          {format(new Date(g.planeacion!.fechaInicio), 'MMM d', { locale: es })} —{' '}
-                          {g.planeacion!.fechaFin
-                            ? format(new Date(g.planeacion!.fechaFin), 'MMM d', { locale: es })
+                          {format(new Date(g.planning!.startDate), 'MMM d', { locale: es })} —{' '}
+                          {g.planning!.endDate
+                            ? format(new Date(g.planning!.endDate), 'MMM d', { locale: es })
                             : 'N/A'}
                         </span>
                       </p>
@@ -466,8 +507,10 @@ export default function PlaneacionPage() {
                     {/* Barra de semanas configuradas */}
                     <div className="pt-2">
                       <div className="flex items-center justify-between text-[10px] uppercase font-semibold text-muted-foreground mb-1">
-                        <span>Progreso</span>
-                        <span>{semanas.length} / 16 Sem</span>
+                        <span>Progreso Académico</span>
+                        <span>
+                          {clasesCompletadas} / {totalClases} Clases
+                        </span>
                       </div>
                       <Progress
                         value={progress}

@@ -25,8 +25,8 @@ export async function POST(req: Request) {
       where: { id: session.user.id },
       select: {
         password: true,
-        correoPersonal: true,
-        correoInstitucional: true,
+        personalEmail: true,
+        institutionalEmail: true,
       },
     });
 
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     });
 
     // Invalidate user cache
-    const emails = [user.correoPersonal, user.correoInstitucional].filter(Boolean) as string[];
+    const emails = [user.personalEmail, user.institutionalEmail].filter(Boolean) as string[];
     // @ts-ignore - Dynamic import
     const { clearAllUserCache } = await import('@/lib/cache');
     await clearAllUserCache(session.user.id, emails);

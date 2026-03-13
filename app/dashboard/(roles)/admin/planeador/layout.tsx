@@ -4,9 +4,10 @@ import { CalendarDays, ClipboardList, FileSpreadsheet, LayoutDashboard } from 'l
 import { usePathname } from 'next/navigation';
 
 const STEPS = [
-  { href: '/dashboard/admin/planeador/horarios', label: '1. Programación', icon: FileSpreadsheet },
-  { href: '/dashboard/admin/planeador/asignacion', label: '2. Ajustes', icon: ClipboardList },
-  { href: '/dashboard/admin/planeador/planeacion', label: '3. Planeación', icon: LayoutDashboard },
+  { href: '/dashboard/admin/planeador/periodos', label: '1. Periodos Académicos', icon: CalendarDays },
+  { href: '/dashboard/admin/planeador/horarios', label: '2. Programación', icon: FileSpreadsheet },
+  { href: '/dashboard/admin/planeador/asignacion', label: '3. Ajustes', icon: ClipboardList },
+  { href: '/dashboard/admin/planeador/planeacion', label: '4. Planeación', icon: LayoutDashboard },
 ];
 
 export default function PlaneadorLayout({ children }: { children: React.ReactNode }) {

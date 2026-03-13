@@ -99,7 +99,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const file = formData.get('file') as File;
     // Campos adicionales del formulario manual
     const docenteId = formData.get('docenteId') as string | null;
-    const periodoAcademico = formData.get('periodoAcademico') as string | null;
+    const academicPeriod = formData.get('academicPeriod') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No se encontró el archivo' }, { status: 400 });
@@ -274,36 +274,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           }
         }
 
-        // Buscar reservas eventuales (RoomBooking) aprobadas para el salón asignado
-        if (slot.salon && slot.salon !== 'Por asignar') {
-          const existingBookings = await db.roomBooking.findMany({
-            where: {
-              status: 'APROBADO',
-              room: { name: slot.salon },
-            },
-            include: {
-              room: true,
-              teacher: { select: { name: true } },
-            },
-          });
-
-          for (const booking of existingBookings) {
-            const bDayOfWeek = booking.startTime
-              .toLocaleDateString('es-CO', { weekday: 'long' })
-              .toUpperCase();
-            const bDayNormalized = normalizeDay(bDayOfWeek);
-            if (bDayNormalized !== dia) continue;
-
-            const bStart = booking.startTime.getHours() * 60 + booking.startTime.getMinutes();
-            const bEnd = booking.endTime.getHours() * 60 + booking.endTime.getMinutes();
-
-            if (!rangesOverlap(newStart, newEnd, bStart, bEnd)) continue;
-
-            conflictErrors.push(
-              `⚠️ Choque con reserva puntual: El salón "${slot.salon}" ya tiene una reserva el ${booking.startTime.toLocaleDateString('es-CO')} de ${booking.startTime.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })} a ${booking.endTime.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })} por ${booking.teacher.name}.`
-            );
-          }
-        }
+        // RoomBooking check removed as the model was deleted in the new schema.
       }
     }
 
@@ -365,13 +336,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
               name: subject.name,
               code: subject.code,
               group: data.group,
-              jornada: data.jornada,
+              shift: data.jornada,
               program: subject.program ?? undefined,
               semester: subject.semester ?? undefined,
               credits: subject.credits ?? undefined,
               directHours: subject.directHours ?? undefined,
               description: subject.description ?? undefined,
-              periodoAcademico: periodoAcademico ?? subject.periodoAcademico ?? undefined,
+              academicPeriod: academicPeriod ?? subject.academicPeriod ?? undefined,
               teacherIds: docenteId ? [docenteId] : [],
               studentIds: [],
             },
@@ -380,8 +351,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         } else {
           // Actualizar asignatura existente: jornada, periodo, docente
           const updateData: Record<string, unknown> = {
-            jornada: data.jornada,
-            ...(periodoAcademico ? { periodoAcademico } : {}),
+            shift: data.jornada,
+            ...(academicPeriod ? { academicPeriod } : {}),
           };
           if (docenteId) {
             const currentTeacherIds: string[] = targetSubject.teacherIds || [];
@@ -431,7 +402,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 startTime,
                 endTime,
                 classroom: slot.salon,
-                jornada: data.jornada,
+                shift: data.jornada,
                 status: 'PROGRAMADA' as const,
               });
             }

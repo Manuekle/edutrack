@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { addDays, addWeeks } from 'date-fns';
+import { addDays, addWeeks, startOfWeek } from 'date-fns';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
@@ -10,52 +10,55 @@ export async function POST(req: Request) {
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    const { grupoId, fechaInicio } = await req.json();
-    if (!grupoId || !fechaInicio) {
-      return NextResponse.json({ error: 'grupoId y fechaInicio son requeridos' }, { status: 400 });
+    const { groupId, startDate } = await req.json();
+    if (!groupId || !startDate) {
+      return NextResponse.json({ error: 'groupId y startDate son requeridos' }, { status: 400 });
     }
 
-    const grupo = await db.grupo.findUnique({
-      where: { id: grupoId },
-      include: { horario: true },
+    const group = await db.group.findUnique({
+      where: { id: groupId },
+      include: { schedule: true },
     });
-    if (!grupo) return NextResponse.json({ error: 'Grupo no encontrado' }, { status: 404 });
+    if (!group) return NextResponse.json({ error: 'Grupo no encontrado' }, { status: 404 });
 
-    // Delete existing planeacion if any
-    const existing = await db.planeacion.findUnique({ where: { grupoId } });
+    // Delete existing planning if any
+    const existing = await db.planning.findUnique({ where: { groupId } });
     if (existing) {
-      await db.planeacion.delete({ where: { grupoId } });
+      // Classes don't have cascade delete, so we delete them manually
+      await db.class.deleteMany({ where: { groupId } });
+      await db.planning.delete({ where: { groupId } });
     }
 
-    const start = new Date(fechaInicio);
+    const start = new Date(startDate);
     const end = addWeeks(start, 16);
 
-    // Create planeacion with 16 semanas
-    const planeacion = await db.planeacion.create({
+    // Create planning with 16 weeks
+    const planning = await db.planning.create({
       data: {
-        grupoId,
-        fechaInicio: start,
-        fechaFin: end,
+        groupId,
+        startDate: start,
+        endDate: end,
       },
     });
 
-    // Generate 16 semanas and classes based on horario
+    // Generate 16 weeks and classes based on schedule
     for (let i = 0; i < 16; i++) {
-      const semanaInicio = addWeeks(start, i);
-      const semanaFin = addDays(semanaInicio, 6);
+      const baseDate = addWeeks(start, i);
+      const weekStart = startOfWeek(baseDate, { weekStartsOn: 1 }); // Force Monday start
+      const weekEnd = addDays(weekStart, 6);
 
-      const semana = await db.semanaAcademica.create({
+      const week = await db.academicWeek.create({
         data: {
-          planeacionId: planeacion.id,
-          numero: i + 1,
-          fechaInicio: semanaInicio,
-          fechaFin: semanaFin,
+          planningId: planning.id,
+          number: i + 1,
+          startDate: weekStart,
+          endDate: weekEnd,
         },
       });
 
-      // Create a class for the semana based on horario
-      if (grupo.horario) {
-        const DIA_TO_DAY_OFFSET: Record<string, number> = {
+      // Create a class for the week based on schedule
+      if (group.schedule) {
+        const DAY_TO_OFFSET: Record<string, number> = {
           LUNES: 0,
           MARTES: 1,
           MIERCOLES: 2,
@@ -64,22 +67,39 @@ export async function POST(req: Request) {
           SABADO: 5,
           DOMINGO: 6,
         };
-        const offset = DIA_TO_DAY_OFFSET[grupo.horario.diaSemana] ?? 0;
-        const classDate = addDays(semanaInicio, offset);
+        const offset = DAY_TO_OFFSET[group.schedule.dayOfWeek] ?? 0;
+        const classDate = addDays(weekStart, offset);
+
+        // Pre-calculate start and end times based on classDate
+        let startTime: Date | undefined;
+        let endTime: Date | undefined;
+
+        if (group.schedule.startTime && group.schedule.endTime) {
+          const [sH, sM] = group.schedule.startTime.split(':').map(Number);
+          const [eH, eM] = group.schedule.endTime.split(':').map(Number);
+          
+          startTime = new Date(classDate);
+          startTime.setUTCHours(sH, sM, 0, 0);
+          
+          endTime = new Date(classDate);
+          endTime.setUTCHours(eH, eM, 0, 0);
+        }
 
         await db.class.create({
           data: {
-            subjectId: grupo.subjectId,
-            grupoId: grupo.id,
-            semanaId: semana.id,
+            subjectId: group.subjectId,
+            groupId: group.id,
+            weekId: week.id,
             date: classDate,
+            startTime,
+            endTime,
             status: 'PROGRAMADA',
           },
         });
       }
     }
 
-    return NextResponse.json({ success: true, planeacionId: planeacion.id });
+    return NextResponse.json({ success: true, planningId: planning.id });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

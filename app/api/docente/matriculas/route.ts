@@ -30,13 +30,13 @@ export async function GET(request: Request) {
     studentIds = subject.studentIds;
   } else {
     // Si no es asignatura, probar con Grupo
-    const grupo = await db.grupo.findFirst({
-      where: { id: subjectId, docenteIds: { has: session.user.id } },
-      select: { estudianteIds: true },
+    const group = await db.group.findFirst({
+      where: { id: subjectId, teacherIds: { has: session.user.id } },
+      select: { studentIds: true },
     });
 
-    if (grupo) {
-      studentIds = grupo.estudianteIds;
+    if (group) {
+      studentIds = group.studentIds;
     } else {
       return NextResponse.json(
         {
@@ -58,10 +58,10 @@ export async function GET(request: Request) {
     select: {
       id: true,
       name: true,
-      correoInstitucional: true,
-      correoPersonal: true,
+      institutionalEmail: true,
+      personalEmail: true,
       document: true,
-      telefono: true,
+      phone: true,
     },
     orderBy: {
       name: 'asc',
@@ -137,10 +137,7 @@ export async function POST(request: Request) {
         where: { id: subjectId },
         data: { studentIds: { push: studentId } },
       }),
-      db.user.update({
-        where: { id: studentId },
-        data: { enrolledSubjectIds: { push: subjectId } },
-      }),
+      // Also update groups if necessary - for now we just update top-level subject
     ]);
     return NextResponse.json({ message: 'Estudiante matriculado con éxito' }, { status: 201 });
   } catch (error: unknown) {

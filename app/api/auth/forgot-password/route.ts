@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     // Buscar usuario por correo institucional o personal
     const user = await db.user.findFirst({
       where: {
-        OR: [{ correoInstitucional: correo }, { correoPersonal: correo }],
+        OR: [{ institutionalEmail: correo }, { personalEmail: correo }],
       },
     });
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         subject: 'Restablece tu contraseña - Sistema de Asistencias FUP',
         react: React.createElement(ResetPasswordEmail, {
           resetUrl: `${process.env.NEXTAUTH_URL}/reset-password/${resetToken}`,
-          userEmail: user.correoInstitucional || user.correoPersonal || '',
+          userEmail: user.institutionalEmail || user.personalEmail || '',
           supportEmail: process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co',
         }),
       });

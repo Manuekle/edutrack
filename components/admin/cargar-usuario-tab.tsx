@@ -15,22 +15,32 @@ import {
 import { CheckCircle2, FileSpreadsheet, Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { sileo } from 'sileo';
+import { Role } from '@prisma/client';
 
-interface SubjectPreview {
+interface UserPreview {
   name: string;
-  code: string;
-  program: string;
-  semester: string;
-  credits: string;
+  document: string;
+  email: string;
+  subjectCode: string;
+  groupCode: string;
   status: 'success' | 'error' | 'warning';
   message: string;
 }
 
-export function MicrocurriculoTab() {
+interface CargarUsuarioTabProps {
+  type: Role;
+}
+
+export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
+  const title = role === 'DOCENTE' ? 'Cargar Docentes' : 'Cargar Estudiantes';
+  const description = role === 'DOCENTE'
+    ? 'Carga un archivo CSV con la lista de docentes para vincularlos a asignaturas y grupos.'
+    : 'Carga un archivo CSV con la lista de estudiantes para matricularlos en asignaturas y grupos.';
+
   const [file, setFile] = useState<File | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewData, setPreviewData] = useState<SubjectPreview[]>([]);
+  const [previewData, setPreviewData] = useState<UserPreview[]>([]);
 
   const handlePreview = async () => {
     if (!file) return;
@@ -41,12 +51,16 @@ export function MicrocurriculoTab() {
       formData.append('file', file);
       formData.append('preview', 'true');
 
-      const response = await fetch('/api/admin/subjects/bulk', {
+      const response = await fetch(`/api/admin/users/bulk?forceRole=${role}`, {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Error al previsualizar');
+      if (!response.ok) {
+         const errorData = await response.json();
+         sileo.error({ description: errorData.error || 'Error al procesar el archivo' });
+         return;
+      }
 
       const data = await response.json();
       setPreviewData(data.previewData || []);
@@ -66,27 +80,31 @@ export function MicrocurriculoTab() {
       formData.append('file', file);
       formData.append('preview', 'false');
 
-      const response = await fetch('/api/admin/subjects/bulk', {
+      const response = await fetch(`/api/admin/users/bulk?forceRole=${role}`, {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Error al cargar asignaturas');
+      if (!response.ok) {
+         const errorData = await response.json();
+         sileo.error({ description: errorData.error || 'Error al cargar usuarios' });
+         return;
+      }
 
       const result = await response.json();
       sileo.success({
-        description: `Carga completada: ${result.summary.created} asignaturas creadas.`,
+        description: `Carga completada: ${result.summary.created} nuevos creados, ${result.summary.mapped} vinculados satisfactoriamente.`,
       });
       setFile(null);
       setPreviewData([]);
     } catch (error) {
-      sileo.error({ description: 'Error al confirmar la carga de asignaturas.' });
+      sileo.error({ description: 'Error al confirmar la carga de usuarios.' });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const validCount = previewData.filter(p => p.status === 'success').length;
+  const validCount = previewData.filter(p => p.status === 'success' || p.status === 'warning').length;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -95,21 +113,21 @@ export function MicrocurriculoTab() {
         <Card className="border shadow-xs">
           <CardHeader className="bg-muted/5 border-b py-4">
             <CardTitle className="text-sm font-semibold tracking-card">
-              Importar Catálogo
+              {title}
             </CardTitle>
             <CardDescription className="text-[11px]">
-              Sube el microcurrículo oficial en formato CSV.
+              {description}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-5 space-y-4">
             <div className="space-y-2">
               <p className="text-[11px] font-semibold">Columnas requeridas:</p>
               <ul className="text-[10px] text-muted-foreground list-disc ml-4 space-y-1">
-                <li><strong>nombre</strong> (o asignatura)</li>
-                <li><strong>codigo</strong> (o code)</li>
-                <li>programa (opcional)</li>
-                <li>semestre (opcional)</li>
-                <li>creditos (opcional)</li>
+                <li><strong>nombre</strong></li>
+                <li><strong>documento</strong></li>
+                <li><strong>correo</strong></li>
+                <li><strong>asignatura</strong> (código existente)</li>
+                <li><strong>grupo</strong> (código existente)</li>
               </ul>
             </div>
             
@@ -161,10 +179,10 @@ export function MicrocurriculoTab() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
                       <TableRow>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Estado</TableHead>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Asignatura</TableHead>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Código</TableHead>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Programa</TableHead>
+                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2 w-10">Estado</TableHead>
+                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Usuario</TableHead>
+                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Asignación</TableHead>
+                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Mensaje</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -173,18 +191,26 @@ export function MicrocurriculoTab() {
                           <TableCell className="px-4 py-2">
                             {row.status === 'success' ? (
                               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            ) : row.status === 'warning' ? (
+                              <Badge variant="outline" className="text-[8px] bg-amber-500/10 text-amber-600 border-amber-500/20 px-1 py-0 h-4">
+                                Vínculo
+                              </Badge>
                             ) : (
-                              <Badge variant={row.status === 'error' ? 'destructive' : 'outline'} className="text-[8px] px-1 h-4">
-                                {row.status === 'error' ? 'Error' : 'Existe'}
+                              <Badge variant="destructive" className="text-[8px] px-1 py-0 h-4 rounded">
+                                Error
                               </Badge>
                             )}
                           </TableCell>
-                          <TableCell className="px-4 py-2 text-xs font-medium truncate max-w-[200px]">
-                            {row.name}
+                          <TableCell className="px-4 py-2 text-xs font-medium truncate max-w-[150px]">
+                            <p>{row.name}</p>
+                            <p className="text-[9px] text-muted-foreground font-normal font-mono">{row.document}</p>
                           </TableCell>
-                          <TableCell className="px-4 py-2 text-[10px] font-mono">{row.code}</TableCell>
-                          <TableCell className="px-4 py-2 text-[10px] text-muted-foreground truncate max-w-[150px]">
-                            {row.program || '—'}
+                          <TableCell className="px-4 py-2 text-[10px] truncate max-w-[150px]">
+                            <p>Asignatura: <span className="font-mono">{row.subjectCode}</span></p>
+                            <p>Grupo: <span className="font-mono">{row.groupCode}</span></p>
+                          </TableCell>
+                          <TableCell className="px-4 py-2 text-[10px] text-muted-foreground truncate max-w-[200px]" title={row.message}>
+                            {row.message}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -193,7 +219,7 @@ export function MicrocurriculoTab() {
                 </div>
                 <div className="p-4 bg-muted/5 border-t flex items-center justify-between">
                   <div className="text-[11px] text-muted-foreground">
-                    <span className="font-semibold text-foreground">{validCount}</span> listos para importar
+                    <span className="font-semibold text-foreground">{validCount}</span> listos para importar/vincular
                   </div>
                   <Button
                     onClick={handleConfirmUpload}

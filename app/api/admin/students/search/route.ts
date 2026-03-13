@@ -23,7 +23,7 @@ export async function GET(request: Request) {
               { document: { contains: query, mode: Prisma.QueryMode.insensitive } },
               { name: { contains: query, mode: Prisma.QueryMode.insensitive } },
               {
-                correoInstitucional: {
+                institutionalEmail: {
                   contains: query,
                   mode: Prisma.QueryMode.insensitive,
                 },
@@ -39,8 +39,8 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         document: true,
-        correoInstitucional: true,
-        codigoEstudiantil: true,
+        institutionalEmail: true,
+        studentCode: true,
       },
       take: 50,
       orderBy: { name: 'asc' },

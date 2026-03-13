@@ -11,59 +11,45 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const grupoNombre = searchParams.get('grupoNombre');
-    const periodo = searchParams.get('periodo');
+    const groupCode = searchParams.get('groupCode');
+    const period = searchParams.get('period');
 
-    const where: Record<string, unknown> = {};
-    if (grupoNombre) where.grupoNombre = grupoNombre;
-    if (periodo) where.periodoAcademico = periodo;
-
-    const assignments = await db.groupAssignment.findMany({
-      where,
+    const groups = await db.group.findMany({
+      where: {
+        ...(groupCode ? { code: groupCode } : {}),
+        ...(period ? { academicPeriod: period } : {}),
+      },
       include: {
-        student: {
+        students: {
           select: {
             id: true,
             name: true,
             document: true,
-            correoInstitucional: true,
-            codigoEstudiantil: true,
+            institutionalEmail: true,
+            studentCode: true,
           },
         },
+        subject: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          }
+        }
       },
-      orderBy: [{ grupoNombre: 'asc' }, { periodoAcademico: 'desc' }],
+      orderBy: [{ academicPeriod: 'desc' }, { code: 'asc' }],
     });
 
-    // Group by grupoNombre + periodoAcademico
-    const groupMap = new Map<
-      string,
-      {
-        grupoNombre: string;
-        periodoAcademico: string;
-        students: {
-          id: string;
-          name: string | null;
-          document: string | null;
-          correoInstitucional: string | null;
-          codigoEstudiantil: string | null;
-        }[];
-      }
-    >();
-
-    for (const a of assignments) {
-      const key = `${a.grupoNombre}|${a.periodoAcademico}`;
-      if (!groupMap.has(key)) {
-        groupMap.set(key, {
-          grupoNombre: a.grupoNombre,
-          periodoAcademico: a.periodoAcademico,
-          students: [],
-        });
-      }
-      groupMap.get(key)!.students.push(a.student);
-    }
-
     return NextResponse.json({
-      groups: Array.from(groupMap.values()),
+      groups: groups.map(g => ({
+        id: g.id,
+        groupCode: g.code,
+        subjectId: g.subjectId,
+        subjectName: g.subject.name,
+        subjectCode: g.subject.code,
+        academicPeriod: g.academicPeriod,
+        students: g.students,
+      })),
     });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
@@ -77,21 +63,49 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { studentId, grupoNombre, periodoAcademico } = await request.json();
+    const { studentId, groupId } = await request.json();
 
-    if (!studentId || !grupoNombre || !periodoAcademico) {
+    if (!studentId || !groupId) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
     }
 
-    await db.groupAssignment.delete({
-      where: {
-        studentId_grupoNombre_periodoAcademico: {
-          studentId,
-          grupoNombre,
-          periodoAcademico,
+    const group = await db.group.findUnique({
+      where: { id: groupId },
+      select: { studentIds: true, subjectId: true },
+    });
+
+    if (!group) {
+      return NextResponse.json({ error: 'Grupo no encontrado' }, { status: 404 });
+    }
+
+    const updatedStudentIds = group.studentIds.filter(id => id !== studentId);
+
+    await db.group.update({
+      where: { id: groupId },
+      data: {
+        studentIds: {
+          set: updatedStudentIds,
         },
       },
     });
+
+    // Also update subject if necessary
+    if (group.subjectId) {
+      const subject = await db.subject.findUnique({
+        where: { id: group.subjectId },
+        select: { studentIds: true },
+      });
+      if (subject) {
+        await db.subject.update({
+          where: { id: group.subjectId },
+          data: {
+            studentIds: {
+              set: subject.studentIds.filter(id => id !== studentId),
+            },
+          },
+        });
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -100,17 +114,20 @@ export async function DELETE(request: NextRequest) {
 }
 
 interface AssignmentRow {
-  documentoEstudiante: string;
-  grupoNombre: string;
-  periodoAcademico: string;
+  studentDocument: string;
+  groupCode: string;
+  subjectCode: string;
+  academicPeriod: string;
 }
 
 interface PreviewResult {
-  documentoEstudiante: string;
-  nombreEstudiante: string;
-  grupoNombre: string;
-  periodoAcademico: string;
-  estudianteId?: string;
+  studentDocument: string;
+  studentName: string;
+  groupCode: string;
+  subjectCode: string;
+  academicPeriod: string;
+  studentId?: string;
+  groupId?: string;
   status: 'success' | 'error' | 'existing' | 'manual';
   message: string;
 }
@@ -152,15 +169,16 @@ export async function POST(request: Request) {
         .toLowerCase()
         .split(/[,;]/)
         .map(h => h.trim());
-      const docIdx = headers.findIndex(h => h.includes('documento') || h.includes('cedula'));
-      const grupoIdx = headers.findIndex(h => h.includes('grupo') || h.includes('destino'));
-      const periodoIdx = headers.findIndex(h => h.includes('periodo') || h.includes('academico'));
+      const docIdx = headers.findIndex(h => h.includes('documento') || h.includes('cedula') || h.includes('student'));
+      const grupoIdx = headers.findIndex(h => h.includes('grupo') || h.includes('destino') || h.includes('group'));
+      const subjectIdx = headers.findIndex(h => h.includes('asignatura') || h.includes('materia') || h.includes('subject'));
+      const periodoIdx = headers.findIndex(h => h.includes('periodo') || h.includes('academico') || h.includes('period'));
 
-      if (docIdx === -1 || grupoIdx === -1) {
+      if (docIdx === -1 || grupoIdx === -1 || subjectIdx === -1) {
         return NextResponse.json(
           {
             error:
-              'El archivo debe tener columnas: documento_estudiante, grupo_destino, periodo_academico',
+              'El archivo debe tener columnas: documento_estudiante, grupo, codigo_asignatura, periodo_academico',
           },
           { status: 400 }
         );
@@ -170,9 +188,10 @@ export async function POST(request: Request) {
         const cols = lines[i].split(/[,;]/).map(c => c.trim());
         if (cols[docIdx]) {
           rawRows.push({
-            documentoEstudiante: cols[docIdx],
-            grupoNombre: grupoIdx !== -1 ? cols[grupoIdx] : '',
-            periodoAcademico: periodoIdx !== -1 ? cols[periodoIdx] : '',
+            studentDocument: cols[docIdx],
+            groupCode: cols[grupoIdx] || 'A',
+            subjectCode: cols[subjectIdx] || '',
+            academicPeriod: periodoIdx !== -1 ? cols[periodoIdx] : '',
           });
         }
       }
@@ -187,88 +206,102 @@ export async function POST(request: Request) {
     }
 
     // Lookup students
-    const documentos = [...new Set(rawRows.map(r => r.documentoEstudiante))];
-    const estudiantes = await db.user.findMany({
-      where: { document: { in: documentos }, role: 'ESTUDIANTE' },
+    const studentDocuments = [...new Set(rawRows.map(r => r.studentDocument))];
+    const students = await db.user.findMany({
+      where: { document: { in: studentDocuments }, role: 'ESTUDIANTE' },
       select: { id: true, name: true, document: true },
     });
 
-    const estudianteMap = new Map(estudiantes.map(e => [e.document!, e]));
+    const studentMap = new Map(students.map(e => [e.document!, e]));
 
-    // Check existing assignments
-    const existingAssignments = await db.groupAssignment.findMany({
+    // Lookup Groups
+    const subjectCodes = [...new Set(rawRows.map(r => r.subjectCode))];
+    const periods = [...new Set(rawRows.map(r => r.academicPeriod))];
+    const groupCodes = [...new Set(rawRows.map(r => r.groupCode))];
+
+    const allGroups = await db.group.findMany({
       where: {
-        studentId: { in: estudiantes.map(e => e.id) },
-        grupoNombre: { in: [...new Set(rawRows.map(r => r.grupoNombre))] },
+        code: { in: groupCodes },
+        academicPeriod: { in: periods },
+        subject: { code: { in: subjectCodes } },
       },
-      select: { studentId: true, grupoNombre: true, periodoAcademico: true },
+      include: { subject: { select: { code: true } } },
     });
 
-    const existingSet = new Set(
-      existingAssignments.map(a => `${a.studentId}-${a.grupoNombre}-${a.periodoAcademico}`)
-    );
+    const groupMap = new Map();
+    for (const g of allGroups) {
+      groupMap.set(`${g.subject.code}-${g.code}-${g.academicPeriod}`, g);
+    }
 
     const results: PreviewResult[] = [];
 
     for (const row of rawRows) {
-      const estudiante = estudianteMap.get(row.documentoEstudiante.trim());
+      const student = studentMap.get(row.studentDocument.trim());
+      const group = groupMap.get(`${row.subjectCode}-${row.groupCode}-${row.academicPeriod}`);
 
-      if (!row.documentoEstudiante?.trim()) {
+      if (!row.studentDocument?.trim()) {
         results.push({
-          documentoEstudiante: row.documentoEstudiante,
-          nombreEstudiante: '',
-          grupoNombre: row.grupoNombre,
-          periodoAcademico: row.periodoAcademico,
+          studentDocument: row.studentDocument,
+          studentName: '',
+          groupCode: row.groupCode,
+          subjectCode: row.subjectCode,
+          academicPeriod: row.academicPeriod,
           status: 'error',
           message: 'Falta el documento del estudiante',
         });
         continue;
       }
 
-      if (!row.grupoNombre?.trim()) {
+      if (!student) {
         results.push({
-          documentoEstudiante: row.documentoEstudiante,
-          nombreEstudiante: estudiante?.name || '',
-          grupoNombre: row.grupoNombre,
-          periodoAcademico: row.periodoAcademico,
-          status: 'error',
-          message: 'Falta el nombre del grupo',
-        });
-        continue;
-      }
-
-      if (!estudiante) {
-        results.push({
-          documentoEstudiante: row.documentoEstudiante,
-          nombreEstudiante: '',
-          grupoNombre: row.grupoNombre,
-          periodoAcademico: row.periodoAcademico,
+          studentDocument: row.studentDocument,
+          studentName: '',
+          groupCode: row.groupCode,
+          subjectCode: row.subjectCode,
+          academicPeriod: row.academicPeriod,
           status: 'error',
           message: 'Estudiante no encontrado en el sistema',
         });
         continue;
       }
 
-      const key = `${estudiante.id}-${row.grupoNombre}-${row.periodoAcademico}`;
-      if (existingSet.has(key)) {
+      if (!group) {
         results.push({
-          documentoEstudiante: row.documentoEstudiante,
-          nombreEstudiante: estudiante.name || '',
-          grupoNombre: row.grupoNombre,
-          periodoAcademico: row.periodoAcademico,
-          estudianteId: estudiante.id,
+          studentDocument: row.studentDocument,
+          studentName: student.name || '',
+          groupCode: row.groupCode,
+          subjectCode: row.subjectCode,
+          academicPeriod: row.academicPeriod,
+          status: 'error',
+          message: 'Grupo no encontrado para esta asignatura y periodo',
+        });
+        continue;
+      }
+
+      const isAlreadyEnrolled = group.studentIds.includes(student.id);
+      if (isAlreadyEnrolled) {
+        results.push({
+          studentDocument: row.studentDocument,
+          studentName: student.name || '',
+          groupCode: row.groupCode,
+          subjectCode: row.subjectCode,
+          academicPeriod: row.academicPeriod,
+          studentId: student.id,
+          groupId: group.id,
           status: 'existing',
-          message: 'Estudiante ya asignado a este grupo en el mismo periodo',
+          message: 'Estudiante ya asignado a este grupo',
         });
         continue;
       }
 
       results.push({
-        documentoEstudiante: row.documentoEstudiante,
-        nombreEstudiante: estudiante.name || '',
-        grupoNombre: row.grupoNombre,
-        periodoAcademico: row.periodoAcademico,
-        estudianteId: estudiante.id,
+        studentDocument: row.studentDocument,
+        studentName: student.name || '',
+        groupCode: row.groupCode,
+        subjectCode: row.subjectCode,
+        academicPeriod: row.academicPeriod,
+        studentId: student.id,
+        groupId: group.id,
         status: 'success',
         message: 'Listo para asignar',
       });
@@ -292,22 +325,27 @@ export async function POST(request: Request) {
 
     await db.$transaction(async tx => {
       for (const item of toCreate) {
-        if (!item.estudianteId) continue;
-        await tx.groupAssignment.upsert({
-          where: {
-            studentId_grupoNombre_periodoAcademico: {
-              studentId: item.estudianteId,
-              grupoNombre: item.grupoNombre,
-              periodoAcademico: item.periodoAcademico,
+        if (!item.studentId || !item.groupId) continue;
+        await tx.group.update({
+          where: { id: item.groupId },
+          data: {
+            studentIds: {
+              push: item.studentId,
             },
           },
-          create: {
-            studentId: item.estudianteId,
-            grupoNombre: item.grupoNombre,
-            periodoAcademico: item.periodoAcademico,
-          },
-          update: {},
         });
+        // Also add to subject studentIds for backward compatibility/fast lookup
+        const group = allGroups.find(g => g.id === item.groupId);
+        if (group?.subjectId) {
+          await tx.subject.update({
+            where: { id: group.subjectId },
+            data: {
+              studentIds: {
+                push: item.studentId,
+              },
+            },
+          });
+        }
       }
     });
 

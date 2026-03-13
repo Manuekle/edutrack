@@ -14,15 +14,15 @@ export async function GET(req: NextRequest) {
 
     const users = await db.user.findMany({
       where: {
-        ...(role ? { role: role as 'ADMIN' | 'DOCENTE' | 'ESTUDIANTE' | 'COORDINADOR' } : {}),
+        ...(role ? { role: role as 'ADMIN' | 'DOCENTE' | 'ESTUDIANTE' } : {}),
         isActive: true,
         ...(search
           ? {
               OR: [
                 { name: { contains: search, mode: 'insensitive' } },
-                { correoInstitucional: { contains: search, mode: 'insensitive' } },
-                { codigoDocente: { contains: search, mode: 'insensitive' } },
-                { codigoEstudiantil: { contains: search, mode: 'insensitive' } },
+                { institutionalEmail: { contains: search, mode: 'insensitive' } },
+                { teacherCode: { contains: search, mode: 'insensitive' } },
+                { studentCode: { contains: search, mode: 'insensitive' } },
               ],
             }
           : {}),
@@ -30,10 +30,10 @@ export async function GET(req: NextRequest) {
       select: {
         id: true,
         name: true,
-        correoInstitucional: true,
-        correoPersonal: true,
-        codigoDocente: true,
-        codigoEstudiantil: true,
+        institutionalEmail: true,
+        personalEmail: true,
+        teacherCode: true,
+        studentCode: true,
         role: true,
         isActive: true,
       },

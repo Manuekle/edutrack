@@ -9,7 +9,7 @@ export const DocenteClaseSchema = z.object({
   topic: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   classroom: z.string().nullable().optional(),
-  status: z.enum(['PROGRAMADA', 'REALIZADA', 'CANCELADA']).default('PROGRAMADA'),
+  status: z.enum(['SCHEDULED', 'COMPLETED', 'CANCELLED']).default('SCHEDULED'),
   cancellationReason: z.string().nullable().optional(),
 
   totalStudents: z.number().optional(),

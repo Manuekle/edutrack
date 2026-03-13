@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingPage } from '@/components/ui/loading';
 import { BookOpen, CalendarDays, GraduationCap, Layout, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -43,20 +43,14 @@ export default function MisGruposPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
-          Mis Grupos
-        </h1>
+        <h1 className="text-2xl font-bold tracking-card">Mis Grupos</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Grupos activos — haz clic en «Ver Bitácora» para registrar las clases de cada grupo.
         </p>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-52" />
-          ))}
-        </div>
+        <LoadingPage />
       ) : grupos.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">

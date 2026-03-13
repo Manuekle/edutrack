@@ -9,19 +9,19 @@ export async function GET() {
     if (!session || session.user?.role !== 'ESTUDIANTE') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    const grupos = await db.grupo.findMany({
-      where: { estudianteIds: { has: session.user.id } },
+    const groups = await db.group.findMany({
+      where: { studentIds: { has: session.user.id } },
       include: {
         subject: { select: { name: true, code: true } },
-        docentes: { select: { id: true, name: true, correoInstitucional: true } },
-        horario: {
-          select: { diaSemana: true, horaInicio: true, horaFin: true, periodicidad: true },
+        teachers: { select: { id: true, name: true, institutionalEmail: true } },
+        schedule: {
+          select: { dayOfWeek: true, startTime: true, endTime: true },
         },
-        sala: { select: { name: true, type: true, capacity: true } },
-        estudiantes: { select: { id: true, name: true, codigoEstudiantil: true } },
+        room: { select: { name: true, type: true, capacity: true } },
+        students: { select: { id: true, name: true, studentCode: true } },
       },
     });
-    return NextResponse.json({ grupos });
+    return NextResponse.json({ groups });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

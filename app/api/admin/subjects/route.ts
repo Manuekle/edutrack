@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { EnrollmentStatus, Prisma, Role } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -46,33 +46,21 @@ export async function GET(req: NextRequest) {
     }
 
     // Obtener asignaturas con paginación
-    const includeObj: Record<string, unknown> = {
+    const includeObj: Prisma.SubjectInclude = {
       teachers: {
         select: {
           id: true,
           name: true,
-          correoInstitucional: true,
-          codigoDocente: true,
+          institutionalEmail: true,
+          teacherCode: true,
         },
       },
-      enrollments: {
-        where: {
-          status: EnrollmentStatus.ACTIVA,
-        },
-        select: {
-          student: {
-            select: {
-              id: true,
-              name: true,
-              correoInstitucional: true,
-              codigoEstudiantil: true,
-            },
-          },
-        },
-      },
+      // Since enrollments is gone, we'll fetch students manually or through groups
+      // For now, let's just include the count of groups or classes
       _count: {
         select: {
           classes: true,
+          groups: true,
         },
       },
     };
@@ -92,19 +80,14 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Transformar para incluir conteo de estudiantes y lista básica de estudiantes
+    // Transformar para incluir conteo de estudiantes
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const subjectsWithCounts = subjects.map((subject: any) => ({
       ...subject,
-      studentCount: subject.enrollments?.length || subject.studentIds?.length || 0,
+      studentCount: subject.studentIds?.length || 0,
       classCount: subject._count?.classes || 0,
-      students:
-        subject.enrollments?.map((enrollment: any) => ({
-          id: enrollment.student.id,
-          name: enrollment.student.name,
-          correoInstitucional: enrollment.student.correoInstitucional,
-          codigoEstudiantil: enrollment.student.codigoEstudiantil,
-        })) || [],
+      groupCount: subject._count?.groups || 0,
+      students: [], // We'd need a separate fetch for students if needed, but for list view count is enough
     }));
 
     const totalPages = Math.ceil(total / pageSize);
@@ -144,8 +127,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verificar que el código no exista (ahora solo código es único)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const existingSubject = await (db as any).subject.findUnique({
+    const existingSubject = await db.subject.findFirst({
       where: {
         code,
       },
@@ -176,8 +158,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newSubject = await (db as any).subject.create({
+    const newSubject = await db.subject.create({
       data: {
         name,
         code,
@@ -191,8 +172,8 @@ export async function POST(req: NextRequest) {
           select: {
             id: true,
             name: true,
-            correoInstitucional: true,
-            codigoDocente: true,
+            institutionalEmail: true,
+            teacherCode: true,
           },
         },
       },

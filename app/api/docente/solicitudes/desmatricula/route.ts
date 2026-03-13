@@ -74,11 +74,11 @@ export async function POST(request: Request) {
     }
 
     // Verificar si ya existe una solicitud pendiente para este estudiante y asignatura
-    const existingRequest = await db.unenrollRequest.findFirst({
+    const existingRequest = await (db as any).unenrollRequest.findFirst({
       where: {
         studentId,
         subjectId,
-        status: 'PENDIENTE',
+        status: 'PENDING',
       },
     });
 
@@ -93,17 +93,17 @@ export async function POST(request: Request) {
 
     try {
       // Crear la solicitud de desmatriculación usando el modelo extendido
-      const unenrollRequest = await db.unenrollRequest.create({
+      const unenrollRequest = await (db as any).unenrollRequest.create({
         data: {
           student: { connect: { id: studentId } },
           subject: { connect: { id: subjectId } },
           reason,
           requestedBy: { connect: { id: session.user.id } },
-          status: 'PENDIENTE',
+          status: 'PENDING',
         },
         include: {
           student: {
-            select: { name: true, correoInstitucional: true },
+            select: { name: true, institutionalEmail: true },
           },
           requestedBy: {
             select: { name: true },
@@ -117,7 +117,7 @@ export async function POST(request: Request) {
         const adminEmail = process.env.ADMIN_EMAIL || 'elustondo129@gmail.com';
 
         // Get subject name from the database
-        const subject = await db.subject.findUnique({
+        const subjectData = await db.subject.findUnique({
           where: { id: unenrollRequest.subjectId },
           select: { name: true },
         });
@@ -125,11 +125,11 @@ export async function POST(request: Request) {
         // Send email to admin
         await sendEmail({
           to: adminEmail,
-          subject: `Solicitud de Desmatriculación - ${subject?.name || 'Asignatura'}`,
+          subject: `Solicitud de Desmatriculación - ${subjectData?.name || 'Asignatura'}`,
           react: React.createElement(UnenrollRequestEmail, {
             studentName: unenrollRequest.student?.name || 'Estudiante',
-            studentEmail: unenrollRequest.student?.correoInstitucional || 'No especificado',
-            subjectName: subject?.name || 'Asignatura',
+            studentEmail: unenrollRequest.student?.institutionalEmail || 'No especificado',
+            subjectName: subjectData?.name || 'Asignatura',
             reason: unenrollRequest.reason,
             requestDate: unenrollRequest.createdAt.toISOString(),
             supportEmail: supportEmail,
