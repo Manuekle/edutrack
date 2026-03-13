@@ -4,6 +4,15 @@ import { SubjectFileUpload } from '@/components/subject-file-upload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -12,214 +21,644 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { CheckCircle2, FileSpreadsheet, Loader2, Upload } from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle,
+  Download,
+  Edit2,
+  FileSpreadsheet,
+  Loader2,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 import { sileo } from 'sileo';
 
-interface SubjectPreview {
-  name: string;
-  code: string;
-  program: string;
-  semester: string;
-  credits: string;
-  status: 'success' | 'error' | 'warning';
+interface PreviewItem {
+  id: string;
+  codigoAsignatura: string;
+  nombreAsignatura: string;
+  programa: string;
+  semestre: number;
+  horas: number;
+  status: 'success' | 'error' | 'existing' | 'manual';
   message: string;
 }
 
+const PROGRAMAS = [
+  'Ingenieria de Sistemas',
+  'Ingenieria Industrial',
+  'Ingenieria Electronica',
+  'Administracion de Empresas',
+  'Contaduria Publica',
+  'Derecho',
+  'Psicologia',
+  'Comunicacion Social',
+  'Economia',
+  'Otro',
+];
+
 export function MicrocurriculoTab() {
+  const [mode, setMode] = useState<'csv' | 'manual'>('csv');
   const [file, setFile] = useState<File | null>(null);
-  const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [previewData, setPreviewData] = useState<SubjectPreview[]>([]);
+  const [isPreview, setIsPreview] = useState(false);
+  const [previewData, setPreviewData] = useState<PreviewItem[]>([]);
+  const [finalResults, setFinalResults] = useState<{ created: number; errors: number } | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+
+  const [manualForm, setManualForm] = useState<{
+    codigo: string;
+    nombre: string;
+    programa: string;
+    semestre: string;
+    horas: string;
+  }>({
+    codigo: '',
+    nombre: '',
+    programa: PROGRAMAS[0],
+    semestre: '1',
+    horas: '4',
+  });
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const handleFileSelect = (selectedFile: File | null) => {
+    setFile(selectedFile);
+    if (!selectedFile) {
+      setIsPreview(false);
+      setPreviewData([]);
+      setFinalResults(null);
+    } else {
+      setFinalResults(null);
+      setIsPreview(false);
+      setPreviewData([]);
+    }
+  };
 
   const handlePreview = async () => {
-    if (!file) return;
-
-    setIsPreviewing(true);
+    if (!file) {
+      sileo.error({
+        title: 'Archivo requerido',
+        description: 'Por favor, selecciona un archivo .csv para continuar.',
+      });
+      return;
+    }
+    setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('preview', 'true');
-
-      const response = await fetch('/api/admin/subjects/bulk', {
+      const res = await fetch('/api/admin/microcurriculo?preview=true', {
         method: 'POST',
         body: formData,
       });
-
-      if (!response.ok) throw new Error('Error al previsualizar');
-
-      const data = await response.json();
-      setPreviewData(data.previewData || []);
-    } catch (error) {
-      sileo.error({ description: 'No se pudo procesar el archivo para vista previa.' });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const dataWithIds = (result.previewData || []).map((item: PreviewItem, index: number) => ({
+          ...item,
+          id: `csv-${index}-${Date.now()}`,
+        }));
+        setPreviewData(dataWithIds);
+        setIsPreview(true);
+        sileo.success({ title: 'Vista previa', description: 'Vista previa generada con éxito' });
+      } else {
+        sileo.error({
+          title: 'Error de previsualización',
+          description: result.error || 'Error al generar la vista previa',
+        });
+        handleCancel();
+      }
+    } catch {
+      sileo.error({
+        title: 'Error inesperado',
+        description: 'Ocurrió un error inesperado al procesar el archivo.',
+      });
+      handleCancel();
     } finally {
-      setIsPreviewing(false);
+      setIsLoading(false);
     }
+  };
+
+  const handleAddManual = () => {
+    if (!manualForm.codigo || !manualForm.nombre) {
+      sileo.error({
+        title: 'Campos requeridos',
+        description: 'El código y nombre son obligatorios.',
+      });
+      return;
+    }
+    const newItem: PreviewItem = {
+      id: `manual-${Date.now()}`,
+      codigoAsignatura: manualForm.codigo,
+      nombreAsignatura: manualForm.nombre,
+      programa: manualForm.programa,
+      semestre: parseInt(manualForm.semestre) || 1,
+      horas: parseInt(manualForm.horas) || 4,
+      status: 'manual',
+      message: 'Nuevo',
+    };
+    setPreviewData([...previewData, newItem]);
+    setIsPreview(true);
+    setManualForm({ codigo: '', nombre: '', programa: PROGRAMAS[0], semestre: '1', horas: '4' });
+    sileo.success({ title: 'Agregado', description: 'Asignatura agregada a la lista' });
+  };
+
+  const handleEditItem = (id: string) => {
+    const item = previewData.find(i => i.id === id);
+    if (item) {
+      setManualForm({
+        codigo: item.codigoAsignatura,
+        nombre: item.nombreAsignatura,
+        programa: item.programa,
+        semestre: item.semestre.toString(),
+        horas: item.horas.toString(),
+      });
+      setEditingId(id);
+      setMode('manual');
+    }
+  };
+
+  const handleUpdateItem = () => {
+    if (!editingId) return;
+    if (!manualForm.codigo || !manualForm.nombre) {
+      sileo.error({
+        title: 'Campos requeridos',
+        description: 'El código y nombre son obligatorios.',
+      });
+      return;
+    }
+    setPreviewData(
+      previewData.map(item =>
+        item.id === editingId
+          ? {
+            ...item,
+            codigoAsignatura: manualForm.codigo,
+            nombreAsignatura: manualForm.nombre,
+            programa: manualForm.programa,
+            semestre: parseInt(manualForm.semestre) || 1,
+            horas: parseInt(manualForm.horas) || 4,
+          }
+          : item
+      )
+    );
+    setEditingId(null);
+    setMode('csv');
+    setManualForm({ codigo: '', nombre: '', programa: PROGRAMAS[0], semestre: '1', horas: '4' });
+    sileo.success({ title: 'Actualizado', description: 'Asignatura actualizada' });
+  };
+
+  const handleDeleteItem = (id: string) => {
+    setPreviewData(previewData.filter(item => item.id !== id));
   };
 
   const handleConfirmUpload = async () => {
-    if (!file || previewData.length === 0) return;
-
-    setIsUploading(true);
+    const successCount = previewData.filter(item => item.status !== 'error').length;
+    if (successCount === 0) {
+      sileo.error({
+        title: 'Sin datos válidos',
+        description: 'No hay asignaturas válidas para crear.',
+      });
+      return;
+    }
+    setIsConfirming(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('preview', 'false');
-
-      const response = await fetch('/api/admin/subjects/bulk', {
+      const validItems = previewData.filter(item => item.status !== 'error');
+      const res = await fetch('/api/admin/microcurriculo', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjects: validItems }),
       });
-
-      if (!response.ok) throw new Error('Error al cargar asignaturas');
-
-      const result = await response.json();
-      sileo.success({
-        description: `Carga completada: ${result.summary.created} asignaturas creadas.`,
-      });
-      setFile(null);
-      setPreviewData([]);
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const totalProcessed = (result.summary?.created || 0) + (result.summary?.updatedCount || 0);
+        sileo.success({
+          title: 'Carga completada',
+          description: `Proceso finalizado. Se procesaron ${totalProcessed} asignaturas.`,
+        });
+        setFinalResults({ created: totalProcessed, errors: result.summary?.errors || 0 });
+        setPreviewData([]);
+      } else {
+        sileo.error({
+          title: 'Error de carga',
+          description: result.error || 'Ocurrió un error en la carga.',
+        });
+      }
     } catch (error) {
-      sileo.error({ description: 'Error al confirmar la carga de asignaturas.' });
+      sileo.error({
+        title: 'Error de red',
+        description: error instanceof Error ? error.message : 'Ocurrió un error inesperado.',
+      });
     } finally {
-      setIsUploading(false);
+      setIsConfirming(false);
     }
   };
 
-  const validCount = previewData.filter(p => p.status === 'success').length;
+  const handleCancel = () => {
+    setFile(null);
+    setIsPreview(false);
+    setPreviewData([]);
+    setFinalResults(null);
+    setEditingId(null);
+    setManualForm({ codigo: '', nombre: '', programa: PROGRAMAS[0], semestre: '1', horas: '4' });
+  };
+
+  const handleNewUpload = () => {
+    setFile(null);
+    setIsPreview(false);
+    setPreviewData([]);
+    setFinalResults(null);
+    setEditingId(null);
+  };
+
+  const successCount = previewData.filter(item => item.status !== 'error').length;
+  const errorCount = previewData.filter(item => item.status === 'error').length;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left Column: Instructions and Upload */}
-      <div className="space-y-6">
-        <Card className="border shadow-xs">
-          <CardHeader className="bg-muted/5 border-b py-4">
-            <CardTitle className="text-sm font-semibold tracking-card">
-              Importar Catálogo
-            </CardTitle>
-            <CardDescription className="text-[11px]">
-              Sube el microcurrículo oficial en formato CSV.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-5 space-y-4">
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold">Columnas requeridas:</p>
-              <ul className="text-[10px] text-muted-foreground list-disc ml-4 space-y-1">
-                <li><strong>nombre</strong> (o asignatura)</li>
-                <li><strong>codigo</strong> (o code)</li>
-                <li>programa (opcional)</li>
-                <li>semestre (opcional)</li>
-                <li>creditos (opcional)</li>
-              </ul>
-            </div>
-            
-            <SubjectFileUpload onFileSelect={setFile} file={file} />
-
-            <div className="flex flex-col gap-2 pt-2">
-              <Button
-                onClick={handlePreview}
-                disabled={!file || isPreviewing || previewData.length > 0}
-                className="h-9 text-xs"
-              >
-                {isPreviewing ? (
-                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Upload className="mr-2 h-3.5 w-3.5" />
-                )}
-                Previsualizar
-              </Button>
-              {previewData.length > 0 && (
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setFile(null);
-                    setPreviewData([]);
-                  }}
-                  className="h-9 text-xs text-muted-foreground"
-                >
-                  Limpiar
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+    <div className="flex flex-col gap-6">
+      <div className="flex justify-end gap-2">
+        <Button
+          variant={mode === 'csv' ? 'default' : 'outline'}
+          onClick={() => {
+            setMode('csv');
+            handleCancel();
+          }}
+          className="text-xs"
+        >
+          <FileSpreadsheet className="mr-2 h-4 w-4" />
+          Carga Masiva (CSV)
+        </Button>
+        <Button
+          variant={mode === 'manual' ? 'default' : 'outline'}
+          onClick={() => setMode('manual')}
+          className="text-xs"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Crear Manual
+        </Button>
       </div>
 
-      {/* Right Column: Preview Table */}
-      <div className="lg:col-span-2">
-        <Card className="border shadow-xs h-full">
-          <CardHeader className="bg-muted/5 border-b py-4">
-            <CardTitle className="text-sm font-semibold tracking-card uppercase flex items-center gap-2">
-              <FileSpreadsheet className="h-4 w-4 text-primary" />
-              Vista Previa ({previewData.length} registros)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 flex flex-col h-[calc(100%-60px)]">
-            {previewData.length > 0 ? (
-              <>
-                <div className="flex-1 overflow-auto max-h-[500px]">
-                  <Table>
-                    <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
-                      <TableRow>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Estado</TableHead>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Asignatura</TableHead>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Código</TableHead>
-                        <TableHead className="text-[10px] uppercase font-bold px-4 py-2">Programa</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {previewData.map((row, idx) => (
-                        <TableRow key={idx} className="hover:bg-muted/30">
-                          <TableCell className="px-4 py-2">
-                            {row.status === 'success' ? (
-                              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                            ) : (
-                              <Badge variant={row.status === 'error' ? 'destructive' : 'outline'} className="text-[8px] px-1 h-4">
-                                {row.status === 'error' ? 'Error' : 'Existe'}
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="px-4 py-2 text-xs font-medium truncate max-w-[200px]">
-                            {row.name}
-                          </TableCell>
-                          <TableCell className="px-4 py-2 text-[10px] font-mono">{row.code}</TableCell>
-                          <TableCell className="px-4 py-2 text-[10px] text-muted-foreground truncate max-w-[150px]">
-                            {row.program || '—'}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-6">
+          {mode === 'csv' ? (
+            <>
+              <Card className="p-0 overflow-hidden border shadow-xs">
+                <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                    Instrucciones
+                  </CardTitle>
+                  <CardDescription className="text-[11px] mt-0.5">
+                    Sigue estos pasos para la carga masiva.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 p-5">
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold">1. Descarga la plantilla</p>
+                    <a href="/formatos/plantilla_microcurriculo.csv" download>
+                      <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                        <Download className="mr-2 h-4 w-4 text-muted-foreground" />
+                        Descargar Plantilla CSV
+                      </Button>
+                    </a>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold">2. Completa los datos</p>
+                    <div className="rounded-md bg-muted/30 p-3 space-y-2 text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="h-3 w-3" />
+                        <span className="font-semibold text-foreground">Columnas requeridas:</span>
+                      </div>
+                      <ul className="space-y-1 ml-5 list-disc text-[10px]">
+                        <li>Programa Académico</li>
+                        <li>Nombre de la Asignatura</li>
+                        <li>Código de Asignatura</li>
+                        <li>Horas de Acompañamiento Directo</li>
+                        <li>Semestre</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="p-0 overflow-hidden border shadow-xs">
+                <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                    Subir Archivo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-5">
+                  <SubjectFileUpload onFileSelect={handleFileSelect} file={file} />
+                  <div className="flex gap-2 mt-4 flex-col">
+                    <Button
+                      onClick={handlePreview}
+                      disabled={!file || isLoading || isPreview}
+                      className="w-full text-xs h-9"
+                    >
+                      {isLoading && !isPreview && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Generar Vista Previa
+                    </Button>
+                    {(file || isPreview) && (
+                      <Button
+                        onClick={handleCancel}
+                        variant="ghost"
+                        className="w-full text-xs h-9 text-muted-foreground hover:text-destructive"
+                      >
+                        Limpiar todo
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <Card className="p-0 overflow-hidden border shadow-xs">
+              <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                  {editingId ? 'Editar Asignatura' : 'Nueva Asignatura'}
+                </CardTitle>
+                <CardDescription className="text-[11px] mt-0.5">
+                  Ingresa los detalles manualmente.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 p-5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="micro-codigo" className="text-xs font-semibold">
+                      Código
+                    </Label>
+                    <Input
+                      id="micro-codigo"
+                      className="h-9 text-xs"
+                      value={manualForm.codigo}
+                      onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })}
+                      placeholder="Ej: 718004"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="micro-semestre" className="text-xs font-semibold">
+                      Semestre
+                    </Label>
+                    <Input
+                      id="micro-semestre"
+                      type="number"
+                      className="h-9 text-xs"
+                      value={manualForm.semestre}
+                      onChange={e => setManualForm({ ...manualForm, semestre: e.target.value })}
+                    />
+                  </div>
                 </div>
-                <div className="p-4 bg-muted/5 border-t flex items-center justify-between">
-                  <div className="text-[11px] text-muted-foreground">
-                    <span className="font-semibold text-foreground">{validCount}</span> listos para importar
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="micro-nombre" className="text-xs font-semibold">
+                    Nombre de la Asignatura
+                  </Label>
+                  <Input
+                    id="micro-nombre"
+                    className="h-9 text-xs"
+                    value={manualForm.nombre}
+                    onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })}
+                    placeholder="Ej: Matemáticas I"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="micro-programa" className="text-xs font-semibold">
+                    Programa Académico
+                  </Label>
+                  <Select
+                    value={manualForm.programa}
+                    onValueChange={value => setManualForm({ ...manualForm, programa: value })}
+                  >
+                    <SelectTrigger id="micro-programa" className="h-9 text-xs">
+                      <SelectValue placeholder="Selecciona..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROGRAMAS.map(p => (
+                        <SelectItem key={p} value={p} className="text-xs">
+                          {p}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="micro-horas" className="text-xs font-semibold">
+                    Horas de acompañamiento directo
+                  </Label>
+                  <Input
+                    id="micro-horas"
+                    type="number"
+                    className="h-9 text-xs"
+                    value={manualForm.horas}
+                    onChange={e => setManualForm({ ...manualForm, horas: e.target.value })}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-4 border-t">
+                  {editingId ? (
+                    <>
+                      <Button onClick={handleUpdateItem} className="flex-1 h-9 text-xs">
+                        Guardar Cambios
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        className="h-9 text-xs text-muted-foreground hover:text-destructive"
+                        onClick={() => {
+                          setEditingId(null);
+                          setMode('csv');
+                          handleCancel();
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </>
+                  ) : (
+                    <Button onClick={handleAddManual} className="w-full h-9 text-xs">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Agregar a la Lista
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        <div className="lg:col-span-2">
+          <Card className="p-0 overflow-hidden border shadow-xs">
+            <CardHeader className="border-b px-5 py-4 bg-muted/10">
+              <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                Asignaturas para Cargar ({previewData.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {isLoading && !isPreview ? (
+                <div className="flex flex-col items-center justify-center h-64 gap-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-xs text-muted-foreground animate-pulse">
+                    Procesando archivo...
+                  </p>
+                </div>
+              ) : finalResults ? (
+                <div className="flex flex-col items-center justify-center min-h-96 space-y-4 text-center p-6">
+                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <CheckCircle className="h-8 w-8 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="sm:text-xl text-lg tracking-card font-semibold">
+                      ¡Carga Exitosa!
+                    </h3>
+                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                      Se han procesado correctamente {finalResults.created} asignaturas en el
+                      sistema.
+                    </p>
+                  </div>
+                  <Button onClick={handleNewUpload} variant="outline" className="mt-4 h-9 text-xs">
+                    Realizar nueva carga
+                  </Button>
+                </div>
+              ) : previewData.length > 0 ? (
+                <div className="bg-card rounded-none overflow-hidden">
+                  <div className="relative overflow-x-auto overflow-y-auto max-h-[600px]">
+                    <Table>
+                      <TableHeader className="bg-muted/30 sticky top-0 z-10">
+                        <TableRow className="hover:bg-transparent">
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                            Asignatura
+                          </TableHead>
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground hidden sm:table-cell">
+                            Información
+                          </TableHead>
+                          <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
+                            Acciones
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {previewData.map(item => (
+                          <TableRow key={item.id} className="hover:bg-muted/50 group">
+                            <TableCell className="text-xs px-4 py-3">
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-xs text-foreground">
+                                    {item.nombreAsignatura}
+                                  </span>
+                                  {item.status === 'existing' && (
+                                    <Badge
+                                      variant="warning"
+                                      className="text-[9px] px-1.5 py-0 h-4 font-normal"
+                                    >
+                                      Actualización
+                                    </Badge>
+                                  )}
+                                  {item.status === 'error' && (
+                                    <Badge
+                                      variant="destructive"
+                                      className="text-[9px] px-1.5 py-0 h-4 font-normal"
+                                    >
+                                      Error
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge
+                                    variant="secondary"
+                                    className="font-mono text-[9px] px-1.5 py-0 rounded bg-muted/50 text-muted-foreground"
+                                  >
+                                    {item.codigoAsignatura}
+                                  </Badge>
+                                  <span className="text-[10px] text-muted-foreground truncate max-w-[150px]">
+                                    {item.programa || 'Sin programa'}
+                                  </span>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs px-4 py-3 hidden sm:table-cell">
+                              <div className="flex flex-col gap-1">
+                                <span className="text-[11px] text-muted-foreground">
+                                  <span className="font-semibold text-foreground">Sem:</span>{' '}
+                                  {item.semestre}°
+                                </span>
+                                <span className="text-[11px] text-muted-foreground">
+                                  <span className="font-semibold text-foreground">Horas:</span>{' '}
+                                  {item.horas}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-xs px-4 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                  onClick={() => handleEditItem(item.id)}
+                                  aria-label="Editar elemento"
+                                >
+                                  <Edit2 className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                                  onClick={() => handleDeleteItem(item.id)}
+                                  aria-label="Eliminar elemento"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center min-h-72 py-12 text-center p-6">
+                  <div className="bg-muted/30 p-4 rounded-full mb-4">
+                    <BookOpen className="h-10 w-10 text-muted-foreground/40" />
+                  </div>
+                  <h4 className="text-[17px] font-semibold tracking-card text-foreground mb-1">
+                    Sin información para cargar
+                  </h4>
+                  <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                    {mode === 'csv'
+                      ? 'Sube un archivo CSV o utiliza la carga manual para ver los datos aquí.'
+                      : 'Agrega asignaturas usando el formulario lateral para ver el resumen.'}
+                  </p>
+                </div>
+              )}
+
+              {previewData.length > 0 && (
+                <div className="border-t px-5 py-4 bg-muted/5 flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-semibold text-foreground">Resumen de carga</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {successCount} asignatura{successCount !== 1 ? 's' : ''} lista
+                      {successCount !== 1 ? 's' : ''} para importar/actualizar
+                      {errorCount > 0 && ` · ${errorCount} con errores`}
+                    </span>
                   </div>
                   <Button
                     onClick={handleConfirmUpload}
-                    disabled={isUploading || validCount === 0}
-                    className="h-9 px-6 text-xs font-semibold"
+                    disabled={isConfirming || successCount === 0}
+                    className="h-9 px-6 text-xs min-w-[150px]"
                   >
-                    {isUploading ? (
-                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                    {isConfirming ? (
+                      <>
+                        <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                        Procesando...
+                      </>
                     ) : (
-                      'Confirmar Carga'
+                      'Confirmar y Crear'
                     )}
                   </Button>
                 </div>
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-24 text-center">
-                <div className="bg-muted/30 p-4 rounded-full mb-3">
-                  <Upload className="h-8 w-8 text-muted-foreground/40" />
-                </div>
-                <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">
-                  Sube un archivo para ver los datos aquí antes de procesarlos.
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

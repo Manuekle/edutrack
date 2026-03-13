@@ -14,7 +14,6 @@ import {
 enum Role {
   ADMIN = 'ADMIN',
   DOCENTE = 'DOCENTE',
-  COORDINADOR = 'COORDINADOR',
 }
 
 // Limpieza de parámetros: null, 'null', '' => undefined

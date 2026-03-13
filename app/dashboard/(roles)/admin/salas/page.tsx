@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -280,25 +280,14 @@ export default function AdminSalasPage() {
           <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
             Gestión de Salas
           </h1>
-          <p className="text-muted-foreground text-[15px] mt-1 max-w-2xl">
+          <p className="text-muted-foreground text-xs mt-1 max-w-2xl">
             Administración de espacios físicos. La asignación a grupos se hace en Planeador →
             Asignación.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <TabsList
-            className="flex items-center p-1 gap-1 bg-muted/30 rounded-full border border-muted/50 h-auto"
-            id="tour-salas-tabs"
-          >
-            <TabsTrigger
-              value="list"
-              className="rounded-full px-5 text-xs font-medium transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground"
-            >
-              Espacios
-            </TabsTrigger>
 
-          </TabsList>
 
           <div className="flex gap-2" id="tour-salas-actions">
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -418,170 +407,197 @@ export default function AdminSalasPage() {
 
             <TabsContent value="carga" className="m-0 space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="space-y-4">
-                  <div className="bg-card border rounded-xl p-4 space-y-3">
-                    <p className="text-xs font-semibold tracking-card text-foreground">
-                      Cómo funciona la carga masiva
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      1. Descarga la plantilla CSV de salas.
-                    </p>
-                    <a href="/formatos/plantilla_salas.csv" download>
-                      <Button variant="outline" className="w-full justify-start h-9 text-xs">
-                        <Download className="mr-2 h-4 w-4 text-muted-foreground" />
-                        Descargar plantilla de salas
-                      </Button>
-                    </a>
-                    <div className="space-y-2">
-                      <p className="text-[11px] font-semibold text-foreground">
-                        Columnas esperadas:
+                <div className="space-y-6">
+                  <Card className="p-0 overflow-hidden border shadow-xs">
+                    <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                      <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                        Instrucciones
+                      </CardTitle>
+                      <CardDescription className="text-[11px] mt-0.5">
+                        Sigue estos pasos para la carga masiva.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4 p-5">
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold">1. Descarga la plantilla</p>
+                        <a href="/formatos/plantilla_salas.csv" download>
+                          <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                            <Download className="mr-2 h-4 w-4 text-muted-foreground" />
+                            Descargar Plantilla CSV
+                          </Button>
+                        </a>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold">2. Completa los datos</p>
+                        <div className="rounded-md bg-muted/30 p-3 space-y-2 text-[11px] text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <Layout className="h-3 w-3" />
+                            <span className="font-semibold text-foreground">Columnas requeridas:</span>
+                          </div>
+                          <ul className="space-y-1 ml-5 list-disc text-[10px]">
+                            <li>name (identificación del espacio)</li>
+                            <li>type (SALA_CLASE, LABORATORIO, AUDITORIO)</li>
+                            <li>capacity (opcional)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="p-0 overflow-hidden border shadow-xs">
+                    <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                      <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                        Subir Archivo
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-5">
+                      <SubjectFileUpload
+                        onFileSelect={f => {
+                          setUploadFile(f);
+                          setIsUploadPreview(false);
+                          setUploadPreviewData([]);
+                        }}
+                        file={uploadFile}
+                      />
+                      <div className="flex gap-2 mt-4 flex-col">
+                        <Button
+                          className="w-full text-xs h-9"
+                          onClick={handleUploadPreview}
+                          disabled={!uploadFile || isUploading || isUploadPreview}
+                        >
+                          {isUploading && !isUploadPreview ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Layout className="mr-2 h-4 w-4" />
+                          )}
+                          Generar Vista Previa
+                        </Button>
+                        {(uploadFile || isUploadPreview) && (
+                          <Button
+                            onClick={() => {
+                              setUploadFile(null);
+                              setIsUploadPreview(false);
+                              setUploadPreviewData([]);
+                            }}
+                            variant="ghost"
+                            className="w-full text-xs h-9 text-muted-foreground hover:text-destructive"
+                          >
+                            Limpiar todo
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-4 text-center">
+                        También puedes crear salas individuales con el botón Nueva Sala arriba.
                       </p>
-                      <ul className="list-disc list-inside space-y-1 text-[10px] text-muted-foreground">
-                        <li>name (identificación del espacio)</li>
-                        <li>type (SALA_CLASE, LABORATORIO, AUDITORIO)</li>
-                        <li>capacity (opcional)</li>
-                      </ul>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      2. Completa el archivo y súbelo para generar una vista previa y validar los
-                      datos antes de importarlos.
-                    </p>
-                  </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div className="lg:col-span-2 space-y-4">
-                  <div className="bg-card border rounded-xl p-5 space-y-4">
-                    <p className="text-xs font-semibold tracking-card text-foreground">
-                      Subir archivo CSV
-                    </p>
-                    <SubjectFileUpload
-                      onFileSelect={f => {
-                        setUploadFile(f);
-                        setIsUploadPreview(false);
-                        setUploadPreviewData([]);
-                      }}
-                      file={uploadFile}
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <Button
-                        className="flex-1 text-xs h-9"
-                        variant="outline"
-                        onClick={handleUploadPreview}
-                        disabled={!uploadFile || isUploading || isUploadPreview}
-                      >
-                        {isUploading && !isUploadPreview ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Generando vista previa...
-                          </>
-                        ) : (
-                          'Vista previa'
-                        )}
-                      </Button>
-                      {(uploadFile || isUploadPreview) && (
-                        <Button
-                          onClick={() => {
-                            setUploadFile(null);
-                            setIsUploadPreview(false);
-                            setUploadPreviewData([]);
-                          }}
-                          variant="ghost"
-                          className="h-9 px-3 text-[11px] text-muted-foreground"
-                        >
-                          Limpiar
-                        </Button>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      También puedes crear salas individuales con el botón Nueva Sala en el listado.
-                    </p>
-                  </div>
-
-                  <div className="bg-card border rounded-xl overflow-hidden">
-                    <div className="px-5 py-3 border-b flex items-center justify-between">
-                      <p className="text-xs font-semibold tracking-card text-foreground">
-                        Salas para cargar ({uploadPreviewData.length})
-                      </p>
-                      <Badge variant="outline" className="text-[10px] bg-muted/30">
-                        {uploadPreviewData.length} registros
-                      </Badge>
-                    </div>
-                    <div className="p-0">
-                      {uploadPreviewData.length === 0 ? (
-                        <div className="py-10 text-center text-[11px] text-muted-foreground">
-                          Sube un archivo y genera la vista previa para ver aquí las salas a
-                          importar.
+                <div className="lg:col-span-2">
+                  <Card className="p-0 overflow-hidden border shadow-xs">
+                    <CardHeader className="border-b px-5 py-4 bg-muted/10">
+                      <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                        Salas para Cargar ({uploadPreviewData.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      {isUploading && !isUploadPreview ? (
+                        <div className="flex flex-col items-center justify-center h-64 gap-3">
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          <p className="text-xs text-muted-foreground animate-pulse">Procesando archivo...</p>
+                        </div>
+                      ) : uploadPreviewData.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center min-h-72 py-12 text-center p-6">
+                          <div className="bg-muted/30 p-4 rounded-full mb-4">
+                            <Layout className="h-10 w-10 text-muted-foreground/40" />
+                          </div>
+                          <h4 className="text-[17px] font-semibold tracking-card text-foreground mb-1">
+                            Sin información para cargar
+                          </h4>
+                          <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                            Sube un archivo CSV para ver los datos aquí.
+                          </p>
                         </div>
                       ) : (
-                        <div className="max-h-80 overflow-auto">
-                          <Table>
-                            <TableHeader className="bg-muted/30">
-                              <TableRow className="hover:bg-transparent">
-                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                                  Identificación
-                                </TableHead>
-                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                                  Tipo
-                                </TableHead>
-                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                                  Capacidad
-                                </TableHead>
-                                <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right">
-                                  Estado
-                                </TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {uploadPreviewData.map(row => (
-                                <TableRow key={row.name} className="hover:bg-muted/50 group">
-                                  <TableCell className="text-xs px-4 py-3 font-medium">
-                                    {row.name}
-                                  </TableCell>
-                                  <TableCell className="text-xs px-4 py-3">{row.type}</TableCell>
-                                  <TableCell className="text-xs px-4 py-3">
-                                    {row.capacity}
-                                  </TableCell>
-                                  <TableCell className="text-xs px-4 py-3 text-right">
-                                    <Badge
-                                      variant={row.status === 'success' ? 'default' : 'secondary'}
-                                      className={cn(
-                                        'text-[10px]',
-                                        row.status === 'success'
-                                          ? 'bg-success text-success-foreground hover:bg-success/90'
-                                          : 'bg-warning/10 text-warning hover:bg-warning/20'
-                                      )}
-                                    >
-                                      {row.status === 'success' ? 'Válido' : 'Existente'}
-                                    </Badge>
-                                  </TableCell>
+                        <div className="bg-card rounded-none overflow-hidden">
+                          <div className="relative overflow-x-auto overflow-y-auto max-h-[600px]">
+                            <Table>
+                              <TableHeader className="bg-muted/30 sticky top-0 z-10">
+                                <TableRow className="hover:bg-transparent">
+                                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                                    Identificación
+                                  </TableHead>
+                                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                                    Tipo
+                                  </TableHead>
+                                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
+                                    Capacidad
+                                  </TableHead>
+                                  <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground text-right w-24">
+                                    Estado
+                                  </TableHead>
                                 </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+                              </TableHeader>
+                              <TableBody>
+                                {uploadPreviewData.map(row => (
+                                  <TableRow key={row.name} className="hover:bg-muted/50 group">
+                                    <TableCell className="text-xs px-4 py-3 font-medium text-foreground">
+                                      {row.name}
+                                    </TableCell>
+                                    <TableCell className="text-xs px-4 py-3">
+                                      {row.type}
+                                    </TableCell>
+                                    <TableCell className="text-xs px-4 py-3 min-w-[100px]">
+                                      {row.capacity || <span className="text-muted-foreground">N/A</span>}
+                                    </TableCell>
+                                    <TableCell className="text-xs px-4 py-3 text-right">
+                                      <Badge
+                                        variant={row.status === 'success' ? 'default' : 'secondary'}
+                                        className={cn(
+                                          'text-[9px] px-1.5 py-0 h-4 font-normal',
+                                          row.status === 'success'
+                                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                            : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                        )}
+                                      >
+                                        {row.status === 'success' ? 'Válido' : 'Existente'}
+                                      </Badge>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
                         </div>
                       )}
-                    </div>
-                    {uploadPreviewData.length > 0 && (
-                      <div className="px-5 py-3 border-t flex justify-end">
-                        <Button
-                          onClick={handleUploadConfirm}
-                          disabled={
-                            !isUploadPreview || isUploading || uploadPreviewData.length === 0
-                          }
-                          className="px-6 h-9 text-xs"
-                        >
-                          {isUploading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Procesando...
-                            </>
-                          ) : (
-                            'Confirmar e importar'
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
+                      
+                      {uploadPreviewData.length > 0 && (
+                        <div className="border-t px-5 py-4 bg-muted/5 flex items-center justify-between gap-4">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-foreground">Resumen de carga</span>
+                            <span className="text-[11px] text-muted-foreground">
+                              {uploadPreviewData.filter(d => d.status === 'success').length} sala{uploadPreviewData.filter(d => d.status === 'success').length !== 1 ? 's' : ''} lista{uploadPreviewData.filter(d => d.status === 'success').length !== 1 ? 's' : ''} para importar
+                              {uploadPreviewData.filter(d => d.status !== 'success').length > 0 && ` · ${uploadPreviewData.filter(d => d.status !== 'success').length} existentes`}
+                            </span>
+                          </div>
+                          <Button
+                            onClick={handleUploadConfirm}
+                            disabled={!isUploadPreview || isUploading || uploadPreviewData.length === 0}
+                            className="h-9 px-6 text-xs min-w-[150px]"
+                          >
+                            {isUploading ? (
+                              <>
+                                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                                Procesando...
+                              </>
+                            ) : (
+                              'Confirmar e importar'
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </TabsContent>
@@ -643,7 +659,7 @@ export default function AdminSalasPage() {
                             <Icon className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-2xl font-bold tracking-tight text-foreground">
+                            <p className="text-2xl font-semibold tracking-tight text-foreground">
                               {count}
                             </p>
                             <p className="text-[12px] text-muted-foreground">{label}</p>

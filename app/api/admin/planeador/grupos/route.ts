@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
+
     const includePlaneacion = req.nextUrl.searchParams.get('includePlaneacion') === 'true';
 
     const groups = await db.group.findMany({
@@ -46,7 +47,26 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json({ grupos: groups });
+    const groupsWithDocentes = groups.map(g => {
+      const { teachers, schedule, room, code, academicPeriod, ...rest } = g;
+      return {
+        ...rest,
+        codigo: code,
+        periodoAcademico: academicPeriod,
+        docentes: teachers,
+        horario: schedule
+          ? {
+              ...schedule,
+              diaSemana: schedule.dayOfWeek,
+              horaInicio: schedule.startTime,
+              horaFin: schedule.endTime,
+            }
+          : null,
+        sala: room,
+      };
+    });
+
+    return NextResponse.json({ grupos: groupsWithDocentes });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

@@ -31,7 +31,6 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         // Check cache first
-        // Check cache first
         const cacheKey = `auth:${credentials.email}`;
         try {
           const cachedAuth = await redis.get(cacheKey);
@@ -82,7 +81,6 @@ export const authOptions: NextAuthOptions = {
         // Prepare user data for session (exclude password)
         const { password, ...userData } = user;
 
-        // Cache successful login
         // Cache successful login
         try {
           await redis.set(

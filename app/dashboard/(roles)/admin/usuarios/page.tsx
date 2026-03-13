@@ -209,12 +209,10 @@ export default function AdminUsuariosPage() {
   });
 
 
-  const getRoleLabel = (role: Role | 'COORDINADOR') => {
+  const getRoleLabel = (role: Role) => {
     switch (role) {
       case 'ADMIN':
         return 'Administrador';
-      case 'COORDINADOR':
-        return 'Coordinador';
       case 'DOCENTE':
         return 'Docente';
       case 'ESTUDIANTE':
@@ -224,12 +222,10 @@ export default function AdminUsuariosPage() {
     }
   };
 
-  const getRoleColor = (role: Role | 'COORDINADOR') => {
+  const getRoleColor = (role: Role) => {
     switch (role) {
       case 'ADMIN':
         return 'bg-red-500/10 text-red-600 dark:text-red-400';
-      case 'COORDINADOR':
-        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400';
       case 'DOCENTE':
         return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
       case 'ESTUDIANTE':
@@ -325,7 +321,6 @@ export default function AdminUsuariosPage() {
                             </SelectTrigger>
                             <SelectContent className="rounded-xl border shadow-xl">
                               <SelectItem value="ADMIN" className="text-xs">Administrador</SelectItem>
-                              <SelectItem value="COORDINADOR" className="text-xs">Coordinador</SelectItem>
                               <SelectItem value="DOCENTE" className="text-xs">Docente</SelectItem>
                               <SelectItem value="ESTUDIANTE" className="text-xs">Estudiante</SelectItem>
                             </SelectContent>
@@ -423,7 +418,6 @@ export default function AdminUsuariosPage() {
                         <SelectItem value="ADMIN" className="text-xs">Administradores</SelectItem>
                         <SelectItem value="DOCENTE" className="text-xs">Docentes</SelectItem>
                         <SelectItem value="ESTUDIANTE" className="text-xs">Estudiantes</SelectItem>
-                        <SelectItem value="COORDINADOR" className="text-xs">Coordinadores</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -467,7 +461,7 @@ export default function AdminUsuariosPage() {
                           <TableCell className="py-3">
                             <div className="flex items-center gap-3">
                               <div className={cn(
-                                'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px]',
+                                'h-8 w-8 rounded-full flex items-center justify-center shrink-0 font-semibold text-[10px]',
                                 getRoleColor(user.role)
                               )}>
                                 {user.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
@@ -524,7 +518,7 @@ export default function AdminUsuariosPage() {
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <AlertDialogContent className="rounded-xl border shadow-2xl">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-lg font-bold text-destructive">
+                  <AlertDialogTitle className="text-lg tracking-card font-semibold text-destructive">
                     ¿Eliminar usuario?
                   </AlertDialogTitle>
                   <AlertDialogDescription className="text-sm">

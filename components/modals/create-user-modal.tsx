@@ -260,7 +260,6 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
                       <SelectItem value="ADMIN">Administrador</SelectItem>
                       <SelectItem value="DOCENTE">Docente</SelectItem>
                       <SelectItem value="ESTUDIANTE">Estudiante</SelectItem>
-                      <SelectItem value="COORDINADOR">Coordinador</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

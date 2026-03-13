@@ -9,7 +9,7 @@ export default function AdminReportesPage() {
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Reportes docentes
         </h1>
-        <p className="text-muted-foreground text-[15px] mt-2 max-w-2xl">
+        <p className="text-muted-foreground text-xs mt-2 max-w-2xl">
           Selecciona un docente para ver el detalle de sus asignaturas, bitácoras y avance por
           semana.
         </p>

@@ -595,9 +595,9 @@ export function TeacherReport() {
                       }`}
                   >
                     <div
-                      className={`h-9 w-9 rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 ${isSelected
-                          ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400'
-                          : 'bg-muted text-muted-foreground'
+                      className={`h-9 w-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 ${isSelected
+                        ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400'
+                        : 'bg-muted text-muted-foreground'
                         }`}
                     >
                       {initials}
@@ -664,7 +664,7 @@ export function TeacherReport() {
               <CardContent className="p-5">
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-[15px] font-bold text-blue-700 dark:text-blue-400 shrink-0">
+                    <div className="h-12 w-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-[15px] font-semibold text-blue-700 dark:text-blue-400 shrink-0">
                       {selectedTeacher.name
                         .split(' ')
                         .map(n => n[0])
@@ -783,7 +783,7 @@ export function TeacherReport() {
                   ) : (
                     <div className="flex items-center justify-center h-full text-muted-foreground">
                       <div className="text-center">
-                        <h3 className="text-xs text-muted-foreground">Sin datos disponibles</h3>
+                        <h3 className="text-[17px] font-semibold tracking-card text-foreground">Sin datos disponibles</h3>
                         <p className="text-xs text-muted-foreground/70">
                           No hay información de asistencia para mostrar
                         </p>

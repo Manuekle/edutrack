@@ -6,7 +6,7 @@ Sistema Integral de Registro Académico para la Fundación Universitaria de la P
 
 ### 👥 **Gestión de Usuarios**
 
-- ✅ Registro y autenticación de usuarios (Admin, Docente, Estudiante, Coordinador)
+- ✅ Registro y autenticación de usuarios (Admin, Docente, Estudiante)
 - ✅ Gestión de perfiles y permisos
 - ✅ Carga masiva de usuarios desde archivos Excel/CSV
 - ✅ Gestión de roles y permisos

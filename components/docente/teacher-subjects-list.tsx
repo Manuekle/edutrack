@@ -57,7 +57,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                           {subject.name}
                         </h4>
                       </div>
-                      <p className="text-[11px] font-bold text-muted-foreground font-mono uppercase tracking-card mb-2">
+                      <p className="text-[11px] font-semibold text-muted-foreground font-mono uppercase tracking-card mb-2">
                         {subject.code}
                       </p>
 
@@ -86,7 +86,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                         <div className="text-[17px] font-semibold text-foreground tracking-card">
                           {Math.round(progress)}%
                         </div>
-                        <div className="text-[9px] uppercase font-bold text-muted-foreground mt-0.5">
+                        <div className="text-[9px] uppercase font-semibold text-muted-foreground mt-0.5">
                           completado
                         </div>
                       </div>

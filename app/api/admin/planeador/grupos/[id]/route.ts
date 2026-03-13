@@ -14,12 +14,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const group = await db.group.update({
       where: { id },
       data: {
-        code: body.codigo,
-        subjectId: body.subjectId,
-        academicPeriod: body.periodoAcademico,
-        teacherIds: body.docenteIds ?? [],
-        scheduleId: body.horarioId ?? null,
-        roomId: body.salaId ?? null,
+        ...(body.codigo && { code: body.codigo }),
+        ...(body.subjectId && { subjectId: body.subjectId }),
+        ...(body.periodoAcademico && { academicPeriod: body.periodoAcademico }),
+        ...(body.docenteIds && { teacherIds: body.docenteIds }),
+        ...(body.horarioId !== undefined && { scheduleId: body.horarioId }),
+        ...(body.salaId !== undefined && { roomId: body.salaId }),
       },
     });
     return NextResponse.json(group);

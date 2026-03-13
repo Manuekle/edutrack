@@ -43,7 +43,7 @@ export default function MisGruposPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-card">Mis Grupos</h1>
+        <h1 className="text-2xl font-semibold tracking-card">Mis Grupos</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Grupos activos — haz clic en «Ver Bitácora» para registrar las clases de cada grupo.
         </p>

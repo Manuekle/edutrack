@@ -20,7 +20,7 @@ export function StudentTableRow({ student }: StudentTableRowProps) {
           </span>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-muted-foreground">
             {student.document && (
-              <span className="flex items-center gap-1 font-mono text-[10px] uppercase font-bold tracking-card">
+              <span className="flex items-center gap-1 font-mono text-[10px] uppercase font-semibold tracking-card">
                 <Hash className="h-3 w-3 opacity-70" />
                 {student.document}
               </span>

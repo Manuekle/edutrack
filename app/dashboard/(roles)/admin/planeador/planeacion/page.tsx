@@ -39,10 +39,10 @@ interface Period {
 
 interface Grupo {
   id: string;
-  code: string;
-  academicPeriod: string;
+  codigo: string;
+  periodoAcademico: string;
   subject: { name: string; code: string };
-  teachers: { name: string }[];
+  docentes: { name: string }[];
   planning: {
     id: string;
     startDate: string;
@@ -88,7 +88,7 @@ export default function PlaneacionPage() {
 
     // Determine the start date automatically based on the selected group's academic period
     let finalFechaInicio: Date;
-    const periodName = currentGrupo?.academicPeriod?.replace(/[-\s]/g, '') || '';
+    const periodName = currentGrupo?.periodoAcademico?.replace(/[-\s]/g, '') || '';
 
     // Buscar en los periodos cargados de la BD
     const matchingPeriod = periods.find(p => p.name.replace(/[-\s]/g, '') === periodName);
@@ -137,7 +137,7 @@ export default function PlaneacionPage() {
   const gruposOrdenados = useMemo(
     () =>
       [...grupos].sort((a, b) => {
-        const cmpPeriodo = (b.academicPeriod ?? '').localeCompare(a.academicPeriod ?? '');
+        const cmpPeriodo = (b.periodoAcademico ?? '').localeCompare(a.periodoAcademico ?? '');
         if (cmpPeriodo !== 0) return cmpPeriodo;
         return (a.subject?.code ?? '').localeCompare(b.subject?.code ?? '');
       }),
@@ -218,7 +218,7 @@ export default function PlaneacionPage() {
       <Card className="border shadow-xs overflow-hidden p-0 bg-card rounded-2xl w-full relative z-10 mt-6">
         <CardHeader className="bg-muted/10 border-b px-5 py-4">
           <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
               1
             </span>
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
@@ -275,7 +275,7 @@ export default function PlaneacionPage() {
                           <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
                         )}
                         <span className="font-mono text-muted-foreground mr-1 text-xs">
-                          [{g.code}]
+                          [{g.codigo}]
                         </span>
                         <span className="font-medium truncate text-sm">{g.subject.name}</span>
                       </span>
@@ -306,7 +306,7 @@ export default function PlaneacionPage() {
                       Cód: {currentGrupo.subject.code}
                     </span>
                     <span className="w-1 h-1 rounded-full bg-muted-foreground/40"></span>
-                    <span>{currentGrupo.academicPeriod}</span>
+                    <span>{currentGrupo.periodoAcademico}</span>
                   </div>
                   <div className="mt-1">
                     {currentGrupo.planning ? (
@@ -332,7 +332,7 @@ export default function PlaneacionPage() {
               <div className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/20 border border-muted flex items-center gap-3">
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                 {(() => {
-                  const pName = currentGrupo?.academicPeriod?.replace(/[-\s]/g, '') || '';
+                  const pName = currentGrupo?.periodoAcademico?.replace(/[-\s]/g, '') || '';
                   const matching = periods.find(p => p.name.replace(/[-\s]/g, '') === pName);
 
                   if (matching) {
@@ -346,7 +346,7 @@ export default function PlaneacionPage() {
 
                   return currentGrupo ? (
                     <span className="text-muted-foreground">
-                      Periodo no configurado ({currentGrupo.academicPeriod})
+                      Periodo no configurado ({currentGrupo.periodoAcademico})
                     </span>
                   ) : (
                     <span className="text-muted-foreground">Selecciona un grupo primero</span>
@@ -401,7 +401,7 @@ export default function PlaneacionPage() {
       {/* Bloque B: Planeaciones ya creadas */}
       <div className="space-y-4 w-full pt-6">
         <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-bold">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-semibold">
             2
           </span>
           <h2 className="text-sm font-semibold tracking-card">Planeaciones activas</h2>
@@ -446,7 +446,7 @@ export default function PlaneacionPage() {
                   key={g.id}
                   className="group relative flex flex-col justify-between bg-card text-card-foreground p-5 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] border-0 hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all overflow-hidden"
                 >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/20"></div>
+
                   <div className="space-y-3.5 z-10">
                     {/* Encabezado de la tarjeta */}
                     <div className="flex items-start justify-between gap-2">
@@ -456,9 +456,9 @@ export default function PlaneacionPage() {
                         </span>
                         <Badge
                           variant="outline"
-                          className="font-mono text-[9px] uppercase font-bold tracking-card rounded border-muted-foreground/20 text-muted-foreground px-1 py-0 w-fit"
+                          className="font-mono text-[9px] uppercase font-semibold tracking-card rounded-full px-2 py-0 w-fit"
                         >
-                          {g.code}
+                          {g.codigo}
                         </Badge>
                       </div>
 
@@ -484,7 +484,7 @@ export default function PlaneacionPage() {
                       <p className="flex items-center gap-2">
                         <Users className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
                         <span className="truncate max-w-[180px]">
-                          {g.teachers[0]?.name ?? (
+                          {g.docentes?.[0]?.name ?? (
                             <span className="text-amber-600 dark:text-amber-500 font-medium bg-amber-500/10 px-1.5 py-0.5 rounded text-[10px]">
                               Sin asignar
                             </span>

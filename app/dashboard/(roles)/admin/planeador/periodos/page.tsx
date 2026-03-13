@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -204,7 +204,7 @@ export default function PeriodosPage() {
                       {format(new Date(p.endDate), 'PPPP', { locale: es })}
                     </TableCell>
                     <TableCell className="px-5">
-                      <Badge className="bg-green-500/10 text-green-600 border-0 shadow-none text-[10px] font-bold uppercase rounded-sm">
+                      <Badge className="bg-green-500/10 text-green-600 border-0 shadow-none text-[10px] font-semibold uppercase rounded-sm">
                         Activo
                       </Badge>
                     </TableCell>

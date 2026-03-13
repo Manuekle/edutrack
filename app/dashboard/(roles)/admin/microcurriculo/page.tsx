@@ -13,7 +13,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -21,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 
 interface SubjectRow {
@@ -36,27 +37,40 @@ export default function MicrocurriculoPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [semesterFilter, setSemesterFilter] = useState('all');
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const pageSize = 10;
 
   useEffect(() => {
-    fetch('/api/admin/microcurriculo')
+    setLoading(true);
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: pageSize.toString(),
+      search,
+      semester: semesterFilter,
+    });
+    
+    fetch(`/api/admin/microcurriculo?${params.toString()}`)
       .then(r => r.json())
-      .then(data => setSubjects(data.subjects ?? []))
+      .then(data => {
+        if (data.success) {
+          setSubjects(data.subjects ?? []);
+          setTotalPages(data.pagination?.totalPages || 1);
+          setTotalItems(data.pagination?.total || 0);
+        }
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [page, search, semesterFilter]);
 
-  const filtered = subjects.filter(
-    s => {
-      const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
-                            s.code.toLowerCase().includes(search.toLowerCase());
-      const matchesSemester = semesterFilter === 'all' || s.semester?.toString() === semesterFilter;
-      return matchesSearch && matchesSemester;
-    }
-  );
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, semesterFilter]);
 
-  const uniqueSemesters = useMemo(() => {
-    const sems = new Set(subjects.map(s => s.semester).filter((s): s is number => s !== null));
-    return Array.from(sems).sort((a, b) => a - b);
-  }, [subjects]);
+  const semesters = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   return (
     <div className="space-y-6">
@@ -90,7 +104,9 @@ export default function MicrocurriculoPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-semibold">{loading ? '—' : subjects.length}</p>
+                <p className="text-3xl font-semibold">
+                  {loading && totalItems === 0 ? '—' : totalItems}
+                </p>
               </CardContent>
             </Card>
             <Card>
@@ -101,7 +117,7 @@ export default function MicrocurriculoPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-semibold">
-                  {loading ? '—' : new Set(subjects.map(s => s.program || 'N/A')).size}
+                  {loading && subjects.length === 0 ? '—' : new Set(subjects.map(s => s.program || 'N/A')).size}
                 </p>
               </CardContent>
             </Card>
@@ -113,7 +129,7 @@ export default function MicrocurriculoPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-semibold">
-                  {loading ? '—' : new Set(subjects.map(s => s.semester ?? 'N/A')).size}
+                  {loading && subjects.length === 0 ? '—' : new Set(subjects.map(s => s.semester ?? 'N/A')).size}
                 </p>
               </CardContent>
             </Card>
@@ -138,7 +154,7 @@ export default function MicrocurriculoPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos los semestres</SelectItem>
-                    {uniqueSemesters.map(sem => (
+                    {semesters.map(sem => (
                       <SelectItem key={sem} value={sem.toString()}>
                         Semestre {sem}
                       </SelectItem>
@@ -161,14 +177,13 @@ export default function MicrocurriculoPage() {
                   {loading ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <TableRow key={i}>
-                        {Array.from({ length: 5 }).map((_, j) => (
-                          <TableCell key={j}>
-                            <Skeleton className="h-4 w-full" />
-                          </TableCell>
-                        ))}
+                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                        <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
                       </TableRow>
                     ))
-                  ) : filtered.length === 0 ? (
+                  ) : subjects.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="py-10">
                         <div className="flex flex-col items-center justify-center text-center gap-2">
@@ -187,7 +202,7 @@ export default function MicrocurriculoPage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filtered.map(subject => (
+                    subjects.map(subject => (
                       <TableRow key={subject.id}>
                         <TableCell className="font-medium">{subject.name}</TableCell>
                         <TableCell>
@@ -204,6 +219,60 @@ export default function MicrocurriculoPage() {
                   )}
                 </TableBody>
               </Table>
+
+              {/* Pagination Controls */}
+              {!loading && totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-4 border-t">
+                  <p className="text-xs text-muted-foreground">
+                    Mostrando página <span className="font-medium text-foreground">{page}</span> de{' '}
+                    <span className="font-medium text-foreground">{totalPages}</span>
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="h-8 text-xs"
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+                      Anterior
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                        // Simple windowing logic
+                        let pageNum = i + 1;
+                        if (totalPages > 5 && page > 3) {
+                          pageNum = page - 3 + i + 1;
+                          if (pageNum > totalPages) pageNum = totalPages - (4 - i);
+                        }
+                        
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={page === pageNum ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setPage(pageNum)}
+                            className="h-8 w-8 text-xs p-0"
+                          >
+                            {pageNum}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className="h-8 text-xs"
+                    >
+                      Siguiente
+                      <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

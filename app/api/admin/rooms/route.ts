@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+// Triggering rebuild after RoomType update
 import { db } from '@/lib/prisma';
 import { RoomType } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
@@ -19,6 +20,7 @@ export async function GET() {
 
     return NextResponse.json(rooms);
   } catch (error) {
+    console.error('[ROOMS_GET_ERROR]', error);
     return NextResponse.json({ error: 'Error al obtener salas' }, { status: 500 });
   }
 }

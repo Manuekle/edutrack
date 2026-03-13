@@ -27,7 +27,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
           </div>
           <div className="flex items-center gap-2 bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-full shrink-0">
             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span className="text-[11px] font-bold uppercase tracking-card hidden md:block mt-0.5">
+            <span className="text-[11px] font-semibold uppercase tracking-card hidden md:block mt-0.5">
               En vivo
             </span>
           </div>
@@ -43,7 +43,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               <div className="flex items-center space-x-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold leading-none text-foreground">
+                  <span className="text-lg font-semibold leading-none text-foreground">
                     {liveClass.attendanceStats.present}
                   </span>
                   <span className="text-[11px] font-medium text-muted-foreground">Presentes</span>
@@ -52,7 +52,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               <div className="flex items-center space-x-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold leading-none text-foreground">
+                  <span className="text-lg font-semibold leading-none text-foreground">
                     {liveClass.attendanceStats.absent}
                   </span>
                   <span className="text-[11px] font-medium text-muted-foreground">Ausentes</span>
@@ -61,7 +61,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               <div className="flex items-center space-x-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold leading-none text-foreground">
+                  <span className="text-lg font-semibold leading-none text-foreground">
                     {liveClass.attendanceStats.late}
                   </span>
                   <span className="text-[11px] font-medium text-muted-foreground">Tardanzas</span>
@@ -70,7 +70,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               <div className="flex items-center space-x-2.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold leading-none text-foreground">
+                  <span className="text-lg font-semibold leading-none text-foreground">
                     {liveClass.attendanceStats.justified}
                   </span>
                   <span className="text-[11px] font-medium text-muted-foreground">
@@ -81,7 +81,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
             </div>
             <p className="text-[11px] font-medium text-muted-foreground text-right uppercase tracking-card">
               Total matriculados:{' '}
-              <span className="font-bold text-foreground mx-1 text-xs">
+              <span className="font-semibold text-foreground mx-1 text-xs">
                 {liveClass.totalStudents}
               </span>
             </p>

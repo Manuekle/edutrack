@@ -305,19 +305,19 @@ export default function AsignacionPage() {
               <div className="bg-muted/30 p-4 rounded-full mb-3">
                 <Users className="h-8 w-8 text-muted-foreground/40" />
               </div>
-               <p className="text-[15px] font-medium text-foreground">No hay grupos</p>
-               <p className="text-[13px] text-muted-foreground mt-1 mb-4 max-w-sm">
-                 Primero importa la programación en el paso 1. Programación. Luego vuelve aquí para
-                 hacer ajustes manuales.
-               </p>
-               <Button asChild variant="outline" size="sm" className="rounded-full shadow-sm">
-                 <Link href="/dashboard/admin/planeador/horarios">Ir a 1. Programación</Link>
-               </Button>
+              <p className="text-[15px] font-medium text-foreground">No hay grupos</p>
+              <p className="text-[13px] text-muted-foreground mt-1 mb-4 max-w-sm">
+                Primero importa la programación en el paso 1. Programación. Luego vuelve aquí para
+                hacer ajustes manuales.
+              </p>
+              <Button asChild variant="outline" size="sm" className="rounded-full shadow-sm">
+                <Link href="/dashboard/admin/planeador/horarios">Ir a 1. Programación</Link>
+              </Button>
             </div>
           ) : (
             <>
               <Select value={selectedGrupo} onValueChange={setSelectedGrupo}>
-                <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border-transparent focus:bg-background focus:border-primary/50 transition-colors">
+                <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border focus:bg-background focus:border-primary/50 transition-colors">
                   <SelectValue placeholder="Elige un grupo..." />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl shadow-lg max-h-80">

@@ -5,7 +5,6 @@ import { TeacherStatsCards } from '@/components/docente/teacher-stats-cards';
 import { TeacherSubjectsList } from '@/components/docente/teacher-subjects-list';
 import { UpcomingClassesCard } from '@/components/docente/upcoming-classes-card';
 import { Button } from '@/components/ui/button';
-import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
   getLiveClassData,
@@ -65,10 +64,10 @@ export default function DocenteDashboard() {
               ...subject,
               nextClass: subject.nextClass
                 ? {
-                    ...subject.nextClass,
-                    date: new Date(subject.nextClass.date),
-                    classroom: subject.nextClass.classroom,
-                  }
+                  ...subject.nextClass,
+                  date: new Date(subject.nextClass.date),
+                  classroom: subject.nextClass.classroom,
+                }
                 : undefined,
             }));
             setSubjects(transformedSubjects);
@@ -113,19 +112,19 @@ export default function DocenteDashboard() {
   const nextClass =
     upcomingClasses.length > 0
       ? {
-          id: upcomingClasses[0].id,
-          subjectName: upcomingClasses[0].subjectName,
-          date: upcomingClasses[0].date,
-          topic: upcomingClasses[0].topic || 'Sin tema',
-          classroom: upcomingClasses[0].classroom || '',
-        }
+        id: upcomingClasses[0].id,
+        subjectName: upcomingClasses[0].subjectName,
+        date: upcomingClasses[0].date,
+        topic: upcomingClasses[0].topic || 'Sin tema',
+        classroom: upcomingClasses[0].classroom || '',
+      }
       : undefined;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-card text-foreground">Inicio</h1>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Resumen del día — clases activas, próximas clases y estadísticas generales.
           </p>

@@ -90,7 +90,7 @@ export default function MiHorarioPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-card text-foreground">
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">
             Mi Horario
           </h1>
           <p className="text-muted-foreground text-sm max-w-md">
