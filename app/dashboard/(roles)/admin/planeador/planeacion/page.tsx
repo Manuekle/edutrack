@@ -214,12 +214,12 @@ export default function PlaneacionPage() {
               <div className="flex-1">
                 <p className="font-semibold">No hay grupos creados aún.</p>
                 <p className="mt-1 leading-relaxed opacity-90 text-[12px]">
-                  Primero crea los grupos en el{' '}
+                  Primero importa la programación en el{' '}
                   <Link
-                    href="/dashboard/admin/planeador/grupos"
+                    href="/dashboard/admin/planeador/horarios"
                     className="underline font-medium hover:text-amber-700 dark:hover:text-amber-200"
                   >
-                    Paso 2 · Grupos
+                    Paso 1 · Programación
                   </Link>
                   .
                 </p>

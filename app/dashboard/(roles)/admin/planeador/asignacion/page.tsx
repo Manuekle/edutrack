@@ -199,10 +199,10 @@ export default function AsignacionPage() {
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">Asignación</h1>
+        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">Ajustes</h1>
         <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
-          Elige un grupo abajo y asígnale: en qué sala se da la clase, qué docentes la imparten y
-          qué estudiantes están matriculados. Guarda los cambios con el botón de cada pestaña.
+          Aquí puedes hacer ajustes manuales después de la carga masiva: cambiar un docente, reasignar
+          un salón, o agregar estudiantes a un grupo específico.
         </p>
       </div>
 
@@ -305,14 +305,14 @@ export default function AsignacionPage() {
               <div className="bg-muted/30 p-4 rounded-full mb-3">
                 <Users className="h-8 w-8 text-muted-foreground/40" />
               </div>
-              <p className="text-[15px] font-medium text-foreground">No hay grupos</p>
-              <p className="text-[13px] text-muted-foreground mt-1 mb-4 max-w-sm">
-                Primero crea grupos en el paso 2. Grupos. Luego vuelve aquí para asignarles sala,
-                docentes y estudiantes.
-              </p>
-              <Button asChild variant="outline" size="sm" className="rounded-full shadow-sm">
-                <Link href="/dashboard/admin/planeador/grupos">Ir a 2. Grupos</Link>
-              </Button>
+               <p className="text-[15px] font-medium text-foreground">No hay grupos</p>
+               <p className="text-[13px] text-muted-foreground mt-1 mb-4 max-w-sm">
+                 Primero importa la programación en el paso 1. Programación. Luego vuelve aquí para
+                 hacer ajustes manuales.
+               </p>
+               <Button asChild variant="outline" size="sm" className="rounded-full shadow-sm">
+                 <Link href="/dashboard/admin/planeador/horarios">Ir a 1. Programación</Link>
+               </Button>
             </div>
           ) : (
             <>
