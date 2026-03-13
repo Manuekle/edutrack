@@ -144,13 +144,6 @@ export const navLinkGroups: NavLinkGroup[] = [
     icon: BookOpen,
     links: [
       {
-        href: '/dashboard/docente/asignaturas',
-        icon: BookMarked,
-        label: 'Mis Asignaturas',
-        roles: ['DOCENTE'],
-        description: 'Asignaturas asignadas por período académico',
-      },
-      {
         href: '/dashboard/docente/grupos',
         icon: Users,
         label: 'Mis Grupos',

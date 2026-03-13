@@ -43,8 +43,7 @@ export default function MisGruposPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold flex items-center gap-2">
-          <Users className="h-6 w-6 text-primary" />
+        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Mis Grupos
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -116,7 +115,7 @@ export default function MisGruposPage() {
                 </div>
                 <div className="flex gap-2 pt-1">
                   <Button asChild size="sm" variant="outline" className="flex-1">
-                    <Link href={`/dashboard/docente/bitacora/${g.id}`}>Ver Bitácora</Link>
+                    <Link href={`/dashboard/docente/grupos/${g.id}`}>Ver Detalles</Link>
                   </Button>
                 </div>
               </CardContent>

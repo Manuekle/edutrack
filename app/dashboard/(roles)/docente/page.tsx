@@ -135,9 +135,9 @@ export default function DocenteDashboard() {
             type="button"
             variant="outline"
             className="w-full sm:w-auto rounded-xl h-10 px-4 shadow-none bg-muted/40 border-transparent hover:bg-muted/60 transition-colors text-sm font-medium"
-            onClick={() => router.push('/dashboard/docente/asignaturas')}
+            onClick={() => router.push('/dashboard/docente/grupos')}
           >
-            Ver todas las asignaturas
+            Ver todos los grupos
           </Button>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
+import { ArrowLeft, LayoutDashboard, NotebookPen } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 type PageProps = {
@@ -102,13 +104,21 @@ export default async function PreviewPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
-        <div>
-          <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-foreground">
-            Bitacora Docente
-          </CardTitle>
-          <CardDescription className="text-xs dark:text-gray-300">
-            Visualiza el reporte de asistencia para la asignatura {subject.name}
-          </CardDescription>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/dashboard/docente/grupos/${id}`}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+          </Link>
+          <div>
+            <CardTitle className="sm:text-2xl text-xs font-semibold tracking-card text-foreground">
+              Bitácora Docente
+            </CardTitle>
+            <CardDescription className="text-xs dark:text-gray-300">
+              Visualiza el reporte de asistencia para la asignatura {subject.name}
+            </CardDescription>
+          </div>
         </div>
         {/* <DownloadPdfButton targetId="pdf-section" /> */}
       </div>

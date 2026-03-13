@@ -3,36 +3,37 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
+import Link from 'next/link';
 
 import { ClassesTable } from '@/components/classes/classes-table';
 import { EventsTable } from '@/components/events/events-table';
 import { StudentsTable } from '@/components/students/students-table';
 import { GenerateReportModal } from '@/components/subjects/generate-report-modal';
 import { Button } from '@/components/ui/button';
-import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { useClassManagement } from '@/hooks/use-class-management';
 import { useSubjectDetail } from '@/hooks/use-subject-detail';
 import { toTableClass } from '@/lib/class-converters';
 import { classStatusMap } from '@/lib/class-utils';
 import * as dateUtils from '@/lib/time-utils';
+import { ArrowLeft, NotebookPen } from 'lucide-react';
 
-export default function SubjectDetailPage() {
+export default function GrupoDetailPage() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const subjectId = Array.isArray(params?.id) ? params.id[0] : params?.id || '';
+  const grupoId = Array.isArray(params?.id) ? params.id[0] : params?.id || '';
 
   // Toast de asistencia cuando el docente llega desde una URL de asistencia no permitida
   useEffect(() => {
     const asistenciaError = searchParams.get('asistenciaError');
     if (asistenciaError) {
       sileo.error({ title: decodeURIComponent(asistenciaError) });
-      router.replace(`/dashboard/docente/asignaturas/${subjectId}`, { scroll: false });
+      router.replace(`/dashboard/docente/grupos/${grupoId}`, { scroll: false });
     }
-  }, [subjectId, searchParams, router]);
+  }, [grupoId, searchParams, router]);
 
-  // Subject data hook with React Query
+  // Subject data hook with React Query (using grupoId as id)
   const {
     subject,
     enrolledStudents,
@@ -49,8 +50,8 @@ export default function SubjectDetailPage() {
     unenrollStudent,
     isUnenrolling,
   } = useSubjectDetail({
-    subjectId,
-    enabled: !!subjectId,
+    subjectId: grupoId,
+    enabled: !!grupoId,
   });
 
   // Local state for classes management - sync with React Query data
@@ -70,7 +71,7 @@ export default function SubjectDetailPage() {
     fetchClasses: async () => {
       await refetchClasses();
     },
-    subjectId,
+    subjectId: grupoId,
   });
 
   // Report modal state
@@ -99,7 +100,7 @@ export default function SubjectDetailPage() {
       return;
     }
 
-    generateReport(subjectId, {
+    generateReport(grupoId, {
       onSuccess: () => {
         setIsReportModalOpen(false);
         router.push('/dashboard/docente/reportes');
@@ -108,7 +109,7 @@ export default function SubjectDetailPage() {
   };
 
   const handleUnenrollRequest = async (studentId: string, reason: string) => {
-    if (!subjectId) return;
+    if (!grupoId) return;
 
     unenrollStudent(
       { studentId, reason },
@@ -137,11 +138,11 @@ export default function SubjectDetailPage() {
           </h2>
           <p className="text-white text-center mb-4 text-xs">{error}</p>
           <Button
-            onClick={() => router.push('/dashboard/docente/asignaturas')}
+            onClick={() => router.push('/dashboard/docente/grupos')}
             variant="default"
             className="w-full sm:w-auto"
           >
-            Volver a la lista de asignaturas
+            Volver a la lista de grupos
           </Button>
         </div>
       </div>
@@ -159,15 +160,32 @@ export default function SubjectDetailPage() {
       />
 
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-card text-foreground flex items-center gap-2">
-            Mis Clases
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Gestiona tus clases y eventos para esta asignatura.
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
+              <Link href="/dashboard/docente/grupos">
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </Button>
+            <h1 className="text-2xl font-semibold tracking-card text-foreground">
+              {subject?.name}
+            </h1>
+          </div>
+          <p className="text-muted-foreground text-sm mt-1 ml-10">
+            Gestiona estudiantes, eventos y consulta la asistencia.
           </p>
         </div>
+
         <div className="flex w-full sm:w-auto items-center gap-3">
+          <Button
+            variant="default"
+            className="w-full sm:w-auto rounded-xl shadow-none h-10 px-6 text-sm font-medium transition-all gap-2 bg-primary hover:bg-primary/90"
+            onClick={() => router.push(`/dashboard/docente/bitacora/${grupoId}`)}
+          >
+            <NotebookPen className="h-4 w-4" />
+            Acceder a Bitácora
+          </Button>
+
           <Button
             variant="outline"
             className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium"
@@ -182,14 +200,6 @@ export default function SubjectDetailPage() {
             }
           >
             {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
-          </Button>
-          <Button
-            variant="default"
-            className="w-full sm:w-auto rounded-xl shadow-none h-10 px-6 text-sm font-medium transition-all"
-            onClick={() => router.push(`/dashboard/docente/asignaturas/${subject?.id}/preview`)}
-            aria-label="Ver vista previa de la asignatura"
-          >
-            Vista Previa
           </Button>
         </div>
       </div>
@@ -208,7 +218,7 @@ export default function SubjectDetailPage() {
       <ClassesTable
         classes={localClasses.map(cls => toTableClass(cls))}
         isLoading={isLoadingClasses}
-        subjectId={subjectId}
+        subjectId={grupoId}
         handleCancel={classManagement.handleCancelClass}
         handleMarkAsDone={classManagement.handleMarkClassAsDone}
         classStatusMap={classStatusMap}
@@ -231,7 +241,7 @@ export default function SubjectDetailPage() {
         }
       />
 
-      <EventsTable subjectId={subjectId} />
+      <EventsTable subjectId={grupoId} />
     </div>
   );
 }
