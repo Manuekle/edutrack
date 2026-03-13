@@ -310,7 +310,7 @@ export default function AsignacionPage() {
                 Primero importa la programación en el paso 1. Programación. Luego vuelve aquí para
                 hacer ajustes manuales.
               </p>
-              <Button asChild variant="outline" size="sm" className="rounded-full shadow-sm">
+              <Button asChild variant="outline" size="default" className="rounded-full shadow-sm">
                 <Link href="/dashboard/admin/planeador/horarios">Ir a 1. Programación</Link>
               </Button>
             </div>

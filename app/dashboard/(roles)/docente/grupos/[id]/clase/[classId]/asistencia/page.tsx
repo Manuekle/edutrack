@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CardDescription, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import {
   Select,
@@ -327,7 +326,7 @@ export default function AttendancePage() {
                 variant="default"
                 onClick={handleGenerateQr}
                 disabled={isGenerating || isClassPast}
-                size="sm"
+                size="default"
               >
                 {isGenerating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

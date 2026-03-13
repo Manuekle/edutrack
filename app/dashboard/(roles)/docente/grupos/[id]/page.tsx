@@ -8,15 +8,16 @@ import { sileo } from 'sileo';
 import { ClassesTable } from '@/components/classes/classes-table';
 import { StudentsTable } from '@/components/students/students-table';
 import { GenerateReportModal } from '@/components/subjects/generate-report-modal';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { CardDescription } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { useClassManagement } from '@/hooks/use-class-management';
 import { useSubjectDetail } from '@/hooks/use-subject-detail';
 import { toTableClass } from '@/lib/class-converters';
 import { classStatusMap } from '@/lib/class-utils';
 import * as dateUtils from '@/lib/time-utils';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ArrowLeft, AlertCircle, Eye, NotebookPen } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Eye, NotebookPen } from 'lucide-react';
 
 export default function GrupoDetailPage() {
   const router = useRouter();
@@ -135,28 +136,30 @@ export default function GrupoDetailPage() {
         isLoading={isGeneratingReport}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
-              <Link href="/dashboard/docente/grupos">
-                <ArrowLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-semibold tracking-card text-foreground">
+
+      <div className="pb-6 w-full flex sm:flex-row flex-col sm:items-center items-start gap-4 justify-between">
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/dashboard/docente/grupos`}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+          </Link>
+          <div>
+            <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
               {subject?.name}
             </h1>
+            <CardDescription className="text-xs dark:text-gray-300">
+              Gestiona estudiantes y <strong>planea los temas de tus clases</strong> en la bitácora.
+            </CardDescription>
           </div>
-          <p className="text-muted-foreground text-sm mt-1 ml-10">
-            Gestiona estudiantes, eventos y <strong>planea los temas de tus clases</strong> en la bitácora.
-          </p>
         </div>
 
         <div className="flex w-full sm:w-auto items-center gap-3">
           <Button
             variant="default"
             className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
-            onClick={() => router.push(`/dashboard/docente/bitacora/${grupoId}`)}
+            onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/bitacora`)}
           >
             Planear Temas y Bitácora
           </Button>
@@ -187,7 +190,6 @@ export default function GrupoDetailPage() {
           </Button>
         </div>
       </div>
-
       <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-start gap-3 mb-6">
         <div className="bg-primary/10 p-2 rounded-full mt-0.5">
           <NotebookPen className="h-4 w-4 text-primary" />

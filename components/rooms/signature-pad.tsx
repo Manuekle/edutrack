@@ -40,7 +40,7 @@ export function SignaturePad({ onSave, onClear }: SignaturePadProps) {
         </span>
         <Button
           variant="ghost"
-          size="sm"
+          size="default"
           onClick={clear}
           className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-destructive"
           type="button"

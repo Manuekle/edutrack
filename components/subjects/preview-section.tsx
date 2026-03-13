@@ -365,7 +365,7 @@ export function PreviewSection({
                               {isEditing ? (
                                 <>
                                   <Button
-                                    size="sm"
+                                    size="default"
                                     variant="default"
                                     className="h-8 w-8 p-0 shadow-sm hover:bg-primary/90 transition-colors"
                                     onClick={() => handleSaveEdit(subject.codigoAsignatura, cls.id)}
@@ -377,7 +377,7 @@ export function PreviewSection({
                                     />
                                   </Button>
                                   <Button
-                                    size="sm"
+                                    size="default"
                                     variant="outline"
                                     className="h-8 w-8 p-0 border-muted-foreground/20 hover:bg-destructive/10 hover:border-destructive/50 hover:text-destructive transition-colors"
                                     onClick={handleCancelEdit}
@@ -389,7 +389,7 @@ export function PreviewSection({
                               ) : (
                                 onUpdateClass && (
                                   <Button
-                                    size="sm"
+                                    size="default"
                                     variant="ghost"
                                     className="h-8 w-8 p-0 hover:bg-muted transition-colors"
                                     onClick={() => handleStartEdit(subject, cls)}
@@ -423,7 +423,7 @@ export function PreviewSection({
                   {successCount > 0 &&
                     `${successCount} ${successCount === 1 ? 'asignatura lista' : 'asignaturas listas'}`}
                 </p>
-                <Button onClick={onUpload} disabled={isLoading || successCount === 0} size="sm">
+                <Button onClick={onUpload} disabled={isLoading || successCount === 0} size="default">
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />

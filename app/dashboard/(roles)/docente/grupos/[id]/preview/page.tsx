@@ -1,4 +1,4 @@
-import { CardDescription, CardTitle } from '@/components/ui/card';
+import { CardDescription } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { ArrowLeft } from 'lucide-react';
@@ -86,7 +86,7 @@ export default async function PreviewPage({ params }: PageProps) {
     subject = grupoData.subject;
     // Aplanamos las clases de las semanas de la planeación activa
     classesToRender = (grupoData.planning?.weeks ?? [])
-      .flatMap((s: { classes: { date: Date; id: string; [key: string]: unknown }[] }) => s.classes)
+      .flatMap((s: { classes: { date: Date; id: string;[key: string]: unknown }[] }) => s.classes)
       .sort((a: { date: Date }, b: { date: Date }) => new Date(a.date).getTime() - new Date(b.date).getTime());
   } else {
     // Si no es grupo, intentar como asignatura (comportamiento base)
@@ -118,7 +118,7 @@ export default async function PreviewPage({ params }: PageProps) {
   }
 
   const isAuthorized = subject.teacherIds.includes(session.user.id) ||
-                       await db.group.findFirst({ where: { id, teacherIds: { has: session.user.id } } });
+    await db.group.findFirst({ where: { id, teacherIds: { has: session.user.id } } });
 
   if (!isAuthorized) {
     return (
@@ -141,7 +141,8 @@ export default async function PreviewPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="pb-4 w-full flex sm:flex-row flex-col items-start gap-4 justify-between">
+      {/* Nav */}
+      <div className="pb-6 w-full flex sm:flex-row flex-col sm:items-center items-start gap-4 justify-between">
         <div className="flex items-center gap-3">
           <Link
             href={`/dashboard/docente/grupos/${id}`}
@@ -150,28 +151,30 @@ export default async function PreviewPage({ params }: PageProps) {
             <ArrowLeft className="h-5 w-5 text-muted-foreground" />
           </Link>
           <div>
-            <h1 className="sm:text-2xl text-xs font-semibold tracking-card text-foreground">
-              Bitácora Docente
+            <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
+              Vista Previa de Bitácora
             </h1>
             <CardDescription className="text-xs dark:text-gray-300">
-              Visualiza el reporte de asistencia para la asignatura {subject.name}
+              Visualiza el reporte de asistencia para {subject.name}
             </CardDescription>
           </div>
         </div>
       </div>
+
       <div
         id="pdf-section"
-        className="mx-auto px-4 sm:px-8 pb-6 bg-white dark:bg-gray-800 rounded-md shadow-sm ring-1 ring-gray-200 dark:ring-gray-700"
+        className="mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden"
       >
-        <div className="border-b border-[#005a9c] dark:border-blue-500 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Header Institucional */}
+        <div className="border-b border-slate-200 dark:border-slate-800 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-start">
-            <div className="relative h-24 w-24 sm:h-32 sm:w-32">
+            <div className="relative h-20 w-20 sm:h-24 sm:w-24">
               <Image
                 src="/logo-fup.png"
                 alt="Logo FUP"
                 width={128}
                 height={128}
-                className="h-full w-full object-contain dark:brightness-0 dark:invert"
+                className="h-full w-full object-contain dark:brightness-0 dark:invert opacity-90"
                 priority
                 unoptimized
               />
@@ -179,94 +182,134 @@ export default async function PreviewPage({ params }: PageProps) {
           </div>
 
           <div className="w-full sm:w-1/2 text-center">
-            <div className="text-[#003366] dark:text-blue-200 font-semibold sm:text-2xl text-xl">
-              REGISTRO DE CLASES Y ASISTENCIA
+            <h2 className="text-slate-900 dark:text-white font-bold sm:text-xl text-lg tracking-card uppercase">
+              Registro de Clases y Asistencia
+            </h2>
+            <div className="text-primary dark:text-primary/80 text-[10px] font-bold tracking-card uppercase mt-1">
+              Sistema de Gestión Académica • Docencia
             </div>
-            <div className="text-[#003366] dark:text-blue-200 text-xs uppercase">Docencia</div>
           </div>
 
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
-            <div className="text-xs border border-[#005a9c] dark:border-blue-400 rounded dark:text-gray-100">
-              <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
-                <span className="font-semibold">Código:</span>
-                <span>FO-DO-005</span>
+            <div className="text-[10px] border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 overflow-hidden shadow-sm">
+              <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
+                <span className="font-bold text-slate-500 uppercase tracking-card">Código:</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">FO-DO-005</span>
               </div>
-              <div className="flex gap-1 border-b border-[#005a9c] dark:border-blue-400 py-1 px-3">
-                <span className="font-semibold">Versión:</span>
-                <span>08</span>
+              <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
+                <span className="font-bold text-slate-500 uppercase tracking-card">Versión:</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">08</span>
               </div>
-              <div className="flex gap-1 py-1 px-3">
-                <span className="font-semibold">Fecha:</span>
-                <span className="capitalize">{metaMonthYear}</span>
+              <div className="flex justify-between items-center gap-4 py-1.5 px-3">
+                <span className="font-bold text-slate-500 uppercase tracking-card">Fecha:</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100 capitalize">
+                  {metaMonthYear}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-xs border border-gray-200 dark:border-gray-700 my-4 rounded-md text-gray-900 dark:text-gray-100">
-          <div className="flex gap-2">
-            <span className="font-semibold">NOMBRE DEL DOCENTE:</span>
-            <span>{teacherName}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">PROGRAMA:</span>
-            <span>{subject.program ?? 'N/A'}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">ASIGNATURA:</span>
-            <span>{subject.name}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">AÑO:</span>
-            <span>{currentYear}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">CÓDIGO:</span>
-            <span>{subject.code}</span>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">PERÍODO:</span>
-            <span className="uppercase">{currentPeriod}</span>
+        {/* Info Box */}
+        <div className="p-6 bg-white dark:bg-slate-900">
+          <div className="bg-slate-50 dark:bg-slate-800/40 p-5 grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-xs border border-slate-200 dark:border-slate-800 rounded-xl">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                Docente
+              </span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase">
+                {teacherName}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                Programa
+              </span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {subject.program ?? 'N/A'}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                Asignatura
+              </span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase">
+                {subject.name}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1 flex-wrap">
+              <div className="grid grid-cols-3 w-full gap-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                    Año
+                  </span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {currentYear}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                    Código
+                  </span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {subject.code}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                    Período
+                  </span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-card">
+                    {currentPeriod}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="text-xs dark:text-gray-100">
-          <div className="-mx-4 sm:mx-0 overflow-x-auto">
-            <div className="min-w-[720px] w-full border border-[#ECEEDF] dark:border-gray-700">
-              <div className="grid" style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}>
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] h-full flex items-center justify-center p-2">
+        {/* Tabla de Clases */}
+        <div className="px-6 pb-8">
+          <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+            <div className="min-w-[720px]">
+              {/* Header de Tabla */}
+              <div
+                className="grid bg-slate-900 dark:bg-slate-800 text-slate-100"
+                style={{ gridTemplateColumns: '5% 12% 16% 45% 8% 14%' }}
+              >
+                <div className="text-center font-bold text-[10px] uppercase border-r border-slate-700/50 flex items-center justify-center p-3">
                   No.
                 </div>
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0]">
-                  <div className="p-1">FECHA</div>
-                  <div className="grid grid-cols-2 border-t border-[#24699be0]">
-                    <div className="p-1 text-xs">DD</div>
-                    <div className="p-1 text-xs">MM</div>
+                <div className="text-center border-r border-slate-700/50">
+                  <div className="p-2 font-bold text-[10px] uppercase tracking-card">Fecha</div>
+                  <div className="grid grid-cols-2 border-t border-slate-700/50">
+                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Día</div>
+                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Mes</div>
                   </div>
                 </div>
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0]">
-                  <div className="p-1">HORA</div>
-                  <div className="grid grid-cols-2 border-t border-[#24699be0]">
-                    <div className="p-1 text-xs">INICIO</div>
-                    <div className="p-1 text-xs">FINAL</div>
+                <div className="text-center border-r border-slate-700/50">
+                  <div className="p-2 font-bold text-[10px] uppercase tracking-card">Horario</div>
+                  <div className="grid grid-cols-2 border-t border-slate-700/50">
+                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Inicio</div>
+                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Fin</div>
                   </div>
                 </div>
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] p-2 h-full flex items-center justify-center">
-                  TEMA
+                <div className="text-center font-bold text-[10px] uppercase border-r border-slate-700/50 flex items-center justify-center p-3 tracking-card">
+                  Contenido Temático / Observaciones
                 </div>
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs border-r border-[#24699be0] p-2 h-full flex items-center justify-center">
-                  TOTAL
+                <div className="text-center font-bold text-[10px] uppercase border-r border-slate-700/50 p-2 flex items-center justify-center leading-tight tracking-card">
+                  Total
                   <br />
-                  HORAS
+                  Horas
                 </div>
-                <div className="bg-[#005a9c] text-[#eeeeee] text-center font-semibold text-xs p-2 h-full flex items-center justify-center">
-                  FIRMA
-                  <br />
-                  DOCENTE
+                <div className="text-center font-bold text-[10px] uppercase p-2 flex items-center justify-center leading-tight tracking-card">
+                  Firma o<br />
+                  Validación
                 </div>
               </div>
 
-              <div>
+              {/* Cuerpo de Tabla */}
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {classesToRender.map((cls, idx) => {
                   const dateObj = new Date(cls.date);
                   const showSignature = shouldShowSignature(cls.status);
@@ -275,60 +318,69 @@ export default async function PreviewPage({ params }: PageProps) {
                   return (
                     <div
                       key={cls.id}
-                      className={`grid min-h-[48px] items-stretch border-t border-[#ECEEDF] dark:border-gray-700 ${idx % 2 === 1 ? 'bg-[#f8f9fa] dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}
-                      style={{ gridTemplateColumns: '5% 11% 14% 50% 7% 13%' }}
+                      className={`grid min-h-[56px] items-stretch transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/30 ${idx % 2 === 1 ? 'bg-slate-50/20 dark:bg-slate-800/10' : 'bg-white dark:bg-slate-900'}`}
+                      style={{ gridTemplateColumns: '5% 12% 16% 45% 8% 14%' }}
                     >
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
+                      <div className="flex items-center justify-center border-r border-slate-100 dark:border-slate-800 text-[11px] font-medium text-slate-500">
                         {idx + 1}
                       </div>
 
-                      <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
-                        <div className="flex items-center justify-center text-xs">
+                      <div className="grid grid-cols-2 border-r border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center justify-center text-[11px] font-semibold text-slate-800 dark:text-slate-200">
                           {formatDD(dateObj)}
                         </div>
-                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
+                        <div className="flex items-center justify-center text-[11px] border-l border-slate-100 dark:border-slate-800 font-medium text-slate-600 dark:text-slate-400">
                           {formatMM(dateObj)}
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 border-r border-[#ECEEDF] dark:border-gray-700">
-                        <div className="flex items-center justify-center text-xs">
+                      <div className="grid grid-cols-2 border-r border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center justify-center text-[11px] font-medium text-slate-700 dark:text-slate-300">
                           {formatTimeHHmm(cls.startTime as Date | null)}
                         </div>
-                        <div className="flex items-center justify-center text-xs border-l border-[#ECEEDF] dark:border-gray-700">
+                        <div className="flex items-center justify-center text-[11px] border-l border-slate-100 dark:border-slate-800 font-medium text-slate-500">
                           {formatTimeHHmm(cls.endTime as Date | null)}
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 p-2 text-center text-xs">
-                        {cls.topic?.trim() || `Sesión ${idx + 1}`}
+                      <div className="flex items-center border-r border-slate-100 dark:border-slate-800 p-4 text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                        {cls.topic?.trim() || `Sesión de clase #${idx + 1}`}
                       </div>
 
-                      <div className="flex items-center justify-center border-r border-[#ECEEDF] dark:border-gray-700 text-xs">
+                      <div className="flex items-center justify-center border-r border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-900 dark:text-slate-100">
                         {calculateHours(cls.startTime as Date | null, cls.endTime as Date | null)}
                       </div>
 
-                      <div className="flex items-center justify-center p-1">
+                      <div className="flex items-center justify-center p-2">
                         {showSignature && signatureUrl ? (
-                          <Image
-                            src={signatureUrl}
-                            alt="Firma docente"
-                            width={150}
-                            height={48}
-                            className="h-12 max-w-full object-contain my-1 dark:brightness-0 dark:invert"
-                          />
+                          <div className="bg-white dark:bg-slate-100 p-1 rounded border border-slate-100 shadow-sm">
+                            <Image
+                              src={signatureUrl}
+                              alt="Firma docente"
+                              width={120}
+                              height={40}
+                              className="h-9 w-auto object-contain mix-blend-multiply"
+                            />
+                          </div>
                         ) : (
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                          <div
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-card ${cls.status === 'PROGRAMADA'
+                              ? finalizada
+                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                              : cls.status === 'REALIZADA'
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+                              }`}
+                          >
                             {cls.status === 'PROGRAMADA'
                               ? finalizada
                                 ? 'Finalizada'
                                 : 'Programada'
                               : cls.status === 'REALIZADA'
-                                ? 'Realizada'
-                                : cls.status === 'CANCELADA'
-                                  ? 'Cancelada'
-                                  : ''}
-                          </span>
+                                ? 'Verificada'
+                                : 'Cancelada'}
+                          </div>
                         )}
                       </div>
                     </div>

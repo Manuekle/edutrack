@@ -753,7 +753,7 @@ export default function ProfilePage() {
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
-                        size="sm"
+                        size="default"
                         onClick={clearCanvas}
                         className="flex-1 text-xs"
                       >
@@ -761,7 +761,7 @@ export default function ProfilePage() {
                       </Button>
                       <Button
                         variant="secondary"
-                        size="sm"
+                        size="default"
                         onClick={saveCanvas}
                         className="flex-1 text-xs"
                       >
@@ -811,7 +811,7 @@ export default function ProfilePage() {
                         <Button
                           onClick={handleUploadSignature}
                           disabled={!signatureFile || isSignatureLoading}
-                          size="sm"
+                          size="default"
                           className="text-xs h-8"
                         >
                           {isSignatureLoading ? (
@@ -827,7 +827,7 @@ export default function ProfilePage() {
                           <Button
                             onClick={handleCancelSignature}
                             variant="ghost"
-                            size="sm"
+                            size="default"
                             className="text-xs h-8 text-muted-foreground"
                           >
                             Cancelar

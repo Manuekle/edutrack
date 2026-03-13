@@ -1,8 +1,16 @@
 'use client';
 
 import { MicrocurriculoTab } from '@/components/admin/microcurriculo-tab';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -13,16 +21,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SubjectRow {
   id: string;
@@ -37,7 +37,7 @@ export default function MicrocurriculoPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [semesterFilter, setSemesterFilter] = useState('all');
-  
+
   // Pagination state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,7 +52,7 @@ export default function MicrocurriculoPage() {
       search,
       semester: semesterFilter,
     });
-    
+
     fetch(`/api/admin/microcurriculo?${params.toString()}`)
       .then(r => r.json())
       .then(data => {
@@ -230,7 +230,7 @@ export default function MicrocurriculoPage() {
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="default"
                       onClick={() => setPage(p => Math.max(1, p - 1))}
                       disabled={page === 1}
                       className="h-8 text-xs"
@@ -246,12 +246,12 @@ export default function MicrocurriculoPage() {
                           pageNum = page - 3 + i + 1;
                           if (pageNum > totalPages) pageNum = totalPages - (4 - i);
                         }
-                        
+
                         return (
                           <Button
                             key={pageNum}
                             variant={page === pageNum ? 'default' : 'ghost'}
-                            size="sm"
+                            size="default"
                             onClick={() => setPage(pageNum)}
                             className="h-8 w-8 text-xs p-0"
                           >
@@ -262,7 +262,7 @@ export default function MicrocurriculoPage() {
                     </div>
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="default"
                       onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
                       className="h-8 text-xs"

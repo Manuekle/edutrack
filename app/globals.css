@@ -397,7 +397,7 @@ input[type='number'] {
   flex-wrap: nowrap !important;
 }
 
-/* All buttons — rounded-full, text-xs, h-8, px-4 — mirrors Button size="sm" */
+/* All buttons — rounded-full, text-xs, h-8, px-4 — mirrors Button size="default" */
 .sira-theme-driver button {
   display: inline-flex !important;
   align-items: center !important;

@@ -83,22 +83,24 @@ export default function PlaneacionPage() {
 
   const currentGrupo = grupos.find(g => g.id === selectedGrupo);
 
+  const matchingPeriod = useMemo(() => {
+    if (!currentGrupo) return null;
+    const pName = currentGrupo.periodoAcademico?.replace(/[-\s]/g, '') || '';
+    return periods.find(p => p.name.replace(/[-\s]/g, '') === pName);
+  }, [currentGrupo, periods]);
+
   async function generatePlaneacion() {
     if (!selectedGrupo) return;
 
     // Determine the start date automatically based on the selected group's academic period
-    let finalFechaInicio: Date;
-    const periodName = currentGrupo?.periodoAcademico?.replace(/[-\s]/g, '') || '';
-
-    // Buscar en los periodos cargados de la BD
-    const matchingPeriod = periods.find(p => p.name.replace(/[-\s]/g, '') === periodName);
-
-    if (matchingPeriod) {
-      finalFechaInicio = new Date(matchingPeriod.startDate);
-    } else {
-      // Fallback to start of current week if period unknown
-      finalFechaInicio = startOfWeek(new Date(), { weekStartsOn: 1 });
+    if (!matchingPeriod) {
+      sileo.error({
+        description: `Periodo "${currentGrupo?.periodoAcademico}" no configurado. Ve a Configuración de Periodos.`,
+      });
+      return;
     }
+
+    const finalFechaInicio = new Date(matchingPeriod.startDate);
 
     setGenerating(true);
     try {
@@ -331,32 +333,32 @@ export default function PlaneacionPage() {
               <Label className="text-xs font-semibold ml-0.5">Fechas del semestre</Label>
               <div className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/20 border border-muted flex items-center gap-3">
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                {(() => {
-                  const pName = currentGrupo?.periodoAcademico?.replace(/[-\s]/g, '') || '';
-                  const matching = periods.find(p => p.name.replace(/[-\s]/g, '') === pName);
-
-                  if (matching) {
-                    return (
-                      <span className="text-foreground font-medium">
-                        {format(new Date(matching.startDate), 'd MMM yyyy', { locale: es })} —{' '}
-                        {format(new Date(matching.endDate), 'd MMM yyyy', { locale: es })}
-                      </span>
-                    );
-                  }
-
-                  return currentGrupo ? (
-                    <span className="text-muted-foreground">
-                      Periodo no configurado ({currentGrupo.periodoAcademico})
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground">Selecciona un grupo primero</span>
-                  );
-                })()}
+                {matchingPeriod ? (
+                  <span className="text-foreground font-medium">
+                    {format(new Date(matchingPeriod.startDate), 'd MMM yyyy', { locale: es })} —{' '}
+                    {format(new Date(matchingPeriod.endDate), 'd MMM yyyy', { locale: es })}
+                  </span>
+                ) : currentGrupo ? (
+                  <span className="text-destructive font-medium flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    Periodo no configurado ({currentGrupo.periodoAcademico})
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">Selecciona un grupo primero</span>
+                )}
               </div>
-              <p className="text-[11px] text-muted-foreground pl-1 leading-relaxed max-w-[90%]">
-                Las fechas se asignan automáticamente según la configuración del periodo académico
-                (ajustable en el Paso 1).
-              </p>
+              {!matchingPeriod && currentGrupo && (
+                <p className="text-[11px] text-destructive pl-1 leading-relaxed max-w-[90%] font-medium">
+                  Error: Las fechas del periodo &quot;{currentGrupo.periodoAcademico}&quot; no están
+                  definidas. Configúralas en la pestaña de Periodos.
+                </p>
+              )}
+              {matchingPeriod && (
+                <p className="text-[11px] text-muted-foreground pl-1 leading-relaxed max-w-[90%]">
+                  Las fechas se asignan automáticamente según la configuración del periodo académico
+                  (ajustable en el Paso 1).
+                </p>
+              )}
             </div>
           </div>
 
@@ -379,7 +381,7 @@ export default function PlaneacionPage() {
           <div className="pt-6">
             <Button
               onClick={generatePlaneacion}
-              disabled={!selectedGrupo || generating || loading}
+              disabled={!selectedGrupo || generating || loading || !matchingPeriod}
               className="w-full sm:w-auto rounded-xl shadow-none h-10 px-8 text-xs font-medium transition-all"
             >
               {generating ? (

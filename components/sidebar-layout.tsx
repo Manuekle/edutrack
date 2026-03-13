@@ -112,7 +112,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).catch(() => {}); // No bloqueamos si falla
+      }).catch(() => { }); // No bloqueamos si falla
 
       // Cerrar sesión en NextAuth
       await signOut({
@@ -179,7 +179,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="sm" asChild className="h-auto py-4">
+            <SidebarMenuButton size="default" asChild className="h-auto py-4">
               <Link href={homePath}>
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
@@ -226,18 +226,16 @@ function AppSidebar({ homePath }: { homePath: string }) {
                         <SidebarMenuButton
                           asChild
                           isActive={isActive}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ease-out active:scale-[0.97] ${
-                            isActive
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ease-out active:scale-[0.97] ${isActive
                               ? 'bg-primary/10 text-primary font-medium'
                               : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
-                          }`}
+                            }`}
                         >
                           <Link href={link.href} className="flex items-center gap-3 w-full">
                             {Icon && (
                               <Icon
-                                className={`h-[18px] w-[18px] shrink-0 ${
-                                  isActive ? 'text-primary' : 'text-muted-foreground'
-                                }`}
+                                className={`h-[18px] w-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'
+                                  }`}
                               />
                             )}
                             <span className="text-[13px]">{link.label}</span>
@@ -320,18 +318,18 @@ function AppSidebar({ homePath }: { homePath: string }) {
                     className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
                   >
                     {theme === 'dark' ||
-                    (theme === 'system' &&
-                      typeof window !== 'undefined' &&
-                      window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
+                      (theme === 'system' &&
+                        typeof window !== 'undefined' &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
                       <Sun className="mr-3 h-4 w-4 shrink-0" />
                     ) : (
                       <Moon className="mr-3 h-4 w-4 shrink-0" />
                     )}
                     <span className="font-sans">
                       {theme === 'dark' ||
-                      (theme === 'system' &&
-                        typeof window !== 'undefined' &&
-                        window.matchMedia('(prefers-color-scheme: dark)').matches)
+                        (theme === 'system' &&
+                          typeof window !== 'undefined' &&
+                          window.matchMedia('(prefers-color-scheme: dark)').matches)
                         ? 'Modo Claro'
                         : 'Modo Oscuro'}
                     </span>

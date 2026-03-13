@@ -626,7 +626,7 @@ export function TeacherReport() {
           <div className="flex items-center justify-between p-3 border-t border-border/40 bg-muted/10">
             <Button
               variant="ghost"
-              size="sm"
+              size="default"
               onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
               className="h-8 px-3 text-xs rounded-full"
@@ -638,7 +638,7 @@ export function TeacherReport() {
             </span>
             <Button
               variant="ghost"
-              size="sm"
+              size="default"
               onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="h-8 px-3 text-xs rounded-full"

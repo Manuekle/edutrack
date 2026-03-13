@@ -220,7 +220,7 @@ export const FileUploadDropZone = ({
           <label htmlFor={id} className="flex cursor-pointer text-xs">
             <Button
               variant="link"
-              size="sm"
+              size="default"
               disabled={isDisabled}
               onClick={() => inputRef.current?.click()}
               className="p-0 h-auto font-normal"
@@ -359,7 +359,7 @@ export const FileListItemProgressBar = ({
 
           <Button
             variant="ghost"
-            size="sm"
+            size="default"
             onClick={onDelete}
             className="h-8 w-8 p-0 -mt-1 -mr-1 self-start"
           >
@@ -371,7 +371,7 @@ export const FileListItemProgressBar = ({
           <div className="mt-2 flex gap-3">
             <Button
               variant="link"
-              size="sm"
+              size="default"
               onClick={onRetry}
               className="h-auto p-0 text-destructive text-xs"
             >
@@ -497,7 +497,7 @@ export const FileListItemProgressFill = ({
             >
               <Button
                 variant="ghost"
-                size="sm"
+                size="default"
                 onClick={onDelete}
                 className="relative h-8 w-8 p-0 -mt-1 -mr-1 self-start"
               >
@@ -511,7 +511,7 @@ export const FileListItemProgressFill = ({
           <div className="relative mt-2 flex gap-3">
             <Button
               variant="link"
-              size="sm"
+              size="default"
               onClick={onRetry}
               className="h-auto p-0 text-destructive text-xs"
             >

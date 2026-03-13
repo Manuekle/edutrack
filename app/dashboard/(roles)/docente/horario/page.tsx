@@ -12,11 +12,11 @@ interface HorarioClase {
   grupoCodigo: string;
   subjectName: string;
   subjectCode: string;
-  diaSemana: string;
-  horaInicio: string;
-  horaFin: string;
-  salaName: string | null;
-  periodoAcademico: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  roomName: string | null;
+  academicPeriod: string;
 }
 
 const DIA_MAP: Record<string, number> = {
@@ -47,11 +47,22 @@ export default function MiHorarioPage() {
     const events: CalendarEvent[] = [];
 
     horarios.forEach((h, idx) => {
-      const dayOffset = (DIA_MAP[h.diaSemana] || 1) - 1; // 0 for Monday
+      // @ts-ignore - The API returns dayOfWeek but the interface was mapped to diaSemana
+      const day = h.dayOfWeek || h.diaSemana;
+      // @ts-ignore
+      const startT = h.startTime || h.horaInicio;
+      // @ts-ignore
+      const endT = h.endTime || h.horaFin;
+      // @ts-ignore
+      const room = h.roomName || h.salaName;
+      
+      const dayOffset = (DIA_MAP[day] || 1) - 1; // 0 for Monday
       const eventDate = addDays(monday, dayOffset);
 
-      const [startH, startM] = h.horaInicio.split(':').map(Number);
-      const [endH, endM] = h.horaFin.split(':').map(Number);
+      if (!startT || !endT) return;
+
+      const [startH, startM] = startT.split(':').map(Number);
+      const [endH, endM] = endT.split(':').map(Number);
 
       const start = setMinutes(setHours(eventDate, startH), startM);
       const end = setMinutes(setHours(eventDate, endH), endM);
@@ -62,7 +73,7 @@ export default function MiHorarioPage() {
         subject: h.subjectName,
         start,
         end,
-        room: h.salaName || 'Aula por asignar',
+        room: room || 'Aula por asignar',
         reason: `${h.grupoCodigo}`,
         type: 'CLASE',
       });

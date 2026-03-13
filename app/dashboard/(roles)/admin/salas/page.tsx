@@ -570,7 +570,7 @@ export default function AdminSalasPage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {uploadPreviewData.length > 0 && (
                         <div className="border-t px-5 py-4 bg-muted/5 flex items-center justify-between gap-4">
                           <div className="flex flex-col">
@@ -659,7 +659,7 @@ export default function AdminSalasPage() {
                             <Icon className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-2xl font-semibold tracking-tight text-foreground">
+                            <p className="text-2xl font-semibold tracking-card text-foreground">
                               {count}
                             </p>
                             <p className="text-[12px] text-muted-foreground">{label}</p>
@@ -742,7 +742,7 @@ export default function AdminSalasPage() {
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   variant="ghost"
-                                  size="sm"
+                                  size="default"
                                   className="h-8 w-8 p-0 text-muted-foreground/50 hover:text-foreground transition-colors"
                                 >
                                   <span className="sr-only">Abrir menú</span>

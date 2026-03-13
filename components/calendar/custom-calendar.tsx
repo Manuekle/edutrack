@@ -339,7 +339,7 @@ export const CustomCalendar = ({
             <Button
               key={v.id}
               variant="ghost"
-              size="sm"
+              size="default"
               className={cn(
                 'rounded-full px-6 text-xs font-semibold transition-all shrink-0',
                 view === v.id

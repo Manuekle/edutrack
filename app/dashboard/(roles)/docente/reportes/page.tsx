@@ -221,7 +221,7 @@ export default function ReportsPage() {
                   {report.status === 'COMPLETADO' && report.fileUrl ? (
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="default"
                       className="h-8 rounded-xl bg-primary/5 hover:bg-primary hover:text-white border-primary/20 transition-all gap-2 text-xs font-semibold"
                       onClick={() => handleDownload(report)}
                       disabled={downloadingReportId === report.id}
