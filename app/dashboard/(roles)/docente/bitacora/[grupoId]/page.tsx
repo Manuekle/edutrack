@@ -200,7 +200,7 @@ export default function BitacoraTablaPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" asChild>
-            <Link href="/dashboard/docente/bitacora">
+            <Link href={`/dashboard/docente/grupos/${grupoId}`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>

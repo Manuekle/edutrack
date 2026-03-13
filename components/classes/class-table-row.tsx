@@ -108,7 +108,7 @@ export function ClassTableRow({
                 <TooltipTrigger asChild>
                   {canTakeAttendance ? (
                     <Link
-                      href={`/dashboard/docente/asignaturas/${subjectId}/clase/${cls.id}/asistencia`}
+                      href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
                       className="text-[15px] font-semibold text-foreground tracking-card hover:text-primary transition-colors truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
                       aria-label={`Registrar asistencia para ${cls.topic || 'Sin tema'}`}
                     >
@@ -185,7 +185,7 @@ export function ClassTableRow({
               )}
             >
               <Link
-                href={`/dashboard/docente/asignaturas/${subjectId}/clase/${cls.id}/asistencia`}
+                href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
                 className="flex items-center w-full"
                 onClick={e => !canTakeAttendance && e.preventDefault()}
                 aria-disabled={!canTakeAttendance}

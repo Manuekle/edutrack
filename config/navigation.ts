@@ -158,13 +158,6 @@ export const navLinkGroups: NavLinkGroup[] = [
         description: 'Vista semanal de clases programadas',
       },
       {
-        href: '/dashboard/docente/bitacora',
-        icon: NotebookPen,
-        label: 'Bitácora de Clases',
-        roles: ['DOCENTE'],
-        description: 'Registrar y consultar clases semana a semana',
-      },
-      {
         href: '/dashboard/docente/reportes',
         icon: TrendingUp,
         label: 'Mis Reportes',
