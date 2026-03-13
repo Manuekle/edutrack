@@ -209,7 +209,7 @@ export async function GET() {
     });
 
     const weeklyAttendedCount = weeklyAttendances.filter(
-      att => att.status === 'PRESENTE' || att.status === 'TARDANZA'
+      att => att.status === 'PRESENT' || att.status === 'LATE'
     ).length;
 
     const nextClassesBySubject = new Map<string, (typeof nextClasses)[0]>();

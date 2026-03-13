@@ -415,7 +415,7 @@ export const AttendanceReportPDF: React.FC<{ data: TeacherReportData }> = ({ dat
     return Math.round(diff / (1000 * 60 * 60)).toString();
   };
 
-  const realizedClasses = data.classes.filter(c => c.status === 'REALIZADA');
+  const realizedClasses = data.classes.filter(c => c.status === 'COMPLETED');
   const currentDate = new Date();
 
   return (
@@ -747,7 +747,7 @@ export async function generateAttendanceReportPDF(
   period: number,
   year: number,
   reportId?: string,
-  requestedBy?: { id: string; name: string; correoPersonal: string | null } | null
+  requestedBy?: { id: string; name: string; personalEmail: string | null } | null
 ): Promise<{ buffer: Buffer; fileName: string }> {
   try {
     const subject = await db.subject.findUnique({
@@ -777,8 +777,8 @@ export async function generateAttendanceReportPDF(
       cls => cls.date >= startDate && cls.date <= endDate
     );
 
-    const realizedClasses = periodClasses.filter(cls => cls.status === 'REALIZADA');
-    const cancelledClasses = periodClasses.filter(cls => cls.status === 'CANCELADA');
+    const realizedClasses = periodClasses.filter(cls => cls.status === 'COMPLETED');
+    const cancelledClasses = periodClasses.filter(cls => cls.status === 'CANCELLED');
 
     // Obtener logo de la institución
     let logoDataUri: string | undefined;
@@ -841,10 +841,10 @@ export async function generateAttendanceReportPDF(
     const fileName = `registro-clases-${subject.code}-${period}-${year}-${Date.now()}.pdf`;
 
     // Enviar notificación por correo si se proporcionó el ID del reporte y el solicitante
-    if (reportId && requestedBy?.correoPersonal) {
+    if (reportId && requestedBy?.personalEmail) {
       try {
         await sendEmail({
-          to: requestedBy.correoPersonal,
+          to: requestedBy.personalEmail,
           subject: `Reporte de asistencia generado - ${subject.name}`,
           react: ReportReadyEmail({
             subjectName: subject.name,
@@ -859,7 +859,7 @@ export async function generateAttendanceReportPDF(
         if (reportId) {
           await db.report.update({
             where: { id: reportId },
-            data: { status: ReportStatus.COMPLETADO },
+            data: { status: ReportStatus.COMPLETED },
           });
         }
       } catch (emailError) {
@@ -867,7 +867,7 @@ export async function generateAttendanceReportPDF(
           await db.report.update({
             where: { id: reportId },
             data: {
-              status: ReportStatus.FALLIDO,
+              status: ReportStatus.FAILED,
               error:
                 'El reporte se generó correctamente, pero hubo un error al enviar la notificación por correo.',
             },

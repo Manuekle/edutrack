@@ -1,5 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
+import { DayOfWeek } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 import Papa from 'papaparse';
@@ -27,6 +28,16 @@ const DIA_VALIDOS = [
   'DOMINGO',
 ] as const;
 
+const DIA_TO_DAYOFWEEK: Record<string, DayOfWeek> = {
+  LUNES: DayOfWeek.MONDAY,
+  MARTES: DayOfWeek.TUESDAY,
+  MIERCOLES: DayOfWeek.WEDNESDAY,
+  JUEVES: DayOfWeek.THURSDAY,
+  VIERNES: DayOfWeek.FRIDAY,
+  SABADO: DayOfWeek.SATURDAY,
+  DOMINGO: DayOfWeek.SUNDAY,
+};
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -35,16 +46,16 @@ export async function GET(req: NextRequest) {
     }
     const subjectId = req.nextUrl.searchParams.get('subjectId') ?? undefined;
 
-    const horarios = await db.horario.findMany({
+    const schedules = await db.schedule.findMany({
       where: subjectId ? { subjectId } : undefined,
       include: {
-        _count: { select: { grupos: true } },
+        _count: { select: { groups: true } },
         subject: { select: { id: true, name: true, code: true } },
-        sala: { select: { id: true, name: true } },
+        room: { select: { id: true, name: true } },
       },
-      orderBy: [{ diaSemana: 'asc' }, { horaInicio: 'asc' }],
+      orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
     });
-    return NextResponse.json({ horarios });
+    return NextResponse.json({ horarios: schedules });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
@@ -63,7 +74,7 @@ export async function POST(req: Request) {
     if (contentType.includes('application/json')) {
       const body = await req.json();
       let subjectId: string | null = body.subjectId ?? null;
-      let salaId: string | null = body.salaId ?? null;
+      let roomId: string | null = body.salaId ?? null;
 
       if (!subjectId && body.subjectCode) {
         const subject = await db.subject.findFirst({
@@ -72,22 +83,23 @@ export async function POST(req: Request) {
         });
         subjectId = subject?.id ?? null;
       }
-      if (!salaId && body.salaNombre) {
+      if (!roomId && body.salaNombre) {
         const room = await db.room.findFirst({
           where: { name: body.salaNombre.trim(), isActive: true },
           select: { id: true },
         });
-        salaId = room?.id ?? null;
+        roomId = room?.id ?? null;
       }
 
-      const horario = await db.horario.create({
+      const dayOfWeek = body.diaSemana ? DIA_TO_DAYOFWEEK[body.diaSemana as string] ?? DayOfWeek.MONDAY : DayOfWeek.MONDAY;
+
+      const schedule = await db.schedule.create({
         data: {
-          diaSemana: body.diaSemana,
-          horaInicio: body.horaInicio,
-          horaFin: body.horaFin,
-          periodicidad: body.periodicidad ?? 'SEMANAL',
+          dayOfWeek,
+          startTime: body.horaInicio,
+          endTime: body.horaFin,
           subjectId: subjectId ?? undefined,
-          salaId: salaId ?? undefined,
+          roomId: roomId ?? undefined,
         },
       });
       // Si se envía código de asignatura y grupo, crear/actualizar Grupo también
@@ -99,33 +111,33 @@ export async function POST(req: Request) {
           });
       if (subjectForGroup && body.subjectCode && body.groupCode) {
         const periodo = body.periodoAcademico || '2025-1';
-        const existingGroup = await db.grupo.findFirst({
+        const existingGroup = await db.group.findFirst({
           where: {
-            codigo: body.groupCode,
+            code: body.groupCode,
             subjectId: subjectForGroup.id,
-            periodoAcademico: periodo,
+            academicPeriod: periodo,
           },
           select: { id: true },
         });
         if (existingGroup) {
-          await db.grupo.update({
+          await db.group.update({
             where: { id: existingGroup.id },
-            data: { horarioId: horario.id, ...(salaId && { salaId }) },
+            data: { scheduleId: schedule.id, ...(roomId && { roomId }) },
           });
         } else {
-          await db.grupo.create({
+          await db.group.create({
             data: {
-              codigo: body.groupCode,
+              code: body.groupCode,
               subjectId: subjectForGroup.id,
-              periodoAcademico: periodo,
-              docenteIds: [],
-              horarioId: horario.id,
-              salaId: salaId ?? undefined,
+              academicPeriod: periodo,
+              teacherIds: [],
+              scheduleId: schedule.id,
+              roomId: roomId ?? undefined,
             },
           });
         }
       }
-      return NextResponse.json(horario);
+      return NextResponse.json(schedule);
     }
 
     // Carga masiva CSV (multipart/form-data)
@@ -327,47 +339,32 @@ export async function POST(req: Request) {
           errors += 1;
           continue;
         }
-        let salaId: string | undefined;
+        let roomId: string | undefined;
         if (item.salaNombre) {
           const room = roomByName.get(item.salaNombre.toLowerCase());
-          salaId = room?.id;
+          roomId = room?.id;
         }
 
-        const existing = await db.horario.findFirst({
+        const dayOfWeek = DIA_TO_DAYOFWEEK[item.diaSemana] ?? DayOfWeek.MONDAY;
+
+        const existing = await db.schedule.findFirst({
           where: {
-            diaSemana: item.diaSemana as
-              | 'LUNES'
-              | 'MARTES'
-              | 'MIERCOLES'
-              | 'JUEVES'
-              | 'VIERNES'
-              | 'SABADO'
-              | 'DOMINGO',
-            horaInicio: item.horaInicio,
-            horaFin: item.horaFin,
+            dayOfWeek,
+            startTime: item.horaInicio,
+            endTime: item.horaFin,
             subjectId,
-            ...(salaId && { salaId }),
+            ...(roomId && { roomId }),
           },
         });
 
         if (!existing) {
-          await db.horario.create({
+          await db.schedule.create({
             data: {
-              diaSemana: item.diaSemana as
-                | 'LUNES'
-                | 'MARTES'
-                | 'MIERCOLES'
-                | 'JUEVES'
-                | 'VIERNES'
-                | 'SABADO'
-                | 'DOMINGO',
-              horaInicio: item.horaInicio,
-              horaFin: item.horaFin,
-              periodicidad: (item.periodicidad === 'QUINCENAL' ? 'QUINCENAL' : 'SEMANAL') as
-                | 'SEMANAL'
-                | 'QUINCENAL',
+              dayOfWeek,
+              startTime: item.horaInicio,
+              endTime: item.horaFin,
               subjectId,
-              salaId,
+              roomId,
             },
           });
           createdHorarios += 1;

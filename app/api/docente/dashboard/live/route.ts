@@ -22,7 +22,7 @@ export async function GET() {
         subject: {
           teacherIds: { has: teacherId },
         },
-        status: 'PROGRAMADA',
+        status: 'SCHEDULED',
         startTime: {
           lte: now,
         },
@@ -87,16 +87,16 @@ export async function GET() {
 
     attendanceCounts.forEach(group => {
       switch (group.status) {
-        case AttendanceStatus.PRESENTE:
+        case AttendanceStatus.PRESENT:
           stats.present = group._count.status;
           break;
-        case AttendanceStatus.AUSENTE:
+        case AttendanceStatus.ABSENT:
           stats.absent = group._count.status;
           break;
-        case AttendanceStatus.TARDANZA:
+        case AttendanceStatus.LATE:
           stats.late = group._count.status;
           break;
-        case AttendanceStatus.JUSTIFICADO:
+        case AttendanceStatus.JUSTIFIED:
           stats.justified = group._count.status;
           break;
         default:

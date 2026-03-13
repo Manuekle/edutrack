@@ -11,18 +11,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const body = await req.json();
-    const grupo = await db.grupo.update({
+    const group = await db.group.update({
       where: { id },
       data: {
-        codigo: body.codigo,
+        code: body.codigo,
         subjectId: body.subjectId,
-        periodoAcademico: body.periodoAcademico,
-        docenteIds: body.docenteIds ?? [],
-        horarioId: body.horarioId ?? null,
-        salaId: body.salaId ?? null,
+        academicPeriod: body.periodoAcademico,
+        teacherIds: body.docenteIds ?? [],
+        scheduleId: body.horarioId ?? null,
+        roomId: body.salaId ?? null,
       },
     });
-    return NextResponse.json(grupo);
+    return NextResponse.json(group);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
@@ -35,7 +35,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    await db.grupo.delete({ where: { id } });
+    await db.group.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });

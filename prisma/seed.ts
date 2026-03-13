@@ -1,11 +1,7 @@
 import {
-  AttendanceStatus,
   ClassStatus,
   DayOfWeek,
-  Jornada,
   PrismaClient,
-  ReportFormat,
-  ReportStatus,
   Role,
   RoomType,
   Subject,
@@ -247,7 +243,7 @@ async function main() {
   // Create some schedules
   const schedule1 = await prisma.schedule.create({
     data: {
-      dayOfWeek: DayOfWeek.LUNES,
+      dayOfWeek: DayOfWeek.MONDAY,
       startTime: '08:00',
       endTime: '10:00',
       subjectId: sub1.id,
@@ -257,7 +253,7 @@ async function main() {
 
   const schedule2 = await prisma.schedule.create({
     data: {
-      dayOfWeek: DayOfWeek.MARTES,
+      dayOfWeek: DayOfWeek.TUESDAY,
       startTime: '10:00',
       endTime: '12:00',
       subjectId: sub2.id,
@@ -297,7 +293,6 @@ async function main() {
       teacherIds: [docente1.id],
       studentIds: [estudiante1.id, estudiante2.id],
       classroom: rooms[0].name,
-      shift: Jornada.DIURNO,
     },
   });
 
@@ -307,7 +302,6 @@ async function main() {
       teacherIds: [docente1.id],
       studentIds: [estudiante1.id],
       classroom: rooms[1].name,
-      shift: Jornada.DIURNO,
     },
   });
 
@@ -328,7 +322,7 @@ async function main() {
       date: classDate,
       startTime,
       endTime,
-      status: ClassStatus.REALIZADA,
+      status: ClassStatus.COMPLETED,
       topic: 'Introducción y repaso',
       classroom: rooms[0].name,
       totalStudents: 2,

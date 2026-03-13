@@ -32,7 +32,7 @@ export async function GET(request: Request) {
         id: true,
         name: true,
         document: true,
-        correoInstitucional: true,
+        institutionalEmail: true,
       },
     });
 

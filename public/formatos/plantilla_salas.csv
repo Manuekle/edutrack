@@ -1,4 +1,4 @@
 nombre_sala,tipo_sala,capacidad,descripcion
-401A,SALON,35,Aula bloque principal
-Sist3,SALA_COMPUTO,25,Sala con 25 PCs
+401A,SALA_CLASE,35,Aula bloque principal
+Sist3,LABORATORIO,25,Sala con 25 PCs
 Auditorio Magna,AUDITORIO,150,Auditorio central

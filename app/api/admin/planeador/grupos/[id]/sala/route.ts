@@ -11,7 +11,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const { salaId } = await req.json();
-    await db.grupo.update({ where: { id }, data: { salaId: salaId ?? null } });
+    await db.group.update({ where: { id }, data: { roomId: salaId ?? null } });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });

@@ -16,7 +16,7 @@ export async function GET(request: Request) {
       where: {
         classId,
         studentId,
-        status: 'JUSTIFICADO',
+        status: 'JUSTIFIED',
       },
       select: {
         id: true,

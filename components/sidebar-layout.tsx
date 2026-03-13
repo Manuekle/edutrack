@@ -287,7 +287,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                       {session?.user?.name || 'Usuario'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {session?.user?.correoInstitucional || getRoleDisplayName(userRole as Role)}
+                      {session?.user?.institutionalEmail || getRoleDisplayName(userRole as Role)}
                     </p>
                   </div>
                   <DropdownMenuItem

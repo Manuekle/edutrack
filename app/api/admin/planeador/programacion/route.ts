@@ -1,5 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
+import { DayOfWeek } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 import Papa from 'papaparse';
@@ -26,6 +27,16 @@ const DIA_VALIDOS = [
   'SABADO',
   'DOMINGO',
 ] as const;
+
+const DIA_TO_DAYOFWEEK: Record<string, DayOfWeek> = {
+  LUNES: DayOfWeek.MONDAY,
+  MARTES: DayOfWeek.TUESDAY,
+  MIERCOLES: DayOfWeek.WEDNESDAY,
+  JUEVES: DayOfWeek.THURSDAY,
+  VIERNES: DayOfWeek.FRIDAY,
+  SABADO: DayOfWeek.SATURDAY,
+  DOMINGO: DayOfWeek.SUNDAY,
+};
 
 // Normalize day names: remove accents and handle aliases
 function normalizeDia(raw: string): string {
@@ -304,65 +315,66 @@ export async function POST(req: Request) {
           continue;
         }
 
-        // 1. Find or create Horario
-        let salaId: string | undefined;
+        // 1. Find or create Schedule
+        let roomId: string | undefined;
         if (item.salon && item.salon.toUpperCase() !== 'S/A') {
           const room = roomByName.get(item.salon.toLowerCase());
-          salaId = room?.id;
+          roomId = room?.id;
         }
 
-        let horario = await db.horario.findFirst({
+        const dayOfWeek = DIA_TO_DAYOFWEEK[item.dia] ?? DayOfWeek.MONDAY;
+
+        let schedule = await db.schedule.findFirst({
           where: {
-            diaSemana: item.dia as typeof DIA_VALIDOS[number],
-            horaInicio: item.horaInicio,
-            horaFin: item.horaFin,
+            dayOfWeek,
+            startTime: item.horaInicio,
+            endTime: item.horaFin,
             subjectId: subject.id,
           },
         });
 
-        if (!horario) {
-          horario = await db.horario.create({
+        if (!schedule) {
+          schedule = await db.schedule.create({
             data: {
-              diaSemana: item.dia as typeof DIA_VALIDOS[number],
-              horaInicio: item.horaInicio,
-              horaFin: item.horaFin,
-              periodicidad: 'SEMANAL',
+              dayOfWeek,
+              startTime: item.horaInicio,
+              endTime: item.horaFin,
               subjectId: subject.id,
-              salaId,
+              roomId,
             },
           });
           createdHorarios++;
         }
 
-        // 2. Find or create Grupo
-        const existingGrupo = await db.grupo.findFirst({
+        // 2. Find or create Group
+        const existingGroup = await db.group.findFirst({
           where: {
-            codigo: item.grupo,
+            code: item.grupo,
             subjectId: subject.id,
-            periodoAcademico: item.periodoAcademico,
+            academicPeriod: item.periodoAcademico,
           },
         });
 
-        if (existingGrupo) {
-          // Update: assign horario, sala
+        if (existingGroup) {
+          // Update: assign schedule, room
           const updateData: Record<string, unknown> = {
-            horarioId: horario.id,
+            scheduleId: schedule.id,
           };
-          if (salaId) updateData.salaId = salaId;
+          if (roomId) updateData.roomId = roomId;
 
-          await db.grupo.update({
-            where: { id: existingGrupo.id },
+          await db.group.update({
+            where: { id: existingGroup.id },
             data: updateData,
           });
           updatedGrupos++;
         } else {
-          await db.grupo.create({
+          await db.group.create({
             data: {
-              codigo: item.grupo,
+              code: item.grupo,
               subjectId: subject.id,
-              periodoAcademico: item.periodoAcademico,
-              horarioId: horario.id,
-              salaId: salaId ?? undefined,
+              academicPeriod: item.periodoAcademico,
+              scheduleId: schedule.id,
+              roomId: roomId ?? undefined,
             },
           });
           createdGrupos++;

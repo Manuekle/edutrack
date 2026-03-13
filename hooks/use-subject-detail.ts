@@ -158,7 +158,7 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
 
   // Calcular si hay clases programadas
   const hasScheduledClasses =
-    classesQuery.data?.data?.some(cls => cls.status === 'PROGRAMADA') || false;
+    classesQuery.data?.data?.some(cls => cls.status === 'SCHEDULED') || false;
 
   return {
     subject: subjectQuery.data?.data

@@ -1,18 +1,18 @@
-export const ROLES = ['ADMIN', 'DOCENTE', 'ESTUDIANTE', 'COORDINADOR'] as const;
+export const ROLES = ['ADMIN', 'DOCENTE', 'ESTUDIANTE'] as const;
 export type Role = (typeof ROLES)[number];
 
 export type User = {
   id: string;
   name: string | null;
-  correoInstitucional: string | null;
-  correoPersonal?: string | null;
+  institutionalEmail: string | null;
+  personalEmail?: string | null;
   role: Role;
   isActive: boolean;
   signatureUrl?: string | null;
   document?: string | null;
-  codigoDocente?: string | null;
-  codigoEstudiantil?: string | null;
-  telefono?: string | null;
+  teacherCode?: string | null;
+  studentCode?: string | null;
+  phone?: string | null;
 };
 
 // API Response Types

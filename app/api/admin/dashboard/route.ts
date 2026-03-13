@@ -140,7 +140,7 @@ export async function GET() {
     );
     const presentAttendances =
       attendanceStats.find(
-        (stat: { status: AttendanceStatus }) => stat.status === AttendanceStatus.PRESENTE
+        (stat: { status: AttendanceStatus }) => stat.status === AttendanceStatus.PRESENT
       )?._count.status || 0;
     const attendancePercentage =
       totalAttendances > 0 ? (presentAttendances / totalAttendances) * 100 : 0;
@@ -156,7 +156,7 @@ export async function GET() {
             ? 'Docentes'
             : role.role === Role.ADMIN
               ? 'Administradores'
-              : 'Coordinadores',
+              : 'Usuarios',
     }));
 
     const attendanceDistribution = attendanceStats.map(
@@ -164,11 +164,11 @@ export async function GET() {
         name: stat.status,
         asistencia: stat._count.status,
         label:
-          stat.status === AttendanceStatus.PRESENTE
+          stat.status === AttendanceStatus.PRESENT
             ? 'Presente'
-            : stat.status === AttendanceStatus.AUSENTE
+            : stat.status === AttendanceStatus.ABSENT
               ? 'Ausente'
-              : stat.status === AttendanceStatus.TARDANZA
+              : stat.status === AttendanceStatus.LATE
                 ? 'Tardanza'
                 : 'Justificado',
       })
@@ -179,9 +179,9 @@ export async function GET() {
         name: stat.status,
         value: stat._count.status,
         label:
-          stat.status === ClassStatus.PROGRAMADA
+          stat.status === ClassStatus.SCHEDULED
             ? 'Programadas'
-            : stat.status === ClassStatus.REALIZADA
+            : stat.status === ClassStatus.COMPLETED
               ? 'Realizadas'
               : 'Canceladas',
       })
@@ -218,7 +218,7 @@ export async function GET() {
       usersByRole.find((role: { role: Role }) => role.role === Role.ESTUDIANTE)?._count.role || 0;
     const completedClasses =
       classStatusStats.find(
-        (stat: { status: ClassStatus }) => stat.status === ClassStatus.REALIZADA
+        (stat: { status: ClassStatus }) => stat.status === ClassStatus.COMPLETED
       )?._count.status || 0;
 
     const dashboardData = {

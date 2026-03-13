@@ -139,7 +139,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
     }
 
     // Handle class cancellation notification
-    if (status === 'CANCELADA' && reason) {
+    if (status === 'CANCELLED' && reason) {
       const classToCancel = await db.class.findUnique({
         where: { id: classId },
         include: {
@@ -156,11 +156,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
       if (classToCancel && classToCancel.subject.studentIds.length > 0) {
         const students = await db.user.findMany({
           where: { id: { in: classToCancel.subject.studentIds } },
-          select: { correoInstitucional: true, correoPersonal: true },
+          select: { institutionalEmail: true, personalEmail: true },
         });
 
         const studentEmails = students
-          .map(s => s.correoInstitucional || s.correoPersonal)
+          .map(s => s.institutionalEmail || s.personalEmail)
           .filter((email): email is string => !!email);
 
         if (studentEmails.length > 0) {
@@ -208,7 +208,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
         ...(topic !== undefined && { topic }),
         ...(description !== undefined && { description }),
         ...(status && { status }),
-        ...(status === 'CANCELADA' && reason && { cancellationReason: reason }),
+        ...(status === 'CANCELLED' && reason && { cancellationReason: reason }),
       },
       include: {
         subject: true,

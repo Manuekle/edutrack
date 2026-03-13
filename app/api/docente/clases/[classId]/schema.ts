@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ClassStatusEnum = z.enum(['PROGRAMADA', 'REALIZADA', 'CANCELADA']);
+export const ClassStatusEnum = z.enum(['SCHEDULED', 'COMPLETED', 'CANCELLED']);
 
 export const DocenteClaseDetailSchema = z.object({
   id: z.string(),

@@ -74,12 +74,12 @@ export function useClassManagement({
   };
 
   const handleMarkClassAsDone = (classId: string) => {
-    handleUpdateClassStatus(classId, 'REALIZADA');
+    handleUpdateClassStatus(classId, 'COMPLETED');
   };
 
   const handleConfirmCancel = async () => {
     if (classToCancel) {
-      await handleUpdateClassStatus(classToCancel.id, 'CANCELADA', cancelReason);
+      await handleUpdateClassStatus(classToCancel.id, 'CANCELLED', cancelReason);
       setClassToCancel(null);
       setCancelReason('');
     }

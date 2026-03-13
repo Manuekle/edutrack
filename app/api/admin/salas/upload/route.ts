@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 
 interface RoomRow {
   name: string;
-  type: 'SALA_COMPUTO' | 'SALON' | 'AUDITORIO';
+  type: 'LABORATORIO' | 'SALA_CLASE' | 'AUDITORIO';
   capacity: number;
   description: string;
 }
@@ -59,8 +59,8 @@ export async function POST(request: Request) {
       if (values.length < 3) continue;
 
       const rawType = values[tipoIdx].toUpperCase();
-      let tipo: 'SALA_COMPUTO' | 'SALON' | 'AUDITORIO' = 'SALON';
-      if (rawType.includes('COMPUT')) tipo = 'SALA_COMPUTO';
+      let tipo: 'LABORATORIO' | 'SALA_CLASE' | 'AUDITORIO' = 'SALA_CLASE';
+      if (rawType.includes('COMPUT') || rawType.includes('LABOR')) tipo = 'LABORATORIO';
       else if (rawType.includes('AUDITORIO')) tipo = 'AUDITORIO';
 
       rawRows.push({

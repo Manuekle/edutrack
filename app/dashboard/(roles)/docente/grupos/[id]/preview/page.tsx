@@ -54,7 +54,7 @@ export default async function PreviewPage({ params }: PageProps) {
   const { id } = await params;
 
   // Intentar cargar como Grupo primero para filtrar clases por planeación (evita duplicados)
-  const grupoData = await db.grupo.findUnique({
+  const grupoData = await db.group.findUnique({
     where: { id },
     include: {
       subject: {
@@ -64,15 +64,15 @@ export default async function PreviewPage({ params }: PageProps) {
           },
         },
       },
-      planeacion: {
+      planning: {
         include: {
-          semanas: {
+          weeks: {
             include: {
-              clases: {
+              classes: {
                 orderBy: { date: 'asc' },
               }
             },
-            orderBy: { numero: 'asc' }
+            orderBy: { number: 'asc' }
           }
         }
       }
@@ -85,9 +85,9 @@ export default async function PreviewPage({ params }: PageProps) {
   if (grupoData) {
     subject = grupoData.subject;
     // Aplanamos las clases de las semanas de la planeación activa
-    classesToRender = (grupoData.planeacion?.semanas ?? [])
-      .flatMap(s => s.clases)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    classesToRender = (grupoData.planning?.weeks ?? [])
+      .flatMap((s: { classes: { date: Date; id: string; [key: string]: unknown }[] }) => s.classes)
+      .sort((a: { date: Date }, b: { date: Date }) => new Date(a.date).getTime() - new Date(b.date).getTime());
   } else {
     // Si no es grupo, intentar como asignatura (comportamiento base)
     subject = await db.subject.findUnique({
@@ -96,9 +96,9 @@ export default async function PreviewPage({ params }: PageProps) {
         teachers: {
           select: { id: true, name: true, signatureUrl: true },
         },
-        classes: { 
-          where: { semanaId: { not: null } },
-          orderBy: { date: 'asc' } 
+        classes: {
+          where: { weekId: { not: null } },
+          orderBy: { date: 'asc' }
         },
       },
     });
@@ -117,8 +117,8 @@ export default async function PreviewPage({ params }: PageProps) {
     );
   }
 
-  const isAuthorized = subject.teacherIds.includes(session.user.id) || 
-                       await db.grupo.findFirst({ where: { id, docenteIds: { has: session.user.id } } });
+  const isAuthorized = subject.teacherIds.includes(session.user.id) ||
+                       await db.group.findFirst({ where: { id, teacherIds: { has: session.user.id } } });
 
   if (!isAuthorized) {
     return (

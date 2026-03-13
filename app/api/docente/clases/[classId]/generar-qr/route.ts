@@ -87,7 +87,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
           },
           select: {
             id: true,
-            correoInstitucional: true,
+            institutionalEmail: true,
             name: true,
           },
         });
@@ -97,14 +97,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
           .filter(
             (
               student
-            ): student is { id: string; correoInstitucional: string; name: string | null } =>
-              !!student.correoInstitucional
+            ): student is { id: string; institutionalEmail: string; name: string | null } =>
+              !!student.institutionalEmail
           )
           .map(async student => {
             const justificationLink = `${process.env.NEXTAUTH_URL}/justificar-ausencia?classId=${classId}&studentId=${student.id}`;
 
             await sendEmail({
-              to: student.correoInstitucional!,
+              to: student.institutionalEmail!,
               subject: `Inicio de clase: ${classToUpdate.subject.name} - ${classToUpdate.topic || 'Sin tema específico'}`,
               react: ClassNotifyEmail({
                 className: classToUpdate.topic || 'Sin tema específico',

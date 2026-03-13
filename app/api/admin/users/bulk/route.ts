@@ -181,7 +181,7 @@ export async function POST(req: Request) {
       const existingUserByDoc = existingDocs.get(documentStr.toLowerCase());
       const existingUserByEmail = existingEmails.get(email.toLowerCase());
 
-      let existingUserId = null;
+      let existingUserId: string | undefined = undefined;
       if (existingUserByDoc || existingUserByEmail) {
          const user = existingUserByDoc || existingUserByEmail;
          // Ensure role matches what we're uploading

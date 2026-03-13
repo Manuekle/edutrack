@@ -78,7 +78,7 @@ export default function AdminSalasPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: '',
-    type: 'SALON' as RoomType,
+    type: 'SALA_CLASE' as RoomType,
     capacity: '',
     description: '',
   });
@@ -226,7 +226,7 @@ export default function AdminSalasPage() {
         });
         setIsDialogOpen(false);
         setEditingRoomId(null);
-        setFormData({ name: '', type: 'SALON', capacity: '', description: '' });
+        setFormData({ name: '', type: 'SALA_CLASE', capacity: '', description: '' });
         fetchRooms();
       } else {
         const error = await response.json();
@@ -239,9 +239,9 @@ export default function AdminSalasPage() {
 
   const getTypeIcon = (type: RoomType) => {
     switch (type) {
-      case 'SALA_COMPUTO':
+      case 'LABORATORIO':
         return <Computer className="h-4 w-4" />;
-      case 'SALON':
+      case 'SALA_CLASE':
         return <Building2 className="h-4 w-4" />;
       case 'AUDITORIO':
         return <Mic2 className="h-4 w-4" />;
@@ -252,9 +252,9 @@ export default function AdminSalasPage() {
 
   const getTypeLabel = (type: RoomType) => {
     switch (type) {
-      case 'SALA_COMPUTO':
+      case 'LABORATORIO':
         return 'Sala de Cómputo';
-      case 'SALON':
+      case 'SALA_CLASE':
         return 'Salón de Clase';
       case 'AUDITORIO':
         return 'Auditorio';
@@ -307,7 +307,7 @@ export default function AdminSalasPage() {
                   className="rounded-full px-5 gap-2 shadow-sm"
                   onClick={() => {
                     setEditingRoomId(null);
-                    setFormData({ name: '', type: 'SALON', capacity: '', description: '' });
+                    setFormData({ name: '', type: 'SALA_CLASE', capacity: '', description: '' });
                   }}
                 >
                   <Plus className="h-4 w-4" />
@@ -354,8 +354,8 @@ export default function AdminSalasPage() {
                             <SelectValue placeholder="Seleccionar" />
                           </SelectTrigger>
                           <SelectContent className="rounded-xl border-none shadow-xl">
-                            <SelectItem value="SALON">Clase</SelectItem>
-                            <SelectItem value="SALA_COMPUTO">Cómputo</SelectItem>
+                            <SelectItem value="SALA_CLASE">Clase</SelectItem>
+                            <SelectItem value="LABORATORIO">Cómputo</SelectItem>
                             <SelectItem value="AUDITORIO">Auditorio</SelectItem>
                           </SelectContent>
                         </Select>
@@ -438,7 +438,7 @@ export default function AdminSalasPage() {
                       </p>
                       <ul className="list-disc list-inside space-y-1 text-[10px] text-muted-foreground">
                         <li>name (identificación del espacio)</li>
-                        <li>type (SALON, SALA_COMPUTO, AUDITORIO)</li>
+                        <li>type (SALA_CLASE, LABORATORIO, AUDITORIO)</li>
                         <li>capacity (opcional)</li>
                       </ul>
                     </div>
@@ -612,14 +612,14 @@ export default function AdminSalasPage() {
                     {[
                       {
                         label: 'Salones',
-                        count: rooms.filter(r => r.type === 'SALON').length,
+                        count: rooms.filter(r => r.type === 'SALA_CLASE').length,
                         icon: Building2,
                         bg: 'bg-blue-500/10',
                         text: 'text-blue-600 dark:text-blue-400',
                       },
                       {
                         label: 'Cómputo',
-                        count: rooms.filter(r => r.type === 'SALA_COMPUTO').length,
+                        count: rooms.filter(r => r.type === 'LABORATORIO').length,
                         icon: Computer,
                         bg: 'bg-orange-500/10',
                         text: 'text-orange-600 dark:text-orange-400',
@@ -684,9 +684,9 @@ export default function AdminSalasPage() {
                           <div
                             className={cn(
                               'h-10 w-10 rounded-xl flex items-center justify-center shrink-0',
-                              room.type === 'SALON'
+                              room.type === 'SALA_CLASE'
                                 ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                                : room.type === 'SALA_COMPUTO'
+                                : room.type === 'LABORATORIO'
                                   ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
                                   : 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
                             )}

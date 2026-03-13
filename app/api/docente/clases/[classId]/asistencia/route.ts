@@ -43,15 +43,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ clas
     const { subject } = classInfo;
     const students = await db.user.findMany({
       where: { id: { in: subject.studentIds } },
-      select: { id: true, name: true, correoInstitucional: true },
+      select: { id: true, name: true, institutionalEmail: true },
     });
     const attendances = await db.attendance.findMany({ where: { classId } });
     const attendanceMap = new Map(attendances.map(att => [att.studentId, att.status]));
     const studentAttendanceList = students.map(student => ({
       studentId: student.id,
       name: student.name,
-      email: student.correoInstitucional,
-      status: attendanceMap.get(student.id) || 'AUSENTE',
+      email: student.institutionalEmail,
+      status: attendanceMap.get(student.id) || 'ABSENT',
     }));
     const validated = AttendanceListResponseSchema.safeParse(studentAttendanceList);
     if (!validated.success) {

@@ -23,10 +23,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
     // Si no se encuentra como Asignatura, podría ser un ID de Grupo
     if (!subject) {
-      const grupo = await db.grupo.findFirst({
+      const grupo = await db.group.findFirst({
         where: {
           id,
-          docenteIds: { has: session.user.id },
+          teacherIds: { has: session.user.id },
         },
         include: { subject: true },
       });

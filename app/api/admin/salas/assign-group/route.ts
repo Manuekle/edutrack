@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       db.class.updateMany({
         where: {
           subjectId: { in: subjectIds },
-          status: 'PROGRAMADA',
+          status: 'SCHEDULED',
         },
         data: { classroom: room.name },
       }),

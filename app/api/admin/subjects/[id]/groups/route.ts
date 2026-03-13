@@ -1,6 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { Jornada } from '@prisma/client';
+import { Shift } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
@@ -29,7 +29,7 @@ interface ScheduleEntry {
 
 interface GroupData {
   group: string;
-  jornada: Jornada;
+  jornada: Shift;
   schedule: ScheduleEntry[];
 }
 
@@ -41,10 +41,10 @@ interface PreviewResult {
   schedule?: ScheduleEntry[];
 }
 
-const normalizeJornada = (value: string): Jornada | null => {
+const normalizeJornada = (value: string): Shift | null => {
   const normalized = value.toUpperCase().trim();
-  if (normalized.includes('DIURNO')) return 'DIURNO';
-  if (normalized.includes('NOCTURNO')) return 'NOCTURNO';
+  if (normalized.includes('DIURNO')) return Shift.DAY;
+  if (normalized.includes('NOCTURNO')) return Shift.NIGHT;
   return null;
 };
 
@@ -174,7 +174,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     for (const row of rowsToProcess) {
       const group = row.grupo?.trim() || 'A';
-      const jornada = normalizeJornada(row.jornada) || 'DIURNO';
+      const jornada = normalizeJornada(row.jornada) || Shift.DAY;
       const key = `${group}-${jornada}`;
 
       if (!jornada) {
@@ -403,7 +403,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 endTime,
                 classroom: slot.salon,
                 shift: data.jornada,
-                status: 'PROGRAMADA' as const,
+                status: 'SCHEDULED' as const,
               });
             }
           }

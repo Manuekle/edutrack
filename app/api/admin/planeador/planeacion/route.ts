@@ -59,13 +59,13 @@ export async function POST(req: Request) {
       // Create a class for the week based on schedule
       if (group.schedule) {
         const DAY_TO_OFFSET: Record<string, number> = {
-          LUNES: 0,
-          MARTES: 1,
-          MIERCOLES: 2,
-          JUEVES: 3,
-          VIERNES: 4,
-          SABADO: 5,
-          DOMINGO: 6,
+          MONDAY: 0,
+          TUESDAY: 1,
+          WEDNESDAY: 2,
+          THURSDAY: 3,
+          FRIDAY: 4,
+          SATURDAY: 5,
+          SUNDAY: 6,
         };
         const offset = DAY_TO_OFFSET[group.schedule.dayOfWeek] ?? 0;
         const classDate = addDays(weekStart, offset);
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
             date: classDate,
             startTime,
             endTime,
-            status: 'PROGRAMADA',
+            status: 'SCHEDULED',
           },
         });
       }

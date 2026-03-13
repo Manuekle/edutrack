@@ -128,11 +128,11 @@ export default function ProfilePage() {
     if (session?.user) {
       profileForm.reset({
         name: session.user.name || '',
-        correoInstitucional: session.user?.correoInstitucional || '',
-        correoPersonal: session.user?.correoPersonal || '',
-        telefono: session.user?.telefono || '',
-        codigoEstudiantil: session.user?.codigoEstudiantil || '',
-        codigoDocente: session.user?.codigoDocente || '',
+        correoInstitucional: session.user?.institutionalEmail || '',
+        correoPersonal: session.user?.personalEmail || '',
+        telefono: session.user?.phone || '',
+        codigoEstudiantil: session.user?.studentCode || '',
+        codigoDocente: session.user?.teacherCode || '',
       });
       // Set initial preview from session
       if (!signatureFile) {
@@ -362,9 +362,9 @@ export default function ProfilePage() {
         ...session?.user, // Keep existing session data
         ...updatedUser, // Override with updated fields
         // Ensure these fields are explicitly included in the session
-        telefono: updatedUser.telefono || null,
-        codigoEstudiantil: updatedUser.codigoEstudiantil || null,
-        codigoDocente: updatedUser.codigoDocente || null,
+        phone: updatedUser.phone || null,
+        studentCode: updatedUser.studentCode || null,
+        teacherCode: updatedUser.teacherCode || null,
       });
 
       // Force a session refresh to ensure all fields are up to date

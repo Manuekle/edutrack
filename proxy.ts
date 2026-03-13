@@ -22,7 +22,6 @@ const roleDashboards = {
   [Role.ADMIN]: '/dashboard/admin',
   [Role.DOCENTE]: '/dashboard/docente',
   [Role.ESTUDIANTE]: '/dashboard/estudiante',
-  [Role.COORDINADOR]: '/dashboard/coordinador',
 } as const;
 
 export default withAuth(
