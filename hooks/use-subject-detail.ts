@@ -156,24 +156,6 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
     },
   });
 
-  // Mutation para solicitud de desmatriculación
-  const unenrollMutation = useMutation({
-    mutationFn: async ({ studentId, reason }: { studentId: string; reason: string }) => {
-      const response = await fetch('/api/docente/solicitudes/desmatricula', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subjectId, studentId, reason }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al enviar la solicitud de desmatriculación');
-      }
-
-      return response.json();
-    },
-  });
-
   // Calcular si hay clases programadas
   const hasScheduledClasses =
     classesQuery.data?.data?.some(cls => cls.status === 'PROGRAMADA') || false;
@@ -220,26 +202,5 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       });
     },
     isGeneratingReport: generateReportMutation.isPending,
-    unenrollStudent: (
-      data: { studentId: string; reason: string },
-      options?: { onSuccess?: () => void }
-    ) => {
-      unenrollMutation.mutate(data, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['subject-students', subjectId] });
-          sileo.success({ title: 'Solicitud de desmatriculación enviada correctamente' });
-          options?.onSuccess?.();
-        },
-        onError: error => {
-          sileo.error({
-            title:
-              error instanceof Error
-                ? error.message
-                : 'Error al enviar la solicitud de desmatriculación',
-          });
-        },
-      });
-    },
-    isUnenrolling: unenrollMutation.isPending,
   };
 }

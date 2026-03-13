@@ -6,7 +6,6 @@ import { sileo } from 'sileo';
 import Link from 'next/link';
 
 import { ClassesTable } from '@/components/classes/classes-table';
-import { EventsTable } from '@/components/events/events-table';
 import { StudentsTable } from '@/components/students/students-table';
 import { GenerateReportModal } from '@/components/subjects/generate-report-modal';
 import { Button } from '@/components/ui/button';
@@ -47,8 +46,6 @@ export default function GrupoDetailPage() {
     refetchClasses,
     generateReport,
     isGeneratingReport,
-    unenrollStudent,
-    isUnenrolling,
   } = useSubjectDetail({
     subjectId: grupoId,
     enabled: !!grupoId,
@@ -77,13 +74,6 @@ export default function GrupoDetailPage() {
   // Report modal state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  // Student unenroll state
-  const [currentStudentForUnenroll, setCurrentStudentForUnenroll] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [unenrollReason, setUnenrollReason] = useState('');
-
   const handleGenerateReport = async () => {
     if (!subject) return;
 
@@ -106,20 +96,6 @@ export default function GrupoDetailPage() {
         router.push('/dashboard/docente/reportes');
       },
     });
-  };
-
-  const handleUnenrollRequest = async (studentId: string, reason: string) => {
-    if (!grupoId) return;
-
-    unenrollStudent(
-      { studentId, reason },
-      {
-        onSuccess: () => {
-          setUnenrollReason('');
-          setCurrentStudentForUnenroll(null);
-        },
-      }
-    );
   };
 
   // Loading state
@@ -219,12 +195,6 @@ export default function GrupoDetailPage() {
       <StudentsTable
         students={enrolledStudents}
         isLoading={isLoadingStudents}
-        currentStudentForUnenroll={currentStudentForUnenroll}
-        unenrollReason={unenrollReason}
-        setUnenrollReason={setUnenrollReason}
-        setCurrentStudentForUnenroll={setCurrentStudentForUnenroll}
-        handleUnenrollRequest={handleUnenrollRequest}
-        isSubmitting={isUnenrolling}
       />
 
       <ClassesTable
@@ -252,8 +222,6 @@ export default function GrupoDetailPage() {
           )
         }
       />
-
-      <EventsTable subjectId={grupoId} />
     </div>
   );
 }

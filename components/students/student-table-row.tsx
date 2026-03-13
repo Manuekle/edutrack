@@ -1,16 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { DialogTrigger } from '@/components/ui/dialog';
-import { Hash, Mail, Phone, UserX } from 'lucide-react';
+import { Hash, Mail, Phone } from 'lucide-react';
 import type { Student } from './students-table';
 
 interface StudentTableRowProps {
   student: Student;
-  onUnenrollClick: (student: { id: string; name: string }) => void;
 }
 
-export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowProps) {
+export function StudentTableRow({ student }: StudentTableRowProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3.5 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group">
       <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -72,23 +69,6 @@ export function StudentTableRow({ student, onUnenrollClick }: StudentTableRowPro
             </a>
           )}
         </div>
-        <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-muted-foreground/50 hover:text-red-600 hover:bg-red-500/10 dark:hover:text-red-400 dark:hover:bg-red-500/20 shrink-0 transition-colors"
-            aria-label="Solicitar desmatrícula"
-            title="Solicitar desmatrícula"
-            onClick={() =>
-              onUnenrollClick({
-                id: student.id,
-                name: student.name || 'el estudiante',
-              })
-            }
-          >
-            <UserX className="h-4 w-4" />
-          </Button>
-        </DialogTrigger>
       </div>
     </div>
   );

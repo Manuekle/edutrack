@@ -1,7 +1,6 @@
 'use client';
 
 import { CardDescription, CardTitle } from '@/components/ui/card';
-import { Dialog } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users } from 'lucide-react';
@@ -9,7 +8,6 @@ import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { TablePagination } from '../shared/table-pagination';
 import { StudentTableRow } from './student-table-row';
-import { UnenrollDialog } from './unenroll-dialog';
 
 export interface Student {
   id: string;
@@ -23,26 +21,13 @@ export interface Student {
 interface StudentsTableProps {
   students: Student[];
   isLoading: boolean;
-  currentStudentForUnenroll: { id: string; name: string } | null;
-  unenrollReason: string;
-  setUnenrollReason: (reason: string) => void;
-  setCurrentStudentForUnenroll: (student: { id: string; name: string } | null) => void;
-  handleUnenrollRequest: (studentId: string, reason: string) => Promise<void>;
-  isSubmitting: boolean;
 }
 
 export const StudentsTable: React.FC<StudentsTableProps> = ({
   students: allStudents,
   isLoading,
-  currentStudentForUnenroll,
-  unenrollReason,
-  setUnenrollReason,
-  setCurrentStudentForUnenroll,
-  handleUnenrollRequest,
-  isSubmitting,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const itemsPerPage = 5;
 
   const totalItems = allStudents.length;
@@ -55,24 +40,6 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
     setCurrentPage(1);
   }, [allStudents]);
 
-  const handleUnenrollClick = (student: { id: string; name: string }) => {
-    setCurrentStudentForUnenroll(student);
-    setIsDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setUnenrollReason('');
-    setCurrentStudentForUnenroll(null);
-  };
-
-  const handleConfirmUnenroll = async () => {
-    if (currentStudentForUnenroll && unenrollReason.trim()) {
-      await handleUnenrollRequest(currentStudentForUnenroll.id, unenrollReason);
-      handleDialogClose();
-    }
-  };
-
   return (
     <>
       <div>
@@ -82,7 +49,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               Gestión de Estudiantes
             </CardTitle>
             <CardDescription className="text-xs">
-              Gestiona los estudiantes matriculados en esta asignatura.
+              Listado de estudiantes matriculados en esta sección.
             </CardDescription>
           </div>
         </div>
@@ -113,17 +80,14 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
             </div>
           ) : allStudents.length > 0 ? (
             <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 relative">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <div className="divide-y divide-border/40">
-                  {currentStudents.map(student => (
-                    <StudentTableRow
-                      key={student.id}
-                      student={student}
-                      onUnenrollClick={handleUnenrollClick}
-                    />
-                  ))}
-                </div>
-              </Dialog>
+              <div className="divide-y divide-border/40">
+                {currentStudents.map(student => (
+                  <StudentTableRow
+                    key={student.id}
+                    student={student}
+                  />
+                ))}
+              </div>
               <TablePagination
                 currentPage={currentPage}
                 totalItems={totalItems}
@@ -136,21 +100,11 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
             <EmptyState
               icon={Users}
               title="No hay estudiantes matriculados"
-              description="Los estudiantes matriculados en esta asignatura aparecerán aquí."
+              description="Los estudiantes matriculados en este grupo aparecerán aquí."
             />
           )}
         </div>
       </div>
-
-      <UnenrollDialog
-        isOpen={isDialogOpen}
-        studentName={currentStudentForUnenroll?.name || null}
-        reason={unenrollReason}
-        isSubmitting={isSubmitting}
-        onReasonChange={setUnenrollReason}
-        onClose={handleDialogClose}
-        onConfirm={handleConfirmUnenroll}
-      />
     </>
   );
 };

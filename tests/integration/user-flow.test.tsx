@@ -5,7 +5,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CreateUserModal } from '@/components/modals/create-user-modal';
-import { EventForm } from '@/components/events/event-form';
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -86,47 +85,6 @@ describe('Flujo de integración de usuario', () => {
       expect(nameInput).toHaveValue('Test User');
       expect(emailInput).toHaveValue('test@example.com');
       expect(passwordInput).toHaveValue('password123');
-    });
-  });
-
-  describe('Flujo de creación de evento', () => {
-    it('debería renderizar el formulario de evento correctamente', async () => {
-      const mockOnSubmit = jest.fn();
-      const mockOnCancel = jest.fn();
-
-      // EventForm se usa dentro de un Dialog, pero podemos testearlo directamente
-      // usando el patrón que usa EventsTable
-      const {
-        Dialog,
-        DialogContent,
-        DialogDescription,
-        DialogHeader,
-        DialogTitle,
-      } = require('@/components/ui/dialog');
-
-      render(
-        <QueryClientProvider client={queryClient}>
-          <Dialog open={true}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Crear Evento</DialogTitle>
-                <DialogDescription>Formulario para crear un nuevo evento</DialogDescription>
-              </DialogHeader>
-              <EventForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />
-            </DialogContent>
-          </Dialog>
-        </QueryClientProvider>
-      );
-
-      // Verificar que el formulario se renderiza
-      await waitFor(() => {
-        expect(screen.getByLabelText(/título/i)).toBeInTheDocument();
-      });
-
-      // Verificar que los campos están presentes
-      expect(screen.getByLabelText(/descripción/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/fecha/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/tipo de evento/i)).toBeInTheDocument();
     });
   });
 });
