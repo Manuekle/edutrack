@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -51,29 +51,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Room, RoomType } from '@prisma/client';
-import {
-  addDays,
-  addMonths,
-  eachDayOfInterval,
-  eachHourOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  isSameDay,
-  isSameMonth,
-  isToday,
-  startOfMonth,
-  startOfWeek,
-  subDays,
-  subMonths,
-} from 'date-fns';
-import { es } from 'date-fns/locale';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Building2,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
   Computer,
   Download,
   Edit2,
@@ -84,8 +64,7 @@ import {
   Plus,
   Search,
   Trash2,
-  User,
-  Users,
+  Users
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -686,7 +665,7 @@ export default function AdminSalasPage() {
                     <div className="h-20 w-20 bg-muted/50 rounded-full flex items-center justify-center mb-6">
                       <Layout className="h-10 w-10 text-muted-foreground/40" />
                     </div>
-                    <p className="text-[17px] font-semibold text-foreground">Sin resultados</p>
+                    <p className="text-[17px] tracking-card font-semibold text-foreground">Sin resultados</p>
                     <p className="text-muted-foreground text-[14px] mt-2 max-w-xs">
                       {searchTerm
                         ? 'No encontramos salas que coincidan con tu búsqueda.'
