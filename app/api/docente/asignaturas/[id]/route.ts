@@ -14,15 +14,30 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 
   try {
-    const subject = await db.subject.findFirst({
+    let subject = await db.subject.findFirst({
       where: {
         id,
         teacherIds: { has: session.user.id },
       },
     });
 
+    // Si no se encuentra como Asignatura, podría ser un ID de Grupo
     if (!subject) {
-      return NextResponse.json({ message: 'Asignatura no encontrada' }, { status: 404 });
+      const grupo = await db.grupo.findFirst({
+        where: {
+          id,
+          docenteIds: { has: session.user.id },
+        },
+        include: { subject: true },
+      });
+
+      if (grupo && grupo.subject) {
+        subject = grupo.subject;
+      }
+    }
+
+    if (!subject) {
+      return NextResponse.json({ message: 'Asignatura o Grupo no encontrado' }, { status: 404 });
     }
 
     // Map Prisma shape (teacherIds) to schema shape (teacherId) for validation

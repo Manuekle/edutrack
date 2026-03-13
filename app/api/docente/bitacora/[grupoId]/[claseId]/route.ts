@@ -75,30 +75,46 @@ export async function POST(
       estadoClase,
       motivoCancelacion,
       asistencias,
+      fecha, // New: allow changing the date
     } = body;
 
-    // Update class status
+    // Update class status and date
+    const updateData: any = {
+      status: estadoClase,
+      cancellationReason: motivoCancelacion ?? null,
+    };
+
+    if (fecha) {
+      updateData.date = new Date(fecha);
+    }
+
     await db.class.update({
       where: { id: claseId },
-      data: {
-        status: estadoClase,
-        cancellationReason: motivoCancelacion ?? null,
-      },
+      data: updateData,
     });
 
-    // Upsert bitacora
-    if (estadoClase === 'REALIZADA') {
-      const existingBitacora = await db.bitacora.findUnique({ where: { classId: claseId } });
-      if (existingBitacora) {
-        await db.bitacora.update({
-          where: { classId: claseId },
-          data: { temaPlaneado, temaEjecutado, actividades, observaciones },
-        });
-      } else {
-        await db.bitacora.create({
-          data: { classId: claseId, temaPlaneado, temaEjecutado, actividades, observaciones },
-        });
-      }
+    // Upsert bitacora - Always update temaPlaneado if provided
+    const existingBitacora = await db.bitacora.findUnique({ where: { classId: claseId } });
+    if (existingBitacora) {
+      await db.bitacora.update({
+        where: { classId: claseId },
+        data: {
+          temaPlaneado: temaPlaneado ?? existingBitacora.temaPlaneado,
+          temaEjecutado: temaEjecutado ?? existingBitacora.temaEjecutado,
+          actividades: actividades ?? existingBitacora.actividades,
+          observaciones: observaciones ?? existingBitacora.observaciones,
+        },
+      });
+    } else {
+      await db.bitacora.create({
+        data: {
+          classId: claseId,
+          temaPlaneado: temaPlaneado ?? '',
+          temaEjecutado: temaEjecutado ?? '',
+          actividades: actividades ?? '',
+          observaciones: observaciones ?? '',
+        },
+      });
     }
 
     // Upsert attendance records

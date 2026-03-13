@@ -172,18 +172,18 @@ export default function GrupoDetailPage() {
             </h1>
           </div>
           <p className="text-muted-foreground text-sm mt-1 ml-10">
-            Gestiona estudiantes, eventos y consulta la asistencia.
+            Gestiona estudiantes, eventos y <strong>planea los temas de tus clases</strong> en la bitácora.
           </p>
         </div>
 
         <div className="flex w-full sm:w-auto items-center gap-3">
           <Button
             variant="default"
-            className="w-full sm:w-auto rounded-xl shadow-none h-10 px-6 text-sm font-medium transition-all gap-2 bg-primary hover:bg-primary/90"
+            className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
             onClick={() => router.push(`/dashboard/docente/bitacora/${grupoId}`)}
           >
             <NotebookPen className="h-4 w-4" />
-            Acceder a Bitácora
+            Planear Temas y Bitácora
           </Button>
 
           <Button
@@ -201,6 +201,18 @@ export default function GrupoDetailPage() {
           >
             {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
           </Button>
+        </div>
+      </div>
+
+      <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-start gap-3 mb-6">
+        <div className="bg-primary/10 p-2 rounded-full mt-0.5">
+          <NotebookPen className="h-4 w-4 text-primary" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-primary">¿Cómo subir los temas de tus clases?</h3>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
+            Usa el botón <strong>"Planear Temas y Bitácora"</strong> arriba para definir la programación de temas clase a clase por las 16 semanas. También puedes ajustar las fechas desde allí.
+          </p>
         </div>
       </div>
 

@@ -17,6 +17,7 @@ interface ClaseBitacora {
   status: 'PROGRAMADA' | 'REALIZADA' | 'CANCELADA';
   bitacora: {
     id: string;
+    temaPlaneado: string | null;
     temaEjecutado: string | null;
     observaciones: string | null;
   } | null;
@@ -91,11 +92,11 @@ export default function BitacoraTablaPage() {
             const dt = new Date(c.date);
             return {
               claseId: c.id,
-              dd: c.bitacora ? format(dt, 'dd') : format(dt, 'dd'),
-              mm: c.bitacora ? format(dt, 'MM') : format(dt, 'MM'),
+              dd: format(dt, 'dd'),
+              mm: format(dt, 'MM'),
               horaInicio: d.horario?.horaInicio ?? '',
               horaFin: d.horario?.horaFin ?? '',
-              tema: c.bitacora?.temaEjecutado ?? '',
+              tema: c.bitacora?.temaEjecutado || c.bitacora?.temaPlaneado || '',
               totalHoras: calcHoras(d.horario?.horaInicio ?? '', d.horario?.horaFin ?? ''),
               dirty: false,
             };
@@ -125,13 +126,18 @@ export default function BitacoraTablaPage() {
     const row = rows.find(r => r.claseId === claseId);
     if (!row) return;
     setSaving(claseId);
+    const year = data?.planeacion ? new Date(data.planeacion.fechaInicio).getFullYear() : new Date().getFullYear();
+    const newDate = new Date(year, parseInt(row.mm) - 1, parseInt(row.dd));
+
     try {
       await fetch(`/api/docente/bitacora/${grupoId}/${claseId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          temaEjecutado: row.tema,
-          estadoClase: row.tema.trim() ? 'REALIZADA' : 'PROGRAMADA',
+          temaPlaneado: row.tema,
+          temaEjecutado: row.tema, // Mantener ambos por ahora para compatibilidad
+          estadoClase: 'PROGRAMADA', // El docente solo planea, el sistema/asistencia marcará como tomada
+          fecha: newDate.toISOString(),
           asistencias: [],
         }),
       });
@@ -154,12 +160,17 @@ export default function BitacoraTablaPage() {
     try {
       await Promise.all(
         dirtyRows.map(async row => {
+          const year = data?.planeacion ? new Date(data.planeacion.fechaInicio).getFullYear() : new Date().getFullYear();
+          const newDate = new Date(year, parseInt(row.mm) - 1, parseInt(row.dd));
+
           await fetch(`/api/docente/bitacora/${grupoId}/${row.claseId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              temaPlaneado: row.tema,
               temaEjecutado: row.tema,
-              estadoClase: row.tema.trim() ? 'REALIZADA' : 'PROGRAMADA',
+              estadoClase: 'PROGRAMADA',
+              fecha: newDate.toISOString(),
               asistencias: [],
             }),
           });
@@ -362,12 +373,12 @@ export default function BitacoraTablaPage() {
 
                 {/* Tema Textarea */}
                 <div className="flex-1 min-w-0">
-                  <Textarea
-                    value={row.tema}
-                    onChange={e => updateRow(row.claseId, 'tema', e.target.value)}
-                    className="min-h-[4.5rem] h-full text-[13px] resize-none bg-background rounded-xl border border-border/50 shadow-sm focus-visible:ring-1 leading-snug p-3"
-                    placeholder="Describir el tema ejecutado en esta sesión..."
-                  />
+                    <Textarea
+                      value={row.tema}
+                      onChange={e => updateRow(row.claseId, 'tema', e.target.value)}
+                      className="min-h-[4.5rem] h-full text-[13px] resize-none bg-background rounded-xl border border-border/50 shadow-sm focus-visible:ring-1 leading-snug p-3"
+                      placeholder="Define el tema a tratar en esta sesión..."
+                    />
                 </div>
 
                 {/* Horas & Acciones */}
