@@ -313,7 +313,18 @@ export async function GET() {
     const response = {
       cards,
       subjects: processedSubjects,
-      upcomingItems: [],
+      upcomingItems: nextClasses.slice(0, 6).map(cls => ({
+        id: cls.id,
+        title: `Clase de ${subjects.find(s => s.id === cls.subjectId)?.name || 'Asignatura'}`,
+        code: subjects.find(s => s.id === cls.subjectId)?.code || '',
+        teacher: subjects.find(s => s.id === cls.subjectId)?.teachers[0]?.name || 'Docente',
+        date: cls.date.toISOString(),
+        startTime: cls.date.toISOString().split('T')[1].substring(0, 5),
+        description: cls.topic || 'Sesión programada',
+        subjectName: subjects.find(s => s.id === cls.subjectId)?.name,
+        type: 'INFO',
+        isEvent: false,
+      })),
     };
 
     // CACHE: Store in cache for 5 minutes (300 seconds)

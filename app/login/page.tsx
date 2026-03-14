@@ -23,8 +23,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -36,7 +37,6 @@ const loginFormSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
 
-// Client component that uses useSearchParams
 function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,10 +51,8 @@ function LoginForm() {
     },
   });
 
-  // Usar el hook useSearchParams del lado del cliente
   const searchParams = useSearchParams();
 
-  // Obtener la URL de retorno de los parámetros de búsqueda
   useEffect(() => {
     const urlCallbackUrl = searchParams?.get('callbackUrl');
     if (urlCallbackUrl) {
@@ -76,7 +74,6 @@ function LoginForm() {
       if (result?.error) {
         setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');
       } else {
-        // Redirigir a la URL de retorno o al dashboard por defecto
         const redirectUrl = typeof callbackUrl === 'string' ? callbackUrl : '/dashboard';
         window.location.href = redirectUrl;
       }
@@ -88,95 +85,117 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto my-auto border-border/20 dark:border-white/[0.08] shadow-xl dark:shadow-2xl backdrop-blur-2xl">
-      <CardHeader className="text-center pb-2">
-        <div className="mx-auto mb-4 h-16 w-16 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
-          <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
+    <Card className="w-full max-w-md relative z-10 border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl rounded-[2.5rem] overflow-hidden">
+
+
+      <CardHeader className="space-y-4 pt-10 pb-4 text-center">
+        <div className='flex items-center justify-center'>
+          <Image src="/icons/favicon-96x96.png" alt="SIRA" width={40} height={40} className="object-contain rounded-full" />
         </div>
-        <CardTitle className="text-2xl font-semibold tracking-card">Bienvenido</CardTitle>
-        <CardDescription className="text-sm mt-1">
-          Ingresa tus credenciales para acceder al sistema.
-        </CardDescription>
+
+        <div className="space-y-1.5">
+          <CardTitle className="text-3xl font-semibold tracking-card">Bienvenido</CardTitle>
+          <CardDescription className="text-muted-foreground text-[15px]">
+            Ingresa al sistema de registro académico
+          </CardDescription>
+        </div>
       </CardHeader>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="grid gap-5 pt-2">
+          <CardContent className="grid gap-6 px-8 py-6">
             {error && (
-              <Alert variant="destructive" className="rounded-xl">
+              <Alert variant="destructive" className="rounded-2xl bg-destructive/5 border-destructive/20 animate-in fade-in slide-in-from-top-2 duration-300">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-[13px]">{error}</AlertDescription>
               </Alert>
             )}
+
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">Correo electrónico</FormLabel>
+                <FormItem className="space-y-2.5">
+                  <FormLabel className="text-sm font-semibold ml-1 text-foreground/80">Correo institucional</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="tu@correo.com"
-                      disabled={isLoading}
-                      className="h-11"
-                      {...field}
-                    />
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                      <Input
+                        type="email"
+                        placeholder="ejemplo@fup.edu.co"
+                        disabled={isLoading}
+                        className="pl-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all text-xs"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="ml-1" />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">Contraseña</FormLabel>
+                <FormItem className="space-y-2.5">
+                  <div className="flex items-center justify-between px-1">
+                    <FormLabel className="text-sm font-semibold text-foreground/80">Contraseña</FormLabel>
+                    <Link
+                      href="/forgot-password"
+                      className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
                   <FormControl>
-                    <div className="relative">
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                       <Input
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="Ingresa tu contraseña"
+                        placeholder="••••••••"
                         disabled={isLoading}
-                        className="pr-10 h-11"
+                        className="pl-12 pr-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all text-[15px]"
                         autoComplete="current-password"
-                        autoCorrect="off"
-                        autoCapitalize="off"
-                        spellCheck="false"
                         {...field}
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                         aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                         disabled={isLoading}
                       >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="ml-1" />
                 </FormItem>
               )}
             />
           </CardContent>
-          <CardFooter className="flex flex-col gap-4 pt-6 pb-2">
-            <Button className="w-full h-11 text-sm font-medium" type="submit" disabled={isLoading}>
-              {isLoading ? 'Ingresando...' : 'Ingresar'}
+
+          <CardFooter className="px-8 pb-10 pt-2 flex flex-col gap-6">
+            <Button
+              className="w-full rounded-full bg-primary hover:bg-primary/95 text-xs font-semibold shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              type="submit"
+              size="default"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Iniciando sesión...
+                </>
+              ) : (
+                'Iniciar Sesión'
+              )}
             </Button>
-            <div className="text-center text-sm">
-              <Link
-                href="/forgot-password"
-                className="text-primary hover:text-primary/80 transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+
+            <p className="text-center text-[13px] text-muted-foreground font-medium">
+              ¿No tienes cuenta? Contacta con administración académmica.
+            </p>
           </CardFooter>
         </form>
       </Form>
@@ -184,14 +203,19 @@ function LoginForm() {
   );
 }
 
-// Main page component with Suspense boundary
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-dvh p-4 font-sans bg-gradient-to-br from-background via-accent/30 to-primary/10">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-background overflow-hidden font-sans">
+      {/* Background Decor */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[5%] -left-[5%] w-[35%] h-[35%] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
+        <div className="absolute -bottom-[5%] -right-[5%] w-[35%] h-[35%] rounded-full bg-blue-500/10 blur-[120px] animate-pulse delay-700" />
+      </div>
+
       <Suspense
         fallback={
-          <Card className="w-full max-w-md mx-auto my-auto p-8 backdrop-blur-2xl">
-            <div className="text-center text-sm text-muted-foreground">Cargando...</div>
+          <Card className="w-full max-w-md mx-auto my-auto p-12 bg-background/60 backdrop-blur-xl border-border/40 rounded-[2.5rem] flex items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin text-primary/40" />
           </Card>
         }
       >

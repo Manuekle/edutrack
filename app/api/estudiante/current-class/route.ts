@@ -111,6 +111,13 @@ export async function GET() {
       select: { studentIds: true },
     });
 
+    const statusMap: Record<string, string> = {
+      PRESENT: 'PRESENTE',
+      ABSENT: 'AUSENTE',
+      LATE: 'TARDANZA',
+      JUSTIFIED: 'JUSTIFICADO',
+    };
+
     const response = {
       id: currentClass.id,
       subjectName: (currentClass as any).subject.name,
@@ -122,7 +129,7 @@ export async function GET() {
       qrToken: currentClass.qrToken,
       attendanceStats: stats,
       totalStudents: subject?.studentIds.length || 0,
-      myStatus: (currentClass as any).attendances[0]?.status || 'ABSENT',
+      myStatus: statusMap[(currentClass as any).attendances[0]?.status] || 'AUSENTE',
       classroom: currentClass.classroom,
     };
 

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle2, QrCode } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -85,15 +85,12 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pt-10 pb-12">
-      <div className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-3">
-          <QrCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-        </div>
+    <div className="max-w-md mx-auto space-y-6">
+      <div className="text-center space-y-1">
         <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Escanear Asistencia
         </h1>
-        <p className="text-[15px] text-muted-foreground max-w-[280px] mx-auto leading-snug">
+        <p className="text-sm text-muted-foreground">
           Apunta tu cámara al código QR generado por el docente
         </p>
       </div>
@@ -157,10 +154,10 @@ export default function ScannerPage() {
             <Card className="rounded-2xl border-border/40 bg-muted/20 shadow-none">
               <CardContent className="p-5">
                 <div className="space-y-3 text-[14px] text-muted-foreground">
-                  <p className="font-semibold text-foreground flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span className="font-semibold text-foreground flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
                     Instrucciones
-                  </p>
+                  </span>
                   <ul className="space-y-2.5 list-none pl-1">
                     <li className="flex gap-2 items-start">
                       <span className="text-muted-foreground/50 mt-0.5">•</span> Asegúrate de estar

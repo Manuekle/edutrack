@@ -50,46 +50,44 @@ export default function HistorialAsistenciasPage() {
     setCurrentPage(1);
   }, [totalItems]);
 
+  const fetchAttendances = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/estudiante/historial');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'No se pudieron cargar las asistencias.');
+      }
+      const responseData = await response.json();
+      setAttendances(responseData.data || []);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (sessionStatus === 'authenticated') {
-      const fetchAttendances = async () => {
-        try {
-          // Llamada al nuevo endpoint específico para el historial del estudiante
-          const response = await fetch('/api/estudiante/historial');
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'No se pudieron cargar las asistencias.');
-          }
-          const responseData = await response.json();
-          setAttendances(responseData.data || []);
-        } catch (err: unknown) {
-          setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
       fetchAttendances();
     } else if (sessionStatus === 'unauthenticated') {
       setIsLoading(false);
       setError('Debes iniciar sesión para ver tu historial.');
     }
-  }, [sessionStatus]);
+  }, [sessionStatus, fetchAttendances]);
 
   if (isLoading) {
     return <LoadingPage />;
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-12">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
-          <div className="p-2 bg-blue-500/10 rounded-xl">
-            <History className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-          </div>
+        <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Mi Historial de Asistencia
         </h1>
-        <p className="text-muted-foreground text-[15px] mt-2 max-w-2xl">
+        <p className="text-muted-foreground text-sm mt-1">
           Registro de tus asistencias durante el período académico actual.
         </p>
       </div>
@@ -113,32 +111,7 @@ export default function HistorialAsistenciasPage() {
                     type="button"
                     variant="outline"
                     className="border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full"
-                    onClick={() => {
-                      setIsLoading(true);
-                      setError(null);
-                      const fetchAttendances = async () => {
-                        try {
-                          const response = await fetch('/api/estudiante/historial');
-                          if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(
-                              errorData.message || 'No se pudieron cargar las asistencias.'
-                            );
-                          }
-                          const responseData = await response.json();
-                          setAttendances(responseData.data || []);
-                        } catch (err: unknown) {
-                          const errorMessage =
-                            err instanceof Error
-                              ? err.message
-                              : 'Error al cargar el historial de asistencias';
-                          setError(errorMessage);
-                        } finally {
-                          setIsLoading(false);
-                        }
-                      };
-                      fetchAttendances();
-                    }}
+                    onClick={fetchAttendances}
                   >
                     <RefreshCw className="mr-2 h-4 w-4" />
                     Reintentar
@@ -148,16 +121,12 @@ export default function HistorialAsistenciasPage() {
             </div>
           </div>
         ) : attendances.length === 0 ? (
-          <Card className="rounded-3xl border-dashed shadow-sm">
-            <CardContent className="py-20 flex flex-col items-center text-center">
-              <div className="h-20 w-20 bg-muted/50 rounded-full flex items-center justify-center mb-6">
-                <History className="h-10 w-10 text-muted-foreground" />
-              </div>
-              <p className="text-lg font-medium text-foreground">
-                Aún no hay asistencias registradas
-              </p>
-              <p className="text-sm text-muted-foreground mt-2 max-w-md">
-                No tienes asistencias registradas para este período académico todavía.
+          <Card>
+            <CardContent className="py-16 text-center">
+              <History className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">Aún no hay asistencias registradas.</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                No tienes asistencias registradas para este período académico.
               </p>
             </CardContent>
           </Card>
@@ -177,24 +146,38 @@ export default function HistorialAsistenciasPage() {
                       <p className="text-[16px] font-semibold text-foreground truncate">
                         {attendance.class.subject.name}
                       </p>
-                      {attendance.status === 'PRESENTE' ? (
+                      {attendance.status === 'PRESENT' ? (
                         <Badge
                           variant="outline"
                           className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
                         >
                           Presente
                         </Badge>
-                      ) : attendance.status === 'AUSENTE' ? (
+                      ) : attendance.status === 'ABSENT' ? (
                         <Badge
                           variant="outline"
                           className="bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
                         >
                           Ausente
                         </Badge>
-                      ) : (
+                      ) : attendance.status === 'LATE' ? (
                         <Badge
                           variant="outline"
                           className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
+                        >
+                          Tardanza
+                        </Badge>
+                      ) : attendance.status === 'JUSTIFIED' ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
+                        >
+                          Justificado
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="bg-muted text-muted-foreground border-border/40 text-[10px] uppercase font-medium tracking-card px-1.5 py-0"
                         >
                           {attendance.status}
                         </Badge>

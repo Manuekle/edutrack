@@ -16,40 +16,45 @@ export default function EstudianteDashboard() {
   }
 
   return (
-    <div className="mx-auto">
-      <div className="p-0 w-full mb-10">
-        <h1 className="sm:text-2xl text-lg font-semibold tracking-card mb-1.5">Mi Panel</h1>
-        <p className="text-sm text-muted-foreground">Resumen de tu progreso académico</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Resumen de tu progreso académico y asistencia.
+        </p>
       </div>
 
       {/* Live Class Card */}
       {liveClass && <LiveClassCard liveClass={liveClass} />}
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
-          title="Asistencia global"
+          title="Asistencia"
           value={`${stats.globalAttendancePercentage}%`}
-          subtitle={`${stats.attendedClasses} de ${stats.totalClasses} clases`}
+          subtitle={`${stats.attendedClasses} de ${stats.totalClasses}`}
           icon={Calendar}
+          color="blue"
         />
         <StatCard
-          title="Asignaturas"
+          title="Activas"
           value={stats.totalSubjects}
-          subtitle="Materias activas"
+          subtitle="asignaturas"
           icon={BookOpen}
         />
         <StatCard
-          title="Riesgo"
+          title="En riesgo"
           value={stats.subjectsAtRisk}
-          subtitle="Asignaturas en riesgo"
+          subtitle="asignaturas"
           icon={AlertTriangle}
+          color="amber"
         />
         <StatCard
-          title="Asistencia semanal"
+          title="Semanal"
           value={`${stats.weeklyAttendanceAverage}%`}
-          subtitle="Promedio últimas 4 semanas"
+          subtitle="últimas 4 semanas"
           icon={BarChart3}
+          color="green"
         />
       </div>
 

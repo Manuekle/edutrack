@@ -247,52 +247,52 @@ export default function BitacoraTablaPage() {
         <div className="bg-background rounded-2xl p-5 mb-1">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 text-[13px]">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Docente
               </span>
               <span className="font-semibold text-foreground truncate">{docente?.name ?? '—'}</span>
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Asignatura
               </span>
               <span className="font-semibold text-foreground truncate">{data.subject.name}</span>
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Programa
               </span>
               <span className="font-medium text-foreground truncate">{data.subject.code}</span>
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Grupo
               </span>
               <span className="font-mono text-foreground">{data.code}</span>
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Período
               </span>
               <span className="font-medium text-foreground">{data.academicPeriod}</span>
             </div>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Año
               </span>
               <span className="font-medium text-foreground">{año}</span>
             </div>
             {data.room && (
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+                <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                   Sala
                 </span>
                 <span className="font-medium text-foreground truncate">{data.room.name}</span>
               </div>
             )}
             <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold tracking-card text-muted-foreground uppercase">
+              <span className="text-[10px] font-semibold tracking-card text-muted-foreground uppercase">
                 Estudiantes
               </span>
               <span className="font-medium text-foreground">{data.studentIds.length}</span>
@@ -324,7 +324,7 @@ export default function BitacoraTablaPage() {
               >
                 {/* Info and Time block */}
                 <div className="flex items-center gap-3 md:w-56 shrink-0">
-                  <div className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-muted/50 text-[11px] font-bold text-muted-foreground shrink-0 border border-border/50">
+                  <div className="flex flex-col items-center justify-center w-8 h-8 rounded-full bg-muted/50 text-[11px] font-semibold text-muted-foreground shrink-0 border border-border/50">
                     {index + 1}
                   </div>
 
@@ -383,7 +383,7 @@ export default function BitacoraTablaPage() {
                 {/* Horas & Acciones */}
                 <div className="flex md:flex-col items-center justify-between md:justify-start gap-4 md:w-20 shrink-0">
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-bold tracking-card uppercase text-muted-foreground">
+                    <span className="text-[10px] font-semibold tracking-card uppercase text-muted-foreground">
                       Horas
                     </span>
                     <Input

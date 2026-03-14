@@ -19,22 +19,32 @@ export async function GET() {
       },
     });
 
-    const schedules = groups
+    const dayMap: Record<string, string> = {
+      MONDAY: 'LUNES',
+      TUESDAY: 'MARTES',
+      WEDNESDAY: 'MIERCOLES',
+      THURSDAY: 'JUEVES',
+      FRIDAY: 'VIERNES',
+      SATURDAY: 'SABADO',
+      SUNDAY: 'DOMINGO',
+    };
+
+    const horarios = groups
       .filter(g => g.schedule)
       .map(g => ({
-        groupId: g.id,
-        groupCode: g.code,
+        grupoId: g.id,
+        grupoCodigo: g.code,
         subjectName: g.subject.name,
         subjectCode: g.subject.code,
-        dayOfWeek: g.schedule!.dayOfWeek,
-        startTime: g.schedule!.startTime,
-        endTime: g.schedule!.endTime,
-        roomName: g.room?.name ?? null,
-        teacherName: g.teachers[0]?.name ?? null,
-        academicPeriod: g.academicPeriod,
+        diaSemana: dayMap[g.schedule!.dayOfWeek] || g.schedule!.dayOfWeek,
+        horaInicio: g.schedule!.startTime,
+        horaFin: g.schedule!.endTime,
+        salaName: g.room?.name ?? null,
+        docenteName: g.teachers[0]?.name ?? null,
+        periodoAcademico: g.academicPeriod,
       }));
 
-    return NextResponse.json({ schedules });
+    return NextResponse.json({ horarios });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

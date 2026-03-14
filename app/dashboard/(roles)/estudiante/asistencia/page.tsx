@@ -144,16 +144,13 @@ export default function StudentAttendancePage() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pt-10 pb-12">
-      <div className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-3">
-          <QrCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-        </div>
+    <div className="max-w-md mx-auto space-y-6">
+      <div className="text-center space-y-1">
         <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Registrar Asistencia
         </h1>
-        <p className="text-[15px] text-muted-foreground max-w-[280px] mx-auto leading-snug">
-          Escanea el código QR de tu docente o ingresa el código manualmente
+        <p className="text-sm text-muted-foreground">
+          Escanea el código QR o ingresa el código manualmente
         </p>
       </div>
 
@@ -231,10 +228,10 @@ export default function StudentAttendancePage() {
               <Card className="rounded-2xl border-border/40 bg-muted/20 shadow-none">
                 <CardContent className="p-5">
                   <div className="space-y-3 text-[14px] text-muted-foreground">
-                    <p className="font-semibold text-foreground flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="font-semibold text-foreground flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
                       Instrucciones
-                    </p>
+                    </span>
                     <ul className="space-y-2.5 list-none pl-1">
                       <li className="flex gap-2 items-start">
                         <span className="text-muted-foreground/50 mt-0.5">•</span> Asegúrate de
@@ -303,7 +300,7 @@ export default function StudentAttendancePage() {
                       placeholder="Pega el código aquí..."
                       value={token}
                       onChange={e => setToken(e.target.value.toLowerCase())}
-                      className="text-center font-mono text-[15px] h-14 rounded-2xl bg-muted/40 border-border/60 focus-visible:ring-blue-500/30"
+                      className="text-center font-mono text-xs rounded-full bg-muted/40 border-border/60 focus-visible:ring-blue-500/30"
                       autoComplete="off"
                       disabled={isLoading}
                     />
@@ -313,7 +310,7 @@ export default function StudentAttendancePage() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full rounded-full h-12 text-[15px] font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    className="w-full rounded-full text-xs font-semibold bg-primary hover:bg-primary/80 text-white shadow-sm"
                     disabled={isLoading || !token.trim()}
                   >
                     {isLoading ? (

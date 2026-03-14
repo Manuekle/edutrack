@@ -51,8 +51,9 @@ export async function POST(request: NextRequest) {
         }),
       });
     } catch (error) {
+      console.error('Error in sendEmail:', error);
       return NextResponse.json(
-        { error: 'Error al enviar el correo de restablecimiento' },
+        { message: 'Error al enviar el correo de restablecimiento' },
         { status: 500 }
       );
     }
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+    console.error('Error in forgot-password POST:', error);
+    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }

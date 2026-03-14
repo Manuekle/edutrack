@@ -241,14 +241,14 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="pt-56 flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4 pt-20 sm:pt-32 pb-12">
       <div className="w-full max-w-md">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="sm:text-2xl text-xs tracking-card">
+        <Card className="w-full rounded-3xl border-border/50 shadow-sm overflow-hidden">
+          <CardHeader className="text-center pt-8 pb-4">
+            <CardTitle className="text-xl font-semibold tracking-card text-foreground">
               Registro de Asistencia
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[14px]">
               {authStatus === 'authenticated'
                 ? scanState.status === 'loading'
                   ? 'Procesando registro...'
@@ -257,26 +257,28 @@ export default function ScanPage() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4 text-center">
+          <CardContent className="space-y-4 text-center px-6">
             <div className="flex justify-center">{renderIcon()}</div>
 
-            <p className="text-xs text-muted-foreground">{scanState.message}</p>
+            <p className="text-[14px] text-muted-foreground">{scanState.message}</p>
 
             {scanState.status === 'error' && scanState.error?.error === 'CLASS_NOT_STARTED' && (
-              <div className="pt-4 border-t">
-                <p className="text-xs text-muted-foreground">Clase inicia a las:</p>
-                <p className="font-semibold">{formatTime(scanState.error.classStartsAt)}</p>
+              <div className="pt-4 border-t border-border/40">
+                <p className="text-[13px] text-muted-foreground">Clase inicia a las:</p>
+                <p className="font-semibold text-[15px]">
+                  {formatTime(scanState.error.classStartsAt)}
+                </p>
               </div>
             )}
 
             {(scanState.status === 'success' || scanState.status === 'info') &&
               scanState.attendance && (
-                <div className="pt-4 border-t space-y-2 text-xs">
-                  <div className="flex justify-between">
+                <div className="pt-4 border-t border-border/40 space-y-2.5">
+                  <div className="flex justify-between text-[14px]">
                     <span className="text-muted-foreground">Asignatura:</span>
                     <span className="font-semibold">{scanState.attendance.subjectName}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-[14px]">
                     <span className="text-muted-foreground">Fecha:</span>
                     <span className="font-semibold">
                       {new Date(scanState.attendance.recordedAt).toLocaleDateString('es-ES')}
@@ -286,24 +288,24 @@ export default function ScanPage() {
               )}
 
             {redirectIn !== undefined && redirectIn > 0 && (
-              <div className="pt-4 border-t">
-                <p className="text-xs text-muted-foreground">
+              <div className="pt-4 border-t border-border/40">
+                <p className="text-[13px] text-muted-foreground">
                   Redirigiendo en {redirectIn} segundos
                 </p>
               </div>
             )}
           </CardContent>
 
-          <CardFooter className="flex gap-2">
+          <CardFooter className="flex gap-3 px-6 pb-6">
             <Button
               variant="outline"
               onClick={() => router.push('/dashboard/estudiante')}
-              className="flex-1"
+              className="flex-1 rounded-xl h-11"
             >
               Inicio
             </Button>
             {scanState.status === 'error' && (
-              <Button onClick={handleScan} className="flex-1">
+              <Button onClick={handleScan} className="flex-1 rounded-xl h-11">
                 <RotateCw className="mr-2 h-4 w-4" />
                 Reintentar
               </Button>

@@ -183,13 +183,6 @@ export const navLinkGroups: NavLinkGroup[] = [
         description: 'Materias en las que estás matriculado',
       },
       {
-        href: '/dashboard/estudiante/mi-grupo',
-        icon: Users,
-        label: 'Mi Grupo',
-        roles: ['ESTUDIANTE'],
-        description: 'Compañeros y docente de tus grupos',
-      },
-      {
         href: '/dashboard/estudiante/horario',
         icon: CalendarDays,
         label: 'Mi Horario',

@@ -23,7 +23,10 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
 
   useEffect(() => {
     import('qr-scanner')
-      .then(mod => setQrScannerLib(mod.default))
+      .then(mod => {
+        const Lib = mod.default;
+        setQrScannerLib(() => Lib);
+      })
       .catch(() => {
         setError('Error al cargar la librería del escáner');
       });

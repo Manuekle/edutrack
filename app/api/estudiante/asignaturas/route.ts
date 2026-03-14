@@ -21,17 +21,31 @@ export async function GET() {
       },
     });
 
-    const subjects = groups.map(g => ({
-      groupId: g.id,
-      groupCode: g.code,
-      academicPeriod: g.academicPeriod,
+    const dayMap: Record<string, string> = {
+      MONDAY: 'LUNES',
+      TUESDAY: 'MARTES',
+      WEDNESDAY: 'MIERCOLES',
+      THURSDAY: 'JUEVES',
+      FRIDAY: 'VIERNES',
+      SATURDAY: 'SABADO',
+      SUNDAY: 'DOMINGO',
+    };
+
+    const asignaturas = groups.map(g => ({
+      grupoId: g.id,
+      grupoCodigo: g.code,
+      periodoAcademico: g.academicPeriod,
       subject: g.subject,
-      teachers: g.teachers,
-      schedule: g.schedule,
-      room: g.room,
+      docentes: g.teachers,
+      horario: g.schedule ? {
+        diaSemana: dayMap[g.schedule.dayOfWeek] || g.schedule.dayOfWeek,
+        horaInicio: g.schedule.startTime,
+        horaFin: g.schedule.endTime,
+      } : null,
+      sala: g.room,
     }));
 
-    return NextResponse.json({ subjects });
+    return NextResponse.json({ asignaturas });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }

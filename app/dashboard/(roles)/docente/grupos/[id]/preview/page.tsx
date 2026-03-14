@@ -198,10 +198,10 @@ export default async function PreviewPage({ params }: PageProps) {
           </div>
 
           <div className="w-full sm:w-1/2 text-center">
-            <h2 className="text-slate-900 dark:text-white font-bold sm:text-xl text-lg tracking-card uppercase">
+            <h2 className="text-slate-900 dark:text-white font-semibold sm:text-xl text-lg tracking-card uppercase">
               Registro de Clases y Asistencia
             </h2>
-            <div className="text-primary dark:text-primary/80 text-[10px] font-bold tracking-card uppercase mt-1">
+            <div className="text-primary dark:text-primary/80 text-[10px] font-semibold tracking-card uppercase mt-1">
               Sistema de Gestión Académica • Docencia
             </div>
           </div>
@@ -209,15 +209,15 @@ export default async function PreviewPage({ params }: PageProps) {
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
             <div className="text-[10px] border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
               <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
-                <span className="font-bold text-slate-500 uppercase tracking-card">Código:</span>
+                <span className="font-semibold text-slate-500 uppercase tracking-card">Código:</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">FO-DO-005</span>
               </div>
               <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
-                <span className="font-bold text-slate-500 uppercase tracking-card">Versión:</span>
+                <span className="font-semibold text-slate-500 uppercase tracking-card">Versión:</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">08</span>
               </div>
               <div className="flex justify-between items-center gap-4 py-1.5 px-3">
-                <span className="font-bold text-slate-500 uppercase tracking-card">Fecha:</span>
+                <span className="font-semibold text-slate-500 uppercase tracking-card">Fecha:</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100 capitalize">
                   {metaMonthYear}
                 </span>
@@ -230,7 +230,7 @@ export default async function PreviewPage({ params }: PageProps) {
         <div className="p-6 bg-white dark:bg-slate-900">
           <div className="bg-slate-50 dark:bg-slate-800/40 p-5 grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-xs border border-slate-200 dark:border-slate-800 rounded-xl">
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-card">
                 Docente
               </span>
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase">
@@ -238,7 +238,7 @@ export default async function PreviewPage({ params }: PageProps) {
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-card">
                 Programa
               </span>
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -246,7 +246,7 @@ export default async function PreviewPage({ params }: PageProps) {
               </span>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-card">
                 Asignatura
               </span>
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 uppercase">
@@ -256,7 +256,7 @@ export default async function PreviewPage({ params }: PageProps) {
             <div className="flex flex-col gap-1 flex-wrap">
               <div className="grid grid-cols-3 w-full gap-4">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-card">
                     Año
                   </span>
                   <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -264,7 +264,7 @@ export default async function PreviewPage({ params }: PageProps) {
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-card">
                     Código
                   </span>
                   <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -272,7 +272,7 @@ export default async function PreviewPage({ params }: PageProps) {
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-card">
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-card">
                     Período
                   </span>
                   <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 tracking-card">
@@ -293,32 +293,32 @@ export default async function PreviewPage({ params }: PageProps) {
                 className="grid bg-slate-900 dark:bg-slate-800 text-slate-100"
                 style={{ gridTemplateColumns: '5% 12% 16% 45% 8% 14%' }}
               >
-                <div className="text-center font-bold text-[10px] uppercase border-r border-slate-700/50 flex items-center justify-center p-3">
+                <div className="text-center font-semibold text-[10px] uppercase border-r border-slate-700/50 flex items-center justify-center p-3">
                   No.
                 </div>
                 <div className="text-center border-r border-slate-700/50">
-                  <div className="p-2 font-bold text-[10px] uppercase tracking-card">Fecha</div>
+                  <div className="p-2 font-semibold text-[10px] uppercase tracking-card">Fecha</div>
                   <div className="grid grid-cols-2 border-t border-slate-700/50">
-                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Día</div>
-                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Mes</div>
+                    <div className="p-1 font-semibold text-[9px] uppercase opacity-60">Día</div>
+                    <div className="p-1 font-semibold text-[9px] uppercase opacity-60">Mes</div>
                   </div>
                 </div>
                 <div className="text-center border-r border-slate-700/50">
-                  <div className="p-2 font-bold text-[10px] uppercase tracking-card">Horario</div>
+                  <div className="p-2 font-semibold text-[10px] uppercase tracking-card">Horario</div>
                   <div className="grid grid-cols-2 border-t border-slate-700/50">
-                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Inicio</div>
-                    <div className="p-1 font-bold text-[9px] uppercase opacity-60">Fin</div>
+                    <div className="p-1 font-semibold text-[9px] uppercase opacity-60">Inicio</div>
+                    <div className="p-1 font-semibold text-[9px] uppercase opacity-60">Fin</div>
                   </div>
                 </div>
-                <div className="text-center font-bold text-[10px] uppercase border-r border-slate-700/50 flex items-center justify-center p-3 tracking-card">
+                <div className="text-center font-semibold text-[10px] uppercase border-r border-slate-700/50 flex items-center justify-center p-3 tracking-card">
                   Contenido Temático / Observaciones
                 </div>
-                <div className="text-center font-bold text-[10px] uppercase border-r border-slate-700/50 p-2 flex items-center justify-center leading-tight tracking-card">
+                <div className="text-center font-semibold text-[10px] uppercase border-r border-slate-700/50 p-2 flex items-center justify-center leading-tight tracking-card">
                   Total
                   <br />
                   Horas
                 </div>
-                <div className="text-center font-bold text-[10px] uppercase p-2 flex items-center justify-center leading-tight tracking-card">
+                <div className="text-center font-semibold text-[10px] uppercase p-2 flex items-center justify-center leading-tight tracking-card">
                   Firma o<br />
                   Validación
                 </div>
@@ -363,7 +363,7 @@ export default async function PreviewPage({ params }: PageProps) {
                         {cls.topic?.trim() || `Sesión de clase #${idx + 1}`}
                       </div>
 
-                      <div className="flex items-center justify-center border-r border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-900 dark:text-slate-100">
+                      <div className="flex items-center justify-center border-r border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-slate-900 dark:text-slate-100">
                         {calculateHours(cls.startTime as Date | null, cls.endTime as Date | null)}
                       </div>
 
@@ -380,7 +380,7 @@ export default async function PreviewPage({ params }: PageProps) {
                           </div>
                         ) : (
                           <div
-                            className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-card ${(cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA')
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-card ${(cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA')
                               ? finalizada
                                 ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-400' // Finalizada
                                 : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' // Programada
