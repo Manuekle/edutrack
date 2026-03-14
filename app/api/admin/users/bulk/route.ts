@@ -10,8 +10,6 @@ interface UserPreview {
   name: string;
   document: string;
   email: string;
-  subjectCode: string;
-  groupCode: string;
   status: 'success' | 'error' | 'warning';
   message: string;
 }
@@ -77,8 +75,6 @@ export async function POST(req: Request) {
       name: ['nombre', 'name', 'nombrecompleto', 'nombres'],
       document: ['documento', 'document', 'cedula', 'identificacion', 'id'],
       email: ['correo', 'email', 'correopersonal', 'correoinstitucional'],
-      subjectCode: ['asignatura', 'codigoasignatura', 'subject', 'codigo_asignatura', 'codigo'],
-      groupCode: ['grupo', 'group', 'codigogrupo'],
     };
 
     const findHeader = (variants: string[]): string | undefined => {
@@ -98,111 +94,80 @@ export async function POST(req: Request) {
     const nameH = findHeader(headerMap.name);
     const documentH = findHeader(headerMap.document);
     const emailH = findHeader(headerMap.email);
-    const subjectCodeH = findHeader(headerMap.subjectCode);
-    const groupCodeH = findHeader(headerMap.groupCode);
 
-    if (!nameH || !documentH || !emailH || !subjectCodeH || !groupCodeH) {
+    if (!nameH || !documentH || !emailH) {
       return NextResponse.json(
         {
           error:
-            'El CSV debe incluir al menos las columnas: nombre, documento, correo, asignatura y grupo. Columnas encontradas: ' +
+            'El CSV debe incluir al menos las columnas: nombre, documento y correo. Columnas encontradas: ' +
             headers.join(', '),
         },
         { status: 400 }
       );
     }
 
-    // Pre-fetch all groups and subjects for validation
-    const groups = await db.group.findMany({
-      include: { subject: true }
-    });
-
-    // Map for quick group lookup: `${subjectCode}_${groupCode}` -> groupId
-    const groupLookup = new Map<string, string>();
-    const subjectLookup = new Map<string, string>();
-
-    groups.forEach(g => {
-       const key = `${g.subject.code}_${g.code}`.toLowerCase();
-       groupLookup.set(key, g.id);
-       subjectLookup.set(g.subject.code.toLowerCase(), g.subject.id);
-    });
-
     const existingUsers = await db.user.findMany({ select: { document: true, personalEmail: true, id: true, role: true } });
     const existingDocs = new Map(existingUsers.map(u => [u.document?.toLowerCase() || '', u]));
     const existingEmails = new Map(existingUsers.map(u => [u.personalEmail?.toLowerCase() || '', u]));
 
-    const previews: (UserPreview & { groupId?: string, subjectId?: string, existingUserId?: string })[] = [];
-    
+    const previews: (UserPreview & { existingUserId?: string })[] = [];
+
     // To check for duplicates within the file itself
-    const processedKeys = new Set<string>();
+    const processedDocs = new Set<string>();
 
     for (const row of parsed.data) {
       const name = getValue(row, nameH);
       const documentStr = getValue(row, documentH);
       const email = getValue(row, emailH);
-      const subjectCode = getValue(row, subjectCodeH);
-      const groupCode = getValue(row, groupCodeH);
 
-      if (!name || !documentStr || !email || !subjectCode || !groupCode) {
+      if (!name || !documentStr || !email) {
         previews.push({
-          name, document: documentStr, email, subjectCode, groupCode,
+          name, document: documentStr, email,
           status: 'error',
           message: 'Faltan campos requeridos en la fila',
         });
         continue;
       }
 
-      const lookupKey = `${subjectCode}_${groupCode}`.toLowerCase();
-      const groupId = groupLookup.get(lookupKey);
-      const subjectId = subjectLookup.get(subjectCode.toLowerCase());
-
-      if (!groupId || !subjectId) {
-        previews.push({
-          name, document: documentStr, email, subjectCode, groupCode,
-          status: 'error',
-          message: `La asignatura '${subjectCode}' con el grupo '${groupCode}' no existe en el sistema.`,
-        });
-        continue;
-      }
-
       // Check for file duplicates
-      const fileKey = `${documentStr}_${lookupKey}`.toLowerCase();
-      if (processedKeys.has(fileKey)) {
+      const docKey = documentStr.toLowerCase();
+      if (processedDocs.has(docKey)) {
           previews.push({
-            name, document: documentStr, email, subjectCode, groupCode,
+            name, document: documentStr, email,
             status: 'error',
-            message: 'Registro duplicado en este mismo archivo.',
+            message: 'Documento duplicado en este mismo archivo.',
           });
           continue;
       }
-      processedKeys.add(fileKey);
+      processedDocs.add(docKey);
 
       // Check if user exists
       const existingUserByDoc = existingDocs.get(documentStr.toLowerCase());
       const existingUserByEmail = existingEmails.get(email.toLowerCase());
 
-      let existingUserId: string | undefined = undefined;
       if (existingUserByDoc || existingUserByEmail) {
          const user = existingUserByDoc || existingUserByEmail;
-         // Ensure role matches what we're uploading
          if (user?.role !== forceRole) {
              previews.push({
-                name, document: documentStr, email, subjectCode, groupCode,
+                name, document: documentStr, email,
                 status: 'error',
                 message: `El usuario ya existe pero tiene rol ${user?.role}.`,
              });
              continue;
          }
-         existingUserId = user?.id;
+         previews.push({
+           name, document: documentStr, email,
+           status: 'warning',
+           message: 'El usuario ya existe en el sistema.',
+           existingUserId: user?.id,
+         });
+         continue;
       }
 
       previews.push({
-        name, document: documentStr, email, subjectCode, groupCode,
-        status: existingUserId ? 'warning' : 'success',
-        message: existingUserId ? 'El usuario existe. Se añadirá a este grupo.' : 'Listo para crear y asignar.',
-        groupId,
-        subjectId,
-        existingUserId
+        name, document: documentStr, email,
+        status: 'success',
+        message: 'Listo para crear.',
       });
     }
 
@@ -210,67 +175,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, previewData: previews });
     }
 
-    // Confirm mode: creation
-    const validItems = previews.filter(p => p.status === 'success' || p.status === 'warning');
-    
+    // Confirm mode: only create new users
+    const validItems = previews.filter(p => p.status === 'success');
+
     if (validItems.length === 0) {
       return NextResponse.json(
-        { error: 'No hay filas válidas para crear' },
+        { error: 'No hay usuarios nuevos para crear' },
         { status: 400 }
       );
     }
 
     let createdCount = 0;
-    let mappedCount = 0;
     let errorCount = 0;
 
     await db.$transaction(async (tx) => {
       for (const item of validItems) {
         try {
-            let userId = item.existingUserId;
-
-            if (!userId) {
-                // Must create the user
-                const hashedPassword = await bcrypt.hash(generatePassword(12), 12);
-                const newUser = await tx.user.create({
-                    data: {
-                        name: item.name,
-                        document: item.document,
-                        personalEmail: item.email,
-                        institutionalEmail: item.email || undefined,
-                        password: hashedPassword,
-                        role: forceRole,
-                        isActive: true
-                    }
-                });
-                userId = newUser.id;
-                createdCount++;
-            } else {
-                mappedCount++;
-            }
-
-            // Map to group and subject
-            if (forceRole === Role.DOCENTE) {
-               // Update group
-               await tx.group.update({
-                  where: { id: item.groupId! },
-                  data: { teachers: { connect: { id: userId } } }
-               });
-               // Update subject
-               await tx.subject.update({
-                  where: { id: item.subjectId! },
-                  data: { teachers: { connect: { id: userId } } }
-               });
-            } else { // ESTUDIANTE
-               await tx.group.update({
-                  where: { id: item.groupId! },
-                  data: { students: { connect: { id: userId } } }
-               });
-               await tx.subject.update({
-                  where: { id: item.subjectId! },
-                  data: { studentIds: { push: userId } } 
-               });
-            }
+            const hashedPassword = await bcrypt.hash(generatePassword(12), 12);
+            await tx.user.create({
+                data: {
+                    name: item.name,
+                    document: item.document,
+                    personalEmail: item.email,
+                    institutionalEmail: item.email || undefined,
+                    password: hashedPassword,
+                    role: forceRole,
+                    isActive: true
+                }
+            });
+            createdCount++;
         } catch (e) {
             console.error(e);
             errorCount++;
@@ -278,14 +211,16 @@ export async function POST(req: Request) {
       }
     });
 
+    const alreadyExisted = previews.filter(p => p.status === 'warning').length;
+
     return NextResponse.json({
       success: true,
       summary: {
         total: previews.length,
         created: createdCount,
-        mapped: mappedCount,
+        alreadyExisted,
         errors: errorCount,
-        skipped: previews.length - createdCount - mappedCount - errorCount,
+        skipped: previews.length - createdCount - alreadyExisted - errorCount,
       },
     });
 

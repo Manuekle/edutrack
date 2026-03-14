@@ -245,7 +245,7 @@ function JustificarAusenciaContent() {
                   <FormItem className="space-y-3">
                     <div className="flex justify-between items-center px-1">
                       <FormLabel className="text-sm font-semibold text-foreground/80">Motivo de la ausencia</FormLabel>
-                      <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">Máximo 500 caracteres</span>
+                      <span className="text-[11px] text-muted-foreground uppercase tracking-card font-semibold">Máximo 500 caracteres</span>
                     </div>
                     <FormControl>
                       <div className="relative">

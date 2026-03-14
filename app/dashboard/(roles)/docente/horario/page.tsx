@@ -3,8 +3,17 @@
 import { CalendarEvent, CustomCalendar } from '@/components/calendar/custom-calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
-import { addDays, addMonths, setHours, setMinutes, startOfWeek, subDays, subMonths } from 'date-fns';
+import {
+  addDays,
+  addMonths,
+  setHours,
+  setMinutes,
+  startOfWeek,
+  subDays,
+  subMonths,
+} from 'date-fns';
 import { CalendarDays } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 interface HorarioClase {
@@ -100,9 +109,7 @@ export default function MiHorarioPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-card text-foreground">
-            Mi Horario
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">Mi Horario</h1>
           <p className="text-muted-foreground text-sm max-w-md">
             Consulta tu programación académica semanal y aulas asignadas.
           </p>
@@ -119,7 +126,8 @@ export default function MiHorarioPage() {
             </div>
             <h3 className="text-xl font-semibold text-foreground">Sin programación disponible</h3>
             <p className="text-muted-foreground mt-2 max-w-xs">
-              No se han encontrado clases registradas para este periodo académico en tu perfil docente.
+              No se han encontrado clases registradas para este periodo académico en tu perfil
+              docente.
             </p>
           </CardContent>
         </Card>

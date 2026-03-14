@@ -107,7 +107,7 @@ const AdminDashboardComponent = () => {
                 {error || 'No se pudieron obtener los datos'}
               </p>
             </div>
-            <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+            <Button size="default" variant="outline" onClick={() => window.location.reload()}>
               Reintentar
             </Button>
           </CardContent>
@@ -157,8 +157,8 @@ const AdminDashboardComponent = () => {
           <Link key={href} href={href}>
             <Card className="h-full transition-all hover:bg-muted/40 cursor-pointer border-border/30">
               <CardContent className="py-3.5 px-4 flex items-center gap-3">
-                <div className="flex  w-9 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-                  <Icon className="h-4 w-4" />
+                <div className="flex w-9 items-center justify-center  text-primary shrink-0">
+                  <Icon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium leading-none">{label}</p>

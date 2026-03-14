@@ -87,6 +87,7 @@ export default function ScannerPage() {
   return (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-1">
+
         <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Escanear Asistencia
         </h1>

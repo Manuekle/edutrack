@@ -85,16 +85,18 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
   // canEdit: Always true for scheduled future classes, or today's classes
   const canEdit = !!(isProgramada && (isFuture || isToday));
   
-  // canCancel: Only for scheduled classes in the future or today
-  const canCancel = !!(isProgramada && (isFuture || isToday));
+  // canCancel: Only for scheduled classes in the future or today, but not while in progress
+  const canCancel = !!(isProgramada && (isFuture || isToday) && !isEnCurso);
   
   // canMarkAsDone: True if it's not cancelled and not already completed/signed, and it's today or past
+  // But restricted if it's currently in course as per user request
   const canMarkAsDone = !!(
     cls.status !== 'CANCELADA' && 
     cls.status !== 'CANCELLED' && 
     cls.status !== 'SIGNED' &&
     cls.status !== 'COMPLETED' &&
-    (isToday || isPast)
+    (isToday || isPast) &&
+    !isEnCurso
   );
 
   // canTakeAttendance: More permissive - allow for any non-cancelled class that is today or past
@@ -104,6 +106,7 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
     cls.status !== 'CANCELLED' && 
     cls.status !== 'SIGNED' &&
     cls.status !== 'COMPLETED' &&
+    visualStatus !== 'FINALIZADA' &&
     (isToday || isPast)
   );
 

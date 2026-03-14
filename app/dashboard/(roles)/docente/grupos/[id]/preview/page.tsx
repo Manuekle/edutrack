@@ -1,7 +1,6 @@
 import { CardDescription } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
-import { ArrowLeft } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -80,13 +79,13 @@ export default async function PreviewPage({ params }: PageProps) {
             include: {
               classes: {
                 orderBy: { date: 'asc' },
-              }
+              },
             },
-            orderBy: { number: 'asc' }
-          }
-        }
-      }
-    }
+            orderBy: { number: 'asc' },
+          },
+        },
+      },
+    },
   });
 
   let subject: any = null;
@@ -96,8 +95,11 @@ export default async function PreviewPage({ params }: PageProps) {
     subject = grupoData.subject;
     // Aplanamos las clases de las semanas de la planeación activa
     classesToRender = (grupoData.planning?.weeks ?? [])
-      .flatMap((s: { classes: { date: Date; id: string;[key: string]: unknown }[] }) => s.classes)
-      .sort((a: { date: Date }, b: { date: Date }) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .flatMap((s: { classes: { date: Date; id: string; [key: string]: unknown }[] }) => s.classes)
+      .sort(
+        (a: { date: Date }, b: { date: Date }) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
   } else {
     // Si no es grupo, intentar como asignatura (comportamiento base)
     subject = await db.subject.findUnique({
@@ -108,7 +110,7 @@ export default async function PreviewPage({ params }: PageProps) {
         },
         classes: {
           where: { weekId: { not: null } },
-          orderBy: { date: 'asc' }
+          orderBy: { date: 'asc' },
         },
       },
     });
@@ -127,8 +129,9 @@ export default async function PreviewPage({ params }: PageProps) {
     );
   }
 
-  const isAuthorized = subject.teacherIds.includes(session.user.id) ||
-    await db.group.findFirst({ where: { id, teacherIds: { has: session.user.id } } });
+  const isAuthorized =
+    subject.teacherIds.includes(session.user.id) ||
+    (await db.group.findFirst({ where: { id, teacherIds: { has: session.user.id } } }));
 
   if (!isAuthorized) {
     return (
@@ -141,10 +144,7 @@ export default async function PreviewPage({ params }: PageProps) {
   }
 
   // Consolidar docentes (dar prioridad a los del grupo)
-  const allTeachers = [
-    ...(grupoData?.teachers ?? []),
-    ...(subject?.teachers ?? [])
-  ];
+  const allTeachers = [...(grupoData?.teachers ?? []), ...(subject?.teachers ?? [])];
 
   const teacherName = allTeachers[0]?.name ?? 'Docente';
   const signatureUrl = allTeachers[0]?.signatureUrl ?? null;
@@ -158,22 +158,14 @@ export default async function PreviewPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       {/* Nav */}
-      <div className="pb-6 w-full flex sm:flex-row flex-col sm:items-center items-start gap-4 justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/dashboard/docente/grupos/${id}`}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-          </Link>
-          <div>
-            <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
-              Vista Previa de Bitácora
-            </h1>
-            <CardDescription className="text-xs dark:text-gray-300">
-              Visualiza el reporte de asistencia para {subject.name}
-            </CardDescription>
-          </div>
+      <div className="pb-6 w-full flex flex-col gap-3">
+        <div>
+          <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
+            Vista Previa de Bitácora
+          </h1>
+          <CardDescription className="text-xs dark:text-gray-300">
+            Visualiza el reporte de asistencia para {subject.name}
+          </CardDescription>
         </div>
       </div>
 
@@ -209,11 +201,15 @@ export default async function PreviewPage({ params }: PageProps) {
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
             <div className="text-[10px] border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
               <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
-                <span className="font-semibold text-slate-500 uppercase tracking-card">Código:</span>
+                <span className="font-semibold text-slate-500 uppercase tracking-card">
+                  Código:
+                </span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">FO-DO-005</span>
               </div>
               <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
-                <span className="font-semibold text-slate-500 uppercase tracking-card">Versión:</span>
+                <span className="font-semibold text-slate-500 uppercase tracking-card">
+                  Versión:
+                </span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">08</span>
               </div>
               <div className="flex justify-between items-center gap-4 py-1.5 px-3">
@@ -304,7 +300,9 @@ export default async function PreviewPage({ params }: PageProps) {
                   </div>
                 </div>
                 <div className="text-center border-r border-slate-700/50">
-                  <div className="p-2 font-semibold text-[10px] uppercase tracking-card">Horario</div>
+                  <div className="p-2 font-semibold text-[10px] uppercase tracking-card">
+                    Horario
+                  </div>
                   <div className="grid grid-cols-2 border-t border-slate-700/50">
                     <div className="p-1 font-semibold text-[9px] uppercase opacity-60">Inicio</div>
                     <div className="p-1 font-semibold text-[9px] uppercase opacity-60">Fin</div>
@@ -375,25 +373,26 @@ export default async function PreviewPage({ params }: PageProps) {
                               alt="Firma docente"
                               width={120}
                               height={40}
-                              className=" w-full object-contain invert dark:invert-0 transition-all"
+                              className="w-full object-contain dark:invert transition-all"
                             />
                           </div>
                         ) : (
                           <div
-                            className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-card ${(cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA')
-                              ? finalizada
-                                ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-400' // Finalizada
-                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' // Programada
-                              : (cls.status === 'SIGNED' || cls.status === 'COMPLETED')
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' // Firmada
-                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400' // Cancelada
-                              }`}
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-card ${
+                              cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA'
+                                ? finalizada
+                                  ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-400' // Finalizada
+                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' // Programada
+                                : cls.status === 'SIGNED' || cls.status === 'COMPLETED'
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' // Firmada
+                                  : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400' // Cancelada
+                            }`}
                           >
-                            {(cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA')
+                            {cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA'
                               ? finalizada
                                 ? 'Finalizada'
                                 : 'Programada'
-                              : (cls.status === 'SIGNED' || cls.status === 'COMPLETED')
+                              : cls.status === 'SIGNED' || cls.status === 'COMPLETED'
                                 ? 'Firmada'
                                 : 'Cancelada'}
                           </div>

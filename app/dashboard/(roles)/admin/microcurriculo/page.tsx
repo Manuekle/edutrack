@@ -21,6 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -76,6 +77,7 @@ export default function MicrocurriculoPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1">
+
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Microcurrículo
         </h1>

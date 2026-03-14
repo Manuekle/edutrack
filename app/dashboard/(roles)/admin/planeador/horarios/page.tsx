@@ -31,6 +31,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -41,6 +48,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TimePicker } from '@/components/ui/time-picker';
 import {
   BookOpen,
   CheckCircle2,
@@ -54,6 +62,7 @@ import {
   Upload,
   Users,
 } from 'lucide-react';
+
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -76,8 +85,9 @@ interface GrupoResumen {
   periodoAcademico: string;
   subject: { name: string; code: string };
   docentes: { id: string; name: string | null }[];
-  horario: { diaSemana: string; horaInicio: string; horaFin: string } | null;
+  horario: { id?: string; diaSemana: string; horaInicio: string; horaFin: string } | null;
   sala: { id: string; name: string } | null;
+  shift: 'DAY' | 'NIGHT' | null;
   _count: { estudiantes: number };
 }
 
@@ -150,6 +160,22 @@ export default function ProgramacionPage() {
   };
 
   const [editLoading, setEditLoading] = useState(false);
+  // State for group editing
+  const [editShift, setEditShift] = useState<'DAY' | 'NIGHT'>('DAY');
+  const [editDia, setEditDia] = useState<string>('MONDAY');
+  const [editHoraInicio, setEditHoraInicio] = useState<string>('07:00');
+  const [editHoraFin, setEditHoraFin] = useState<string>('09:00');
+
+  // Initialize edit state when group selected
+  useEffect(() => {
+    if (groupToEdit) {
+      setEditShift(groupToEdit.shift || 'DAY');
+      setEditDia(groupToEdit.horario?.diaSemana || 'MONDAY');
+      setEditHoraInicio(groupToEdit.horario?.horaInicio || '07:00');
+      setEditHoraFin(groupToEdit.horario?.horaFin || '09:00');
+    }
+  }, [groupToEdit]);
+
   const handleEditGroup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!groupToEdit) return;
@@ -165,7 +191,10 @@ export default function ProgramacionPage() {
         body: JSON.stringify({
           codigo,
           periodoAcademico,
-          // For now just basic fields
+          shift: editShift,
+          diaSemana: editDia,
+          horaInicio: editHoraInicio,
+          horaFin: editHoraFin,
         }),
       });
       if (res.ok) {
@@ -296,6 +325,7 @@ export default function ProgramacionPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-1">
+
           <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
             Programación
           </h1>
@@ -335,7 +365,7 @@ export default function ProgramacionPage() {
                   <CardContent className="space-y-4 p-5">
                     <div className="space-y-2">
                       <p className="text-xs font-semibold">1. Descarga la plantilla</p>
-                      <a href="/formatos/plantilla_horarios.csv" download>
+                      <a href="/formatos/plantilla_programacion.csv" download>
                         <Button variant="outline" className="w-full justify-start  text-xs">
                           <Download className="mr-2 h-4 w-4 text-muted-foreground" />
                           Descargar Plantilla CSV
@@ -360,9 +390,6 @@ export default function ProgramacionPage() {
                             <strong>grupo</strong> — Ej: Grupo: 1
                           </li>
                           <li>
-                            <strong>jornada</strong> — DIURNO, NOCTURNO
-                          </li>
-                          <li>
                             <strong>dia</strong> — LUNES, MARTES, etc.
                           </li>
                           <li>
@@ -372,7 +399,7 @@ export default function ProgramacionPage() {
                             <strong>hora_fin</strong> — Ej: 11:10, 18:00
                           </li>
                           <li>
-                            <strong>salon</strong> — Nombre de la sala o S/A
+                            <strong>salon</strong> — Opcional (Ej: SJ 213 o S/A)
                           </li>
                         </ul>
                       </div>
@@ -409,7 +436,7 @@ export default function ProgramacionPage() {
                     <div className="flex gap-2 mt-4 flex-col">
                       <Button
                         onClick={handlePreview}
-                        disabled={!file || previewLoading || previewData.length > 0}
+                        disabled={!file || previewLoading}
                         className="w-full text-xs "
                       >
                         {previewLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -536,16 +563,16 @@ export default function ProgramacionPage() {
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-32 text-xs">
-                                      <DropdownMenuItem onClick={() => setRowToEdit({ idx, row })}>
-                                        <Edit2 className="mr-2 h-3 w-3" />
-                                        Editar
+                                      <DropdownMenuItem className="cursor-pointer gap-2 py-2.5 rounded-lg focus:bg-primary/10" onClick={() => setRowToEdit({ idx, row })}>
+                                        <Edit2 className="h-4 w-4 text-primary" />
+                                        <span className="text-xs text-primary">Editar</span>
                                       </DropdownMenuItem>
                                       <DropdownMenuItem
-                                        className="text-red-600 focus:text-red-600 cursor-pointer"
+                                        className="cursor-pointer gap-2 py-2.5 rounded-lg text-destructive focus:bg-destructive/10"
                                         onClick={() => handleRemovePreviewRow(idx)}
                                       >
-                                        <Trash2 className="mr-2 h-3 w-3" />
-                                        Remover
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                        <span className="text-xs text-destructive">Eliminar</span>
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
@@ -738,7 +765,7 @@ export default function ProgramacionPage() {
                           </TableCell>
                           <TableCell className="px-5">
                             <Badge variant="outline" className="font-mono text-xs shadow-none">
-                              {g.codigo}
+                              Grupo: {g.codigo}
                             </Badge>
                           </TableCell>
                           <TableCell className="px-5 hidden md:table-cell">
@@ -774,18 +801,18 @@ export default function ProgramacionPage() {
                                 <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                  className="text-amber-600 focus:text-amber-600 cursor-pointer"
+                                  className="cursor-pointer gap-2 py-2.5 rounded-lg"
                                   onClick={() => setGroupToEdit(g)}
                                 >
-                                  <Edit2 className="mr-2 h-4 w-4" />
-                                  Editar
+                                  <Edit2 className="h-4 w-4 text-primary" />
+                                  <span className="text-xs text-primary">Editar</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                                  className="cursor-pointer gap-2 py-2.5 rounded-lg text-destructive focus:bg-destructive/10"
                                   onClick={() => setGroupToDelete(g)}
                                 >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Eliminar
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                  <span className="text-xs text-destructive">Eliminar grupo</span>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -865,6 +892,46 @@ export default function ProgramacionPage() {
                   placeholder="Ej: 2025-1"
                   required
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="shift">Jornada</Label>
+                  <Select value={editShift} onValueChange={(v: any) => setEditShift(v)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Seleccionar jornada" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DAY">Diurna</SelectItem>
+                      <SelectItem value="NIGHT">Nocturna</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="diaSemana">Día</Label>
+                  <Select value={editDia} onValueChange={setEditDia}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Seleccionar día" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(DIA_LABELS)
+                        .filter(([key]) => ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].includes(key))
+                        .map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="horaInicio">Hora Inicio</Label>
+                  <TimePicker value={editHoraInicio} onChange={setEditHoraInicio} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="horaFin">Hora Fin</Label>
+                  <TimePicker value={editHoraFin} onChange={setEditHoraFin} />
+                </div>
               </div>
               <div className="pt-4 flex justify-end gap-2">
                 <Button

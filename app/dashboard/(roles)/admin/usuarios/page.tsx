@@ -248,6 +248,7 @@ export default function AdminUsuariosPage() {
     <div className="space-y-6 animate-in fade-in duration-500 mx-auto pb-12">
       {/* Header Section */}
       <div className="flex flex-col gap-1">
+
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Gestión de Usuarios
         </h1>

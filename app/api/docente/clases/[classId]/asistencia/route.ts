@@ -8,9 +8,18 @@ import { AttendanceListResponseSchema, AttendanceUpsertSchema } from './schema';
 async function verifyTeacherOwnership(classId: string, teacherId: string) {
   const cls = await db.class.findUnique({
     where: { id: classId },
-    include: { subject: true },
+    include: { 
+      subject: { select: { teacherIds: true } },
+      group: { select: { teacherIds: true } }
+    },
   });
-  return cls?.subject.teacherIds.includes(teacherId) ?? false;
+  
+  if (!cls) return false;
+
+  const inSubject = cls.subject?.teacherIds?.includes(teacherId) ?? false;
+  const inGroup = cls.group?.teacherIds?.includes(teacherId) ?? false;
+
+  return inSubject || inGroup;
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ classId: string }> }) {
@@ -35,14 +44,27 @@ export async function GET(request: Request, { params }: { params: Promise<{ clas
             studentIds: true,
           },
         },
+        group: {
+          select: {
+            id: true,
+            studentIds: true,
+          },
+        },
       },
     });
+
     if (!classInfo || !classInfo.subject) {
       return NextResponse.json({ message: 'Clase o asignatura no encontrada' }, { status: 404 });
     }
-    const { subject } = classInfo;
+
+    const { subject, group } = classInfo;
+    const allStudentIds = Array.from(new Set([
+      ...(subject.studentIds || []),
+      ...(group?.studentIds || []),
+    ]));
+
     const students = await db.user.findMany({
-      where: { id: { in: subject.studentIds } },
+      where: { id: { in: allStudentIds } },
       select: { id: true, name: true, institutionalEmail: true },
     });
     const attendances = await db.attendance.findMany({ where: { classId } });

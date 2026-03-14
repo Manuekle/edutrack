@@ -9,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AlertCircle, CheckCircle, Clock, Download, FileText, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -158,9 +159,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-card text-foreground">
-            Mis Reportes
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">Mis Reportes</h1>
           <p className="text-muted-foreground text-sm max-w-xl">
             Historial de reportes de asistencia — solicítalos desde el detalle de una asignatura y
             descárgalos aquí cuando estén listos.
@@ -178,13 +177,15 @@ export default function ReportsPage() {
               Aún no has solicitado reportes
             </p>
             <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-              Ve al detalle de una asignatura y usa el botón «Generar Reporte» para
-              comenzar.
+              Ve al detalle de una asignatura y usa el botón «Generar Reporte» para comenzar.
             </p>
           </div>
         ) : (
           reports.map(report => (
-            <Card key={report.id} className="hover:shadow-md transition-all duration-300 border-border/50 group overflow-hidden">
+            <Card
+              key={report.id}
+              className="hover:shadow-md transition-all duration-300 border-border/50 group overflow-hidden"
+            >
               <CardHeader className="pb-3 bg-muted/5 group-hover:bg-muted/10 transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1 flex-1 min-w-0">

@@ -18,11 +18,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       data: { studentIds: estudianteIds },
     });
 
-    // Update each student's studentGroupsIds (sync back-reference)
-    // Remove this group from all previous students not in new list
+    // Remove this group from all students who are no longer in it
     await db.user.updateMany({
-      where: { studentGroupsIds: { has: id } },
-      data: { studentGroupsIds: { set: [] } }, // Will be corrected below
+      where: { 
+        studentGroupsIds: { has: id },
+        id: { notIn: estudianteIds }
+      },
+      data: { studentGroupsIds: { pull: id } } as any,
     });
 
     // Set correctly for each student

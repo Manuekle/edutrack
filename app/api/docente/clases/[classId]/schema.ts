@@ -17,7 +17,7 @@ export const DocenteClaseDetailSchema = z.object({
   subject: z.object({
     id: z.string(),
     name: z.string(),
-    code: z.string().optional(),
+    code: z.string(),
     program: z.string().nullable().optional(),
     semester: z.number().nullable().optional(),
     credits: z.number().nullable().optional(),

@@ -17,7 +17,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     let subject = await db.subject.findFirst({
       where: {
         id,
-        teacherIds: { has: session.user.id },
+        OR: [
+          { teacherIds: { has: session.user.id } },
+          { groups: { some: { teacherIds: { has: session.user.id } } } },
+        ],
       },
     });
 

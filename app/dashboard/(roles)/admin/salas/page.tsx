@@ -277,6 +277,7 @@ export default function AdminSalasPage() {
         id="tour-salas-title"
       >
         <div className="space-y-1">
+
           <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
             Gestión de Salas
           </h1>

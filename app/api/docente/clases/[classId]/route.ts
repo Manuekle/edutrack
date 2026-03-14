@@ -62,7 +62,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cla
     const classInfo = await db.class.findUnique({
       where: { id: classId },
       include: {
-        subject: { select: { id: true, name: true, teacherIds: true } },
+        subject: { select: { id: true, name: true, code: true, teacherIds: true } },
         group: { select: { id: true, teacherIds: true } },
       },
     });

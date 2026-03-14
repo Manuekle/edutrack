@@ -186,9 +186,11 @@ model Group {
   // Planning and classes
   planning    Planning?
   classes     Class[]     @relation("GroupClasses")
+  shift       Shift?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 
   @@unique([code, subjectId, academicPeriod])
   @@index([subjectId])

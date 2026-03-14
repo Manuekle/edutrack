@@ -1,10 +1,20 @@
 'use client';
 
+import { BulkEnrollmentUpload } from '@/components/admin/bulk-enrollment-upload';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -14,10 +24,22 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GraduationCap, Layout, Search, UserCheck, Users } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  FileUp,
+  GraduationCap,
+  Layout,
+  Loader2,
+  Save,
+  Search,
+  UserCheck,
+  Users,
+} from 'lucide-react';
+
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { sileo } from 'sileo';
 
 interface Grupo {
@@ -39,6 +61,7 @@ interface Grupo {
 interface Estudiante {
   id: string;
   name: string;
+  document?: string | null;
   studentCode: string | null;
   correoInstitucional: string | null;
 }
@@ -46,6 +69,7 @@ interface Estudiante {
 interface Docente {
   id: string;
   name: string;
+  document?: string | null;
   codigoDocente: string | null;
 }
 
@@ -71,22 +95,28 @@ export default function AsignacionPage() {
   const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGrupo, setSelectedGrupo] = useState<string>('');
+  const [grupoComboOpen, setGrupoComboOpen] = useState(false);
 
   // Estudiantes
   const [students, setStudents] = useState<Estudiante[]>([]);
   const [studentsInGroup, setStudentsInGroup] = useState<string[]>([]);
   const [studentSearch, setStudentSearch] = useState('');
-  const [savingStudents, setSavingStudents] = useState(false);
 
   // Docentes
   const [docentes, setDocentes] = useState<Docente[]>([]);
   const [docentesInGroup, setDocentesInGroup] = useState<string[]>([]);
-  const [savingDocentes, setSavingDocentes] = useState(false);
+  const [docenteSearch, setDocenteSearch] = useState('');
+
+  // Modes
+  const [studentMode, setStudentMode] = useState<'search' | 'csv'>('search');
+  const [docenteMode, setDocenteMode] = useState<'search' | 'csv'>('search');
 
   // Sala
   const [salas, setSalas] = useState<Sala[]>([]);
   const [salaId, setSalaId] = useState('');
-  const [savingSala, setSavingSala] = useState(false);
+
+  // Global save
+  const [saving, setSaving] = useState(false);
 
   const gruposOrdenados = useMemo(
     () =>
@@ -107,6 +137,16 @@ export default function AsignacionPage() {
     () => grupos.filter(g => (g.estudianteIds?.length ?? 0) > 0).length,
     [grupos]
   );
+
+  const fetchUsers = useCallback(() => {
+    Promise.all([
+      fetch('/api/admin/usuarios?role=ESTUDIANTE').then(r => r.json()),
+      fetch('/api/admin/usuarios?role=DOCENTE').then(r => r.json()),
+    ]).then(([st, d]) => {
+      setStudents(st.users ?? []);
+      setDocentes(d.users ?? []);
+    });
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -141,52 +181,49 @@ export default function AsignacionPage() {
 
   const currentGrupo = grupos.find(g => g.id === selectedGrupo);
 
-  async function saveEstudiantes() {
-    setSavingStudents(true);
+  async function saveAll() {
+    setSaving(true);
     try {
-      await fetch(`/api/admin/planeador/grupos/${selectedGrupo}/estudiantes`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estudianteIds: studentsInGroup }),
-      });
-      sileo.success({ description: 'Estudiantes actualizados' });
-    } catch {
-      sileo.error({ description: 'Error al actualizar estudiantes' });
-    } finally {
-      setSavingStudents(false);
-    }
-  }
+      const salaIdToSend = salaId && salaId !== 'none' ? salaId : null;
 
-  async function saveDocentes() {
-    setSavingDocentes(true);
-    try {
-      await fetch(`/api/admin/planeador/grupos/${selectedGrupo}/docentes`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ docenteIds: docentesInGroup }),
-      });
-      sileo.success({ description: 'Docentes actualizados' });
-    } catch {
-      sileo.error({ description: 'Error al actualizar docentes' });
-    } finally {
-      setSavingDocentes(false);
-    }
-  }
+      await Promise.all([
+        fetch(`/api/admin/planeador/grupos/${selectedGrupo}/estudiantes`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estudianteIds: studentsInGroup }),
+        }),
+        fetch(`/api/admin/planeador/grupos/${selectedGrupo}/docentes`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ docenteIds: docentesInGroup }),
+        }),
+        fetch(`/api/admin/planeador/grupos/${selectedGrupo}/sala`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ salaId: salaIdToSend }),
+        }),
+      ]);
 
-  async function saveSala() {
-    setSavingSala(true);
-    try {
-      const idToSend = salaId && salaId !== 'none' ? salaId : null;
-      await fetch(`/api/admin/planeador/grupos/${selectedGrupo}/sala`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ salaId: idToSend }),
-      });
-      sileo.success({ description: 'Sala actualizada' });
+      sileo.success({ description: 'Grupo actualizado correctamente' });
+
+      // Update local state
+      setGrupos(prev =>
+        prev.map(g => {
+          if (g.id !== selectedGrupo) return g;
+          return {
+            ...g,
+            estudianteIds: studentsInGroup,
+            docentes: docentes
+              .filter(d => docentesInGroup.includes(d.id))
+              .map(d => ({ id: d.id, name: d.name })),
+            sala: salas.find(s => s.id === salaIdToSend) || null,
+          };
+        })
+      );
     } catch {
-      sileo.error({ description: 'Error al actualizar sala' });
+      sileo.error({ description: 'Error al guardar los cambios' });
     } finally {
-      setSavingSala(false);
+      setSaving(false);
     }
   }
 
@@ -196,13 +233,19 @@ export default function AsignacionPage() {
       s.studentCode?.toLowerCase().includes(studentSearch.toLowerCase())
   );
 
+  const filteredDocentes = docentes.filter(
+    d =>
+      d.name?.toLowerCase().includes(docenteSearch.toLowerCase()) ||
+      d.codigoDocente?.toLowerCase().includes(docenteSearch.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
-      <div className="mb-8">
+      <div className="">
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">Ajustes</h1>
         <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
-          Aquí puedes hacer ajustes manuales después de la carga masiva: cambiar un docente, reasignar
-          un salón, o agregar estudiantes a un grupo específico.
+          Configura cada grupo: asigna sala, docentes y estudiantes. Puedes buscar usuarios
+          existentes o cargar un CSV para asignar en masa.
         </p>
       </div>
 
@@ -316,29 +359,92 @@ export default function AsignacionPage() {
             </div>
           ) : (
             <>
-              <Select value={selectedGrupo} onValueChange={setSelectedGrupo}>
-                <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border focus:bg-background focus:border-primary/50 transition-colors">
-                  <SelectValue placeholder="Elige un grupo..." />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl shadow-lg max-h-80">
-                  {gruposOrdenados.map(g => (
-                    <SelectItem
-                      key={g.id}
-                      value={g.id}
-                      className="py-2.5 px-3 rounded-lg mx-1 my-0.5 text-sm"
-                    >
-                      <span className="font-mono text-muted-foreground mr-1 text-xs">
-                        [{g.codigo}]
+              <Popover open={grupoComboOpen} onOpenChange={setGrupoComboOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={grupoComboOpen}
+                    className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border hover:bg-muted/60 focus:bg-background focus:border-primary/50 transition-colors justify-between font-normal"
+                  >
+                    {currentGrupo ? (
+                      <span className="flex items-center gap-2 truncate">
+                        <span className="font-mono text-muted-foreground text-xs">
+                          [{currentGrupo.codigo}]
+                        </span>
+                        <span className="font-medium truncate">{currentGrupo.subject.name}</span>
+                        <span className="text-muted-foreground text-xs hidden sm:inline">
+                          — {currentGrupo.subject.code} — {currentGrupo.periodoAcademico}
+                        </span>
                       </span>
-                      <span className="font-medium">{g.subject.name}</span>
-                      <span className="text-muted-foreground ml-1 text-xs">
-                        {' '}
-                        — {g.periodoAcademico}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    ) : (
+                      <span className="text-muted-foreground">Buscar por grupo, código o asignatura...</span>
+                    )}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl shadow-lg" align="start">
+                  <Command
+                    filter={(value, search) => {
+                      const grupo = grupos.find(g => g.id === value);
+                      if (!grupo) return 0;
+                      const s = search.toLowerCase();
+                      const haystack = `${grupo.codigo} ${grupo.subject.name} ${grupo.subject.code} ${grupo.periodoAcademico}`.toLowerCase();
+                      return haystack.includes(s) ? 1 : 0;
+                    }}
+                  >
+                    <CommandInput placeholder="Buscar grupo, código o asignatura..." className="h-11" />
+                    <CommandList className="max-h-80">
+                      <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                        No se encontró ningún grupo.
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {gruposOrdenados.map(g => (
+                          <CommandItem
+                            key={g.id}
+                            value={g.id}
+                            onSelect={(val) => {
+                              setSelectedGrupo(val === selectedGrupo ? '' : val);
+                              setGrupoComboOpen(false);
+                            }}
+                            className="py-2.5 px-3 rounded-lg mx-1 my-0.5 cursor-pointer"
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 shrink-0 ${selectedGrupo === g.id ? 'opacity-100' : 'opacity-0'
+                                }`}
+                            />
+                            <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-muted-foreground text-xs">
+                                  Grupo {g.codigo}
+                                </span>
+                                <span className="text-muted-foreground text-[10px]">
+                                  {g.periodoAcademico}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm truncate">{g.subject.name}</span>
+                                <span className="text-muted-foreground text-xs shrink-0">
+                                  {g.subject.code}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                                {g.docentes?.length > 0 && (
+                                  <span className="truncate max-w-[200px]">
+                                    {g.docentes.map(d => d.name).join(', ')}
+                                  </span>
+                                )}
+                                <span>{g.estudianteIds?.length ?? 0} est.</span>
+                                {g.sala && <span>{g.sala.name}</span>}
+                              </div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               {currentGrupo && (
                 <div className="flex flex-wrap items-center gap-2 mt-4 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 text-sm">
                   <div className="w-full sm:w-auto mb-1 sm:mb-0 mr-2 flex flex-col gap-0.5">
@@ -366,23 +472,8 @@ export default function AsignacionPage() {
                   </Badge>
                   <span className="text-muted-foreground flex items-center gap-1.5 ml-0 sm:ml-auto text-xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                    Estudiantes: <strong>{currentGrupo.estudianteIds?.length ?? 0}</strong>
+                    Estudiantes: <strong>{studentsInGroup.length}</strong>
                   </span>
-                  {currentGrupo.sala && (
-                    <span className="text-muted-foreground flex items-center gap-1.5 ml-2 text-xs">
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
-                      Sala:{' '}
-                      <strong className="text-foreground font-medium">
-                        {currentGrupo.sala.name}
-                      </strong>
-                    </span>
-                  )}
-                  {currentGrupo.horario?.sala && !currentGrupo.sala && (
-                    <span className="text-muted-foreground text-[11px] flex items-center gap-1.5 ml-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
-                      Sala (horario): {currentGrupo.horario.sala.name}
-                    </span>
-                  )}
                   {currentGrupo.docentes?.length > 0 && (
                     <span className="text-muted-foreground flex items-center gap-1.5 ml-2 text-xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
@@ -400,295 +491,357 @@ export default function AsignacionPage() {
       </Card>
 
       {selectedGrupo && (
-        <Tabs defaultValue="estudiantes" className="mt-8 space-y-6">
-          <TabsList className="grid grid-cols-3 w-full bg-muted/50 p-1 rounded-full shadow-inner max-w-[480px]">
-            <TabsTrigger
-              value="estudiantes"
-              className="gap-2 rounded-full py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-            >
-              <GraduationCap className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Estudiantes</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="docentes"
-              className="gap-2 rounded-full py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-            >
-              <UserCheck className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Docentes</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="sala"
-              className="gap-2 rounded-full py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
-            >
-              <Layout className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Sala</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Estudiantes Tab */}
-          <TabsContent value="estudiantes" className="outline-none">
-            <Card className="border shadow-xs overflow-hidden p-0 rounded-2xl">
-              <CardHeader className="bg-muted/10 border-b px-5 py-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
-                      Estudiantes asignados:{' '}
-                      <span className="text-primary ml-1">{studentsInGroup.length}</span>
-                    </CardTitle>
-                    <CardDescription className="text-[11px] mt-0.5">
-                      Selecciona los estudiantes para este grupo. Total en sistema:{' '}
-                      {students.length}.
-                    </CardDescription>
-                  </div>
-                  <Button
-                    onClick={saveEstudiantes}
-                    disabled={savingStudents}
-                    className="rounded-xl shadow-none w-full sm:w-auto  px-6 text-xs"
-                  >
-                    {savingStudents ? 'Guardando...' : 'Guardar Cambios'}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-5">
-                <div className="relative mb-4">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar por nombre o código..."
-                    value={studentSearch}
-                    onChange={e => setStudentSearch(e.target.value)}
-                    className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none text-sm"
-                  />
-                </div>
-
-                <div className="bg-card rounded-xl border overflow-hidden shadow-none">
-                  <div className="max-h-[400px] overflow-y-auto p-0">
-                    {filteredStudents.length === 0 ? (
-                      <div className="py-8 text-center text-xs text-muted-foreground">
-                        No se encontraron estudiantes
-                      </div>
-                    ) : (
-                      <div className="flex flex-col divide-y">
-                        {filteredStudents.map(s => (
-                          <label
-                            key={s.id}
-                            className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
-                          >
-                            <Checkbox
-                              id={`student-${s.id}`}
-                              className="rounded-[4px] h-4 w-4"
-                              checked={studentsInGroup.includes(s.id)}
-                              onCheckedChange={checked => {
-                                setStudentsInGroup(prev =>
-                                  checked ? [...prev, s.id] : prev.filter(id => id !== s.id)
-                                );
-                              }}
-                              onClick={e => e.stopPropagation()}
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground truncate">
-                                {s.name}
-                              </p>
-                              <p className="text-[11px] text-muted-foreground truncate">
-                                {s.studentCode ??
-                                  s.correoInstitucional ??
-                                  'Sin código matriculado'}
-                              </p>
-                            </div>
-                            {studentsInGroup.includes(s.id) && (
-                              <Badge
-                                variant="default"
-                                className="text-[9px] font-semibold uppercase tracking-card bg-primary/10 text-primary border-0 shadow-none px-1.5 py-0 h-4 rounded-sm"
-                              >
-                                Asignado
-                              </Badge>
-                            )}
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Docentes Tab */}
-          <TabsContent value="docentes" className="outline-none">
-            <Card className="border shadow-xs overflow-hidden p-0 rounded-2xl">
-              <CardHeader className="bg-muted/10 border-b px-5 py-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
-                      Docentes asignados:{' '}
-                      <span className="text-purple-600 dark:text-purple-400 ml-1">
-                        {docentesInGroup.length}
-                      </span>
-                    </CardTitle>
-                    <CardDescription className="text-[11px] mt-0.5">
-                      Selecciona qué docentes imparten la clase.
-                    </CardDescription>
-                  </div>
-                  <Button
-                    onClick={saveDocentes}
-                    disabled={savingDocentes}
-                    className="rounded-xl shadow-none w-full sm:w-auto  px-6 text-xs bg-purple-600 hover:bg-purple-700 text-white"
-                  >
-                    {savingDocentes ? 'Guardando...' : 'Guardar Cambios'}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-5">
-                <div className="bg-card rounded-xl border overflow-hidden shadow-none">
-                  <div className="max-h-[400px] overflow-y-auto">
-                    {docentes.length === 0 ? (
-                      <div className="py-8 text-center text-xs text-muted-foreground">
-                        No hay docentes registrados
-                      </div>
-                    ) : (
-                      <div className="flex flex-col divide-y">
-                        {docentes.map(d => (
-                          <label
-                            key={d.id}
-                            className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
-                          >
-                            <Checkbox
-                              id={`docente-${d.id}`}
-                              className="rounded-[4px] h-4 w-4 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
-                              checked={docentesInGroup.includes(d.id)}
-                              onCheckedChange={checked => {
-                                setDocentesInGroup(prev =>
-                                  checked ? [...prev, d.id] : prev.filter(id => id !== d.id)
-                                );
-                              }}
-                              onClick={e => e.stopPropagation()}
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground truncate">
-                                {d.name}
-                              </p>
-                              <p className="text-[11px] text-muted-foreground truncate">
-                                {d.codigoDocente ?? 'Sin código docente'}
-                              </p>
-                            </div>
-                            {docentesInGroup.includes(d.id) && (
-                              <Badge
-                                variant="default"
-                                className="text-[9px] font-semibold uppercase tracking-card bg-purple-500/10 text-purple-600 dark:text-purple-400 border-0 shadow-none px-1.5 py-0 h-4 rounded-sm"
-                              >
-                                Asignado
-                              </Badge>
-                            )}
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Sala Tab */}
-          <TabsContent value="sala" className="outline-none">
-            <Card className="border shadow-xs overflow-hidden p-0 rounded-2xl max-w-2xl">
-              <CardHeader className="bg-muted/10 border-b px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
-                    Sala asignada al grupo
-                  </CardTitle>
-                  {currentGrupo?.horario?.sala && (
-                    <CardDescription className="text-[11px] flex items-center gap-1.5 mt-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
-                      Sugerida por horario:{' '}
-                      <strong className="text-foreground">{currentGrupo.horario.sala.name}</strong>
-                    </CardDescription>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="p-5 space-y-5">
-                <Select
-                  value={salaId || 'none'}
-                  onValueChange={v => setSalaId(v === 'none' ? '' : v)}
+        <>
+          <Tabs defaultValue="estudiantes" className="space-y-6">
+            <div className="flex items-center justify-between gap-4">
+              <TabsList className="grid grid-cols-3 w-full bg-muted/50 p-1 rounded-full shadow-inner max-w-[480px]">
+                <TabsTrigger
+                  value="estudiantes"
+                  className="gap-2 rounded-full py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
                 >
-                  <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border-transparent focus:bg-background focus:border-primary/50 transition-colors">
-                    <SelectValue placeholder="Seleccionar sala..." />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl shadow-lg border-muted-foreground/10 max-h-80">
-                    <SelectItem
-                      value="none"
-                      className="py-2.5 px-3 rounded-lg mx-1 my-0.5 text-sm text-muted-foreground"
-                    >
-                      Sin sala asignada
-                    </SelectItem>
-                    {salas.map(s => (
-                      <SelectItem
-                        key={s.id}
-                        value={s.id}
-                        className="py-2.5 px-3 rounded-lg mx-1 my-0.5 text-sm"
-                      >
-                        <span className="font-medium">{s.name}</span>
-                        {s.capacity != null ? (
-                          <span className="text-muted-foreground ml-2 text-xs">
-                            — Cap. {s.capacity}
-                          </span>
-                        ) : (
-                          ''
-                        )}
-                        <span className="text-muted-foreground ml-1 text-[10px] uppercase">
-                          ({s.type?.replace('_', ' ') ?? 'sala'})
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Estudiantes</span>
+                  <span className="text-[10px] text-muted-foreground ml-0.5">{studentsInGroup.length}</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="docentes"
+                  className="gap-2 rounded-full py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+                >
+                  <UserCheck className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Docentes</span>
+                  <span className="text-[10px] text-muted-foreground ml-0.5">{docentesInGroup.length}</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="sala"
+                  className="gap-2 rounded-full py-1.5 text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+                >
+                  <Layout className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Sala</span>
+                </TabsTrigger>
+              </TabsList>
+              <Button
+                onClick={saveAll}
+                disabled={saving}
+                className="rounded-xl shadow-sm px-6 text-xs gap-2 shrink-0"
+              >
+                {saving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Save className="h-3.5 w-3.5" />
+                )}
+                {saving ? 'Guardando...' : 'Guardar Cambios'}
+              </Button>
+            </div>
 
-                {salaId &&
-                  salaId !== 'none' &&
-                  (() => {
-                    const sala = salas.find(s => s.id === salaId);
-                    return sala ? (
-                      <div className="text-xs text-muted-foreground p-4 bg-orange-50/50 dark:bg-orange-500/5 rounded-xl flex flex-col gap-1.5 border border-orange-100 dark:border-orange-500/10">
-                        <p className="flex justify-between items-center">
-                          <span className="text-muted-foreground/80 font-medium">
-                            Sala seleccionada:
-                          </span>{' '}
-                          <strong className="text-orange-700 dark:text-orange-400 font-semibold">
-                            {sala.name}
-                          </strong>
-                        </p>
-                        {sala.capacity != null && (
-                          <p className="flex justify-between items-center">
-                            <span className="text-muted-foreground/80 font-medium">Capacidad:</span>{' '}
-                            <span>{sala.capacity} personas</span>
-                          </p>
-                        )}
-                        {sala.type && (
+            {/* Estudiantes Tab */}
+            <TabsContent value="estudiantes" className="outline-none">
+              <Card className="border shadow-xs overflow-hidden p-0 rounded-2xl">
+                <CardHeader className="bg-muted/10 border-b px-5 py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                        Estudiantes
+                      </CardTitle>
+                      <CardDescription className="text-[11px] mt-0.5">
+                        {studentsInGroup.length} asignados de {students.length} en el sistema.
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <Button
+                        variant={studentMode === 'search' ? 'default' : 'outline'}
+                        size="sm"
+                        className="text-xs rounded-lg gap-1.5 h-8"
+                        onClick={() => setStudentMode('search')}
+                      >
+                        <Search className="h-3 w-3" />
+                        Buscar
+                      </Button>
+                      <Button
+                        variant={studentMode === 'csv' ? 'default' : 'outline'}
+                        size="sm"
+                        className="text-xs rounded-lg gap-1.5 h-8"
+                        onClick={() => setStudentMode('csv')}
+                      >
+                        <FileUp className="h-3 w-3" />
+                        CSV
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-5">
+                  {studentMode === 'search' ? (
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Buscar por nombre o código..."
+                          value={studentSearch}
+                          onChange={e => setStudentSearch(e.target.value)}
+                          className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none text-sm"
+                        />
+                      </div>
+                      <div className="bg-card rounded-xl border overflow-hidden shadow-none">
+                        <div className="max-h-[400px] overflow-y-auto p-0">
+                          {filteredStudents.length === 0 ? (
+                            <div className="py-8 text-center text-xs text-muted-foreground">
+                              No se encontraron estudiantes
+                            </div>
+                          ) : (
+                            <div className="flex flex-col divide-y">
+                              {filteredStudents.map(s => (
+                                <label
+                                  key={s.id}
+                                  className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
+                                >
+                                  <Checkbox
+                                    id={`student-${s.id}`}
+                                    className="rounded-[4px] h-4 w-4"
+                                    checked={studentsInGroup.includes(s.id)}
+                                    onCheckedChange={checked => {
+                                      setStudentsInGroup(prev =>
+                                        checked ? [...prev, s.id] : prev.filter(id => id !== s.id)
+                                      );
+                                    }}
+                                    onClick={e => e.stopPropagation()}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium text-foreground truncate">
+                                      {s.name}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground truncate">
+                                      {s.studentCode ??
+                                        s.correoInstitucional ??
+                                        'Sin código matriculado'}
+                                    </p>
+                                  </div>
+                                  {studentsInGroup.includes(s.id) && (
+                                    <Badge
+                                      variant="default"
+                                      className="text-[9px] font-semibold uppercase tracking-card bg-primary/10 text-primary border-0 shadow-none px-1.5 py-0 h-4 rounded-sm"
+                                    >
+                                      Asignado
+                                    </Badge>
+                                  )}
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <BulkEnrollmentUpload
+                      role="ESTUDIANTE"
+                      allUsers={students.map(s => ({ id: s.id, name: s.name, document: s.document, studentCode: s.studentCode }))}
+                      currentlyAssignedIds={studentsInGroup}
+                      onEnrollmentComplete={(merged) => setStudentsInGroup(merged)}
+                      onUsersCreated={fetchUsers}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Docentes Tab */}
+            <TabsContent value="docentes" className="outline-none">
+              <Card className="border shadow-xs overflow-hidden p-0 rounded-2xl">
+                <CardHeader className="bg-muted/10 border-b px-5 py-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                        Docentes
+                      </CardTitle>
+                      <CardDescription className="text-[11px] mt-0.5">
+                        {docentesInGroup.length} asignados de {docentes.length} en el sistema.
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <Button
+                        variant={docenteMode === 'search' ? 'default' : 'outline'}
+                        size="sm"
+                        className="text-xs rounded-lg gap-1.5 h-8"
+                        onClick={() => setDocenteMode('search')}
+                      >
+                        <Search className="h-3 w-3" />
+                        Buscar
+                      </Button>
+                      <Button
+                        variant={docenteMode === 'csv' ? 'default' : 'outline'}
+                        size="sm"
+                        className="text-xs rounded-lg gap-1.5 h-8"
+                        onClick={() => setDocenteMode('csv')}
+                      >
+                        <FileUp className="h-3 w-3" />
+                        CSV
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-5">
+                  {docenteMode === 'search' ? (
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Buscar por nombre o código..."
+                          value={docenteSearch}
+                          onChange={e => setDocenteSearch(e.target.value)}
+                          className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none text-sm"
+                        />
+                      </div>
+                      <div className="bg-card rounded-xl border overflow-hidden shadow-none">
+                        <div className="max-h-[400px] overflow-y-auto">
+                          {filteredDocentes.length === 0 ? (
+                            <div className="py-8 text-center text-xs text-muted-foreground">
+                              No se encontraron docentes
+                            </div>
+                          ) : (
+                            <div className="flex flex-col divide-y">
+                              {filteredDocentes.map(d => (
+                                <label
+                                  key={d.id}
+                                  className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
+                                >
+                                  <Checkbox
+                                    id={`docente-${d.id}`}
+                                    className="rounded-[4px] h-4 w-4 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                    checked={docentesInGroup.includes(d.id)}
+                                    onCheckedChange={checked => {
+                                      setDocentesInGroup(prev =>
+                                        checked ? [...prev, d.id] : prev.filter(id => id !== d.id)
+                                      );
+                                    }}
+                                    onClick={e => e.stopPropagation()}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium text-foreground truncate">
+                                      {d.name}
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground truncate">
+                                      {d.codigoDocente ?? 'Sin código docente'}
+                                    </p>
+                                  </div>
+                                  {docentesInGroup.includes(d.id) && (
+                                    <Badge
+                                      variant="default"
+                                      className="text-[9px] font-semibold uppercase tracking-card bg-purple-500/10 text-purple-600 dark:text-purple-400 border-0 shadow-none px-1.5 py-0 h-4 rounded-sm"
+                                    >
+                                      Asignado
+                                    </Badge>
+                                  )}
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <BulkEnrollmentUpload
+                      role="DOCENTE"
+                      allUsers={docentes.map(d => ({ id: d.id, name: d.name, document: d.document }))}
+                      currentlyAssignedIds={docentesInGroup}
+                      onEnrollmentComplete={(merged) => setDocentesInGroup(merged)}
+                      onUsersCreated={fetchUsers}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Sala Tab */}
+            <TabsContent value="sala" className="outline-none">
+              <Card className="border shadow-xs overflow-hidden p-0 rounded-2xl max-w-2xl">
+                <CardHeader className="bg-muted/10 border-b px-5 py-4">
+                  <div>
+                    <CardTitle className="sm:text-sm text-xs font-semibold tracking-card text-foreground">
+                      Sala asignada al grupo
+                    </CardTitle>
+                    {currentGrupo?.horario?.sala && (
+                      <CardDescription className="text-[11px] flex items-center gap-1.5 mt-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500/50"></span>
+                        Sugerida por horario:{' '}
+                        <strong className="text-foreground">{currentGrupo.horario.sala.name}</strong>
+                      </CardDescription>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-5 space-y-5">
+                  <Select
+                    value={salaId || 'none'}
+                    onValueChange={v => setSalaId(v === 'none' ? '' : v)}
+                  >
+                    <SelectTrigger className="w-full rounded-full border text-sm px-4 shadow-none bg-muted/40 focus:bg-background focus:border-primary/50 transition-colors">
+                      <SelectValue placeholder="Seleccionar sala..." />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl shadow-lg border-muted-foreground/10 max-h-80">
+                      <SelectItem
+                        value="none"
+                        className="py-2.5 pl-10 rounded-full mx-1 my-0.5 text-sm text-muted-foreground"
+                      >
+                        Sin sala asignada
+                      </SelectItem>
+                      {salas.map(s => (
+                        <SelectItem
+                          key={s.id}
+                          value={s.id}
+                          className="py-2.5 pl-10 rounded-full mx-1 my-0.5 text-sm"
+                        >
+                          <span className="font-medium">{s.name}</span>
+                          {s.capacity != null ? (
+                            <span className="text-muted-foreground ml-2 text-xs">
+                              — Cap. {s.capacity}
+                            </span>
+                          ) : (
+                            ''
+                          )}
+                          <span className="text-muted-foreground ml-1 text-[10px] uppercase">
+                            ({s.type?.replace('_', ' ') ?? 'sala'})
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {salaId &&
+                    salaId !== 'none' &&
+                    (() => {
+                      const sala = salas.find(s => s.id === salaId);
+                      return sala ? (
+                        <div className="text-xs text-muted-foreground p-4 bg-orange-50/50 dark:bg-orange-500/5 rounded-xl flex flex-col gap-1.5 border border-orange-100 dark:border-orange-500/10">
                           <p className="flex justify-between items-center">
                             <span className="text-muted-foreground/80 font-medium">
-                              Tipo de sala:
+                              Sala seleccionada:
                             </span>{' '}
-                            <span className="capitalize">
-                              {sala.type.toLowerCase().replace('_', ' ')}
-                            </span>
+                            <strong className="text-orange-700 dark:text-orange-400 font-semibold">
+                              {sala.name}
+                            </strong>
                           </p>
-                        )}
-                      </div>
-                    ) : null;
-                  })()}
+                          {sala.capacity != null && (
+                            <p className="flex justify-between items-center">
+                              <span className="text-muted-foreground/80 font-medium">Capacidad:</span>{' '}
+                              <span>{sala.capacity} personas</span>
+                            </p>
+                          )}
+                          {sala.type && (
+                            <p className="flex justify-between items-center">
+                              <span className="text-muted-foreground/80 font-medium">
+                                Tipo de sala:
+                              </span>{' '}
+                              <span className="capitalize">
+                                {sala.type.toLowerCase().replace('_', ' ')}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      ) : null;
+                    })()}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
-                <div className="pt-1">
-                  <Button
-                    onClick={saveSala}
-                    disabled={savingSala}
-                    className="rounded-xl shadow-none w-full sm:w-auto px-8  text-xs"
-                  >
-                    {savingSala ? 'Guardando...' : 'Guardar Sala'}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        </>
       )}
     </div>
   );

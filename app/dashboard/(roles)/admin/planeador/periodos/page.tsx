@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+
 import { CalendarDays, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -88,6 +89,7 @@ export default function PeriodosPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div className="flex flex-col gap-1">
+
           <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2 text-foreground">
             Configuración de Periodos
           </h1>

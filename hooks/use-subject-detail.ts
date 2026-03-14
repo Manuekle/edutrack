@@ -60,7 +60,7 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       return result;
     },
     enabled: enabled && !!subjectId,
-    staleTime: 60 * 1000, // 1 minuto
+    staleTime: 0,
   });
 
   // Query para obtener los estudiantes inscritos
@@ -85,7 +85,7 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       return { data: Array.isArray(result) ? result : [] };
     },
     enabled: enabled && !!subjectId,
-    staleTime: 60 * 1000, // 1 minuto
+    staleTime: 0,
   });
 
   // Query para obtener las clases
@@ -113,7 +113,7 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
       return result;
     },
     enabled: enabled && !!subjectId,
-    staleTime: 60 * 1000, // 1 minuto
+    staleTime: 0,
   });
 
   // Query para verificar si existe un reporte para el período actual

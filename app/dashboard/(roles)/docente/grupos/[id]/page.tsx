@@ -17,7 +17,7 @@ import { useSubjectDetail } from '@/hooks/use-subject-detail';
 import { toTableClass } from '@/lib/class-converters';
 import { classStatusMap } from '@/lib/class-utils';
 import * as dateUtils from '@/lib/time-utils';
-import { AlertCircle, ArrowLeft, Eye, NotebookPen } from 'lucide-react';
+import { AlertCircle, Eye, NotebookPen } from 'lucide-react';
 
 export default function GrupoDetailPage() {
   const router = useRouter();
@@ -56,11 +56,8 @@ export default function GrupoDetailPage() {
   // Local state for classes management - sync with React Query data
   const [localClasses, setLocalClasses] = useState(classes);
 
-  // Sync local classes when React Query data changes
   useEffect(() => {
-    if (classes.length > 0) {
-      setLocalClasses(classes);
-    }
+    setLocalClasses(classes);
   }, [classes]);
 
   // Class management hook
@@ -136,15 +133,8 @@ export default function GrupoDetailPage() {
         isLoading={isGeneratingReport}
       />
 
-
-      <div className="pb-6 w-full flex sm:flex-row flex-col sm:items-center items-start gap-4 justify-between">
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/dashboard/docente/grupos`}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 hover:bg-muted transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-          </Link>
+      <div className="pb-6 space-y-3">
+        <div className="flex sm:flex-row flex-col sm:items-center items-start gap-4 justify-between">
           <div>
             <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
               {subject?.name}
@@ -153,41 +143,40 @@ export default function GrupoDetailPage() {
               Gestiona estudiantes y <strong>planea los temas de tus clases</strong> en la bitácora.
             </CardDescription>
           </div>
-        </div>
+          <div className="flex w-full sm:w-auto items-center gap-3">
+            <Button
+              variant="default"
+              className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
+              onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/bitacora`)}
+            >
+              Planear Temas y Bitácora
+            </Button>
 
-        <div className="flex w-full sm:w-auto items-center gap-3">
-          <Button
-            variant="default"
-            className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
-            onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/bitacora`)}
-          >
-            Planear Temas y Bitácora
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium gap-2"
+              onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/preview`)}
+            >
+              <Eye className="h-4 w-4" />
+              Vista previa
+            </Button>
 
-          <Button
-            variant="outline"
-            className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium gap-2"
-            onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/preview`)}
-          >
-            <Eye className="h-4 w-4" />
-            Vista previa
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium"
-            onClick={() => setIsReportModalOpen(true)}
-            disabled={hasScheduledClasses || reportExistsForCurrentPeriod}
-            title={
-              hasScheduledClasses
-                ? 'No se puede generar el reporte porque hay clases programadas pendientes'
-                : reportExistsForCurrentPeriod
-                  ? 'Ya se ha generado un reporte para este período'
-                  : 'Generar reporte de asistencia'
-            }
-          >
-            {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium"
+              onClick={() => setIsReportModalOpen(true)}
+              disabled={hasScheduledClasses || reportExistsForCurrentPeriod}
+              title={
+                hasScheduledClasses
+                  ? 'No se puede generar el reporte porque hay clases programadas pendientes'
+                  : reportExistsForCurrentPeriod
+                    ? 'Ya se ha generado un reporte para este período'
+                    : 'Generar reporte de asistencia'
+              }
+            >
+              {reportExistsForCurrentPeriod ? 'Reporte Generado' : 'Generar Reporte'}
+            </Button>
+          </div>
         </div>
       </div>
       <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex items-start gap-3 mb-6">
@@ -195,17 +184,18 @@ export default function GrupoDetailPage() {
           <NotebookPen className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-primary">¿Cómo subir los temas de tus clases?</h3>
+          <h3 className="text-sm font-semibold text-primary">
+            ¿Cómo subir los temas de tus clases?
+          </h3>
           <p className="text-[13px] text-muted-foreground mt-0.5">
-            Usa el botón <strong>"Planear Temas y Bitácora"</strong> arriba para definir la programación de temas clase a clase por las 16 semanas. También puedes ajustar las fechas desde allí.
+            Usa el botón <strong>"Planear Temas y Bitácora"</strong> arriba para definir la
+            programación de temas clase a clase por las 16 semanas. También puedes ajustar las
+            fechas desde allí.
           </p>
         </div>
       </div>
 
-      <StudentsTable
-        students={enrolledStudents}
-        isLoading={isLoadingStudents}
-      />
+      <StudentsTable students={enrolledStudents} isLoading={isLoadingStudents} />
 
       <ClassesTable
         classes={localClasses.map(cls => toTableClass(cls))}

@@ -161,95 +161,97 @@ export function ClassTableRow({
       </div>
 
       <div className="flex justify-end shrink-0 sm:pl-0 pl-14">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 rounded-full text-muted-foreground/50 hover:text-foreground shrink-0 transition-colors"
-              aria-label={`Acciones para clase ${cls.topic || 'sin tema'}`}
-            >
-              <span className="sr-only">Abrir menú</span>
-              <MoreHorizontal className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-44 rounded-xl">
-            <DropdownMenuLabel className="font-sans font-semibold text-xs">
-              Acciones
-            </DropdownMenuLabel>
-            {cls.status !== 'SIGNED' && cls.status !== 'COMPLETED' && (
-              <>
-                <DropdownMenuItem
-                  asChild
-                  disabled={!canTakeAttendance}
-                  className={cn(
-                    'rounded-lg cursor-pointer text-[13px]',
-                    !canTakeAttendance
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:text-blue-400 dark:focus:bg-blue-500/10'
-                  )}
-                >
-                  <Link
-                    href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
-                    className="flex items-center w-full"
-                    onClick={e => !canTakeAttendance && e.preventDefault()}
-                    aria-disabled={!canTakeAttendance}
+        {cls.status !== 'SIGNED' && cls.status !== 'COMPLETED' && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="h-8 w-8 p-0 rounded-full text-muted-foreground/50 hover:text-foreground shrink-0 transition-colors"
+                aria-label={`Acciones para clase ${cls.topic || 'sin tema'}`}
+              >
+                <span className="sr-only">Abrir menú</span>
+                <MoreHorizontal className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-44 rounded-xl">
+              <DropdownMenuLabel className="font-sans font-semibold text-xs">
+                Acciones
+              </DropdownMenuLabel>
+              {cls.status !== 'SIGNED' && cls.status !== 'COMPLETED' && (
+                <>
+                  <DropdownMenuItem
+                    asChild
+                    disabled={!canTakeAttendance}
+                    className={cn(
+                      'rounded-lg cursor-pointer text-[13px]',
+                      !canTakeAttendance
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:text-blue-400 dark:focus:bg-blue-500/10'
+                    )}
                   >
-                    <UserCheck
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        !canTakeAttendance ? 'text-muted-foreground' : 'text-blue-500 dark:text-blue-400'
-                      )}
-                      aria-hidden="true"
-                    />
-                    <span>Asistencia</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  disabled={!canCancel}
-                  onSelect={e => {
-                    e.preventDefault();
-                    if (canCancel) onCancel();
-                  }}
-                  className={cn(
-                    'rounded-lg text-[13px]',
-                    !canCancel
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:bg-red-500/10 cursor-pointer'
-                  )}
-                  aria-disabled={!canCancel}
-                >
-                  <Ban className={cn("mr-2 h-4 w-4", !canCancel ? 'text-muted-foreground' : 'text-red-400 dark:text-red-400')} aria-hidden="true" />
-                  <span>Cancelar Clase</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            <DropdownMenuItem
-              disabled={!canMarkAsDone}
-              onSelect={e => {
-                e.preventDefault();
-                if (canMarkAsDone) onMarkAsDone();
-              }}
-              className={cn(
-                'rounded-lg text-[13px] cursor-pointer',
-                !canMarkAsDone
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'text-green-600 focus:text-green-600 focus:bg-green-50 dark:text-green-400 dark:focus:bg-green-500/10'
+                    <Link
+                      href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
+                      className="flex items-center w-full"
+                      onClick={e => !canTakeAttendance && e.preventDefault()}
+                      aria-disabled={!canTakeAttendance}
+                    >
+                      <UserCheck
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          !canTakeAttendance ? 'text-muted-foreground' : 'text-blue-500 dark:text-blue-400'
+                        )}
+                        aria-hidden="true"
+                      />
+                      <span>Asistencia</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    disabled={!canCancel}
+                    onSelect={e => {
+                      e.preventDefault();
+                      if (canCancel) onCancel();
+                    }}
+                    className={cn(
+                      'rounded-lg text-[13px]',
+                      !canCancel
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:bg-red-500/10 cursor-pointer'
+                    )}
+                    aria-disabled={!canCancel}
+                  >
+                    <Ban className={cn("mr-2 h-4 w-4", !canCancel ? 'text-muted-foreground' : 'text-red-400 dark:text-red-400')} aria-hidden="true" />
+                    <span>Cancelar Clase</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
               )}
-              aria-disabled={!canMarkAsDone}
-            >
-              <Signature
+              <DropdownMenuItem
+                disabled={!canMarkAsDone}
+                onSelect={e => {
+                  e.preventDefault();
+                  if (canMarkAsDone) onMarkAsDone();
+                }}
                 className={cn(
-                  'mr-2 h-4 w-4',
-                  !canMarkAsDone ? 'text-muted-foreground' : 'text-green-500 dark:text-green-400'
+                  'rounded-lg text-[13px] cursor-pointer',
+                  !canMarkAsDone
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'text-green-600 focus:text-green-600 focus:bg-green-50 dark:text-green-400 dark:focus:bg-green-500/10'
                 )}
-                aria-hidden="true"
-              />
-              <span>Firmar Clase</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                aria-disabled={!canMarkAsDone}
+              >
+                <Signature
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    !canMarkAsDone ? 'text-muted-foreground' : 'text-green-500 dark:text-green-400'
+                  )}
+                  aria-hidden="true"
+                />
+                <span>Firmar Clase</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

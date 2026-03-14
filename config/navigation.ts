@@ -81,6 +81,15 @@ export const navLinkGroups: NavLinkGroup[] = [
         label: '1. Programación',
         roles: ['ADMIN'],
         description: 'Carga masiva de horarios y creación de grupos',
+        subLinks: [
+          {
+            href: '/dashboard/admin/planeador/periodos',
+            label: 'Periodos Académicos',
+            roles: ['ADMIN'],
+            isSubLink: true,
+            parentHref: '/dashboard/admin/planeador/horarios',
+          },
+        ],
       },
       {
         href: '/dashboard/admin/planeador/asignacion',
@@ -149,6 +158,36 @@ export const navLinkGroups: NavLinkGroup[] = [
         label: 'Mis Grupos',
         roles: ['DOCENTE'],
         description: 'Grupos activos — accede a la bitácora desde aquí',
+        subLinks: [
+          {
+            href: '/dashboard/docente/grupos/[id]',
+            label: 'Detalle del Grupo',
+            roles: ['DOCENTE'],
+            isSubLink: true,
+            parentHref: '/dashboard/docente/grupos',
+          },
+          {
+            href: '/dashboard/docente/grupos/[id]/preview',
+            label: 'Vista Previa',
+            roles: ['DOCENTE'],
+            isSubLink: true,
+            parentHref: '/dashboard/docente/grupos',
+          },
+          {
+            href: '/dashboard/docente/grupos/[id]/bitacora',
+            label: 'Bitácora',
+            roles: ['DOCENTE'],
+            isSubLink: true,
+            parentHref: '/dashboard/docente/grupos',
+          },
+          {
+            href: '/dashboard/docente/grupos/[id]/clase/[classId]/asistencia',
+            label: 'Asistencia',
+            roles: ['DOCENTE'],
+            isSubLink: true,
+            parentHref: '/dashboard/docente/grupos',
+          },
+        ],
       },
       {
         href: '/dashboard/docente/horario',
@@ -195,6 +234,22 @@ export const navLinkGroups: NavLinkGroup[] = [
         label: 'Registrar Asistencia',
         roles: ['ESTUDIANTE'],
         description: 'Registra con QR o código manual',
+        subLinks: [
+          {
+            href: '/dashboard/estudiante/escanear',
+            label: 'Escanear QR',
+            roles: ['ESTUDIANTE'],
+            isSubLink: true,
+            parentHref: '/dashboard/estudiante/asistencia',
+          },
+          {
+            href: '/dashboard/estudiante/escanear/[token]',
+            label: 'Registrando Asistencia',
+            roles: ['ESTUDIANTE'],
+            isSubLink: true,
+            parentHref: '/dashboard/estudiante/asistencia',
+          },
+        ],
       },
       {
         href: '/dashboard/estudiante/historial',

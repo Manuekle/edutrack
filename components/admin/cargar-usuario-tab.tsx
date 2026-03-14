@@ -21,8 +21,6 @@ interface UserPreview {
   name: string;
   document: string;
   email: string;
-  subjectCode: string;
-  groupCode: string;
   status: 'success' | 'error' | 'warning';
   message: string;
 }
@@ -34,8 +32,8 @@ interface CargarUsuarioTabProps {
 export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
   const title = role === 'DOCENTE' ? 'Cargar Docentes' : 'Cargar Estudiantes';
   const description = role === 'DOCENTE'
-    ? 'Carga un archivo CSV con la lista de docentes para vincularlos a asignaturas y grupos.'
-    : 'Carga un archivo CSV con la lista de estudiantes para matricularlos en asignaturas y grupos.';
+    ? 'Carga un archivo CSV con la lista de docentes para crearlos en el sistema.'
+    : 'Carga un archivo CSV con la lista de estudiantes para crearlos en el sistema.';
 
   const templateHref =
     role === 'DOCENTE' ? '/formatos/plantilla_docentes.csv' : '/formatos/plantilla_estudiantes.csv';
@@ -44,7 +42,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewData, setPreviewData] = useState<UserPreview[]>([]);
-  const [finalResults, setFinalResults] = useState<{ created: number; mapped: number } | null>(null);
+  const [finalResults, setFinalResults] = useState<{ created: number; alreadyExisted: number } | null>(null);
 
   const handlePreview = async () => {
     if (!file) return;
@@ -99,11 +97,11 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
       const result = await response.json();
       sileo.success({
         title: 'Carga completada',
-        description: `${result.summary.created} nuevos creados, ${result.summary.mapped} vinculados satisfactoriamente.`,
+        description: `${result.summary.created} usuarios creados exitosamente.`,
       });
       setFinalResults({
         created: result.summary.created || 0,
-        mapped: result.summary.mapped || 0,
+        alreadyExisted: result.summary.alreadyExisted || 0,
       });
       setPreviewData([]);
     } catch (error) {
@@ -126,8 +124,9 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
   };
 
   const validCount = previewData.filter(
-    (p) => p.status === 'success' || p.status === 'warning'
+    (p) => p.status === 'success'
   ).length;
+  const warningCount = previewData.filter((p) => p.status === 'warning').length;
   const errorCount = previewData.filter((p) => p.status === 'error').length;
 
   return (
@@ -163,9 +162,10 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                   <li>nombre</li>
                   <li>documento</li>
                   <li>correo</li>
-                  <li>asignatura (código existente)</li>
-                  <li>grupo (código existente)</li>
                 </ul>
+                <p className="text-[10px] mt-2 text-muted-foreground/80">
+                  La asignaci&oacute;n a grupos se realiza en Planeador &gt; Ajustes.
+                </p>
               </div>
             </div>
           </CardContent>
@@ -182,7 +182,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
             <div className="flex gap-2 mt-4 flex-col">
               <Button
                 onClick={handlePreview}
-                disabled={!file || isPreviewing || previewData.length > 0}
+                disabled={!file || isPreviewing}
                 className="w-full text-xs "
               >
                 {isPreviewing ? (
@@ -229,8 +229,10 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                     ¡Carga Exitosa!
                   </h3>
                   <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                    Se han procesado correctamente {finalResults.created} usuarios nuevos y
-                    vinculado {finalResults.mapped} registros en el sistema.
+                    Se crearon {finalResults.created} usuarios nuevos en el sistema.
+                    {finalResults.alreadyExisted > 0 && (
+                      <> {finalResults.alreadyExisted} ya exist&iacute;an previamente.</>
+                    )}
                   </p>
                 </div>
                 <Button onClick={handleNewUpload} variant="outline" className="mt-4  text-xs">
@@ -249,9 +251,6 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                         <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                           Usuario
                         </TableHead>
-                        <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground hidden sm:table-cell">
-                          Asignación
-                        </TableHead>
                         <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                           Mensaje
                         </TableHead>
@@ -268,7 +267,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                                 variant="outline"
                                 className="text-[8px] bg-amber-500/10 text-amber-600 border-amber-500/20 px-1.5 py-0 h-4"
                               >
-                                Vínculo
+                                Existe
                               </Badge>
                             ) : (
                               <Badge
@@ -286,18 +285,6 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                               </span>
                               <span className="text-[10px] text-muted-foreground font-mono mt-1">
                                 {row.document}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-xs px-4 py-3 hidden sm:table-cell">
-                            <div className="flex flex-col gap-1">
-                              <span className="text-[11px] text-muted-foreground">
-                                <span className="font-semibold text-foreground">Asig:</span>{' '}
-                                <span className="font-mono">{row.subjectCode}</span>
-                              </span>
-                              <span className="text-[11px] text-muted-foreground">
-                                <span className="font-semibold text-foreground">Grp:</span>{' '}
-                                <span className="font-mono">{row.groupCode}</span>
                               </span>
                             </div>
                           </TableCell>
@@ -319,10 +306,10 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                   <Upload className="h-10 w-10 text-muted-foreground/40" />
                 </div>
                 <h4 className="text-[17px] font-semibold tracking-card text-foreground mb-1">
-                  Sin información para cargar
+                  Sin informaci&oacute;n para cargar
                 </h4>
                 <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                  Sube un archivo CSV para ver los datos aquí.
+                  Sube un archivo CSV para ver los datos aqu&iacute;.
                 </p>
               </div>
             )}
@@ -332,8 +319,9 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-foreground">Resumen de carga</span>
                   <span className="text-[11px] text-muted-foreground">
-                    {validCount} usuario{validCount !== 1 ? 's' : ''} listo
-                    {validCount !== 1 ? 's' : ''} para importar/vincular
+                    {validCount} usuario{validCount !== 1 ? 's' : ''} nuevo
+                    {validCount !== 1 ? 's' : ''} para crear
+                    {warningCount > 0 && ` · ${warningCount} ya existe${warningCount !== 1 ? 'n' : ''}`}
                     {errorCount > 0 && ` · ${errorCount} con errores`}
                   </span>
                 </div>
@@ -348,7 +336,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                       Procesando...
                     </>
                   ) : (
-                    'Confirmar y Cargar'
+                    'Confirmar y Crear'
                   )}
                 </Button>
               </div>

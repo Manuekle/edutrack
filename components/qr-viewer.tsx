@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Check, Clock, Copy, Loader2, Maximize2, RefreshCw } from 'lucide-react';
+import { Check, Clock, Copy, Maximize2, RefreshCw } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { useEffect, useRef, useState } from 'react';
 import { sileo } from 'sileo';
@@ -10,37 +10,60 @@ import { sileo } from 'sileo';
 interface QRViewerProps {
   qrUrl: string;
   qrToken: string;
-  expiresIn: number | null;
+  expiresAt?: string | Date | null;
   onRefresh?: () => void;
-  onClose: () => void;
+  onClose?: () => void;
   isRefreshing?: boolean;
 }
 
 export function QRViewer({
   qrUrl,
   qrToken,
-  expiresIn,
+  expiresAt = null,
   onRefresh,
   onClose,
   isRefreshing = false,
 }: QRViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  // Removed unused isDarkMode state as it's not being used in the component
   const [copied, setCopied] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const qrContainerRef = useRef<HTMLDivElement>(null);
 
-  const qrSize = isFullscreen ? 400 : 240;
+  const qrSize = isFullscreen ? 500 : 260;
 
-  // Removed unused dark mode detection effect
+  useEffect(() => {
+    if (!expiresAt) {
+      setTimeLeft(null);
+      return;
+    }
+
+    const calculateTimeLeft = () => {
+      try {
+        const target = new Date(expiresAt).getTime();
+        const now = Date.now();
+        const diff = Math.max(0, Math.floor((target - now) / 1000));
+        setTimeLeft(diff);
+        return diff;
+      } catch (e) {
+        return 0;
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(() => {
+      const remaining = calculateTimeLeft();
+      if (remaining <= 0) clearInterval(timer);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [expiresAt]);
 
   const toggleFullscreen = () => {
     if (!qrContainerRef.current) return;
     if (!document.fullscreenElement) {
       qrContainerRef.current.requestFullscreen().catch(() => { });
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 
@@ -51,7 +74,7 @@ export function QRViewer({
   }, []);
 
   const formatTime = (seconds: number | null) => {
-    if (seconds === null) return '00:00';
+    if (seconds === null || seconds < 0) return '00:00';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
@@ -61,110 +84,100 @@ export function QRViewer({
     try {
       await navigator.clipboard.writeText(qrToken);
       setCopied(true);
-      sileo.success({ title: 'Código copiado al portapapeles' });
+      sileo.success({ title: 'Copiado' });
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      sileo.error({ title: 'No se pudo copiar el código' });
-    }
+    } catch (error) { }
   };
 
   return (
     <div
       ref={qrContainerRef}
       className={cn(
-        'transition-all duration-300',
-        isFullscreen
-          ? 'bg-white dark:bg-black w-screen h-screen fixed inset-0 z-50 flex items-center justify-center'
-          : 'bg-background rounded-xl shadow-sm dark:shadow-lg w-full max-w-md mx-auto p-8 flex flex-col items-center justify-center'
+        'flex flex-col items-center justify-center w-full',
+        isFullscreen ? 'bg-white dark:bg-[#0a0a0a] fixed inset-0 z-[60] p-10' : ''
       )}
     >
-      {isFullscreen ? (
-        // Solo QR en pantalla completa
-        <QRCodeCanvas value={qrUrl} size={qrSize} level="H" fgColor="#000000" bgColor="#ffffff" />
-      ) : (
-        // Vista normal con todos los elementos
-        <>
-          {/* QR Code */}
-          <div className="relative mb-8">
-            <div className="bg-card border border-border p-4 rounded-lg shadow-sm">
-              <QRCodeCanvas
-                value={qrUrl}
-                size={qrSize}
-                level="H"
-                fgColor="#000000"
-                bgColor="#ffffff"
-              />
+      <div className="flex flex-col items-center w-full max-w-[340px] space-y-6">
+        {/* QR Frame - Standard Centered */}
+        <div className={cn(
+          "bg-white p-6 rounded-2xl shadow-sm border border-border/40 transition-all",
+          isFullscreen ? "scale-110" : "scale-100"
+        )}>
+          {qrUrl ? (
+            <QRCodeCanvas
+              value={qrUrl}
+              size={qrSize}
+              level="M"
+              fgColor="#000000"
+              bgColor="#ffffff"
+            />
+          ) : (
+            <div className="flex items-center justify-center bg-muted/20" style={{ width: qrSize, height: qrSize }}>
+              <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            </div>
+          )}
+        </div>
+
+        {/* Info & Controls */}
+        {!isFullscreen && (
+          <div className="w-full space-y-5">
+            <div className="flex flex-col items-center gap-2">
+              <div className={cn(
+                "flex items-center gap-2 px-4 py-1.5 rounded-full border shadow-sm transition-all duration-300",
+                (timeLeft !== null && timeLeft <= 30)
+                  ? "bg-destructive/10 border-destructive/20 text-destructive animate-pulse"
+                  : "bg-primary/5 border-primary/10 text-primary"
+              )}>
+                <Clock className="w-3.5 h-3.5" />
+                <span className="font-mono text-sm font-black tracking-card leading-none">
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
             </div>
 
-            {/* Timer */}
-            {expiresIn !== null && (
-              <div className="absolute -top-5 -right-5 bg-background border rounded-full px-3 py-1 shadow-sm">
-                <div className="flex items-center gap-1 text-xs">
-                  <Clock className="w-3 h-3" />
-                  <span className="font-mono">{formatTime(expiresIn)}</span>
-                </div>
+            <div className="px-4 py-2 bg-muted/40 rounded-full border border-border/20">
+              <div className="flex items-center justify-between gap-3">
+                <code className="font-mono text-sm font-bold tracking-card text-foreground truncate select-all">
+                  {qrToken || '........'}
+                </code>
+                <Button variant="ghost" size="icon" onClick={copyToken} className="h-8 w-8 shrink-0 hover:bg-background">
+                  {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5 opacity-60" />}
+                </Button>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Manual Code */}
-          <div className="w-full mb-6 space-y-3">
-            <div className="relative">
-              <div className="font-mono text-center p-3 pr-10 bg-muted rounded-lg text-xs break-all select-all">
-                {qrToken}
-              </div>
-              <div className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8">
+            {/* Action Buttons Integrated */}
+            <div className="flex flex-col gap-2 pt-2">
+              <div className="grid grid-cols-2 gap-2">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="default"
-                  onClick={copyToken}
-                  className="h-8 w-8 p-0 relative overflow-visible"
+                  onClick={toggleFullscreen}
+                  className="rounded-full text-xs font-bold uppercase border-muted-foreground/20"
                 >
-                  <div
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
-                        ? 'translate-y-0 opacity-100'
-                        : '-translate-y-2 opacity-0 pointer-events-none'
-                      }`}
-                  >
-                    <Check className="h-3 w-3 text-green-500" />
-                  </div>
-                  <div
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 transform ${copied
-                        ? 'translate-y-2 opacity-0 pointer-events-none'
-                        : 'translate-y-0 opacity-100'
-                      }`}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </div>
+                  <Maximize2 className="h-3.5 w-3.5 mr-2" />
+                  Pantalla
                 </Button>
+
+                {onRefresh && (
+                  <Button
+                    variant="default"
+                    size="default"
+                    onClick={onRefresh}
+                    disabled={isRefreshing}
+                    className="rounded-full text-xs font-bold uppercase border-muted-foreground/20"
+                  >
+                    <RefreshCw className={cn("h-3.5 w-3.5 mr-2", isRefreshing && "animate-spin")} />
+                    Renovar
+                  </Button>
+                )}
               </div>
+
+
             </div>
           </div>
-
-          {/* Actions */}
-          <div className="w-full space-y-3">
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" size="default" onClick={toggleFullscreen}>
-                <Maximize2 className="h-4 w-4" />
-              </Button>
-
-              {onRefresh && (
-                <Button variant="outline" size="default" onClick={onRefresh} disabled={isRefreshing}>
-                  {isRefreshing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4" />
-                  )}
-                </Button>
-              )}
-            </div>
-
-            <Button onClick={onClose} className="w-full font-semibold">
-              Finalizar
-            </Button>
-          </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }

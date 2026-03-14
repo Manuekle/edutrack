@@ -1,4 +1,4 @@
-documento,nombre,apellido,correo,grupo
-1001,Pedro,Rodriguez,pedro.rodriguez@est.fup.edu.co,A
-1002,Ana,Lopez,ana.lopez@est.fup.edu.co,A
-1003,Carlos,Martinez,carlos.martinez@est.fup.edu.co,B
+documento,nombre,correo
+1001,Pedro Rodriguez,pedro.rodriguez@est.fup.edu.co
+1002,Ana Lopez,ana.lopez@est.fup.edu.co
+1003,Carlos Martinez,carlos.martinez@est.fup.edu.co

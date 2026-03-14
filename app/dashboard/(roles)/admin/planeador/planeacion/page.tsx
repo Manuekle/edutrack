@@ -104,7 +104,7 @@ export default function PlaneacionPage() {
 
     setGenerating(true);
     try {
-      await fetch(`/api/admin/planeador/planeacion`, {
+      const res = await fetch(`/api/admin/planeador/planeacion`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,6 +112,11 @@ export default function PlaneacionPage() {
           startDate: finalFechaInicio.toISOString(),
         }),
       });
+      const data = await res.json();
+      if (!res.ok) {
+        sileo.error({ description: data.error ?? 'Error al generar planeación' });
+        return;
+      }
       sileo.success({ description: 'Planeación de 16 semanas generada' });
       setSelectedGrupo('');
       load();
@@ -149,7 +154,7 @@ export default function PlaneacionPage() {
   return (
     <div className="space-y-6">
       {/* Encabezado */}
-      <div className="mb-8">
+      <div className="">
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2 text-foreground">
           Planeación del semestre
         </h1>
@@ -277,7 +282,7 @@ export default function PlaneacionPage() {
                           <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
                         )}
                         <span className="font-mono text-muted-foreground mr-1 text-xs">
-                          [{g.codigo}]
+                          [Grupo: {g.codigo}]
                         </span>
                         <span className="font-medium truncate text-sm">{g.subject.name}</span>
                       </span>
@@ -460,7 +465,7 @@ export default function PlaneacionPage() {
                           variant="outline"
                           className="font-mono text-[9px] uppercase font-semibold tracking-card rounded-full px-2 py-0 w-fit"
                         >
-                          {g.codigo}
+                          Grupo: {g.codigo}
                         </Badge>
                       </div>
 

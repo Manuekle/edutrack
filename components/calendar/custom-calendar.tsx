@@ -181,7 +181,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                       </p>
                       {heightPx >= 48 && (
                         <p className="text-[10px] font-medium opacity-70 truncate mt-0.5">
-                          {event.reason || event.room}
+                          Grupo: {event.reason || event.room}
                         </p>
                       )}
                       {heightPx >= 64 && (

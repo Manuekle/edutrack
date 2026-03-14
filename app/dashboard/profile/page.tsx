@@ -32,6 +32,7 @@ import { uploadSignature } from '@/lib/actions/user.actions';
 import { Loader2, Lock, PenLine, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { sileo } from 'sileo';
@@ -85,22 +86,10 @@ export default function ProfilePage() {
   // Signature
   const [signatureFile, setSignatureFile] = useState<File | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
-  const [signaturePenColor, setSignaturePenColor] = useState<string>('#171717');
+  const [signaturePenColor] = useState<string>('#000000');
 
   const sigCanvas = useRef<SignatureCanvas>(null);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
-
-  // Color del trazo según tema (canvas no resuelve CSS vars; debe ser color válido para verse en light/dark)
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    const root = document.documentElement;
-    const apply = () =>
-      setSignaturePenColor(root.classList.contains('dark') ? '#e5e5e5' : '#171717');
-    apply();
-    const obs = new MutationObserver(apply);
-    obs.observe(root, { attributes: true, attributeFilter: ['class'] });
-    return () => obs.disconnect();
-  }, []);
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -735,7 +724,7 @@ export default function ProfilePage() {
                     <Label className="text-xs text-muted-foreground">Dibujar firma a mano</Label>
                     <div
                       ref={canvasWrapperRef}
-                      className="signature-canvas-container w-full h-[180px] rounded-xl bg-card border border-border relative overflow-hidden touch-none select-none"
+                      className="signature-canvas-container w-full h-[180px] rounded-xl bg-white border border-border relative overflow-hidden touch-none select-none"
                     >
                       <SignatureCanvas
                         ref={sigCanvas}
@@ -782,7 +771,7 @@ export default function ProfilePage() {
                             alt="Firma"
                             fill
                             style={{ objectFit: 'contain' }}
-                            className=" w-full object-contain invert dark:invert-0 transition-all"
+                            className="w-full object-contain dark:invert transition-all"
                           />
                         </div>
                       ) : (

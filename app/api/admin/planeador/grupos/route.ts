@@ -26,6 +26,13 @@ export async function GET(req: NextRequest) {
           },
         },
         room: { select: { id: true, name: true } },
+        planning: {
+          select: {
+            id: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
         _count: { select: { students: true } },
         ...(includePlaneacion
           ? {
@@ -48,18 +55,22 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
     const groupsWithDocentes = groups.map(g => {
-      const { teachers, schedule, room, code, academicPeriod, ...rest } = g;
+      const { teachers, schedule, room, code, academicPeriod, studentIds, shift, planning, ...rest } = g;
       return {
         ...rest,
         codigo: code,
         periodoAcademico: academicPeriod,
         docentes: teachers,
+        estudianteIds: studentIds,
+        shift,
+        planning,
         horario: schedule
           ? {
               ...schedule,
               diaSemana: schedule.dayOfWeek,
               horaInicio: schedule.startTime,
               horaFin: schedule.endTime,
+              room: schedule.room,
             }
           : null,
         sala: room,

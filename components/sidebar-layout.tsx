@@ -406,14 +406,22 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
     // Función para verificar si una ruta coincide con un patrón de ruta dinámica
     const isMatchingRoute = (routePattern: string, currentPath: string) => {
-      // Si la ruta incluye [id], la convertimos en un patrón de expresión regular
-      if (routePattern.includes('[id]')) {
-        const pattern = routePattern.replace(/\[id\]/g, '[^/]+');
-        const regex = new RegExp(`^${pattern}(?:/|$)`);
+      if (routePattern.includes('[')) {
+        const pattern = routePattern.replace(/\[[^\]]+\]/g, '[^/]+');
+        const regex = new RegExp(`^${pattern}$`);
         return regex.test(currentPath);
       }
-      // Para rutas estáticas, comparación normal
       return currentPath === routePattern || currentPath.startsWith(`${routePattern}/`);
+    };
+
+    // Resolver patrones dinámicos ([id], [classId], etc.) a URLs reales
+    const resolveHref = (routePattern: string, currentPath: string): string => {
+      if (!routePattern.includes('[')) return routePattern;
+      const patternParts = routePattern.split('/');
+      const pathParts = currentPath.split('/');
+      return patternParts
+        .map((part, i) => (/^\[.+\]$/.test(part) ? pathParts[i] ?? part : part))
+        .join('/');
     };
 
     // Encontrar el enlace que mejor coincida con la ruta actual
@@ -432,7 +440,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       );
       if (parentLink) {
         crumbs.push({
-          href: parentLink.href,
+          href: resolveHref(parentLink.href, pathname),
           label: parentLink.label,
         });
       }
@@ -442,7 +450,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       // Solo lo añadimos si no es el home
       if (currentLink.href !== homePath) {
         crumbs.push({
-          href: currentLink.href,
+          href: resolveHref(currentLink.href, pathname),
           label: currentLink.label,
         });
       }
@@ -452,18 +460,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     if (currentLink.isSubLink || (currentLink.subLinks && pathname !== currentLink.href)) {
       // Buscar si hay un subLink activo
       const activeSubLink = currentLink.subLinks?.find(
-        subLink => pathname === subLink.href || pathname.startsWith(`${subLink.href}/`)
+        subLink => isMatchingRoute(subLink.href, pathname)
       );
 
       if (activeSubLink) {
         crumbs.push({
-          href: activeSubLink.href,
+          href: resolveHref(activeSubLink.href, pathname),
           label: activeSubLink.label,
         });
       } else if (currentLink.isSubLink) {
         // Si es un subLink y no hemos encontrado otro subLink más específico
         crumbs.push({
-          href: currentLink.href,
+          href: resolveHref(currentLink.href, pathname),
           label: currentLink.label,
         });
       }

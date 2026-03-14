@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
@@ -55,6 +56,7 @@ export default function MisGruposPage() {
 
   return (
     <div className="space-y-6">
+
       <div>
         <h1 className="text-2xl font-semibold tracking-card">Mis Grupos</h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -83,17 +85,12 @@ export default function MisGruposPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <Badge variant="outline" className="font-mono">
-                        {g.codigo || g.code}
+                        Grupo: {g.codigo || g.code}
                       </Badge>
                       <Badge variant="secondary">{g.periodoAcademico || g.academicPeriod}</Badge>
                     </div>
                     <CardTitle className="text-base">{g.subject.name}</CardTitle>
                     <code className="text-xs text-muted-foreground">{g.subject.code}</code>
-                    {g.subject.credits && (
-                      <span className="text-xs text-muted-foreground ml-2">
-                        · {g.subject.credits} créditos
-                      </span>
-                    )}
                   </div>
                 </div>
               </CardHeader>

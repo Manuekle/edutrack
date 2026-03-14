@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarDays, GraduationCap, Layout, User } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 interface AsignaturaEstudiante {
@@ -80,17 +81,12 @@ export default function MisAsignaturasEstudiantePage() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <Badge variant="outline" className="font-mono">
-                        {a.grupoCodigo}
+                        Grupo: {a.grupoCodigo}
                       </Badge>
                       <Badge variant="secondary">{a.periodoAcademico}</Badge>
                     </div>
                     <CardTitle className="text-base">{a.subject.name}</CardTitle>
                     <code className="text-xs text-muted-foreground">{a.subject.code}</code>
-                    {a.subject.credits && (
-                      <span className="text-xs text-muted-foreground ml-2">
-                        &middot; {a.subject.credits} cr&eacute;ditos
-                      </span>
-                    )}
                   </div>
                 </div>
               </CardHeader>

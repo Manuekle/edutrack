@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { addDays, setHours, setMinutes, startOfWeek } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { addMonths, subDays, subMonths } from 'date-fns';
 
@@ -111,7 +112,8 @@ export default function HorarioEstudiantePage() {
             </div>
             <h3 className="text-xl font-semibold text-foreground">Sin programación disponible</h3>
             <p className="text-muted-foreground mt-2 max-w-xs">
-              No se han encontrado clases registradas para este periodo académico en tu perfil de estudiante.
+              No se han encontrado clases registradas para este periodo académico en tu perfil de
+              estudiante.
             </p>
           </CardContent>
         </Card>
