@@ -34,14 +34,21 @@ function calculateHours(start?: Date | null, end?: Date | null) {
   return String(Math.max(0, hours));
 }
 
-function isFinalizada(status: string, endTime?: Date | null) {
-  if (status !== 'PROGRAMADA') return false;
-  if (!endTime) return false;
-  return new Date(endTime).getTime() < Date.now();
+function isFinalizada(status: string, date: Date, endTime?: Date | null) {
+  if (status !== 'SCHEDULED' && status !== 'PROGRAMADA') return false;
+  // If we have endTime, compare exactly. Otherwise, check if today is past the class date.
+  if (endTime) {
+    return new Date(endTime).getTime() < Date.now();
+  }
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d.getTime() < Date.now();
 }
 
 function shouldShowSignature(status: string) {
-  return status === 'REALIZADA' || status === 'CANCELADA';
+  if (!status) return false;
+  const s = status.toUpperCase();
+  return s === 'SIGNED' || s === 'COMPLETED';
 }
 
 export default async function PreviewPage({ params }: PageProps) {
@@ -57,6 +64,9 @@ export default async function PreviewPage({ params }: PageProps) {
   const grupoData = await db.group.findUnique({
     where: { id },
     include: {
+      teachers: {
+        select: { id: true, name: true, signatureUrl: true },
+      },
       subject: {
         include: {
           teachers: {
@@ -130,8 +140,14 @@ export default async function PreviewPage({ params }: PageProps) {
     );
   }
 
-  const teacherName = subject.teachers[0]?.name ?? 'Docente';
-  const signatureUrl = subject.teachers[0]?.signatureUrl ?? null;
+  // Consolidar docentes (dar prioridad a los del grupo)
+  const allTeachers = [
+    ...(grupoData?.teachers ?? []),
+    ...(subject?.teachers ?? [])
+  ];
+
+  const teacherName = allTeachers[0]?.name ?? 'Docente';
+  const signatureUrl = allTeachers[0]?.signatureUrl ?? null;
 
   const today = new Date();
   const metaMonthYear = today.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
@@ -191,7 +207,7 @@ export default async function PreviewPage({ params }: PageProps) {
           </div>
 
           <div className="w-full sm:w-1/4 flex justify-center sm:justify-end">
-            <div className="text-[10px] border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-950 overflow-hidden shadow-sm">
+            <div className="text-[10px] border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
               <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
                 <span className="font-bold text-slate-500 uppercase tracking-card">Código:</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">FO-DO-005</span>
@@ -313,7 +329,7 @@ export default async function PreviewPage({ params }: PageProps) {
                 {classesToRender.map((cls, idx) => {
                   const dateObj = new Date(cls.date);
                   const showSignature = shouldShowSignature(cls.status);
-                  const finalizada = isFinalizada(cls.status, cls.endTime);
+                  const finalizada = isFinalizada(cls.status, dateObj, cls.endTime);
 
                   return (
                     <div
@@ -353,32 +369,32 @@ export default async function PreviewPage({ params }: PageProps) {
 
                       <div className="flex items-center justify-center p-2">
                         {showSignature && signatureUrl ? (
-                          <div className="bg-white dark:bg-slate-100 p-1 rounded border border-slate-100 shadow-sm">
+                          <div className="flex items-center justify-center w-full h-full p-1">
                             <Image
                               src={signatureUrl}
                               alt="Firma docente"
                               width={120}
                               height={40}
-                              className="h-9 w-auto object-contain mix-blend-multiply"
+                              className="h-9 w-full object-contain invert dark:invert-0 transition-all"
                             />
                           </div>
                         ) : (
                           <div
-                            className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-card ${cls.status === 'PROGRAMADA'
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-card ${(cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA')
                               ? finalizada
-                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                                : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                              : cls.status === 'REALIZADA'
-                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+                                ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-400' // Finalizada
+                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' // Programada
+                              : (cls.status === 'SIGNED' || cls.status === 'COMPLETED')
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' // Firmada
+                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400' // Cancelada
                               }`}
                           >
-                            {cls.status === 'PROGRAMADA'
+                            {(cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA')
                               ? finalizada
                                 ? 'Finalizada'
                                 : 'Programada'
-                              : cls.status === 'REALIZADA'
-                                ? 'Verificada'
+                              : (cls.status === 'SIGNED' || cls.status === 'COMPLETED')
+                                ? 'Firmada'
                                 : 'Cancelada'}
                           </div>
                         )}

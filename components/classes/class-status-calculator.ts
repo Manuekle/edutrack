@@ -70,7 +70,7 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
   const isTodayFinished = !!(isToday && classEndTime && now > classEndTime);
 
   let visualStatus: string = cls.status;
-  if (cls.status === 'PROGRAMADA') {
+  if (cls.status === 'PROGRAMADA' || cls.status === 'SCHEDULED') {
     if (isWithinClassTime || isWithinEarlyBuffer) {
       visualStatus = 'EN_CURSO';
     } else if (isTodayFinished || isPast) {
@@ -78,17 +78,33 @@ export function calculateClassStatus(cls: ClassWithStatus, dateUtils: DateUtils)
     }
   }
 
-  const isProgramada = cls.status === 'PROGRAMADA';
+  const isProgramada = cls.status === 'PROGRAMADA' || cls.status === 'SCHEDULED';
   const isEnCurso = visualStatus === 'EN_CURSO';
+  const isFinalizada = visualStatus === 'FINALIZADA' || cls.status === 'SIGNED' || cls.status === 'COMPLETED';
 
-  const canEdit = !!(isProgramada && (isFuture || isScheduledForToday));
-  const canCancel = !!(isProgramada && (isFuture || isScheduledForToday));
-  const canMarkAsDone = !!((isProgramada || isEnCurso) && (isToday || isPast));
+  // canEdit: Always true for scheduled future classes, or today's classes
+  const canEdit = !!(isProgramada && (isFuture || isToday));
+  
+  // canCancel: Only for scheduled classes in the future or today
+  const canCancel = !!(isProgramada && (isFuture || isToday));
+  
+  // canMarkAsDone: True if it's not cancelled and not already completed/signed, and it's today or past
+  const canMarkAsDone = !!(
+    cls.status !== 'CANCELADA' && 
+    cls.status !== 'CANCELLED' && 
+    cls.status !== 'SIGNED' &&
+    cls.status !== 'COMPLETED' &&
+    (isToday || isPast)
+  );
+
+  // canTakeAttendance: More permissive - allow for any non-cancelled class that is today or past
+  // (Teachers often need to take attendance after the class finishes, but NOT after signing)
   const canTakeAttendance = !!(
-    (isWithinClassTime || isWithinEarlyBuffer) &&
-    (isProgramada || isEnCurso) &&
-    cls.status !== 'REALIZADA' &&
-    cls.status !== 'CANCELADA'
+    cls.status !== 'CANCELADA' && 
+    cls.status !== 'CANCELLED' && 
+    cls.status !== 'SIGNED' &&
+    cls.status !== 'COMPLETED' &&
+    (isToday || isPast)
   );
 
   return {

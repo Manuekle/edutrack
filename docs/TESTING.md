@@ -12,7 +12,7 @@
 
 - ✅ Criterios de aceptación claros y verificables
 - ✅ Test cases identificados (positivo, negativo, límite)
-- ✅ Estimación realizada (story points)
+- ✅ Estimación SIGNED (story points)
 - ✅ Dependencias identificadas y resueltas
 - ✅ Aceptado por Product Owner
 - ✅ No tiene bloqueos técnicos

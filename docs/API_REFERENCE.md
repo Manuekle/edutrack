@@ -592,7 +592,7 @@ curl -X POST http://localhost:3000/api/docente/clases/clase001/asistencia/manual
 
 ### POST /api/docente/clases/:id/actividades
 
-**Descripción:** Registrar actividades realizadas en la clase
+**Descripción:** Registrar actividades SIGNEDs en la clase
 
 **Requerimientos:** Rol DOCENTE
 

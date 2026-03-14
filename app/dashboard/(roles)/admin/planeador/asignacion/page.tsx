@@ -39,7 +39,7 @@ interface Grupo {
 interface Estudiante {
   id: string;
   name: string;
-  codigoEstudiantil: string | null;
+  studentCode: string | null;
   correoInstitucional: string | null;
 }
 
@@ -193,7 +193,7 @@ export default function AsignacionPage() {
   const filteredStudents = students.filter(
     s =>
       s.name?.toLowerCase().includes(studentSearch.toLowerCase()) ||
-      s.codigoEstudiantil?.toLowerCase().includes(studentSearch.toLowerCase())
+      s.studentCode?.toLowerCase().includes(studentSearch.toLowerCase())
   );
 
   return (
@@ -489,7 +489,7 @@ export default function AsignacionPage() {
                                 {s.name}
                               </p>
                               <p className="text-[11px] text-muted-foreground truncate">
-                                {s.codigoEstudiantil ??
+                                {s.studentCode ??
                                   s.correoInstitucional ??
                                   'Sin código matriculado'}
                               </p>

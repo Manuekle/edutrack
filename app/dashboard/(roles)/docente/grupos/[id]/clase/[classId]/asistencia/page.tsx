@@ -55,7 +55,7 @@ type ClassInfo = {
   startTime?: string;
   endTime?: string;
   topic: string;
-  status: 'PROGRAMADA' | 'REALIZADA' | 'CANCELADA';
+  status: 'PROGRAMADA' | 'SIGNED' | 'CANCELADA';
   subject: {
     name: string;
   };
@@ -134,7 +134,7 @@ export default function AttendancePage() {
         ? now < new Date(classStartDate.getTime() - bufferMs)
         : false;
       const isPast = classEndDate ? now > new Date(classEndDate.getTime() + bufferMs) : false;
-      const isCompleted = classData.status === 'REALIZADA' || classData.status === 'CANCELADA';
+      const isCompleted = classData.status === 'SIGNED' || classData.status === 'CANCELADA';
 
       setIsClassPast(isPast);
       setIsClassTooEarly(isTooEarly);
@@ -300,7 +300,7 @@ export default function AttendancePage() {
         </div>
         {isClassPast && (
           <Badge variant="outline" className="text-xs font-normal">
-            Realizada
+            SIGNED
           </Badge>
         )}
       </div>

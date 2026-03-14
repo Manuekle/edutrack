@@ -1,69 +1,100 @@
+/**
+ * SIRA - Class Management API
+ * Fixed: Resolving Turbopack parsing error by cleaning structure.
+ */
+
 import ClassCancellationEmail from '@/app/emails/ClassCancellationEmail';
 import { authOptions } from '@/lib/auth';
 import { clearSubjectCache } from '@/lib/cache';
 import { sendEmail } from '@/lib/email';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import React from 'react';
 import { DocenteClaseDetailSchema, DocenteClaseUpdateSchema } from './schema';
 
+// --- Helpers ---
+
 async function verifyTeacherOwnership(classId: string, teacherId: string) {
-  const classWithSubject = await db.class.findUnique({
+  const classWithRelations = await db.class.findUnique({
     where: { id: classId },
-    include: { subject: true },
+    include: { 
+      subject: { select: { teacherIds: true } },
+      group: { select: { teacherIds: true } }
+    },
   });
 
-  if (!classWithSubject || !classWithSubject.subject.teacherIds.includes(teacherId)) {
-    return false;
-  }
-  return true;
+  if (!classWithRelations) return false;
+
+  const inSubject = classWithRelations.subject?.teacherIds?.includes(teacherId) || false;
+  const inGroup = classWithRelations.group?.teacherIds?.includes(teacherId) || false;
+
+  return inSubject || inGroup;
 }
 
+const parseLocalDate = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const combineDateTime = (date: Date, timeStr: string): Date => {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  const combined = new Date(date);
+  combined.setHours(hours, minutes, 0, 0);
+  return combined;
+};
+
+// --- Handlers ---
+
 // GET: Obtener los detalles de una clase específica
-export async function GET(request: Request, { params }: { params: Promise<{ classId: string }> }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ classId: string }> }) {
   const { classId } = await params;
   const session = await getServerSession(authOptions);
+  
   if (!session?.user || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 403 });
   }
+  
   const teacherId = session.user.id;
 
   try {
-    // Obtener la clase con el subject relacionado
     const classInfo = await db.class.findUnique({
       where: { id: classId },
       include: {
-        subject: true,
+        subject: { select: { id: true, name: true, teacherIds: true } },
+        group: { select: { id: true, teacherIds: true } },
       },
     });
 
-    // Verificar que la clase exista y pertenezca al docente
-    if (!classInfo || !classInfo.subject.teacherIds.includes(teacherId)) {
+    const hasAccess = 
+      classInfo && 
+      (classInfo.subject?.teacherIds?.includes(teacherId) || 
+       classInfo.group?.teacherIds?.includes(teacherId));
+
+    if (!hasAccess) {
       return NextResponse.json(
         { message: 'Clase no encontrada o no pertenece al docente' },
         { status: 404 }
       );
     }
 
-    // Validar y formatear la respuesta
     const validated = DocenteClaseDetailSchema.safeParse(classInfo);
     if (!validated.success) {
       return NextResponse.json(
-        {
-          message: 'Error de validación en la respuesta',
-          errors: validated.error.issues,
-        },
+        { message: 'Error de validación en la respuesta', errors: validated.error.issues },
         { status: 500 }
       );
     }
+    
     return NextResponse.json({ data: validated.data });
-  } catch {
+  } catch (error) {
+    console.error(`[API] Error in GET class ${classId}:`, error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
-// HU-009: Actualizar una clase
+// PUT: Actualizar una clase
 export async function PUT(request: Request, { params }: { params: Promise<{ classId: string }> }) {
   const { classId } = await params;
   const session = await getServerSession(authOptions);
@@ -90,115 +121,79 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
 
     const { date, startTime, endTime, topic, description, status, reason } = result.data;
 
-    // Parse date string to local Date object (YYYY-MM-DD format)
-    const parseLocalDate = (dateStr: string): Date => {
-      const [year, month, day] = dateStr.split('-').map(Number);
-      return new Date(year, month - 1, day);
-    };
-
-    // Parse time string and combine with date (HH:MM format)
-    const combineDateTime = (date: Date, timeStr: string): Date => {
-      const [hours, minutes] = timeStr.split(':').map(Number);
-      const combined = new Date(date);
-      combined.setHours(hours, minutes, 0, 0);
-      return combined;
-    };
-
-    // Prepare date and time updates
     let parsedDate: Date | undefined;
     let parsedStartTime: Date | undefined;
     let parsedEndTime: Date | undefined;
 
     if (date) {
       parsedDate = parseLocalDate(date);
-
-      // If we have a new date, we need to update start/end times with the new date
-      if (startTime) {
-        parsedStartTime = combineDateTime(parsedDate, startTime);
-      }
-      if (endTime) {
-        parsedEndTime = combineDateTime(parsedDate, endTime);
-      }
-    } else {
-      // If no date change, but time changes, use existing date
-      if (startTime || endTime) {
-        const existingClass = await db.class.findUnique({
-          where: { id: classId },
-          select: { date: true },
-        });
-
-        if (existingClass) {
-          if (startTime) {
-            parsedStartTime = combineDateTime(existingClass.date, startTime);
-          }
-          if (endTime) {
-            parsedEndTime = combineDateTime(existingClass.date, endTime);
-          }
-        }
+      if (startTime) parsedStartTime = combineDateTime(parsedDate, startTime);
+      if (endTime) parsedEndTime = combineDateTime(parsedDate, endTime);
+    } else if (startTime || endTime) {
+      const existingClass = await db.class.findUnique({
+        where: { id: classId },
+        select: { date: true },
+      });
+      if (existingClass) {
+        if (startTime) parsedStartTime = combineDateTime(existingClass.date, startTime);
+        if (endTime) parsedEndTime = combineDateTime(existingClass.date, endTime);
       }
     }
 
-    // Handle class cancellation notification
+    // Email Notification logic
     if (status === 'CANCELLED' && reason) {
       const classToCancel = await db.class.findUnique({
         where: { id: classId },
         include: {
-          subject: {
-            include: {
-              teachers: {
-                select: { name: true },
-              },
-            },
-          },
+          group: { select: { studentIds: true } },
+          subject: { include: { teachers: { select: { name: true } } } },
         },
       });
 
-      if (classToCancel && classToCancel.subject.studentIds.length > 0) {
-        const students = await db.user.findMany({
-          where: { id: { in: classToCancel.subject.studentIds } },
-          select: { institutionalEmail: true, personalEmail: true },
-        });
+      if (classToCancel) {
+        const allStudentIds = new Set([
+          ...(classToCancel.subject.studentIds || []),
+          ...(classToCancel.group?.studentIds || []),
+        ]);
 
-        const studentEmails = students
-          .map(s => s.institutionalEmail || s.personalEmail)
-          .filter((email): email is string => !!email);
+        if (allStudentIds.size > 0) {
+          const students = await db.user.findMany({
+            where: { id: { in: Array.from(allStudentIds) } },
+            select: { institutionalEmail: true, personalEmail: true },
+          });
 
-        if (studentEmails.length > 0) {
-          try {
-            // Create the email content once to be reused
+          const studentEmails = students
+            .map(s => s.institutionalEmail || s.personalEmail)
+            .filter((e): e is string => !!e);
+
+          if (studentEmails.length > 0) {
+            console.log(`[API] Notifying ${studentEmails.length} students about cancellation`);
             const teacherName = classToCancel.subject.teachers[0]?.name || 'El docente';
             const emailComponent = React.createElement(ClassCancellationEmail, {
               subjectName: classToCancel.subject.name,
-              teacherName: teacherName,
+              teacherName,
               classDate: classToCancel.date.toISOString(),
-              reason: reason,
+              reason,
               supportEmail: process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co',
+              loginUrl: `${process.env.NEXTAUTH_URL}/login`,
             });
 
-            // Send email to all students
-            const emailPromises = studentEmails.map(studentEmail =>
+            const emailPromises = studentEmails.map(to =>
               sendEmail({
-                to: studentEmail,
+                to,
                 subject: `Clase Cancelada: ${classToCancel.subject.name}`,
                 react: emailComponent,
-              }).catch(error => {
-                return { success: false, email: studentEmail, error };
+              }).catch(err => {
+                console.error(`[API] Failed email to ${to}:`, err);
+                return { success: false };
               })
             );
-
-            // Wait for all emails to be sent
-            const results = await Promise.all(emailPromises);
-            const failedEmails = results.filter(r => !r.success);
-
-            if (failedEmails.length > 0) {
-            } else {
-            }
-          } catch {}
+            await Promise.all(emailPromises);
+          }
         }
       }
     }
 
-    // Update the class
     const updatedClass = await db.class.update({
       where: { id: classId },
       data: {
@@ -207,55 +202,49 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
         ...(parsedEndTime && { endTime: parsedEndTime }),
         ...(topic !== undefined && { topic }),
         ...(description !== undefined && { description }),
-        ...(status && { status }),
+        ...(status && { status: status as any }),
         ...(status === 'CANCELLED' && reason && { cancellationReason: reason }),
       },
-      include: {
-        subject: true,
-      },
+      include: { subject: true, group: true },
     });
 
-    // Validate and return the response
     const validated = DocenteClaseDetailSchema.safeParse(updatedClass);
     if (!validated.success) {
       return NextResponse.json(
-        {
-          message: 'Error de validación en la respuesta',
-          errors: validated.error.issues,
-        },
+        { message: 'Error de validación en la respuesta', errors: validated.error.issues },
         { status: 500 }
       );
     }
 
-    // CACHE: Invalidate cache for this subject
     await clearSubjectCache(updatedClass.subject.id);
+    const revalidateId = updatedClass.groupId || updatedClass.subjectId;
+    if (revalidateId) {
+      revalidatePath(`/dashboard/docente/grupos/${revalidateId}`);
+      revalidatePath(`/dashboard/docente/grupos/${revalidateId}/preview`);
+    }
 
     return NextResponse.json({ data: validated.data });
-  } catch {
-    return NextResponse.json({ message: 'Ocurrió un error interno del servidor' }, { status: 500 });
+  } catch (error) {
+    console.error(`[API] Error updating class ${classId}:`, error);
+    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
 
-// HU-009: Eliminar una clase
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ classId: string }> }
-) {
+// DELETE: Eliminar una clase
+export async function DELETE(_request: Request, { params }: { params: Promise<{ classId: string }> }) {
   const { classId } = await params;
   const session = await getServerSession(authOptions);
+  
   if (!session?.user || session.user.role !== 'DOCENTE') {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
   }
+
   const hasPermission = await verifyTeacherOwnership(classId, session.user.id);
   if (!hasPermission) {
-    return NextResponse.json(
-      { message: 'No tienes permiso para eliminar esta clase' },
-      { status: 403 }
-    );
+    return NextResponse.json({ message: 'No tienes permiso' }, { status: 403 });
   }
 
   try {
-    // Get subject ID before deleting
     const classToDelete = await db.class.findUnique({
       where: { id: classId },
       select: { subjectId: true },
@@ -265,27 +254,14 @@ export async function DELETE(
       where: { id: classId },
       include: { subject: true },
     });
-    const validated = DocenteClaseDetailSchema.safeParse(deleted);
-    if (!validated.success) {
-      return NextResponse.json(
-        {
-          message: 'Clase eliminada, pero error de validación en la respuesta',
-          errors: validated.error.issues,
-        },
-        { status: 200 }
-      );
-    }
 
-    // CACHE: Invalidate cache for this subject
     if (classToDelete) {
       await clearSubjectCache(classToDelete.subjectId);
     }
 
-    return NextResponse.json(
-      { data: validated.data, message: 'Clase eliminada con éxito' },
-      { status: 200 }
-    );
-  } catch {
+    return NextResponse.json({ message: 'Clase eliminada con éxito' });
+  } catch (error) {
+    console.error(`[API] Error deleting class ${classId}:`, error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }

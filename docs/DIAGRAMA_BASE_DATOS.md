@@ -503,7 +503,7 @@ SELECT
     c.fecha,
     c.hora_inicio,
     c.tema,
-    STRING_AGG(DISTINCT ac.tipo, ', ') as actividades_realizadas,
+    STRING_AGG(DISTINCT ac.tipo, ', ') as actividades_SIGNEDs,
     COUNT(DISTINCT ac.id) as total_actividades,
     COUNT(DISTINCT m.estudiante_id) as estudiantes_esperados
 FROM clases c

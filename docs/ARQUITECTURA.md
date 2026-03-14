@@ -18,7 +18,7 @@
 | 6 | RF-DOC-001 | Registro de clases | El docente puede registrar clases dictadas para sus asignaturas | Alta |
 | 7 | RF-DOC-002 | Registro de asistencia manual | El docente puede registrar la asistencia de estudiantes de forma manual | Alta |
 | 8 | RF-DOC-003 | Control de asistencia por QR | El docente puede generar códigos QR para control automático de asistencia | Alta |
-| 9 | RF-DOC-004 | Gestión de actividades docentes | El docente puede registrar actividades realizadas durante las clases | Media |
+| 9 | RF-DOC-004 | Gestión de actividades docentes | El docente puede registrar actividades SIGNEDs durante las clases | Media |
 | 10 | RF-DOC-005 | Consulta de asignaturas | El docente puede consultar sus asignaturas asignadas y los estudiantes matriculados | Alta |
 | 11 | RF-DOC-006 | Generación de reportes | El docente puede generar reportes de asistencia y actividades de sus asignaturas | Media |
 | 12 | RF-EST-001 | Consulta de asistencia | El estudiante puede consultar su registro de asistencia por asignatura | Alta |
@@ -189,7 +189,7 @@ pages/
 | GET | `/api/docente/clases/:id/actividades` | Listar actividades de una clase |
 | PUT | `/api/docente/clases/:id` | Finalizar clase |
 | GET | `/api/docente/reportes/asistencia` | Obtener reportes de asistencia por asignatura |
-| GET | `/api/docente/reportes/actividades` | Obtener reportes de actividades realizadas |
+| GET | `/api/docente/reportes/actividades` | Obtener reportes de actividades SIGNEDs |
 
 ##### **Endpoints de Estudiante**
 

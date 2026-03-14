@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { authOptions } from '@/lib/auth';
 import { clearSubjectCache } from '@/lib/cache';
 import { db } from '@/lib/prisma';
@@ -73,18 +75,10 @@ export async function GET(request: Request) {
     }
 
     // Clases: filtrado por grupo si es aplicable
-    // Usamos el filtro de semana -> planeacion para evitar duplicados huérfanos
     const classes = await db.class.findMany({
       where: {
         ...(groupIdRef 
-          ? { 
-              groupId: groupIdRef,
-              week: {
-                planning: {
-                  groupId: groupIdRef
-                }
-              }
-            } 
+          ? { groupId: groupIdRef } 
           : { subjectId: subjectIdRef }
         ),
       },
@@ -95,24 +89,28 @@ export async function GET(request: Request) {
       include: {
         subject: { select: { name: true, code: true } },
         group: { include: { schedule: true } }, // Include group schedule
+        logbook: true, // Include logbook for topics
       },
     });
     const now = new Date();
 
-    const classesToUpdate: string[] = [];
+    // No auto-update status anymore. Teacher must sign manually.
     const formatted = classes.map(cls => {
+      // Use endTime or startTime or just the date as base for "past" check
       const classEndTime = cls.endTime || cls.startTime || cls.date;
       const isPast = new Date(classEndTime) < now;
 
-      if (isPast && !cls.status) {
-        classesToUpdate.push(cls.id);
-      }
+      // Maintain original status
+      const currentStatus = cls.status || 'SCHEDULED';
 
-      // Fallback logic for uninitialized times (midnight UTC)
+      // Sync topic with logbook if class topic is null
+      const logbookTopic = cls.logbook?.executedTopic || cls.logbook?.plannedTopic;
+      const finalTopic = cls.topic || logbookTopic || null;
+
+      // Fallback logic for uninitialized times
       let finalStartTime = cls.startTime;
       let finalEndTime = cls.endTime;
-
-      // Check if startTime is exactly at midnight UTC
+      // ... (rest of the time logic remains same)
       const isStartTimeMidnight = cls.startTime && 
         cls.startTime.getUTCHours() === 0 && 
         cls.startTime.getUTCMinutes() === 0;
@@ -141,10 +139,10 @@ export async function GET(request: Request) {
         date: cls.date,
         startTime: finalStartTime,
         endTime: finalEndTime,
-        topic: cls.topic,
+        topic: finalTopic,
         description: cls.description,
         classroom: cls.classroom,
-        status: (isPast && !cls.status ? 'COMPLETED' : cls.status) || 'SCHEDULED',
+        status: currentStatus,
         cancellationReason: cls.cancellationReason,
         totalStudents: cls.totalStudents,
         presentCount: cls.presentCount,
@@ -158,12 +156,7 @@ export async function GET(request: Request) {
       };
     });
 
-    if (classesToUpdate.length > 0) {
-      await db.class.updateMany({
-        where: { id: { in: classesToUpdate } },
-        data: { status: 'COMPLETED' as any },
-      });
-    }
+    // Validation of the response
 
     const validados = z.array(DocenteClaseSchema).safeParse(formatted);
     if (!validados.success) {

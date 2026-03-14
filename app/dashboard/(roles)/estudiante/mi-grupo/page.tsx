@@ -20,7 +20,7 @@ interface MiGrupoData {
       periodicidad: string;
     } | null;
     sala: { name: string; type: string; capacity: number | null } | null;
-    estudiantes: { id: string; name: string; codigoEstudiantil: string | null }[];
+    estudiantes: { id: string; name: string; studentCode: string | null }[];
   }[];
 }
 
@@ -237,7 +237,7 @@ export default function MiGrupoPage() {
                         </div>
                         <div className="shrink-0 text-right">
                           <code className="text-[12px] text-muted-foreground bg-muted/30 px-2 py-1 rounded-md">
-                            {e.codigoEstudiantil ?? 'Sin código'}
+                            {e.studentCode ?? 'Sin código'}
                           </code>
                         </div>
                       </div>

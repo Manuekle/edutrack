@@ -10,6 +10,12 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
+    // Delete all classes for the group associated with this planning
+    const planning = await db.planning.findUnique({ where: { id }, select: { groupId: true } });
+    if (planning) {
+      await db.class.deleteMany({ where: { groupId: planning.groupId } });
+    }
+    
     await db.planning.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {

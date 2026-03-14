@@ -53,7 +53,7 @@ const createUserSchema = z
     role: z.nativeEnum(Role),
     document: z.string().optional(),
     telefono: z.string().optional(),
-    codigoEstudiantil: z.string().optional(),
+    studentCode: z.string().optional(),
     codigoDocente: z.string().optional(),
   })
   .refine(data => data.correoPersonal || data.correoInstitucional, {
@@ -76,7 +76,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
       role: Role.ESTUDIANTE,
       document: '',
       telefono: '',
-      codigoEstudiantil: '',
+      studentCode: '',
       codigoDocente: '',
     },
   });
@@ -96,7 +96,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
           correoInstitucional: data.correoInstitucional || undefined,
           document: data.document || undefined,
           telefono: data.telefono || undefined,
-          codigoEstudiantil: data.codigoEstudiantil || undefined,
+          studentCode: data.studentCode || undefined,
           codigoDocente: data.codigoDocente || undefined,
         }),
       });
@@ -270,7 +270,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
             {role === 'ESTUDIANTE' && (
               <FormField
                 control={form.control}
-                name="codigoEstudiantil"
+                name="studentCode"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Código de Estudiante</FormLabel>

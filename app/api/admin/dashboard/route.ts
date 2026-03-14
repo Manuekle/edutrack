@@ -181,8 +181,8 @@ export async function GET() {
         label:
           stat.status === ClassStatus.SCHEDULED
             ? 'Programadas'
-            : stat.status === ClassStatus.COMPLETED
-              ? 'Realizadas'
+            : stat.status === ClassStatus.COMPLETED || stat.status === ClassStatus.SIGNED
+              ? 'Firmadas'
               : 'Canceladas',
       })
     );
@@ -217,9 +217,10 @@ export async function GET() {
     const activeStudents =
       usersByRole.find((role: { role: Role }) => role.role === Role.ESTUDIANTE)?._count.role || 0;
     const completedClasses =
-      classStatusStats.find(
-        (stat: { status: ClassStatus }) => stat.status === ClassStatus.COMPLETED
-      )?._count.status || 0;
+      classStatusStats.filter(
+        (stat: { status: ClassStatus }) => 
+          stat.status === ClassStatus.COMPLETED || stat.status === ClassStatus.SIGNED
+      ).reduce((sum, stat) => sum + stat._count.status, 0);
 
     const dashboardData = {
       // Cards principales
@@ -233,7 +234,7 @@ export async function GET() {
         {
           title: 'Materias Activas',
           value: totalSubjects,
-          subtitle: `${completedClasses} clases realizadas`,
+          subtitle: `${completedClasses} clases SIGNEDs`,
           trend: '+5% vs mes anterior',
         },
         {

@@ -21,30 +21,60 @@ export async function POST(req: Request) {
     });
     if (!group) return NextResponse.json({ error: 'Grupo no encontrado' }, { status: 404 });
 
-    // Delete existing planning if any
-    const existing = await db.planning.findUnique({ where: { groupId } });
-    if (existing) {
-      // Classes don't have cascade delete, so we delete them manually
-      await db.class.deleteMany({ where: { groupId } });
-      await db.planning.delete({ where: { groupId } });
+    // 0. Thorough cleanup: Delete all classes for this group ID first
+    await db.class.deleteMany({
+      where: { groupId }
+    });
+
+    // 1. Delete existing planning and its weeks explicitly (though cascade should handle it)
+    const existingPlanning = await db.planning.findUnique({
+      where: { groupId },
+      include: { weeks: true }
+    });
+
+    if (existingPlanning) {
+      // Manually delete weeks to be paranoid (Cascade should handle it usually)
+      await db.academicWeek.deleteMany({
+        where: { planningId: existingPlanning.id }
+      });
+      
+      await db.planning.delete({
+        where: { id: existingPlanning.id }
+      });
     }
 
     const start = new Date(startDate);
-    const end = addWeeks(start, 16);
+    
+    // Use UTC methods to avoid timezone shift issues on the server
+    let firstClassDate = new Date(start);
+    if (group.schedule) {
+      const DAY_TO_OFFSET: Record<string, number> = {
+        SUNDAY: 0, MONDAY: 1, TUESDAY: 2, WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5, SATURDAY: 6
+      };
+      const targetDay = DAY_TO_OFFSET[group.schedule.dayOfWeek] ?? 1;
+      
+      // Ensure we hit the target day strictly ON or AFTER the start date
+      // We use getUTCDay because startDate is usually "YYYY-MM-DD" which Date(s) parses as midnight UTC
+      while (firstClassDate.getUTCDay() !== targetDay) {
+        firstClassDate.setUTCDate(firstClassDate.getUTCDate() + 1);
+      }
+    }
 
-    // Create planning with 16 weeks
+    const end = addWeeks(firstClassDate, 15); // End of the 16th week
+
+    // Create planning
     const planning = await db.planning.create({
       data: {
         groupId,
-        startDate: start,
+        startDate: firstClassDate,
         endDate: end,
       },
     });
 
     // Generate 16 weeks and classes based on schedule
     for (let i = 0; i < 16; i++) {
-      const baseDate = addWeeks(start, i);
-      const weekStart = startOfWeek(baseDate, { weekStartsOn: 1 }); // Force Monday start
+      const classDate = addWeeks(firstClassDate, i);
+      const weekStart = startOfWeek(classDate, { weekStartsOn: 1 });
       const weekEnd = addDays(weekStart, 6);
 
       const week = await db.academicWeek.create({
@@ -56,20 +86,7 @@ export async function POST(req: Request) {
         },
       });
 
-      // Create a class for the week based on schedule
       if (group.schedule) {
-        const DAY_TO_OFFSET: Record<string, number> = {
-          MONDAY: 0,
-          TUESDAY: 1,
-          WEDNESDAY: 2,
-          THURSDAY: 3,
-          FRIDAY: 4,
-          SATURDAY: 5,
-          SUNDAY: 6,
-        };
-        const offset = DAY_TO_OFFSET[group.schedule.dayOfWeek] ?? 0;
-        const classDate = addDays(weekStart, offset);
-
         // Pre-calculate start and end times based on classDate
         let startTime: Date | undefined;
         let endTime: Date | undefined;

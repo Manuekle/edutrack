@@ -25,7 +25,7 @@ interface Subject {
     id: string;
     name: string | null;
     correoInstitucional: string | null;
-    codigoEstudiantil: string | null;
+    studentCode: string | null;
   }[];
   studentCount: number;
   classCount: number;

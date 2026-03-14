@@ -136,7 +136,7 @@ export async function GET() {
     const processedSubjects = subjectsWithProgress.map(subject => {
       const totalClasses = subject.classes.length;
       const completedClasses = subject.classes.filter(
-        cls => cls.status === 'REALIZADA' || cls.status === 'CANCELADA'
+        cls => cls.status === 'SIGNED' || cls.status === 'CANCELADA'
       ).length;
 
       const upcomingClass = subject.classes.find(

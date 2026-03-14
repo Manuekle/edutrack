@@ -53,7 +53,20 @@ export function useClassManagement({
       const updatedClass = responseData.data;
 
       if (updatedClass) {
-        setClasses(prev => prev.map(c => (c.id === classId ? updatedClass : c)));
+        setClasses(prev =>
+          prev.map(c => {
+            if (c.id === classId) {
+              // Transform schema-based updatedClass to table-friendly format
+              return {
+                ...c,
+                ...updatedClass,
+                subjectName: updatedClass.subject?.name || c.subjectName,
+                subjectCode: updatedClass.subject?.code || c.subjectCode,
+              };
+            }
+            return c;
+          })
+        );
       }
       sileo.success({ title: `La clase ha sido marcada como ${status.toLowerCase()}.` });
 
@@ -74,7 +87,7 @@ export function useClassManagement({
   };
 
   const handleMarkClassAsDone = (classId: string) => {
-    handleUpdateClassStatus(classId, 'COMPLETED');
+    handleUpdateClassStatus(classId, 'SIGNED');
   };
 
   const handleConfirmCancel = async () => {

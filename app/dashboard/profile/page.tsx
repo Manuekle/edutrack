@@ -57,7 +57,7 @@ const profileFormSchema = z.object({
   correoInstitucional: z.string().email('Correo institucional inválido'),
   correoPersonal: z.string().email('Correo personal inválido').optional().or(z.literal('')),
   telefono: z.string().optional(),
-  codigoEstudiantil: z.string().optional(),
+  studentCode: z.string().optional(),
   codigoDocente: z.string().optional(),
 });
 
@@ -109,7 +109,7 @@ export default function ProfilePage() {
       correoInstitucional: '',
       correoPersonal: '',
       telefono: '',
-      codigoEstudiantil: '',
+      studentCode: '',
       codigoDocente: '',
     },
   });
@@ -131,7 +131,7 @@ export default function ProfilePage() {
         correoInstitucional: session.user?.institutionalEmail || '',
         correoPersonal: session.user?.personalEmail || '',
         telefono: session.user?.phone || '',
-        codigoEstudiantil: session.user?.studentCode || '',
+        studentCode: session.user?.studentCode || '',
         codigoDocente: session.user?.teacherCode || '',
       });
       // Set initial preview from session
@@ -321,7 +321,7 @@ export default function ProfilePage() {
         correoPersonal: string | null;
         correoInstitucional: string;
         telefono: string | null;
-        codigoEstudiantil?: string | null;
+        studentCode?: string | null;
         codigoDocente?: string | null;
       } = {
         name: data.name,
@@ -332,7 +332,7 @@ export default function ProfilePage() {
 
       // Only include the appropriate code based on user role
       if (session?.user?.role === 'ESTUDIANTE') {
-        updateData.codigoEstudiantil = data.codigoEstudiantil || null;
+        updateData.studentCode = data.studentCode || null;
       } else {
         updateData.codigoDocente = data.codigoDocente || null;
       }
@@ -579,7 +579,7 @@ export default function ProfilePage() {
                     {session?.user?.role === 'ESTUDIANTE' && (
                       <FormField
                         control={profileForm.control}
-                        name="codigoEstudiantil"
+                        name="studentCode"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-xs text-muted-foreground">
@@ -782,7 +782,7 @@ export default function ProfilePage() {
                             alt="Firma"
                             fill
                             style={{ objectFit: 'contain' }}
-                            className="rounded-md dark:invert"
+                            className="h-9 w-full object-contain invert dark:invert-0 transition-all"
                           />
                         </div>
                       ) : (

@@ -1,7 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/prisma';
 import { redis } from '@/lib/redis';
-import { ClassStatus } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
@@ -87,7 +86,7 @@ export async function GET() {
         subjectId: {
           in: subjectIds,
         },
-        status: 'SCHEDULED' as any,
+        status: { in: ['SCHEDULED', 'COMPLETED', 'SIGNED'] as any },
       },
       select: {
         id: true,
@@ -136,7 +135,7 @@ export async function GET() {
           gte: fourWeeksAgo,
           lte: now,
         },
-        status: 'SCHEDULED' as any,
+        status: { in: ['SCHEDULED', 'COMPLETED', 'SIGNED'] as any },
       },
       select: {
         id: true,
@@ -156,7 +155,7 @@ export async function GET() {
             gte: fourWeeksAgo,
             lte: now,
           },
-          status: 'SCHEDULED' as any,
+          status: { in: ['SCHEDULED', 'COMPLETED', 'SIGNED'] as any },
         },
       },
       select: {

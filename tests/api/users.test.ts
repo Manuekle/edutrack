@@ -101,7 +101,7 @@ describe('API /api/admin/users', () => {
           createdAt: new Date(),
           document: '1234567890',
           telefono: '1234567890',
-          codigoEstudiantil: null,
+          studentCode: null,
           codigoDocente: null,
         },
       ];
@@ -220,7 +220,7 @@ describe('API /api/admin/users', () => {
         createdAt: new Date(),
         document: null,
         telefono: null,
-        codigoEstudiantil: null,
+        studentCode: null,
         codigoDocente: null,
         password: 'hashed_password123',
       };
@@ -403,7 +403,7 @@ describe('API /api/admin/users', () => {
         isActive: true,
         document: '1234567890',
         telefono: '1234567890',
-        codigoEstudiantil: 'E001',
+        studentCode: 'E001',
         codigoDocente: null,
         createdAt: new Date(),
       };

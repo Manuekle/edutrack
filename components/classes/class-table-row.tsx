@@ -70,7 +70,7 @@ export function ClassTableRow({
     if (cls.status === 'CANCELADA') {
       return `Clase cancelada${cls.cancellationReason ? `: ${cls.cancellationReason}` : ''}`;
     }
-    if (cls.status === 'REALIZADA') {
+    if (cls.status === 'SIGNED') {
       return 'Clase ya finalizada';
     }
     if (canTakeAttendance) {
@@ -176,50 +176,55 @@ export function ClassTableRow({
             <DropdownMenuLabel className="font-sans font-semibold text-xs">
               Acciones
             </DropdownMenuLabel>
-            <DropdownMenuItem
-              asChild
-              disabled={!canTakeAttendance}
-              className={cn(
-                'rounded-lg cursor-pointer text-[13px]',
-                !canTakeAttendance
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:text-blue-400 dark:focus:bg-blue-500/10'
-              )}
-            >
-              <Link
-                href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
-                className="flex items-center w-full"
-                onClick={e => !canTakeAttendance && e.preventDefault()}
-                aria-disabled={!canTakeAttendance}
-              >
-                <UserCheck
+            {cls.status !== 'SIGNED' && cls.status !== 'COMPLETED' && (
+              <>
+                <DropdownMenuItem
+                  asChild
+                  disabled={!canTakeAttendance}
                   className={cn(
-                    'mr-2 h-4 w-4',
-                    !canTakeAttendance ? 'text-muted-foreground' : 'text-blue-500 dark:text-blue-400'
+                    'rounded-lg cursor-pointer text-[13px]',
+                    !canTakeAttendance
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:text-blue-400 dark:focus:bg-blue-500/10'
                   )}
-                  aria-hidden="true"
-                />
-                <span>Asistencia</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              disabled={!canCancel}
-              onSelect={e => {
-                e.preventDefault();
-                if (canCancel) onCancel();
-              }}
-              className={cn(
-                'rounded-lg text-[13px]',
-                !canCancel
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:bg-red-500/10 cursor-pointer'
-              )}
-              aria-disabled={!canCancel}
-            >
-              <Ban className={cn("mr-2 h-4 w-4", !canCancel ? 'text-muted-foreground' : 'text-red-400 dark:text-red-400')} aria-hidden="true" />
-              <span>Cancelar Clase</span>
-            </DropdownMenuItem>
+                >
+                  <Link
+                    href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
+                    className="flex items-center w-full"
+                    onClick={e => !canTakeAttendance && e.preventDefault()}
+                    aria-disabled={!canTakeAttendance}
+                  >
+                    <UserCheck
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        !canTakeAttendance ? 'text-muted-foreground' : 'text-blue-500 dark:text-blue-400'
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span>Asistencia</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  disabled={!canCancel}
+                  onSelect={e => {
+                    e.preventDefault();
+                    if (canCancel) onCancel();
+                  }}
+                  className={cn(
+                    'rounded-lg text-[13px]',
+                    !canCancel
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'text-red-600 focus:text-red-600 focus:bg-red-50 dark:text-red-400 dark:focus:bg-red-500/10 cursor-pointer'
+                  )}
+                  aria-disabled={!canCancel}
+                >
+                  <Ban className={cn("mr-2 h-4 w-4", !canCancel ? 'text-muted-foreground' : 'text-red-400 dark:text-red-400')} aria-hidden="true" />
+                  <span>Cancelar Clase</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem
               disabled={!canMarkAsDone}
               onSelect={e => {

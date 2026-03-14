@@ -75,7 +75,7 @@ export default function MisGruposPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {grupos.map(g => (
             <Card key={g.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">

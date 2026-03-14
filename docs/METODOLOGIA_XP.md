@@ -285,7 +285,7 @@ export async function POST(req: NextRequest) {
 User Story está **READY** cuando:
 
 - ✅ Criterios de aceptación claros y medibles
-- ✅ Estimación realizada (story points)
+- ✅ Estimación SIGNED (story points)
 - ✅ Dependencias identificadas
 - ✅ Aceptado por Product Owner
 - ✅ Tests identificados (test cases)

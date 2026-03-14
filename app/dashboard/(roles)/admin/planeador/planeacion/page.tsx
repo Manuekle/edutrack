@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, startOfWeek } from 'date-fns';
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
   AlertCircle,
@@ -260,7 +260,7 @@ export default function PlaneacionPage() {
             <div className="space-y-2.5">
               <Label className="text-xs font-semibold ml-0.5">Elige el grupo</Label>
               <Select value={selectedGrupo} onValueChange={setSelectedGrupo} disabled={loading}>
-                <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border-transparent focus:bg-background focus:border-primary/50 transition-colors">
+                <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border border-muted-foreground/10 focus:bg-background focus:border-primary/50 transition-colors">
                   <SelectValue placeholder="Seleccionar grupo..." />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl shadow-lg border-muted-foreground/10 max-h-80">
@@ -438,7 +438,7 @@ export default function PlaneacionPage() {
               const todasLasClases = semanas.flatMap(s => s.classes);
               const totalClases = todasLasClases.length || 16; // Fallback a 16 si no hay clases registradas aún
               const clasesCompletadas = todasLasClases.filter(
-                c => c.status === 'REALIZADA' || c.status === 'CANCELADA'
+                c => c.status === 'SIGNED' || c.status === 'CANCELADA'
               ).length;
 
               const progress = (clasesCompletadas / totalClases) * 100;

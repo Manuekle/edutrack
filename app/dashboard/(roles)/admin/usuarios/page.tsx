@@ -70,7 +70,7 @@ interface UserData {
   role: Role;
   isActive: boolean;
   document: string | null;
-  codigoEstudiantil?: string | null;
+  studentCode?: string | null;
   codigoDocente?: string | null;
 }
 
