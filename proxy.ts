@@ -69,10 +69,35 @@ export default withAuth(
       ];
 
       cookieNames.forEach(cookieName => {
+        // Clear for current domain
         response.cookies.set({
           name: cookieName,
           value: '',
           path: '/',
+          expires: new Date(0),
+          secure: true,
+          httpOnly: true,
+          sameSite: 'lax',
+        });
+        
+        // Clear specifically for the old domain if we're on the new one, to prevent session collisions
+        response.cookies.set({
+          name: cookieName,
+          value: '',
+          path: '/',
+          domain: '.sira-fup.online',
+          expires: new Date(0),
+          secure: true,
+          httpOnly: true,
+          sameSite: 'lax',
+        });
+
+        // Clear for the new domain explicitly as well
+        response.cookies.set({
+          name: cookieName,
+          value: '',
+          path: '/',
+          domain: '.sira-fup.online',
           expires: new Date(0),
           secure: true,
           httpOnly: true,

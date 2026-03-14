@@ -140,7 +140,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
     );
   }
 
-  let baseUrl = process.env.NEXTAUTH_URL || 'https://sira-fup.vercel.app';
+  let baseUrl = process.env.NEXTAUTH_URL || 'https://sira-fup.online';
   // Ensure the URL has a protocol
   if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
     baseUrl = `https://${baseUrl}`;

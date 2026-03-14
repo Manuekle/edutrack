@@ -5,7 +5,7 @@ export function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     'name': 'SIRA - Sistema Integral de Registro Académico',
-    'url': 'https://sira-fup.vercel.app',
+    'url': 'https://sira-fup.online',
     'description': 'Sistema Integral de Registro Académico para la gestión automatizada de asistencias mediante códigos QR.',
     'applicationCategory': 'EducationApplication',
     'operatingSystem': 'Web, Android, iOS',

@@ -8,7 +8,7 @@ import { CACHE_TTL, redis } from './redis';
 
 // 🔧 Configuración según entorno
 const isProduction = process.env.NODE_ENV === 'production';
-let baseUrl = process.env.NEXTAUTH_URL || 'https://sira-fup.vercel.app';
+let baseUrl = process.env.NEXTAUTH_URL || 'https://sira-fup.online';
 
 if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
   baseUrl = `https://${baseUrl}`;
@@ -243,7 +243,7 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: useSecureCookies,
-        domain: isProduction ? '.sira-fup.vercel.app' : undefined,
+        domain: isProduction ? '.sira-fup.online' : undefined,
       },
     },
   },

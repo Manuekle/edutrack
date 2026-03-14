@@ -13,7 +13,7 @@ User-agent: GPTBot
 Disallow: /
 
 # Host
-Host: https://sira-fup.vercel.app
+Host: https://sira-fup.online
 
 # Sitemaps
-Sitemap: https://sira-fup.vercel.app/sitemap.xml
+Sitemap: https://sira-fup.online/sitemap.xml

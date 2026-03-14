@@ -1,5 +1,5 @@
 export default {
-  siteUrl: process.env.SITE_URL || 'https://sira-fup.vercel.app',
+  siteUrl: process.env.SITE_URL || 'https://sira-fup.online',
   generateRobotsTxt: true,
   sitemapSize: 5000,
   exclude: [

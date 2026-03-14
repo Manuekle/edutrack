@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sira-fup.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://sira-fup.online';
 
   return [
     {
