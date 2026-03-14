@@ -264,7 +264,7 @@ export function PreviewSection({
                               <div className="min-h-[2.25rem]">
                                 <p className="text-muted-foreground text-xs mb-0.5">Fecha</p>
                                 {isEditing ? (
-                                  <div className="[&_input]:h-9 [&_input]:text-xs">
+                                  <div className="[&_input]: [&_input]:text-xs">
                                     <DatePicker
                                       value={parseDateString(currentData.fechaClase || '')}
                                       onChange={date => {
@@ -295,7 +295,7 @@ export function PreviewSection({
                               <div className="min-h-[2.25rem]">
                                 <p className="text-muted-foreground text-xs mb-0.5">Hora Inicio</p>
                                 {isEditing ? (
-                                  <div className="[&_input]:h-9 [&_input]:text-xs">
+                                  <div className="[&_input]: [&_input]:text-xs">
                                     <TimePicker
                                       value={currentData.horaInicio || ''}
                                       onChange={value => {
@@ -318,7 +318,7 @@ export function PreviewSection({
                               <div className="min-h-[2.25rem]">
                                 <p className="text-muted-foreground text-xs mb-0.5">Hora Fin</p>
                                 {isEditing ? (
-                                  <div className="[&_input]:h-9 [&_input]:text-xs">
+                                  <div className="[&_input]: [&_input]:text-xs">
                                     <TimePicker
                                       value={currentData.horaFin || ''}
                                       onChange={value => {
@@ -352,7 +352,7 @@ export function PreviewSection({
                                       }
                                     }}
                                     placeholder="Tema de la clase"
-                                    className="w-full text-xs h-9"
+                                    className="w-full text-xs "
                                   />
                                 ) : (
                                   <p className="font-semibold truncate min-h-[2.25rem] flex items-center">

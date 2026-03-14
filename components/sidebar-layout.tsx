@@ -69,7 +69,7 @@ const UserMenuButton = React.forwardRef<
       type="button"
       className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center"
     >
-      <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
+      <Avatar className="h-8 w-8 sm: sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
         <AvatarFallback className="bg-primary/10 text-primary">
           {session?.user?.name?.charAt(0) || 'U'}
         </AvatarFallback>
@@ -179,10 +179,10 @@ function AppSidebar({ homePath }: { homePath: string }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="default" asChild className="h-auto py-4">
+            <SidebarMenuButton size="default" asChild className="h-auto py-4 rounded-xl">
               <Link href={homePath}>
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
                     <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
                   </div>
                   <div className="grid flex-1 text-left">
@@ -217,7 +217,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                 <SidebarGroupLabel className="px-3 py-2 text-[11px] font-semibold uppercase tracking-card text-muted-foreground/50">
                   {group.title}
                 </SidebarGroupLabel>
-                <SidebarGroupContent className="flex flex-col gap-0.5 px-2">
+                <SidebarGroupContent className="flex flex-col gap-1 px-2">
                   {group.links.map(link => {
                     const Icon = link.icon;
                     const isActive = isLinkActive(link.href);
@@ -227,8 +227,8 @@ function AppSidebar({ homePath }: { homePath: string }) {
                           asChild
                           isActive={isActive}
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ease-out active:scale-[0.97] ${isActive
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
+                            ? 'bg-primary/10 text-primary font-medium'
+                            : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
                             }`}
                         >
                           <Link href={link.href} className="flex items-center gap-3 w-full">
@@ -257,7 +257,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
             {mounted ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger className="w-full flex items-center p-2 sm:p-3 rounded-xl hover:bg-sidebar-accent transition-all duration-200 active:scale-[0.97] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center data-[state=open]:bg-sidebar-accent">
-                  <Avatar className="h-8 w-8 sm:h-9 sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
+                  <Avatar className="h-8 w-8 sm: sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {session?.user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
@@ -290,10 +290,10 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   </div>
                   <DropdownMenuItem
                     onClick={() => router.push('/dashboard/profile')}
-                    className="cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
+                    className="cursor-pointer gap-2 py-2.5 rounded-lg text-primary focus:bg-primary/10"
                   >
-                    <Settings className="mr-3 h-4 w-4 shrink-0" />
-                    <span>Perfil</span>
+                    <Settings className="mr-3 h-4 w-4 shrink-0 text-foreground" />
+                    <span className="text-foreground">Perfil</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     aria-label="Cambiar entre modo oscuro y modo claro"
@@ -315,17 +315,17 @@ function AppSidebar({ homePath }: { homePath: string }) {
                         localStorage.setItem('theme', newTheme);
                       }
                     }}
-                    className="cursor-pointer py-1 my-1 px-4 text-xs flex items-center"
+                    className="cursor-pointer gap-2 py-2.5 rounded-lg text-primary focus:bg-primary/10"
                   >
                     {theme === 'dark' ||
                       (theme === 'system' &&
                         typeof window !== 'undefined' &&
                         window.matchMedia('(prefers-color-scheme: dark)').matches) ? (
-                      <Sun className="mr-3 h-4 w-4 shrink-0" />
+                      <Sun className="mr-3 h-4 w-4 shrink-0 text-foreground" />
                     ) : (
-                      <Moon className="mr-3 h-4 w-4 shrink-0" />
+                      <Moon className="mr-3 h-4 w-4 shrink-0 text-foreground" />
                     )}
-                    <span className="font-sans">
+                    <span className="text-foreground">
                       {theme === 'dark' ||
                         (theme === 'system' &&
                           typeof window !== 'undefined' &&
@@ -336,10 +336,10 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleSignOut}
-                    className="text-destructive cursor-pointer py-1 mt-1 px-4 text-xs flex items-center"
+                    className="cursor-pointer gap-2 py-2.5 rounded-lg text-destructive focus:bg-destructive/10"
                   >
-                    <LogOut className="mr-3 h-4 w-4 shrink-0" />
-                    <span className="font-sans">Cerrar sesión</span>
+                    <LogOut className="mr-3 h-4 w-4 shrink-0 text-destructive" />
+                    <span className="text-destructive">Cerrar sesión</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

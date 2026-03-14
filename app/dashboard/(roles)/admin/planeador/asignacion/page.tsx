@@ -443,7 +443,7 @@ export default function AsignacionPage() {
                   <Button
                     onClick={saveEstudiantes}
                     disabled={savingStudents}
-                    className="rounded-xl shadow-none w-full sm:w-auto h-9 px-6 text-xs"
+                    className="rounded-xl shadow-none w-full sm:w-auto  px-6 text-xs"
                   >
                     {savingStudents ? 'Guardando...' : 'Guardar Cambios'}
                   </Button>
@@ -531,7 +531,7 @@ export default function AsignacionPage() {
                   <Button
                     onClick={saveDocentes}
                     disabled={savingDocentes}
-                    className="rounded-xl shadow-none w-full sm:w-auto h-9 px-6 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+                    className="rounded-xl shadow-none w-full sm:w-auto  px-6 text-xs bg-purple-600 hover:bg-purple-700 text-white"
                   >
                     {savingDocentes ? 'Guardando...' : 'Guardar Cambios'}
                   </Button>
@@ -680,7 +680,7 @@ export default function AsignacionPage() {
                   <Button
                     onClick={saveSala}
                     disabled={savingSala}
-                    className="rounded-xl shadow-none w-full sm:w-auto px-8 h-9 text-xs"
+                    className="rounded-xl shadow-none w-full sm:w-auto px-8  text-xs"
                   >
                     {savingSala ? 'Guardando...' : 'Guardar Sala'}
                   </Button>

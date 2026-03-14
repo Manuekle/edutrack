@@ -567,7 +567,7 @@ export function TeacherReport() {
             placeholder="Buscar docente..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="text-sm h-9 rounded-xl"
+            className="text-sm  rounded-xl"
           />
         </div>
         <div className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:hidden">
@@ -595,7 +595,7 @@ export function TeacherReport() {
                       }`}
                   >
                     <div
-                      className={`h-9 w-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 ${isSelected
+                      className={` w-9 rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 ${isSelected
                         ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400'
                         : 'bg-muted text-muted-foreground'
                         }`}
@@ -688,7 +688,7 @@ export function TeacherReport() {
                     id="tour-reportes-filters"
                   >
                     <Select value={period} onValueChange={setPeriod}>
-                      <SelectTrigger className="w-full sm:w-36 h-9 rounded-xl text-sm">
+                      <SelectTrigger className="w-full sm:w-36  rounded-xl text-sm">
                         <SelectValue placeholder="Periodo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -704,7 +704,7 @@ export function TeacherReport() {
                       onValueChange={setSelectedSubjectId}
                       disabled={!subjects.length}
                     >
-                      <SelectTrigger className="w-full sm:w-52 h-9 rounded-xl text-sm">
+                      <SelectTrigger className="w-full sm:w-52  rounded-xl text-sm">
                         <SelectValue placeholder="Todas las asignaturas" />
                       </SelectTrigger>
                       <SelectContent>

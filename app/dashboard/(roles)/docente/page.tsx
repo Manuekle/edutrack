@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 
 type SubjectStats = {
   id: string;
+  groupId: string;
   name: string;
   code: string;
   totalClasses: number;
@@ -31,11 +32,13 @@ type SubjectStats = {
 
 interface UpcomingClass {
   id: string;
+  groupId: string;
   subjectId: string;
   subjectName: string;
   topic: string | null;
   classroom?: string | null;
   date: Date;
+  startTime?: string | null;
 }
 
 export default function DocenteDashboard() {

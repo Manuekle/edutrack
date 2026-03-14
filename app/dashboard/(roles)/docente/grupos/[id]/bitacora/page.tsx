@@ -400,14 +400,14 @@ export default function BitacoraTablaPage() {
             ))}
 
             {/* Footer Total */}
-            <div className="bg-background rounded-b-2xl p-4 flex items-center justify-end gap-3 border-t">
+            <div className="bg-background rounded-b-2xl py-4 px-6 flex items-center justify-end gap-4">
               <span className="text-[13px] font-medium text-muted-foreground">
                 Total horas acumuladas:
               </span>
               <span className="font-mono font-semibold text-[15px] bg-muted/50 px-3 py-1 rounded-lg border">
                 {totalHorasAcum > 0 ? totalHorasAcum.toFixed(1) : '0.0'}
               </span>
-              <div className="w-20 md:block hidden" /> {/* Spacer to align with inputs */}
+
             </div>
           </div>
         )}

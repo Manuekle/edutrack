@@ -336,7 +336,7 @@ export default function ProgramacionPage() {
                     <div className="space-y-2">
                       <p className="text-xs font-semibold">1. Descarga la plantilla</p>
                       <a href="/formatos/plantilla_horarios.csv" download>
-                        <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                        <Button variant="outline" className="w-full justify-start  text-xs">
                           <Download className="mr-2 h-4 w-4 text-muted-foreground" />
                           Descargar Plantilla CSV
                         </Button>
@@ -410,7 +410,7 @@ export default function ProgramacionPage() {
                       <Button
                         onClick={handlePreview}
                         disabled={!file || previewLoading || previewData.length > 0}
-                        className="w-full text-xs h-9"
+                        className="w-full text-xs "
                       >
                         {previewLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Generar Vista Previa
@@ -419,7 +419,7 @@ export default function ProgramacionPage() {
                         <Button
                           onClick={handleCancel}
                           variant="ghost"
-                          className="w-full text-xs h-9 text-muted-foreground hover:text-destructive"
+                          className="w-full text-xs  text-muted-foreground hover:text-destructive"
                         >
                           Limpiar todo
                         </Button>
@@ -585,7 +585,7 @@ export default function ProgramacionPage() {
                         <Button
                           onClick={handleConfirm}
                           disabled={confirmLoading || !file || validCount === 0}
-                          className="h-9 px-6 text-xs min-w-[150px]"
+                          className=" px-6 text-xs min-w-[150px]"
                         >
                           {confirmLoading ? (
                             <>
@@ -665,7 +665,7 @@ export default function ProgramacionPage() {
                       placeholder="Buscar por asignatura, docente, grupo, periodo..."
                       value={search}
                       onChange={e => setSearch(e.target.value)}
-                      className="pl-9 h-9 text-xs bg-background shadow-none"
+                      className="pl-9  text-xs bg-background shadow-none"
                     />
                   </div>
                 </div>

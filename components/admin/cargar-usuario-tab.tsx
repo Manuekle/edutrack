@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Role } from '@prisma/client';
-import { BookOpen, CheckCircle, CheckCircle2, Download, FileSpreadsheet, Loader2, Upload } from 'lucide-react';
+import { BookOpen, CheckCircle, CheckCircle2, Download, Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -146,7 +146,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
             <div className="space-y-2">
               <p className="text-xs font-semibold">1. Descarga la plantilla</p>
               <a href={templateHref} download>
-                <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                <Button variant="outline" className="w-full justify-start  text-xs">
                   <Download className="mr-2 h-4 w-4 text-muted-foreground" />
                   Descargar Plantilla CSV
                 </Button>
@@ -183,7 +183,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
               <Button
                 onClick={handlePreview}
                 disabled={!file || isPreviewing || previewData.length > 0}
-                className="w-full text-xs h-9"
+                className="w-full text-xs "
               >
                 {isPreviewing ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -196,7 +196,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                 <Button
                   onClick={handleCancel}
                   variant="ghost"
-                  className="w-full text-xs h-9 text-muted-foreground hover:text-destructive"
+                  className="w-full text-xs  text-muted-foreground hover:text-destructive"
                 >
                   Limpiar todo
                 </Button>
@@ -220,7 +220,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                 <p className="text-xs text-muted-foreground animate-pulse">Procesando archivo...</p>
               </div>
             ) : finalResults ? (
-              <div className="flex flex-col items-center justify-center min-h-96 space-y-4 text-center p-6">
+              <div className="flex flex-col items-center justify-center min-6 space-y-4 text-center p-6">
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                   <CheckCircle className="h-8 w-8 text-primary" />
                 </div>
@@ -233,7 +233,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                     vinculado {finalResults.mapped} registros en el sistema.
                   </p>
                 </div>
-                <Button onClick={handleNewUpload} variant="outline" className="mt-4 h-9 text-xs">
+                <Button onClick={handleNewUpload} variant="outline" className="mt-4  text-xs">
                   Realizar nueva carga
                 </Button>
               </div>
@@ -340,7 +340,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                 <Button
                   onClick={handleConfirmUpload}
                   disabled={isUploading || validCount === 0}
-                  className="h-9 px-6 text-xs min-w-[150px]"
+                  className=" px-6 text-xs min-w-[150px]"
                 >
                   {isUploading ? (
                     <>

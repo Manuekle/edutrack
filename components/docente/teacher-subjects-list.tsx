@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 interface SubjectStats {
   id: string;
+  groupId: string;
   name: string;
   code: string;
   totalClasses: number;
@@ -40,15 +41,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                   role="button"
                   tabIndex={0}
                   key={subject.id}
-                  className="group relative rounded-2xl border-0 transition-all duration-300 hover:bg-card hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_2px_12px_rgba(0,0,0,0.2)] dark:hover:bg-[#1C1C1E] cursor-pointer bg-muted/40 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  onClick={() => router.push(`/dashboard/docente/asignaturas/${subject.id}`)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      router.push(`/dashboard/docente/asignaturas/${subject.id}`);
-                    }
-                  }}
-                  aria-label={`Ver detalles de la asignatura ${subject.name}`}
+                  className="group relative rounded-2xl border-0 transition-all duration-300 bg-muted/40 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">

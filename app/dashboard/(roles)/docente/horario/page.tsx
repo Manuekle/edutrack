@@ -8,8 +8,8 @@ import { CalendarDays } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 interface HorarioClase {
-  grupoId: string;
-  grupoCodigo: string;
+  groupId: string;
+  groupCode: string;
   subjectName: string;
   subjectCode: string;
   dayOfWeek: string;
@@ -20,6 +20,14 @@ interface HorarioClase {
 }
 
 const DIA_MAP: Record<string, number> = {
+  MONDAY: 1,
+  TUESDAY: 2,
+  WEDNESDAY: 3,
+  THURSDAY: 4,
+  FRIDAY: 5,
+  SATURDAY: 6,
+  SUNDAY: 0,
+  // Fallback español
   LUNES: 1,
   MARTES: 2,
   MIERCOLES: 3,
@@ -47,34 +55,25 @@ export default function MiHorarioPage() {
     const events: CalendarEvent[] = [];
 
     horarios.forEach((h, idx) => {
-      // @ts-ignore - The API returns dayOfWeek but the interface was mapped to diaSemana
-      const day = h.dayOfWeek || h.diaSemana;
-      // @ts-ignore
-      const startT = h.startTime || h.horaInicio;
-      // @ts-ignore
-      const endT = h.endTime || h.horaFin;
-      // @ts-ignore
-      const room = h.roomName || h.salaName;
-      
-      const dayOffset = (DIA_MAP[day] || 1) - 1; // 0 for Monday
+      const dayOffset = (DIA_MAP[h.dayOfWeek] || 1) - 1; // 0 for Monday
       const eventDate = addDays(monday, dayOffset);
 
-      if (!startT || !endT) return;
+      if (!h.startTime || !h.endTime) return;
 
-      const [startH, startM] = startT.split(':').map(Number);
-      const [endH, endM] = endT.split(':').map(Number);
+      const [startH, startM] = h.startTime.split(':').map(Number);
+      const [endH, endM] = h.endTime.split(':').map(Number);
 
       const start = setMinutes(setHours(eventDate, startH), startM);
       const end = setMinutes(setHours(eventDate, endH), endM);
 
       events.push({
-        id: `${h.grupoId}-${idx}`,
+        id: `${h.groupId}-${idx}`,
         title: h.subjectName,
         subject: h.subjectName,
         start,
         end,
-        room: room || 'Aula por asignar',
-        reason: `${h.grupoCodigo}`,
+        room: h.roomName || 'Aula por asignar',
+        reason: h.groupCode,
         type: 'CLASE',
       });
     });

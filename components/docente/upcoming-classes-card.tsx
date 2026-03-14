@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 
 interface UpcomingClass {
   id: string;
+  groupId: string;
   subjectId: string;
   subjectName: string;
   topic: string | null;
   classroom?: string | null;
   date: Date;
+  startTime?: string | null;
 }
 
 interface UpcomingClassesCardProps {
@@ -35,8 +37,8 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
             {classes.map(cls => (
               <div
                 key={cls.id}
-                className="group relative rounded-2xl border-0 transition-all duration-300 hover:bg-card hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:hover:shadow-[0_2px_12px_rgba(0,0,0,0.2)] dark:hover:bg-[#1C1C1E] cursor-pointer bg-muted/40 p-4"
-                onClick={() => router.push(`/dashboard/docente/asignaturas/${cls.subjectId}`)}
+                className="group relative rounded-2xl border-0 transition-all duration-300 bg-muted/40 p-4"
+
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
@@ -61,8 +63,8 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
                         </span>
                         <span className="w-1 h-1 rounded-full bg-border" />
                         <span>
-                          {cls.date
-                            ? `${String(new Date(cls.date).getUTCHours()).padStart(2, '0')}:${String(new Date(cls.date).getUTCMinutes()).padStart(2, '0')}`
+                          {cls.startTime
+                            ? `${String(new Date(cls.startTime).getUTCHours()).padStart(2, '0')}:${String(new Date(cls.startTime).getUTCMinutes()).padStart(2, '0')}`
                             : 'Sin hora definida'}
                         </span>
                         {cls.classroom && (

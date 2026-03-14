@@ -89,7 +89,7 @@ export function TablePagination({
                 if (currentPage > 1) onPageChange(currentPage - 1);
               }}
               className={cn(
-                'h-9 w-9 p-0 flex items-center justify-center',
+                ' w-9 p-0 flex items-center justify-center',
                 currentPage === 1 ? 'pointer-events-none opacity-40' : 'hover:bg-accent'
               )}
             >
@@ -113,7 +113,7 @@ export function TablePagination({
                   }}
                   isActive={currentPage === pageNum}
                   className={cn(
-                    'h-9 w-9 p-0 flex items-center justify-center',
+                    ' w-9 p-0 flex items-center justify-center',
                     'hover:bg-accent transition-colors',
                     currentPage === pageNum ? 'font-semibold' : ''
                   )}
@@ -132,7 +132,7 @@ export function TablePagination({
                 if (currentPage < totalPages) onPageChange(currentPage + 1);
               }}
               className={cn(
-                'h-9 w-9 p-0 flex items-center justify-center',
+                ' w-9 p-0 flex items-center justify-center',
                 currentPage === totalPages ? 'pointer-events-none opacity-40' : 'hover:bg-accent'
               )}
             >

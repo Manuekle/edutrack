@@ -20,7 +20,7 @@ export function TutorialButton() {
             variant="ghost"
             size="icon"
             onClick={startTutorial}
-            className="h-8 w-8 sm:h-9 sm:w-9 text-muted-foreground hover:text-primary transition-colors duration-200"
+            className="h-8 w-8 sm: sm:w-9 text-muted-foreground hover:text-primary transition-colors duration-200"
             aria-label="Iniciar tutorial de esta página"
           >
             <CircleHelp className="h-5 w-5" />

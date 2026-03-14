@@ -294,42 +294,14 @@ input[type='number'] {
   /* Espacio para el gradiente */
 }
 
-/* Ocultar el scrollbar en navegadores compatibles */
+/* Ocultar scrollbar globalmente */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--scroll-thumb) transparent;
-}
-
-/* Para WebKit (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-/* Personalizar el thumb (barra desplazable) */
-::-webkit-scrollbar-thumb {
-  background: var(--scroll-thumb);
-  border-radius: 10px;
-}
-
-/* Personalizar el track (fondo del scrollbar) */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Ocultar completamente el scrollbar en algunos elementos si es necesario */
-.scroll-hidden::-webkit-scrollbar {
-  display: none;
-}
-
-.scroll-hidden {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* Soporte para Tailwind (variables dinámicas) */
-:root {
-  --scroll-thumb: #c0c0c0;
+::-webkit-scrollbar {
+  display: none;
 }
 
 .dark {

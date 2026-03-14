@@ -375,7 +375,7 @@ export default async function PreviewPage({ params }: PageProps) {
                               alt="Firma docente"
                               width={120}
                               height={40}
-                              className="h-9 w-full object-contain invert dark:invert-0 transition-all"
+                              className=" w-full object-contain invert dark:invert-0 transition-all"
                             />
                           </div>
                         ) : (

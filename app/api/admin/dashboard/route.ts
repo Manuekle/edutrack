@@ -2,21 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { AttendanceStatus, ClassStatus, Role } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
-interface MonthlyClassData {
-  date: Date;
-}
-
-interface SubjectWithCounts {
-  name: string;
-  code: string;
-  _count: {
-    classes: number;
-  };
-}
-
 export async function GET() {
   try {
-    // Obtener estadísticas generales
     const [
       totalUsers,
       totalSubjects,
@@ -27,231 +14,181 @@ export async function GET() {
       attendanceStats,
       classStatusStats,
       monthlyClassesData,
-      subjectEnrollmentData,
-      classroomOccupancyRaw,
+      groupsWithStudents,
+      classroomData,
     ] = await Promise.all([
-      // Total de usuarios
       prisma.user.count({ where: { isActive: true } }),
-
-      // Total de materias
       prisma.subject.count(),
-
-      // Total de grupos (ahora cuenta subjects únicos con grupo asignado)
-      prisma.subject.count({
-        where: {
-          group: { not: null },
-        },
-      }),
-
-      // Total de clases
+      prisma.group.count(),
       prisma.class.count(),
-
-      // Total de reportes
       prisma.report.count(),
 
-      // Usuarios por rol
       prisma.user.groupBy({
         by: ['role'],
         where: { isActive: true },
         _count: { role: true },
       }),
 
-      // Estadísticas de asistencia
       prisma.attendance.groupBy({
         by: ['status'],
         _count: { status: true },
       }),
 
-      // Estadísticas de estado de clases
       prisma.class.groupBy({
         by: ['status'],
         _count: { status: true },
       }),
 
-      // Clases por mes (últimos 6 meses)
+      // Classes in the last 6 months
       prisma.class.findMany({
         where: {
-          date: {
-            gte: new Date(new Date().setMonth(new Date().getMonth() - 6)),
-          },
+          date: { gte: new Date(new Date().setMonth(new Date().getMonth() - 6)) },
         },
+        select: { date: true },
+        orderBy: { date: 'asc' },
+      }),
+
+      // Groups with student counts and subject info
+      prisma.group.findMany({
         select: {
-          date: true,
-        },
-        orderBy: {
-          date: 'asc',
+          studentIds: true,
+          subject: { select: { name: true, code: true } },
+          room: { select: { name: true } },
         },
       }),
 
-      // Top 10 materias con más estudiantes matriculados
-      prisma.subject.findMany({
-        select: {
-          name: true,
-          code: true,
-          studentIds: true,
-          _count: {
-            select: {
-              classes: true,
-            },
-          },
-        },
-        take: 10,
-      }),
-
-      // Datos de ocupación de salones
-      prisma.subject.findMany({
-        where: {
-          classroom: {
-            not: null,
-          },
-        },
-        select: {
-          classroom: true,
-          studentIds: true,
-        },
+      // Classroom usage from classes
+      prisma.class.groupBy({
+        by: ['classroom'],
+        where: { classroom: { not: null } },
+        _count: { id: true },
       }),
     ]);
 
-    // Calcular ocupación de salones
-    const occupancyMap = new Map<string, number>();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (classroomOccupancyRaw as any[]).forEach(
-      (item: { classroom: string | null; studentIds?: string[] }) => {
-        if (item.classroom) {
-          const studentCount = item.studentIds?.length || 0;
-          const current = occupancyMap.get(item.classroom) || 0;
-          occupancyMap.set(item.classroom, current + studentCount);
-        }
-      }
-    );
+    // --- Derived metrics ---
+    const activeTeachers =
+      usersByRole.find(r => r.role === Role.DOCENTE)?._count.role || 0;
+    const activeStudents =
+      usersByRole.find(r => r.role === Role.ESTUDIANTE)?._count.role || 0;
 
-    const classroomOccupancy = Array.from(occupancyMap.entries())
-      .map(([name, value]) => ({
-        name,
-        value,
-      }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 10); // Top 10 salones más ocupados
+    const completedClasses = classStatusStats
+      .filter(s => s.status === ClassStatus.COMPLETED || s.status === ClassStatus.SIGNED)
+      .reduce((sum, s) => sum + s._count.status, 0);
 
-    // Calcular porcentaje de asistencia general
-    const totalAttendances = attendanceStats.reduce(
-      (sum: number, stat) => sum + stat._count.status,
-      0
-    );
-    const presentAttendances =
-      attendanceStats.find(
-        (stat: { status: AttendanceStatus }) => stat.status === AttendanceStatus.PRESENT
-      )?._count.status || 0;
+    const scheduledClasses = classStatusStats
+      .find(s => s.status === ClassStatus.SCHEDULED)?._count.status || 0;
+
+    // Attendance percentage
+    const totalAttendances = attendanceStats.reduce((sum, s) => sum + s._count.status, 0);
+    const presentCount =
+      attendanceStats.find(s => s.status === AttendanceStatus.PRESENT)?._count.status || 0;
     const attendancePercentage =
-      totalAttendances > 0 ? (presentAttendances / totalAttendances) * 100 : 0;
+      totalAttendances > 0 ? (presentCount / totalAttendances) * 100 : 0;
 
-    // Formatear datos para las gráficas
-    const roleDistribution = usersByRole.map((role: { role: Role; _count: { role: number } }) => ({
-      name: role.role.charAt(0).toUpperCase() + role.role.slice(1).toLowerCase(),
-      value: role._count.role,
-      label:
-        role.role === Role.ESTUDIANTE
-          ? 'Estudiantes'
-          : role.role === Role.DOCENTE
-            ? 'Docentes'
-            : role.role === Role.ADMIN
-              ? 'Administradores'
-              : 'Usuarios',
+    // --- Charts data ---
+
+    // Role distribution
+    const roleLabels: Record<string, string> = {
+      ESTUDIANTE: 'Estudiantes',
+      DOCENTE: 'Docentes',
+      ADMIN: 'Administradores',
+    };
+    const roleDistribution = usersByRole.map(r => ({
+      name: roleLabels[r.role] || r.role,
+      value: r._count.role,
+      label: roleLabels[r.role] || r.role,
     }));
 
-    const attendanceDistribution = attendanceStats.map(
-      (stat: { status: AttendanceStatus; _count: { status: number } }) => ({
-        name: stat.status,
-        asistencia: stat._count.status,
-        label:
-          stat.status === AttendanceStatus.PRESENT
-            ? 'Presente'
-            : stat.status === AttendanceStatus.ABSENT
-              ? 'Ausente'
-              : stat.status === AttendanceStatus.LATE
-                ? 'Tardanza'
-                : 'Justificado',
-      })
-    );
+    // Attendance distribution
+    const attendanceLabels: Record<string, string> = {
+      PRESENT: 'Presente',
+      ABSENT: 'Ausente',
+      LATE: 'Tardanza',
+      JUSTIFIED: 'Justificado',
+    };
+    const attendanceDistribution = attendanceStats.map(s => ({
+      name: s.status,
+      asistencia: s._count.status,
+      label: attendanceLabels[s.status] || s.status,
+    }));
 
-    const classStatusDistribution = classStatusStats.map(
-      (stat: { status: ClassStatus; _count: { status: number } }) => ({
-        name: stat.status,
-        value: stat._count.status,
-        label:
-          stat.status === ClassStatus.SCHEDULED
-            ? 'Programadas'
-            : stat.status === ClassStatus.COMPLETED || stat.status === ClassStatus.SIGNED
-              ? 'Firmadas'
-              : 'Canceladas',
-      })
-    );
+    // Class status distribution
+    const classStatusLabels: Record<string, string> = {
+      SCHEDULED: 'Programadas',
+      COMPLETED: 'Completadas',
+      SIGNED: 'Firmadas',
+      CANCELLED: 'Canceladas',
+    };
+    const classStatusDistribution = classStatusStats.map(s => ({
+      name: s.status,
+      value: s._count.status,
+      label: classStatusLabels[s.status] || s.status,
+    }));
 
-    // Formatear datos de clases mensuales
-    const monthlyClassesMap = new Map<string, number>();
-
-    (monthlyClassesData as MonthlyClassData[]).forEach(classItem => {
-      const monthKey = new Date(classItem.date).toLocaleDateString('es-ES', {
+    // Monthly classes
+    const monthlyMap = new Map<string, number>();
+    monthlyClassesData.forEach(c => {
+      const key = new Date(c.date).toLocaleDateString('es-ES', {
         month: 'short',
         year: 'numeric',
       });
-      monthlyClassesMap.set(monthKey, (monthlyClassesMap.get(monthKey) || 0) + 1);
+      monthlyMap.set(key, (monthlyMap.get(key) || 0) + 1);
     });
-
-    const monthlyClasses = Array.from(monthlyClassesMap.entries()).map(([month, count]) => ({
+    const monthlyClasses = Array.from(monthlyMap.entries()).map(([month, clases]) => ({
       month,
-      clases: count,
+      clases,
     }));
 
-    // Obtener las 3 materias con más clases
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const topSubjects = (subjectEnrollmentData as any[]).slice(0, 3).map((subject: any) => ({
-      name: subject.name,
-      code: subject.code,
-      classes: subject._count?.classes || 0,
-    }));
+    // Top subjects by enrolled students (from Groups, not Subjects)
+    const subjectStudentMap = new Map<string, { name: string; code: string; students: Set<string> }>();
+    for (const group of groupsWithStudents) {
+      const key = group.subject.code;
+      const existing = subjectStudentMap.get(key);
+      if (existing) {
+        group.studentIds.forEach(id => existing.students.add(id));
+      } else {
+        subjectStudentMap.set(key, {
+          name: group.subject.name,
+          code: group.subject.code,
+          students: new Set(group.studentIds),
+        });
+      }
+    }
+    const topSubjects = Array.from(subjectStudentMap.values())
+      .map(s => ({ name: s.name, code: s.code, students: s.students.size }))
+      .sort((a, b) => b.students - a.students)
+      .slice(0, 6);
 
-    // Calcular métricas adicionales
-    const activeTeachers =
-      usersByRole.find((role: { role: Role }) => role.role === Role.DOCENTE)?._count.role || 0;
-    const activeStudents =
-      usersByRole.find((role: { role: Role }) => role.role === Role.ESTUDIANTE)?._count.role || 0;
-    const completedClasses =
-      classStatusStats.filter(
-        (stat: { status: ClassStatus }) => 
-          stat.status === ClassStatus.COMPLETED || stat.status === ClassStatus.SIGNED
-      ).reduce((sum, stat) => sum + stat._count.status, 0);
+    // Classroom occupancy (by number of classes held)
+    const classroomOccupancy = classroomData
+      .filter(c => c.classroom)
+      .map(c => ({ name: c.classroom as string, value: c._count.id }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8);
 
-    const dashboardData = {
-      // Cards principales
+    return NextResponse.json({
       cards: [
         {
           title: 'Total Usuarios',
           value: totalUsers,
           subtitle: `${activeStudents} estudiantes, ${activeTeachers} docentes`,
-          trend: '+12% vs mes anterior',
         },
         {
-          title: 'Materias Activas',
+          title: 'Materias',
           value: totalSubjects,
-          subtitle: `${completedClasses} clases SIGNEDs`,
-          trend: '+5% vs mes anterior',
+          subtitle: `${totalGroups} grupos activos`,
         },
         {
           title: 'Asistencia General',
           value: `${attendancePercentage.toFixed(1)}%`,
-          subtitle: `${presentAttendances} de ${totalAttendances} asistencia`,
-          trend: attendancePercentage > 85 ? '+2.3% vs promedio' : '-1.2% vs promedio',
+          subtitle: `${presentCount} de ${totalAttendances} registros`,
         },
         {
-          title: 'Grupos Activos',
-          value: totalGroups,
-          subtitle: `${totalSubjects} asignaturas`,
-          trend: '+5% vs mes anterior',
+          title: 'Clases',
+          value: totalClasses,
+          subtitle: `${completedClasses} completadas, ${scheduledClasses} programadas`,
         },
       ],
-
-      // Datos para gráficas
       charts: {
         roleDistribution,
         attendanceDistribution,
@@ -260,8 +197,6 @@ export async function GET() {
         topSubjects,
         classroomOccupancy,
       },
-
-      // Métricas adicionales
       metrics: {
         totalUsers,
         totalSubjects,
@@ -273,9 +208,7 @@ export async function GET() {
         completedClasses,
         activeTeachers,
       },
-    };
-
-    return NextResponse.json(dashboardData);
+    });
   } catch (error) {
     return NextResponse.json({ error: 'Error al obtener datos del dashboard' }, { status: 500 });
   } finally {

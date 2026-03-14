@@ -3,6 +3,7 @@ import { getSession } from 'next-auth/react';
 
 type SubjectStats = {
   id: string;
+  groupId: string;
   name: string;
   code: string;
   totalClasses: number;
@@ -25,6 +26,7 @@ export async function getTeacherDashboardData(): Promise<
     subjects: SubjectStats[];
     upcomingClasses: Array<{
       id: string;
+      groupId: string;
       subjectId: string;
       subjectName: string;
       subjectCode: string;

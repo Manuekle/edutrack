@@ -457,7 +457,7 @@ export default function ProfilePage() {
         value={activeTab}
       >
         <TabsList
-          className="inline-flex h-9 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground shadow-sm border border-border/50"
+          className="inline-flex  items-center justify-center rounded-full bg-muted p-1 text-muted-foreground shadow-sm border border-border/50"
           style={{
             display: 'grid',
             gridTemplateColumns: session?.user?.role === 'DOCENTE' ? '1fr 1fr 1fr' : '1fr 1fr',
@@ -782,7 +782,7 @@ export default function ProfilePage() {
                             alt="Firma"
                             fill
                             style={{ objectFit: 'contain' }}
-                            className="h-9 w-full object-contain invert dark:invert-0 transition-all"
+                            className=" w-full object-contain invert dark:invert-0 transition-all"
                           />
                         </div>
                       ) : (

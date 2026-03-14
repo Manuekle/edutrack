@@ -315,7 +315,7 @@ export function MicrocurriculoTab() {
                   <div className="space-y-2">
                     <p className="text-xs font-semibold">1. Descarga la plantilla</p>
                     <a href="/formatos/plantilla_microcurriculo.csv" download>
-                      <Button variant="outline" className="w-full justify-start h-9 text-xs">
+                      <Button variant="outline" className="w-full justify-start  text-xs">
                         <Download className="mr-2 h-4 w-4 text-muted-foreground" />
                         Descargar Plantilla CSV
                       </Button>
@@ -352,7 +352,7 @@ export function MicrocurriculoTab() {
                     <Button
                       onClick={handlePreview}
                       disabled={!file || isLoading || isPreview}
-                      className="w-full text-xs h-9"
+                      className="w-full text-xs "
                     >
                       {isLoading && !isPreview && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Generar Vista Previa
@@ -361,7 +361,7 @@ export function MicrocurriculoTab() {
                       <Button
                         onClick={handleCancel}
                         variant="ghost"
-                        className="w-full text-xs h-9 text-muted-foreground hover:text-destructive"
+                        className="w-full text-xs  text-muted-foreground hover:text-destructive"
                       >
                         Limpiar todo
                       </Button>
@@ -388,7 +388,7 @@ export function MicrocurriculoTab() {
                     </Label>
                     <Input
                       id="micro-codigo"
-                      className="h-9 text-xs"
+                      className=" text-xs"
                       value={manualForm.codigo}
                       onChange={e => setManualForm({ ...manualForm, codigo: e.target.value })}
                       placeholder="Ej: 718004"
@@ -401,7 +401,7 @@ export function MicrocurriculoTab() {
                     <Input
                       id="micro-semestre"
                       type="number"
-                      className="h-9 text-xs"
+                      className=" text-xs"
                       value={manualForm.semestre}
                       onChange={e => setManualForm({ ...manualForm, semestre: e.target.value })}
                     />
@@ -414,7 +414,7 @@ export function MicrocurriculoTab() {
                   </Label>
                   <Input
                     id="micro-nombre"
-                    className="h-9 text-xs"
+                    className=" text-xs"
                     value={manualForm.nombre}
                     onChange={e => setManualForm({ ...manualForm, nombre: e.target.value })}
                     placeholder="Ej: Matemáticas I"
@@ -429,7 +429,7 @@ export function MicrocurriculoTab() {
                     value={manualForm.programa}
                     onValueChange={value => setManualForm({ ...manualForm, programa: value })}
                   >
-                    <SelectTrigger id="micro-programa" className="h-9 text-xs">
+                    <SelectTrigger id="micro-programa" className=" text-xs">
                       <SelectValue placeholder="Selecciona..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -449,7 +449,7 @@ export function MicrocurriculoTab() {
                   <Input
                     id="micro-horas"
                     type="number"
-                    className="h-9 text-xs"
+                    className=" text-xs"
                     value={manualForm.horas}
                     onChange={e => setManualForm({ ...manualForm, horas: e.target.value })}
                   />
@@ -458,12 +458,12 @@ export function MicrocurriculoTab() {
                 <div className="flex gap-2 pt-4 border-t">
                   {editingId ? (
                     <>
-                      <Button onClick={handleUpdateItem} className="flex-1 h-9 text-xs">
+                      <Button onClick={handleUpdateItem} className="flex-1  text-xs">
                         Guardar Cambios
                       </Button>
                       <Button
                         variant="ghost"
-                        className="h-9 text-xs text-muted-foreground hover:text-destructive"
+                        className=" text-xs text-muted-foreground hover:text-destructive"
                         onClick={() => {
                           setEditingId(null);
                           setMode('csv');
@@ -474,7 +474,7 @@ export function MicrocurriculoTab() {
                       </Button>
                     </>
                   ) : (
-                    <Button onClick={handleAddManual} className="w-full h-9 text-xs">
+                    <Button onClick={handleAddManual} className="w-full  text-xs">
                       <Plus className="mr-2 h-4 w-4" />
                       Agregar a la Lista
                     </Button>
@@ -501,7 +501,7 @@ export function MicrocurriculoTab() {
                   </p>
                 </div>
               ) : finalResults ? (
-                <div className="flex flex-col items-center justify-center min-h-96 space-y-4 text-center p-6">
+                <div className="flex flex-col items-center justify-center min-6 space-y-4 text-center p-6">
                   <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <CheckCircle className="h-8 w-8 text-primary" />
                   </div>
@@ -514,7 +514,7 @@ export function MicrocurriculoTab() {
                       sistema.
                     </p>
                   </div>
-                  <Button onClick={handleNewUpload} variant="outline" className="mt-4 h-9 text-xs">
+                  <Button onClick={handleNewUpload} variant="outline" className="mt-4  text-xs">
                     Realizar nueva carga
                   </Button>
                 </div>
@@ -643,7 +643,7 @@ export function MicrocurriculoTab() {
                   <Button
                     onClick={handleConfirmUpload}
                     disabled={isConfirming || successCount === 0}
-                    className="h-9 px-6 text-xs min-w-[150px]"
+                    className=" px-6 text-xs min-w-[150px]"
                   >
                     {isConfirming ? (
                       <>

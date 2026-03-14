@@ -65,13 +65,13 @@ import { sileo } from 'sileo';
 interface UserData {
   id: string;
   name: string | null;
-  correoInstitucional: string | null;
-  correoPersonal: string | null;
+  institutionalEmail: string | null;
+  personalEmail: string | null;
   role: Role;
   isActive: boolean;
   document: string | null;
   studentCode?: string | null;
-  codigoDocente?: string | null;
+  teacherCode?: string | null;
 }
 
 export default function AdminUsuariosPage() {
@@ -88,8 +88,8 @@ export default function AdminUsuariosPage() {
 
   const [formData, setFormData] = useState({
     name: '',
-    correoInstitucional: '',
-    correoPersonal: '',
+    institutionalEmail: '',
+    personalEmail: '',
     role: 'ESTUDIANTE' as Role,
     document: '',
     password: '',
@@ -121,10 +121,19 @@ export default function AdminUsuariosPage() {
       const url = editingUserId ? `/api/admin/users/${editingUserId}` : '/api/admin/users';
       const method = editingUserId ? 'PATCH' : 'POST';
 
+      const payload = {
+        name: formData.name,
+        institutionalEmail: formData.institutionalEmail,
+        personalEmail: formData.personalEmail,
+        role: formData.role,
+        document: formData.document,
+        ...(formData.password ? { password: formData.password } : {}),
+      };
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -168,8 +177,8 @@ export default function AdminUsuariosPage() {
   const resetForm = () => {
     setFormData({
       name: '',
-      correoInstitucional: '',
-      correoPersonal: '',
+      institutionalEmail: '',
+      personalEmail: '',
       role: 'ESTUDIANTE',
       document: '',
       password: '',
@@ -188,8 +197,8 @@ export default function AdminUsuariosPage() {
     setEditingUserId(user.id);
     setFormData({
       name: user.name || '',
-      correoInstitucional: user.correoInstitucional || '',
-      correoPersonal: user.correoPersonal || '',
+      institutionalEmail: user.institutionalEmail || '',
+      personalEmail: user.personalEmail || '',
       role: user.role,
       document: user.document || '',
       password: '', // Password is not returned or editable via this form normally
@@ -200,7 +209,7 @@ export default function AdminUsuariosPage() {
   const filteredUsers = users.filter(user => {
     const matchesSearch =
       user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.correoInstitucional?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.institutionalEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.document?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
@@ -249,7 +258,7 @@ export default function AdminUsuariosPage() {
 
       <div className="flex gap-2">
         <Tabs defaultValue="listado" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 max-w-md h-9 text-xs mb-6 mx-auto">
+          <TabsList className="grid w-full grid-cols-3 max-w-md  text-xs mb-6 mx-auto">
             <TabsTrigger value="listado" className="text-xs h-7">Listado de Usuarios</TabsTrigger>
             <TabsTrigger value="docentes" className="text-xs h-7">Cargar Docentes</TabsTrigger>
             <TabsTrigger value="estudiantes" className="text-xs h-7">Cargar Estudiantes</TabsTrigger>
@@ -265,7 +274,7 @@ export default function AdminUsuariosPage() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button className="h-9 px-4 shadow-sm gap-2">
+                  <Button className=" px-4 shadow-sm gap-2">
                     <Plus className="h-4 w-4" />
                     <span className="text-xs font-semibold">Nuevo Usuario</span>
                   </Button>
@@ -289,7 +298,7 @@ export default function AdminUsuariosPage() {
                         <Input
                           value={formData.name}
                           onChange={e => setFormData({ ...formData, name: e.target.value })}
-                          className="h-9 text-xs"
+                          className=" text-xs"
                           placeholder="Ej: Juan Pérez"
                           required
                         />
@@ -303,7 +312,7 @@ export default function AdminUsuariosPage() {
                           <Input
                             value={formData.document}
                             onChange={e => setFormData({ ...formData, document: e.target.value })}
-                            className="h-9 text-xs"
+                            className=" text-xs"
                             placeholder="Identificación"
                             required
                           />
@@ -316,7 +325,7 @@ export default function AdminUsuariosPage() {
                             value={formData.role}
                             onValueChange={(v: Role) => setFormData({ ...formData, role: v })}
                           >
-                            <SelectTrigger className="h-9 text-xs">
+                            <SelectTrigger className=" text-xs">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="rounded-xl border shadow-xl">
@@ -337,7 +346,7 @@ export default function AdminUsuariosPage() {
                             type="password"
                             value={formData.password}
                             onChange={e => setFormData({ ...formData, password: e.target.value })}
-                            className="h-9 text-xs"
+                            className=" text-xs"
                             placeholder="••••••••"
                             required={!editingUserId}
                           />
@@ -349,11 +358,11 @@ export default function AdminUsuariosPage() {
                           Correo Institucional
                         </Label>
                         <Input
-                          value={formData.correoInstitucional}
+                          value={formData.institutionalEmail}
                           onChange={e =>
-                            setFormData({ ...formData, correoInstitucional: e.target.value })
+                            setFormData({ ...formData, institutionalEmail: e.target.value })
                           }
-                          className="h-9 text-xs"
+                          className=" text-xs"
                           placeholder="usuario@fup.edu.co"
                           required
                         />
@@ -363,7 +372,7 @@ export default function AdminUsuariosPage() {
                     <DialogFooter>
                       <Button
                         type="submit"
-                        className="w-full h-9 font-semibold text-xs"
+                        className="w-full  font-semibold text-xs"
                         disabled={isSaving}
                       >
                         {isSaving ? (
@@ -403,14 +412,14 @@ export default function AdminUsuariosPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                     <Input
                       placeholder="Buscar por nombre, documento o correo..."
-                      className="pl-9 h-9 bg-background border-border/40 text-xs"
+                      className="pl-9  bg-background border-border/40 text-xs"
                       value={searchTerm}
                       onChange={e => setSearchTerm(e.target.value)}
                     />
                   </div>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Select value={roleFilter} onValueChange={setRoleFilter}>
-                      <SelectTrigger className="h-9 bg-background border-border/40 w-full sm:w-44 text-xs">
+                      <SelectTrigger className=" bg-background border-border/40 w-full sm:w-44 text-xs">
                         <SelectValue placeholder="Filtrar Rol" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border shadow-xl">
@@ -468,7 +477,7 @@ export default function AdminUsuariosPage() {
                               </div>
                               <div className="flex flex-col min-w-0">
                                 <p className="text-xs font-semibold text-foreground truncate">{user.name}</p>
-                                <p className="text-[10px] text-muted-foreground truncate">{user.correoInstitucional}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{user.institutionalEmail}</p>
                               </div>
                             </div>
                           </TableCell>
@@ -493,16 +502,16 @@ export default function AdminUsuariosPage() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border">
-                                <DropdownMenuItem className="text-xs gap-2 py-2 cursor-pointer" onClick={() => handleEditUser(user)}>
-                                  <Edit2 className="h-3.5 w-3.5 text-blue-500" />
-                                  <span>Editar</span>
+                                <DropdownMenuItem className="cursor-pointer gap-2 py-2.5 rounded-lg text-blue-500 focus:bg-blue-500/10" onClick={() => handleEditUser(user)}>
+                                  <Edit2 className="h-3.5 w-3.5 text-primary" />
+                                  <span className="text-primary">Editar</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="text-xs gap-2 py-2 cursor-pointer text-destructive" onClick={() => {
+                                <DropdownMenuItem className="cursor-pointer gap-2 py-2.5 rounded-lg text-destructive focus:bg-destructive/10" onClick={() => {
                                   setUserToDelete(user);
                                   setIsDeleteDialogOpen(true);
                                 }}>
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                  <span>Eliminar</span>
+                                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                                  <span className="text-destructive">Eliminar</span>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -526,10 +535,10 @@ export default function AdminUsuariosPage() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="rounded-lg h-9 text-xs">Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="rounded-lg  text-xs">Cancelar</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteUser}
-                    className="rounded-lg h-9 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    className="rounded-lg  text-xs bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     disabled={isDeleting}
                   >
                     {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Eliminar Permanentemente'}
