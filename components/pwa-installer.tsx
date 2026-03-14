@@ -91,12 +91,15 @@ export function PWAInstaller() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md pb-safe">
-      <div className="bg-card border border-border/30 rounded-2xl shadow-lg p-5">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+    <div className="fixed bottom-6 left-4 right-4 z-[100] mx-auto max-w-md animate-in fade-in slide-in-from-bottom-5 duration-700">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-6 overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full -ml-12 -mb-12 blur-2xl" />
+        
+        <div className="relative flex items-start gap-4">
+          <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-primary to-primary/60 rounded-2xl shadow-lg shadow-primary/20 flex items-center justify-center">
             <svg
-              className="w-5 h-5 text-primary"
+              className="w-7 h-7 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -109,18 +112,18 @@ export function PWAInstaller() {
               />
             </svg>
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-sm">Instalar SIRA</h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              Añade esta app a tu pantalla de inicio para un acceso rápido
+          <div className="flex-1 pt-1">
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">Instalar SIRA</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+              Consigue la experiencia completa instalando nuestra app en tu dispositivo.
             </p>
           </div>
           <button
             onClick={handleDismiss}
-            className="flex-shrink-0 p-1 hover:bg-muted rounded-full"
+            className="flex-shrink-0 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
             aria-label="Cerrar"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -130,18 +133,18 @@ export function PWAInstaller() {
             </svg>
           </button>
         </div>
-        <div className="mt-4 flex gap-2">
+        <div className="mt-6 flex gap-3">
           <button
             onClick={handleInstall}
-            className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold py-2 px-4 rounded-full transition-colors"
+            className="flex-[2] bg-primary text-white hover:bg-primary/90 text-sm font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
           >
-            Instalar
+            Instalar ahora
           </button>
           <button
             onClick={handleDismiss}
-            className="flex-1 bg-muted hover:bg-muted/80 text-xs font-semibold py-2 px-4 rounded-full transition-colors"
+            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-semibold py-3.5 px-6 rounded-2xl transition-all active:scale-[0.98]"
           >
-            Ahora no
+            Quizás pronto
           </button>
         </div>
       </div>

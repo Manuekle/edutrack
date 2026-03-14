@@ -6,6 +6,11 @@ Disallow: /dashboard/*
 Disallow: /_next/*
 Disallow: /404
 Disallow: /500
+Disallow: /offline
+
+# GPTBot
+User-agent: GPTBot
+Disallow: /
 
 # Host
 Host: https://sira-fup.vercel.app

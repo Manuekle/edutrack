@@ -2,13 +2,27 @@ export default {
   siteUrl: process.env.SITE_URL || 'https://sira-fup.vercel.app',
   generateRobotsTxt: true,
   sitemapSize: 5000,
-  exclude: ['/api/*', '/dashboard/*', '/_error', '/_next/*', '/404', '/500'],
+  exclude: [
+    '/api/*',
+    '/dashboard/admin/*',
+    '/dashboard/docente/*',
+    '/dashboard/estudiante/*',
+    '/_error',
+    '/_next/*',
+    '/404',
+    '/500',
+    '/offline',
+  ],
   robotsTxtOptions: {
     policies: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/*', '/dashboard/*', '/_next/*', '/404', '/500'],
+        disallow: ['/api/*', '/dashboard/*', '/_next/*', '/404', '/500', '/offline'],
+      },
+      {
+        userAgent: 'GPTBot',
+        disallow: ['/'],
       },
     ],
   },
@@ -22,9 +36,5 @@ export default {
     await config.transform(config, '/login'),
     await config.transform(config, '/forgot-password'),
     await config.transform(config, '/reset-password'),
-    await config.transform(config, '/dashboard'),
-    await config.transform(config, '/dashboard/estudiante'),
-    await config.transform(config, '/dashboard/docente'),
-    await config.transform(config, '/dashboard/admin'),
   ],
 };

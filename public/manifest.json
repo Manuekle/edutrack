@@ -1,7 +1,10 @@
 {
+  "id": "com.fup.sira",
   "name": "SIRA - Sistema Integral de Registro Académico",
   "short_name": "SIRA",
   "description": "Sistema Integral de Registro Académico para la gestión automatizada de asistencias mediante códigos QR",
+  "lang": "es-CO",
+  "dir": "ltr",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -25,19 +28,31 @@
       "src": "/icons/favicon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/favicon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "apple_mobile_web_app_capable": true,
   "apple_mobile_web_app_status_bar_style": "default",
   "apple_touch_icon": "/icons/favicon-180x180.png",
-  "categories": ["education", "productivity"],
+  "categories": ["education", "productivity", "utilities"],
   "shortcuts": [
     {
       "name": "Escanear QR",
