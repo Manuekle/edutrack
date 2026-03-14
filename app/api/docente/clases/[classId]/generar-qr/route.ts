@@ -19,30 +19,42 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
     return NextResponse.json({ message: 'El ID de la clase es requerido' }, { status: 400 });
   }
 
-  // 1. Verificar que la clase pertenece al docente y cargar la relación con subject
-  const classToUpdate = await db.class.findFirst({
-    where: {
-      id: classId,
-      subject: {
-        teacherIds: { has: session.user.id },
-      },
-    },
+  // 1. Verificar que la clase existe y cargar relaciones
+  const classToUpdate = await db.class.findUnique({
+    where: { id: classId },
     include: {
       subject: {
         select: {
           id: true,
           code: true,
           name: true,
-          studentIds: true, // Incluir studentIds en la consulta
+          studentIds: true,
+          teacherIds: true,
+        },
+      },
+      group: {
+        select: {
+          id: true,
+          studentIds: true,
+          teacherIds: true,
         },
       },
     },
   });
 
   if (!classToUpdate) {
+    return NextResponse.json({ message: 'Clase no encontrada' }, { status: 404 });
+  }
+
+  // Verificar pertenencia (sujeto o grupo)
+  const isTeacher = 
+    classToUpdate.subject?.teacherIds?.includes(session.user.id) || 
+    classToUpdate.group?.teacherIds?.includes(session.user.id);
+
+  if (!isTeacher) {
     return NextResponse.json(
-      { message: 'Clase no encontrada o no pertenece al docente' },
-      { status: 404 }
+      { message: 'No tienes permiso para generar el QR de esta clase' },
+      { status: 403 }
     );
   }
 
@@ -78,10 +90,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ cla
     // 5. Enviar notificación por correo si es la primera vez
     if (shouldSendNotification) {
       try {
-        // Obtener todos los estudiantes matriculados en la materia
+        // Obtener todos los estudiantes matriculados (materia + grupo)
+        const allStudentIds = Array.from(new Set([
+          ...(classToUpdate.subject?.studentIds || []),
+          ...(classToUpdate.group?.studentIds || []),
+        ]));
+
         const students = await db.user.findMany({
           where: {
-            id: { in: classToUpdate.subject.studentIds },
+            id: { in: allStudentIds },
             role: 'ESTUDIANTE',
             isActive: true,
           },

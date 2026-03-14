@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
 
     // Generar token de reset
     const resetToken = crypto.randomUUID();
-    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+    // Sync with ResetPasswordEmail.tsx which says 24 hours
+    const resetTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // Guardar token en la base de datos
     await db.user.update({
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Renderizar y enviar el correo electrónico
     try {
-      await sendEmail({
+      const emailResult = await sendEmail({
         to: correo,
         subject: 'Restablece tu contraseña - Sistema de Asistencias FUP',
         react: React.createElement(ResetPasswordEmail, {
@@ -50,10 +51,24 @@ export async function POST(request: NextRequest) {
           supportEmail: process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co',
         }),
       });
+
+      if (!emailResult.success) {
+        throw new Error('Email sending failed unexpectedly');
+      }
     } catch (error) {
-      console.error('Error in sendEmail:', error);
+      console.error('Detailed error in forgot-password email sending:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        correo,
+        userId: user.id,
+      });
+
       return NextResponse.json(
-        { message: 'Error al enviar el correo de restablecimiento' },
+        {
+          message: 'Error al enviar el correo de restablecimiento',
+          // Incluimos más detalles en desarrollo
+          debug: process.env.NODE_ENV === 'development' ? String(error) : undefined,
+        },
         { status: 500 }
       );
     }
@@ -66,7 +81,13 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error in forgot-password POST:', error);
-    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
+    console.error('Critical error in forgot-password POST:', error);
+    return NextResponse.json(
+      {
+        message: 'Error interno del servidor',
+        debug: process.env.NODE_ENV === 'development' ? String(error) : undefined,
+      },
+      { status: 500 }
+    );
   }
 }

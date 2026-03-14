@@ -39,6 +39,10 @@ export async function sendEmail({
     });
 
     if (error) {
+      console.error('Resend error details:', {
+        message: error.message,
+        name: error.name,
+      });
       throw new Error(error.message);
     }
 
@@ -47,6 +51,7 @@ export async function sendEmail({
       id: data?.id,
     };
   } catch (error) {
+    console.error('Exception in sendEmail:', error);
     throw new Error(
       `Error al enviar el correo con Resend: ${error instanceof Error ? error.message : String(error)}`
     );
