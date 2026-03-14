@@ -1,7 +1,14 @@
 import { Resend } from 'resend';
 import * as React from 'react';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendInstance: Resend | null = null;
+
+function getResend() {
+  if (!resendInstance) {
+    resendInstance = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendInstance;
+}
 
 export interface SendEmailOptions {
   to: string | string[];
@@ -24,7 +31,7 @@ export async function sendEmail({
   const defaultFrom = `Sistema de Asistencias FUP <${process.env.SMTP_FROM || 'onboarding@resend.dev'}>`;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: from || defaultFrom,
       to: Array.isArray(to) ? to : [to],
       subject,
