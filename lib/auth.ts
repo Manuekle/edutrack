@@ -67,6 +67,7 @@ export const authOptions: NextAuthOptions = {
             phone: true,
             document: true,
             isActive: true,
+            mustChangePassword: true,
             password: true,
           },
         });
@@ -136,6 +137,7 @@ export const authOptions: NextAuthOptions = {
           phone: user.phone,
           document: user.document,
           isActive: user.isActive,
+          mustChangePassword: user.mustChangePassword,
         };
 
         try {
@@ -179,6 +181,7 @@ export const authOptions: NextAuthOptions = {
             phone: true,
             document: true,
             isActive: true,
+            mustChangePassword: true,
           },
         });
 
@@ -214,6 +217,7 @@ export const authOptions: NextAuthOptions = {
           phone: token.phone as string | null,
           document: token.document as string | null,
           isActive: token.isActive as boolean,
+          mustChangePassword: token.mustChangePassword as boolean,
         };
       }
       return session;

@@ -1,3 +1,4 @@
+import ForcePasswordChangeGuard from '@/components/force-password-change-guard';
 import SidebarLayout from '@/components/sidebar-layout';
 import { ReactNode } from 'react';
 
@@ -15,6 +16,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarLayout>
       <div className="font-sans" id="main-content">
+        <ForcePasswordChangeGuard />
         {children}
       </div>
     </SidebarLayout>

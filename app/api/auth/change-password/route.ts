@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     // Update password
     await db.user.update({
       where: { id: session.user.id },
-      data: { password: hashedPassword },
+      data: { password: hashedPassword, mustChangePassword: false },
     });
 
     // Invalidate user cache

@@ -289,7 +289,7 @@ export function BulkEnrollmentUpload({
         </div>
         <div className="flex flex-col justify-between gap-3">
           <a href="/formatos/plantilla_asignacion.csv" download>
-            <Button variant="outline" size="default" className="w-full justify-start text-xs">
+            <Button variant="default" size="default" className="w-full justify-start text-xs">
               <Download className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               Descargar Plantilla CSV
             </Button>
@@ -301,14 +301,14 @@ export function BulkEnrollmentUpload({
       {/* Process button */}
       <div className="flex gap-2 justify-end">
         {(file || matchedRows.length > 0) && (
-          <Button onClick={handleClear} variant="ghost" size="sm" className="text-xs text-muted-foreground">
+          <Button onClick={handleClear} variant="ghost" size="default" className="text-xs text-muted-foreground">
             Limpiar
           </Button>
         )}
         <Button
           onClick={processFile}
           disabled={!file || processing}
-          size="sm"
+          size="default"
           className="text-xs"
         >
           {processing ? (
@@ -409,7 +409,7 @@ export function BulkEnrollmentUpload({
             <Button
               onClick={handleConfirm}
               disabled={actionableCount === 0 || confirming}
-              size="sm"
+              size="default"
               className="text-xs px-5"
             >
               {confirming ? (

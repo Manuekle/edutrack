@@ -1008,7 +1008,7 @@ export function TeacherReport() {
                           </div>
                         </div>
 
-                        <Button asChild size="sm" variant="default" className="w-full text-xs h-8 mt-auto">
+                        <Button asChild size="default" variant="default" className="w-full text-xs h-8 mt-auto">
                           <Link href={`/dashboard/admin/reportes/bitacora/${g.id}`}>
                             Ver Bitácora
                           </Link>

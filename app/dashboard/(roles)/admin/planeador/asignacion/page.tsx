@@ -549,7 +549,7 @@ export default function AsignacionPage() {
                     <div className="flex gap-1.5">
                       <Button
                         variant={studentMode === 'search' ? 'default' : 'outline'}
-                        size="sm"
+                        size="default"
                         className="text-xs rounded-lg gap-1.5 h-8"
                         onClick={() => setStudentMode('search')}
                       >
@@ -558,7 +558,7 @@ export default function AsignacionPage() {
                       </Button>
                       <Button
                         variant={studentMode === 'csv' ? 'default' : 'outline'}
-                        size="sm"
+                        size="default"
                         className="text-xs rounded-lg gap-1.5 h-8"
                         onClick={() => setStudentMode('csv')}
                       >
@@ -658,7 +658,7 @@ export default function AsignacionPage() {
                     <div className="flex gap-1.5">
                       <Button
                         variant={docenteMode === 'search' ? 'default' : 'outline'}
-                        size="sm"
+                        size="default"
                         className="text-xs rounded-lg gap-1.5 h-8"
                         onClick={() => setDocenteMode('search')}
                       >
@@ -667,7 +667,7 @@ export default function AsignacionPage() {
                       </Button>
                       <Button
                         variant={docenteMode === 'csv' ? 'default' : 'outline'}
-                        size="sm"
+                        size="default"
                         className="text-xs rounded-lg gap-1.5 h-8"
                         onClick={() => setDocenteMode('csv')}
                       >

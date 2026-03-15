@@ -15,14 +15,6 @@ interface UserPreview {
   message: string;
 }
 
-const generatePassword = (length: number = 10) => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-};
 
 export async function POST(req: Request) {
   try {
@@ -193,7 +185,7 @@ export async function POST(req: Request) {
     const itemsWithPasswords = await Promise.all(
       validItems.map(async item => ({
         ...item,
-        hashedPassword: await bcrypt.hash(generatePassword(12), 10),
+        hashedPassword: await bcrypt.hash(item.document, 10),
       }))
     );
 
@@ -211,6 +203,7 @@ export async function POST(req: Request) {
             password: item.hashedPassword,
             role: forceRole,
             isActive: true,
+            mustChangePassword: true,
           },
         })
       )
