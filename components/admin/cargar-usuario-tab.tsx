@@ -128,6 +128,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
   ).length;
   const warningCount = previewData.filter((p) => p.status === 'warning').length;
   const errorCount = previewData.filter((p) => p.status === 'error').length;
+  const docLabel = role === 'ESTUDIANTE' ? 'Código' : 'Documento';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -160,7 +161,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                 </div>
                 <ul className="space-y-1 ml-5 list-disc text-[10px]">
                   <li>nombre</li>
-                  <li>documento</li>
+                  <li>{role === 'ESTUDIANTE' ? 'codigo_estudiante' : 'documento'}</li>
                   <li>correo</li>
                 </ul>
                 <p className="text-[10px] mt-2 text-muted-foreground/80">
@@ -284,7 +285,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                                 {row.name}
                               </span>
                               <span className="text-[10px] text-muted-foreground font-mono mt-1">
-                                {row.document}
+                                {docLabel}: {row.document}
                               </span>
                             </div>
                           </TableCell>

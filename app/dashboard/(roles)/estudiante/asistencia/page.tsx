@@ -98,7 +98,11 @@ export default function StudentAttendancePage() {
     }
   };
 
-  const handleScan = async (qrToken: string) => {
+  const handleScan = async (rawData: string) => {
+    // Extraer token de URL si es necesario
+    const tokenMatch = rawData.match(/escanear\/([a-f0-9]{32})/i);
+    const qrToken = tokenMatch ? tokenMatch[1] : rawData;
+
     setIsProcessing(true);
     setQrSuccess(false);
     const loadingId = sileo.show({ title: 'Procesando código QR...', type: 'loading' });

@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { decodeCSVBuffer } from '@/lib/csv-encoding';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const buffer = await file.arrayBuffer();
-    const text = new TextDecoder('utf-8').decode(buffer);
+    const text = decodeCSVBuffer(buffer);
     const lines = text.split(/\r?\n/).filter(l => l.trim());
 
     if (lines.length < 2) {

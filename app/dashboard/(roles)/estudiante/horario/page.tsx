@@ -26,7 +26,7 @@ const DIA_MAP: Record<string, number> = {
   JUEVES: 4,
   VIERNES: 5,
   SABADO: 6,
-  DOMINGO: 0,
+  DOMINGO: 7,
 };
 
 export default function HorarioEstudiantePage() {
@@ -47,7 +47,7 @@ export default function HorarioEstudiantePage() {
     const events: CalendarEvent[] = [];
 
     horarios.forEach((h, idx) => {
-      const dayOffset = (DIA_MAP[h.diaSemana] ?? 1) - 1; // 0 for Monday
+      const dayOffset = DIA_MAP[h.diaSemana] - 1; // 0 for Monday
       const eventDate = addDays(monday, dayOffset);
 
       if (!h.horaInicio || !h.horaFin) return;

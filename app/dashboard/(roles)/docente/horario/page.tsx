@@ -26,7 +26,7 @@ const DIA_MAP: Record<string, number> = {
   THURSDAY: 4,
   FRIDAY: 5,
   SATURDAY: 6,
-  SUNDAY: 0,
+  SUNDAY: 7,
   // Fallback español
   LUNES: 1,
   MARTES: 2,
@@ -34,7 +34,7 @@ const DIA_MAP: Record<string, number> = {
   JUEVES: 4,
   VIERNES: 5,
   SABADO: 6,
-  DOMINGO: 0,
+  DOMINGO: 7,
 };
 
 export default function MiHorarioPage() {
@@ -55,7 +55,7 @@ export default function MiHorarioPage() {
     const events: CalendarEvent[] = [];
 
     horarios.forEach((h, idx) => {
-      const dayOffset = (DIA_MAP[h.dayOfWeek] || 1) - 1; // 0 for Monday
+      const dayOffset = (DIA_MAP[h.dayOfWeek] ?? 1) - 1; // 0 for Monday
       const eventDate = addDays(monday, dayOffset);
 
       if (!h.startTime || !h.endTime) return;

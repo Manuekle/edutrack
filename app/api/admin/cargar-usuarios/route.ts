@@ -1,5 +1,6 @@
 import WelcomeUserEmail from '@/app/emails/WelcomeUserEmail';
 import { authOptions } from '@/lib/auth';
+import { decodeCSVBuffer } from '@/lib/csv-encoding';
 import { sendEmail } from '@/lib/email';
 import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
@@ -106,14 +107,8 @@ export async function POST(request: Request) {
       const buffer = await file.arrayBuffer();
       let rows: ExcelRow[] = [];
 
-      // CSV: soporte UTF-8 con BOM (Excel) y detección de delimitador (; o ,)
-      const rawBytes = new Uint8Array(buffer);
-      const hasBOM =
-        rawBytes.length >= 3 &&
-        rawBytes[0] === 0xef &&
-        rawBytes[1] === 0xbb &&
-        rawBytes[2] === 0xbf;
-      const text = new TextDecoder('utf-8').decode(hasBOM ? rawBytes.slice(3) : rawBytes);
+      // CSV: soporte UTF-8 con BOM (Excel), fallback Windows-1252 y detección de delimitador
+      const text = decodeCSVBuffer(buffer);
       const lines = text.split(/\r?\n/).filter(line => line.trim());
 
       if (lines.length === 0) {

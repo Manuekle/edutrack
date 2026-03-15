@@ -1,5 +1,6 @@
 import { authOptions } from '@/lib/auth';
 import { detectDelimiter, parseCSVLine, validateCSVHeaders } from '@/lib/csv-parser';
+import { decodeCSVBuffer } from '@/lib/csv-encoding';
 import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
@@ -47,7 +48,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     const buffer = await file.arrayBuffer();
-    const text = new TextDecoder('utf-8').decode(buffer);
+    const text = decodeCSVBuffer(buffer);
     const delimiter = detectDelimiter(text);
     const lines = text.split(/\r?\n/).filter(line => line.trim());
 

@@ -170,7 +170,7 @@ export async function POST(request: Request) {
       data: {
         classId: classRecord.id,
         studentId: session.user.id,
-        status: 'PRESENT' as any,
+        status: 'PRESENT',
         createdAt: new Date(),
       },
     });
@@ -183,7 +183,7 @@ export async function POST(request: Request) {
     const attendanceResponse = {
       id: newAttendance.id,
       status: newAttendance.status,
-      createdAt: newAttendance.createdAt,
+      recordedAt: newAttendance.createdAt,
       subject: subject.name,
       class: classRecord.topic || classRecord.date.toISOString().split('T')[0],
     };

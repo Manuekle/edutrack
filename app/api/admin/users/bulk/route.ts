@@ -1,4 +1,5 @@
 import { authOptions } from '@/lib/auth';
+import { decodeCSVBuffer } from '@/lib/csv-encoding';
 import { db } from '@/lib/prisma';
 import { Role } from '@prisma/client';
 import { getServerSession } from 'next-auth/next';
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
     }
 
     const buffer = await file.arrayBuffer();
-    const text = new TextDecoder('utf-8').decode(buffer);
+    const text = decodeCSVBuffer(buffer);
 
     const parsed = Papa.parse<Record<string, string>>(text, {
       header: true,
@@ -73,7 +74,7 @@ export async function POST(req: Request) {
     // Header mapping
     const headerMap: Record<string, string[]> = {
       name: ['nombre', 'name', 'nombrecompleto', 'nombres'],
-      document: ['documento', 'document', 'cedula', 'identificacion', 'id'],
+      document: ['codigo_estudiante', 'codigoestudiante', 'documento', 'document', 'cedula', 'identificacion', 'id'],
       email: ['correo', 'email', 'correopersonal', 'correoinstitucional'],
     };
 
@@ -96,10 +97,11 @@ export async function POST(req: Request) {
     const emailH = findHeader(headerMap.email);
 
     if (!nameH || !documentH || !emailH) {
+      const docLabel = forceRole === Role.ESTUDIANTE ? 'codigo_estudiante' : 'documento';
       return NextResponse.json(
         {
           error:
-            'El CSV debe incluir al menos las columnas: nombre, documento y correo. Columnas encontradas: ' +
+            `El CSV debe incluir al menos las columnas: nombre, ${docLabel} y correo. Columnas encontradas: ` +
             headers.join(', '),
         },
         { status: 400 }
@@ -135,7 +137,9 @@ export async function POST(req: Request) {
           previews.push({
             name, document: documentStr, email,
             status: 'error',
-            message: 'Documento duplicado en este mismo archivo.',
+            message: forceRole === Role.ESTUDIANTE
+              ? 'Código estudiante duplicado en este mismo archivo.'
+              : 'Documento duplicado en este mismo archivo.',
           });
           continue;
       }

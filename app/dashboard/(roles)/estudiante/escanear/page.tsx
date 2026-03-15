@@ -29,7 +29,11 @@ export default function ScannerPage() {
   } | null>(null);
   const router = useRouter();
 
-  const handleScan = async (qrToken: string) => {
+  const handleScan = async (rawData: string) => {
+    // Extraer token de URL si es necesario
+    const tokenMatch = rawData.match(/escanear\/([a-f0-9]{32})/i);
+    const qrToken = tokenMatch ? tokenMatch[1] : rawData;
+
     setIsProcessing(true);
     setSuccess(false);
 

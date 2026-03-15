@@ -64,10 +64,47 @@ export function BulkEnrollmentUpload({
     if (!file) return;
     setProcessing(true);
 
-    Papa.parse<Record<string, string>>(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
+    // Leer como ArrayBuffer para detectar encoding (UTF-8 vs Windows-1252)
+    const reader = new FileReader();
+    reader.onload = () => {
+      const buffer = reader.result as ArrayBuffer;
+      const rawBytes = new Uint8Array(buffer);
+
+      // Strip UTF-8 BOM if present
+      const hasBOM =
+        rawBytes.length >= 3 &&
+        rawBytes[0] === 0xef &&
+        rawBytes[1] === 0xbb &&
+        rawBytes[2] === 0xbf;
+      const bytes = hasBOM ? rawBytes.slice(3) : rawBytes;
+
+      // Try UTF-8 first, fallback to Windows-1252 for ñ, tildes, etc.
+      let text: string;
+      try {
+        text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+      } catch {
+        text = new TextDecoder('windows-1252').decode(bytes);
+      }
+
+      const results = Papa.parse<Record<string, string>>(text, {
+        header: true,
+        skipEmptyLines: true,
+      });
+
+      processResults(results);
+    };
+    reader.onerror = () => {
+      setMatchedRows([{
+        document: '',
+        status: 'not_found',
+        message: 'Error al leer el archivo CSV.',
+      }]);
+      setProcessing(false);
+    };
+    reader.readAsArrayBuffer(file);
+  }, [file, allUsers, currentlyAssignedIds]);
+
+  const processResults = useCallback((results: Papa.ParseResult<Record<string, string>>) => {
         const headers = results.meta.fields || [];
         const docHeader = findHeader(headers, ['documento', 'document', 'cedula', 'identificacion', 'id']);
         const nameHeader = findHeader(headers, ['nombre', 'name', 'nombrecompleto', 'nombres']);
@@ -153,17 +190,7 @@ export function BulkEnrollmentUpload({
 
         setMatchedRows(rows);
         setProcessing(false);
-      },
-      error: () => {
-        setMatchedRows([{
-          document: '',
-          status: 'not_found',
-          message: 'Error al leer el archivo CSV.',
-        }]);
-        setProcessing(false);
-      },
-    });
-  }, [file, allUsers, currentlyAssignedIds]);
+  }, [allUsers, currentlyAssignedIds]);
 
   const existingNewIds = matchedRows.filter(r => r.status === 'new' && r.userId).map(r => r.userId!);
   const toCreateRows = matchedRows.filter(r => r.status === 'will_create');
@@ -180,9 +207,10 @@ export function BulkEnrollmentUpload({
 
       // Create missing users via bulk API
       if (toCreateRows.length > 0) {
+        const quote = (v: string = '') => `"${v.replace(/"/g, '""')}"`;
         const csvContent = 'documento,nombre,correo\n' +
-          toCreateRows.map(r => `${r.document},${r.name},${r.email}`).join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+          toCreateRows.map(r => `${quote(r.document)},${quote(r.name)},${quote(r.email)}`).join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' });
         const formData = new FormData();
         formData.append('file', blob, 'bulk_create.csv');
         formData.append('preview', 'false');
