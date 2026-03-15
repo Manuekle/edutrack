@@ -1,7 +1,7 @@
 'use client';
 
 import { FileUpload } from '@/components/ui/file-upload';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
 interface UploadedFile {
@@ -32,6 +32,10 @@ export function SubjectFileUpload({ onFileSelect, file }: SubjectFileUploadProps
     }
     return null;
   });
+
+  useEffect(() => {
+    if (!file) setUploadedFile(null);
+  }, [file]);
 
   const handleDropFiles = (files: FileList) => {
     const newFile = files[0];

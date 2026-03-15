@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { BookOpen, CheckCircle2, Download, FileUp, Loader2, UserPlus } from 'lucide-react';
+import { BookOpen, CheckCircle2, Download, Eye, FileUp, Loader2, UserPlus } from 'lucide-react';
 import Papa from 'papaparse';
 import { useCallback, useState } from 'react';
 import { sileo } from 'sileo';
@@ -56,6 +56,7 @@ export function BulkEnrollmentUpload({
   const [confirming, setConfirming] = useState(false);
 
   const roleLabel = role === 'DOCENTE' ? 'docentes' : 'estudiantes';
+  const isEstudiante = role === 'ESTUDIANTE';
 
   const findHeader = (headers: string[], variants: string[]) =>
     headers.find(h => variants.includes(h.toLowerCase().replace(/[\s_]+/g, '')));
@@ -106,24 +107,30 @@ export function BulkEnrollmentUpload({
 
   const processResults = useCallback((results: Papa.ParseResult<Record<string, string>>) => {
     const headers = results.meta.fields || [];
-    const docHeader = findHeader(headers, ['documento', 'document', 'cedula', 'identificacion', 'id']);
     const nameHeader = findHeader(headers, ['nombre', 'name', 'nombrecompleto', 'nombres']);
     const emailHeader = findHeader(headers, ['correo', 'email', 'correopersonal', 'correoinstitucional']);
 
-    if (!docHeader) {
+    // Estudiantes usan codigo_estudiante, docentes usan documento
+    const idHeader = isEstudiante
+      ? findHeader(headers, ['codigoestudiante', 'codigo', 'code', 'studentcode'])
+      : findHeader(headers, ['documento', 'document', 'cedula', 'identificacion', 'id']);
+    const expectedColumn = isEstudiante ? 'codigo_estudiante' : 'documento';
+
+    if (!idHeader) {
       setMatchedRows([{
         document: '',
         status: 'not_found',
-        message: `No se encontr\u00f3 columna "documento" en el CSV. Columnas: ${headers.join(', ')}`,
+        message: `No se encontró columna "${expectedColumn}" en el CSV. Columnas: ${headers.join(', ')}`,
       }]);
       setProcessing(false);
       return;
     }
 
-    const userByDoc = new Map<string, BulkEnrollmentUser>();
+    const userByKey = new Map<string, BulkEnrollmentUser>();
     for (const u of allUsers) {
-      if (u.document) {
-        userByDoc.set(u.document.toLowerCase().trim(), u);
+      const key = isEstudiante ? u.studentCode : u.document;
+      if (key) {
+        userByKey.set(key.toLowerCase().trim(), u);
       }
     }
 
@@ -132,7 +139,7 @@ export function BulkEnrollmentUpload({
     const rows: MatchedRow[] = [];
 
     for (const row of results.data) {
-      const docRaw = (row[docHeader] || '').trim();
+      const docRaw = (row[idHeader] || '').trim();
       if (!docRaw) continue;
 
       const docKey = docRaw.toLowerCase();
@@ -145,7 +152,7 @@ export function BulkEnrollmentUpload({
       }
       seenDocs.add(docKey);
 
-      const user = userByDoc.get(docKey);
+      const user = userByKey.get(docKey);
       if (!user) {
         if (name && email) {
           rows.push({
@@ -154,7 +161,7 @@ export function BulkEnrollmentUpload({
             email,
             status: 'will_create',
             userName: name,
-            message: 'Se crear\u00e1 y asignar\u00e1 al grupo.',
+            message: 'Se creará y asignará al grupo.',
           });
         } else {
           rows.push({
@@ -184,13 +191,13 @@ export function BulkEnrollmentUpload({
         userId: user.id,
         userName: user.name,
         status: 'new',
-        message: 'Se asignar\u00e1 al grupo.',
+        message: 'Se asignará al grupo.',
       });
     }
 
     setMatchedRows(rows);
     setProcessing(false);
-  }, [allUsers, currentlyAssignedIds]);
+  }, [allUsers, currentlyAssignedIds, isEstudiante]);
 
   const existingNewIds = matchedRows.filter(r => r.status === 'new' && r.userId).map(r => r.userId!);
   const toCreateRows = matchedRows.filter(r => r.status === 'will_create');
@@ -251,7 +258,7 @@ export function BulkEnrollmentUpload({
       setMatchedRows([]);
       setFile(null);
     } catch {
-      sileo.error({ description: 'Error al procesar la asignaci\u00f3n.' });
+      sileo.error({ description: 'Error al procesar la asignación.' });
     } finally {
       setConfirming(false);
     }
@@ -261,6 +268,8 @@ export function BulkEnrollmentUpload({
     setFile(null);
     setMatchedRows([]);
   };
+
+  const idColumnLabel = isEstudiante ? 'codigo_estudiante' : 'documento';
 
   return (
     <div className="space-y-4">
@@ -273,8 +282,8 @@ export function BulkEnrollmentUpload({
           </div>
           <ol className="space-y-1.5 text-[11px] text-muted-foreground list-decimal ml-4">
             <li>Descarga la plantilla CSV</li>
-            <li>Columna <strong className="text-foreground">documento</strong> (obligatoria)</li>
-            <li>Columnas <strong className="text-foreground">nombre</strong> y <strong className="text-foreground">correo</strong> (opcionales: si el usuario no existe, se crear&aacute; autom&aacute;ticamente)</li>
+            <li>Columna <strong className="text-foreground">{idColumnLabel}</strong> (obligatoria)</li>
+            <li>Columnas <strong className="text-foreground">nombre</strong> y <strong className="text-foreground">correo</strong> (opcionales: si el usuario no existe, se creará automáticamente)</li>
             <li>Sube el archivo, revisa y confirma</li>
           </ol>
         </div>
@@ -290,7 +299,12 @@ export function BulkEnrollmentUpload({
       </div>
 
       {/* Process button */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 justify-end">
+        {(file || matchedRows.length > 0) && (
+          <Button onClick={handleClear} variant="ghost" size="sm" className="text-xs text-muted-foreground">
+            Limpiar
+          </Button>
+        )}
         <Button
           onClick={processFile}
           disabled={!file || processing}
@@ -300,15 +314,10 @@ export function BulkEnrollmentUpload({
           {processing ? (
             <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
           ) : (
-            <FileUp className="mr-2 h-3.5 w-3.5" />
+            <Eye className="mr-2 h-3.5 w-3.5" />
           )}
-          Procesar CSV
+          Vista previa
         </Button>
-        {(file || matchedRows.length > 0) && (
-          <Button onClick={handleClear} variant="ghost" size="sm" className="text-xs text-muted-foreground">
-            Limpiar
-          </Button>
-        )}
       </div>
 
       {/* Preview table */}
@@ -323,7 +332,7 @@ export function BulkEnrollmentUpload({
                       Estado
                     </TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
-                      Documento
+                      {isEstudiante ? 'Código' : 'Documento'}
                     </TableHead>
                     <TableHead className="text-xs font-normal px-4 py-2 text-muted-foreground">
                       Usuario
@@ -391,7 +400,7 @@ export function BulkEnrollmentUpload({
               {newCount > 0 && createCount > 0 && ' \u00b7 '}
               {createCount > 0 && (
                 <span className="text-violet-600">
-                  {createCount} se crear&aacute;{createCount !== 1 ? 'n' : ''}
+                  {createCount} se crearán
                 </span>
               )}
               {alreadyCount > 0 && ` \u00b7 ${alreadyCount} ya asignado${alreadyCount !== 1 ? 's' : ''}`}
