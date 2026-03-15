@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   addDays,
+  addMonths,
+  addWeeks,
   differenceInMinutes,
   eachDayOfInterval,
   eachHourOfInterval,
@@ -17,11 +19,14 @@ import {
   startOfDay,
   startOfMonth,
   startOfWeek,
+  subDays,
+  subMonths,
+  subWeeks,
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Clock, MapPin, User } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 // --- CUSTOM CALENDAR COMPONENTS ---
 
@@ -163,7 +168,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
             <div
               key={day.toISOString()}
               className="relative border-r last:border-r-0"
-              style={{ height: `${hours.length * 4}rem` }} // 4rem = h-16
+              style={{ height: `${hours.length * 4}rem` }}
             >
               {/* Hour grid lines */}
               {hours.map(hour => (
@@ -177,7 +182,6 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                   const startMinutes = differenceInMinutes(event.start, startOfEventDay);
                   const durationMinutes = Math.max(differenceInMinutes(event.end, event.start), 30);
 
-                  // Calculamos la posición en rem (4rem = h-16)
                   const topRem = ((startMinutes - WEEK_START_HOUR * 60) / 60) * 4;
                   const heightRem = (durationMinutes / 60) * 4;
 
@@ -192,7 +196,6 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                       <p className="text-[11px] font-bold truncate leading-tight">
                         {event.subject || event.title}
                       </p>
-                      {/* Ocultamos detalles si la tarjeta es muy pequeña (40px aprox es 2.5rem) */}
                       {heightRem >= 2.5 && (
                         <p className="text-[10px] font-medium opacity-90 truncate mt-0.5 flex items-center gap-1">
                           <User className="h-3 w-3" aria-hidden="true" />
@@ -255,7 +258,6 @@ const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
                   const startMins = event.start.getMinutes();
                   const durationMins = Math.max(differenceInMinutes(event.end, event.start), 30);
 
-                  // Calculamos en rem (6rem = h-24)
                   const topRem = (startMins / 60) * 6;
                   const heightRem = (durationMins / 60) * 6;
 
@@ -366,34 +368,55 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
 };
 
 export const CustomCalendar = ({
-  date,
-  view,
+  date: initialDate = new Date(),
+  view: initialView = 'month',
   events,
   onNavigate,
   onView,
   label = 'Agenda Institucional',
 }: {
-  date: Date;
-  view: string;
+  date?: Date;
+  view?: string;
   events: CalendarEvent[];
-  onNavigate: (action: 'PREV' | 'NEXT' | 'TODAY') => void;
-  onView: (view: string) => void;
+  onNavigate?: (action: 'PREV' | 'NEXT' | 'TODAY') => void;
+  onView?: (view: string) => void;
   label?: string;
 }) => {
   const shouldReduceMotion = useReducedMotion();
 
+  // Estado interno: el calendario se controla a sí mismo
+  const [currentDate, setCurrentDate] = useState<Date>(initialDate);
+  const [currentView, setCurrentView] = useState<string>(initialView);
+
+  const handleNavigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+    setCurrentDate(prev => {
+      if (action === 'TODAY') return new Date();
+      if (currentView === 'month') return action === 'PREV' ? subMonths(prev, 1) : addMonths(prev, 1);
+      if (currentView === 'week') return action === 'PREV' ? subWeeks(prev, 1) : addWeeks(prev, 1);
+      if (currentView === 'day') return action === 'PREV' ? subDays(prev, 1) : addDays(prev, 1);
+      return prev;
+    });
+    // Notifica al padre si quiere escuchar
+    onNavigate?.(action);
+  };
+
+  const handleView = (v: string) => {
+    setCurrentView(v);
+    onView?.(v);
+  };
+
   const getLabel = () => {
-    if (view === 'month') return format(date, 'MMMM yyyy', { locale: es });
-    if (view === 'week') return `Semana ${format(date, 'w')} - ${format(date, 'yyyy')}`;
-    if (view === 'day') return format(date, "d 'de' MMMM", { locale: es });
+    if (currentView === 'month') return format(currentDate, 'MMMM yyyy', { locale: es });
+    if (currentView === 'week') return `Semana ${format(currentDate, 'w')} - ${format(currentDate, 'yyyy')}`;
+    if (currentView === 'day') return format(currentDate, "d 'de' MMMM", { locale: es });
     return label;
   };
 
   const getNavLabel = (dir: 'PREV' | 'NEXT') => {
     const isPrev = dir === 'PREV';
-    if (view === 'month') return isPrev ? 'Mes anterior' : 'Mes siguiente';
-    if (view === 'week') return isPrev ? 'Semana anterior' : 'Semana siguiente';
-    if (view === 'day') return isPrev ? 'Día anterior' : 'Día siguiente';
+    if (currentView === 'month') return isPrev ? 'Mes anterior' : 'Mes siguiente';
+    if (currentView === 'week') return isPrev ? 'Semana anterior' : 'Semana siguiente';
+    if (currentView === 'day') return isPrev ? 'Día anterior' : 'Día siguiente';
     return isPrev ? 'Anterior' : 'Siguiente';
   };
 
@@ -406,7 +429,7 @@ export const CustomCalendar = ({
             size="icon"
             className="w-9 rounded-full bg-background hover:bg-primary hover:text-primary-foreground transition-all"
             aria-label={getNavLabel('PREV')}
-            onClick={() => onNavigate('PREV')}
+            onClick={() => handleNavigate('PREV')}
           >
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </Button>
@@ -414,7 +437,7 @@ export const CustomCalendar = ({
             variant="outline"
             className="h-10 rounded-full px-6 text-xs bg-background tracking-card font-semibold"
             aria-label="Ir a la fecha de hoy"
-            onClick={() => onNavigate('TODAY')}
+            onClick={() => handleNavigate('TODAY')}
           >
             Hoy
           </Button>
@@ -423,7 +446,7 @@ export const CustomCalendar = ({
             size="icon"
             className="w-9 rounded-full bg-background hover:bg-primary hover:text-primary-foreground transition-all"
             aria-label={getNavLabel('NEXT')}
-            onClick={() => onNavigate('NEXT')}
+            onClick={() => handleNavigate('NEXT')}
           >
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </Button>
@@ -448,14 +471,14 @@ export const CustomCalendar = ({
               key={v.id}
               variant="ghost"
               size="default"
-              aria-pressed={view === v.id}
+              aria-pressed={currentView === v.id}
               className={cn(
                 'rounded-full px-6 text-xs font-semibold transition-all shrink-0',
-                view === v.id
+                currentView === v.id
                   ? 'bg-primary text-primary-foreground hover:bg-primary dark:hover:text-primary-foreground hover:text-white/90'
                   : 'text-muted-foreground/60 hover:bg-muted/30 hover:text-foreground'
               )}
-              onClick={() => onView(v.id)}
+              onClick={() => handleView(v.id)}
             >
               {v.label}
             </Button>
@@ -466,16 +489,16 @@ export const CustomCalendar = ({
       <div className="transition-colors duration-300">
         <AnimatePresence mode="wait">
           <motion.div
-            key={view + date.toISOString()}
+            key={currentView + currentDate.toISOString()}
             initial={shouldReduceMotion ? undefined : { opacity: 0, y: 10 }}
             animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             exit={shouldReduceMotion ? undefined : { opacity: 0, y: -10 }}
             transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
           >
-            {view === 'month' && <MonthView date={date} events={events} />}
-            {view === 'week' && <WeekView date={date} events={events} />}
-            {view === 'day' && <DayView date={date} events={events} />}
-            {view === 'agenda' && <AgendaView date={date} events={events} />}
+            {currentView === 'month' && <MonthView date={currentDate} events={events} />}
+            {currentView === 'week' && <WeekView date={currentDate} events={events} />}
+            {currentView === 'day' && <DayView date={currentDate} events={events} />}
+            {currentView === 'agenda' && <AgendaView date={currentDate} events={events} />}
           </motion.div>
         </AnimatePresence>
       </div>
