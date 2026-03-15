@@ -249,6 +249,18 @@ export default function AttendancePage() {
   const isPast = classEndDate ? now > new Date(classEndDate.getTime() + bufferMs) : false;
   const isCompleted = classInfo?.status === 'SIGNED' || classInfo?.status === 'CANCELADA';
 
+  // Redirigir automáticamente cuando llegue la hora fin de clase
+  useEffect(() => {
+    if (!classEndDate || !groupId) return;
+    const msUntilEnd = new Date(classEndDate.getTime() + bufferMs).getTime() - Date.now();
+    if (msUntilEnd <= 0) return; // ya está manejado por isPast
+    const timer = setTimeout(() => {
+      sileo.info({ title: 'La clase ha finalizado', description: 'Redirigiendo al grupo...' });
+      router.push(`/dashboard/docente/grupos/${groupId}`);
+    }, msUntilEnd);
+    return () => clearTimeout(timer);
+  }, [classEndDate, groupId, router]);
+
   if (isLoading) return <LoadingPage />;
 
   if (isTooEarly || isPast || isCompleted) {
