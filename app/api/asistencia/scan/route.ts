@@ -133,22 +133,8 @@ export async function POST(request: Request) {
 
     const subject = group.subject;
     const studentIds = group.studentIds || [];
-    // 6. Validar horario de la clase
-    const now = new Date();
-    const classStart = classRecord.startTime || classRecord.date;
-    const classEnd = classRecord.endTime || new Date(classStart.getTime() + 2 * 60 * 60 * 1000);
-    if (now < classStart) {
-      const minutesUntilClass = Math.ceil((classStart.getTime() - now.getTime()) / (60 * 1000));
-      return createErrorResponse('CLASS_NOT_STARTED', {
-        startsIn: minutesUntilClass,
-        classStartsAt: classStart.toISOString(),
-      });
-    }
-    if (now > classEnd) {
-      return createErrorResponse('CLASS_ENDED', {
-        classEndedAt: classEnd.toISOString(),
-      });
-    }
+    // 6. El QR activo (qrTokenExpiresAt > now) ya garantiza que la clase está en curso.
+    //    No se valida horario adicional para evitar falsos positivos por zona horaria.
     // 7. Verificar si el estudiante está matriculado en el grupo
     const isEnrolled = studentIds.includes(session.user.id);
     if (!isEnrolled) {

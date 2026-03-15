@@ -128,7 +128,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
   ).length;
   const warningCount = previewData.filter((p) => p.status === 'warning').length;
   const errorCount = previewData.filter((p) => p.status === 'error').length;
-  const docLabel = role === 'ESTUDIANTE' ? 'Código' : 'Documento';
+  const docLabel = role === 'ESTUDIANTE' ? 'Código estudiante' : 'Documento';
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

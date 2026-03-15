@@ -189,30 +189,36 @@ export async function POST(req: Request) {
       );
     }
 
+    // Hash all passwords BEFORE the transaction (bcrypt is slow, must not run inside a transaction)
+    const itemsWithPasswords = await Promise.all(
+      validItems.map(async item => ({
+        ...item,
+        hashedPassword: await bcrypt.hash(generatePassword(12), 10),
+      }))
+    );
+
     let createdCount = 0;
     let errorCount = 0;
 
-    await db.$transaction(async (tx) => {
-      for (const item of validItems) {
-        try {
-            const hashedPassword = await bcrypt.hash(generatePassword(12), 12);
-            await tx.user.create({
-                data: {
-                    name: item.name,
-                    document: item.document,
-                    personalEmail: item.email,
-                    institutionalEmail: item.email || undefined,
-                    password: hashedPassword,
-                    role: forceRole,
-                    isActive: true
-                }
-            });
-            createdCount++;
-        } catch (e) {
-            console.error(e);
-            errorCount++;
-        }
-      }
+    await db.$transaction(
+      itemsWithPasswords.map(item =>
+        db.user.create({
+          data: {
+            name: item.name,
+            document: item.document,
+            personalEmail: item.email,
+            institutionalEmail: item.email || undefined,
+            password: item.hashedPassword,
+            role: forceRole,
+            isActive: true,
+          },
+        })
+      )
+    ).then(results => {
+      createdCount = results.length;
+    }).catch(e => {
+      console.error(e);
+      errorCount = itemsWithPasswords.length;
     });
 
     const alreadyExisted = previews.filter(p => p.status === 'warning').length;
