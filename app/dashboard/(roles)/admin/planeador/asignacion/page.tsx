@@ -365,7 +365,7 @@ export default function AsignacionPage() {
                     variant="outline"
                     role="combobox"
                     aria-expanded={grupoComboOpen}
-                    className="w-full h-11 rounded-xl sm:text-sm text-xs px-4 shadow-none bg-muted/40 border hover:bg-muted/60 focus:bg-background focus:border-primary/50 transition-colors justify-between font-normal"
+                    className="w-full h-11 rounded-xl sm:text-sm text-xs px-4 shadow-none bg-background border border-input hover:bg-accent focus:bg-background focus:border-primary/50 transition-colors justify-between font-normal"
                   >
                     {currentGrupo ? (
                       <span className="flex items-center gap-2 truncate">
@@ -652,7 +652,7 @@ export default function AsignacionPage() {
                         Docentes
                       </CardTitle>
                       <CardDescription className="text-[11px] mt-0.5">
-                        {docentesInGroup.length} asignados de {docentes.length} en el sistema.
+                        {docentesInGroup.length === 1 ? '1 docente asignado' : 'Sin docente asignado'} — {docentes.length} disponibles.
                       </CardDescription>
                     </div>
                     <div className="flex gap-1.5">
@@ -707,9 +707,7 @@ export default function AsignacionPage() {
                                     className="rounded-[4px] h-4 w-4 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                                     checked={docentesInGroup.includes(d.id)}
                                     onCheckedChange={checked => {
-                                      setDocentesInGroup(prev =>
-                                        checked ? [...prev, d.id] : prev.filter(id => id !== d.id)
-                                      );
+                                      setDocentesInGroup(checked ? [d.id] : []);
                                     }}
                                     onClick={e => e.stopPropagation()}
                                   />
