@@ -10,26 +10,9 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Get subjects where student is enrolled (via Subject.studentIds)
-    const subjects = await db.subject.findMany({
-      where: { studentIds: { has: session.user.id } },
-      select: { id: true },
-    });
-    const subjectIds = subjects.map(s => s.id);
-
-    // Also get groups where student is enrolled (via Group.studentIds)
-    const groupsFromGroup = await db.group.findMany({
-      where: { studentIds: { has: session.user.id } },
-      select: { subjectId: true },
-    });
-    const groupSubjectIds = groupsFromGroup.map(g => g.subjectId);
-
-    // Combine both lists of subject IDs
-    const allSubjectIds = [...new Set([...subjectIds, ...groupSubjectIds])];
-
-    // Get all groups from these subjects
+    // Get ONLY the groups where student is directly enrolled (via Group.studentIds)
     const groups = await db.group.findMany({
-      where: { subjectId: { in: allSubjectIds }, scheduleId: { not: null } },
+      where: { studentIds: { has: session.user.id }, scheduleId: { not: null } },
       include: {
         subject: {
           select: { name: true, code: true },

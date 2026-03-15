@@ -1,95 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SIRA - Sin conexión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --primary: #638ecb;
+        --primary-foreground: #ffffff;
+        --background: #f0f3fa;
+        --foreground: #1a1f36;
+        --card: #ffffff;
+        --card-foreground: #1a1f36;
+        --muted-foreground: #6b7a99;
+        --radius: 1rem;
+      }
+      @media (prefers-color-scheme: dark) {
         :root {
-            --primary: #6366F1;
-            --background: #ffffff;
-            --text: #1f2937;
-            --text-muted: #6b7280;
+          --background: #0a0e1a;
+          --foreground: #e2e8f0;
+          --card: rgba(17, 24, 45, 0.8);
+          --card-foreground: #e2e8f0;
+          --muted-foreground: #8aaee0;
         }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --background: #0f172a;
-                --text: #f8fafc;
-                --text-muted: #94a3b8;
-            }
-        }
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--background);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 20px;
-        }
-        .container {
-            max-width: 400px;
-        }
-        .icon-container {
-            width: 80px;
-            height: 80px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-        }
-        svg {
-            width: 40px;
-            height: 40px;
-            color: var(--primary);
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0 0 12px;
-        }
-        p {
-            font-size: 16px;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin: 0 0 32px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 9999px;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-        .btn:hover {
-            opacity: 0.9;
-        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          'Inter',
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background-color: var(--background);
+        color: var(--foreground);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 20px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .container {
+        max-width: 400px;
+        background-color: var(--card);
+        color: var(--card-foreground);
+        padding: 48px 32px;
+        border-radius: var(--radius);
+        box-shadow:
+          0px 4px 6px -1px rgba(57, 88, 134, 0.06),
+          0px 2px 4px -2px rgba(57, 88, 134, 0.04);
+      }
+      .icon-container {
+        width: 80px;
+        height: 80px;
+        background: rgba(99, 142, 203, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+      }
+      svg {
+        width: 40px;
+        height: 40px;
+        color: var(--primary);
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 12px;
+        color: var(--card-foreground);
+      }
+      p {
+        font-size: 16px;
+        color: var(--muted-foreground);
+        line-height: 1.5;
+        margin: 0 0 32px;
+      }
+      .btn {
+        display: inline-block;
+        background-color: var(--primary);
+        color: var(--primary-foreground);
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: var(--radius);
+        font-weight: 600;
+        font-size: 14px;
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      .btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="icon-container">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3" />
-            </svg>
-        </div>
-        <h1>Estás sin conexión</h1>
-        <p>Parece que no tienes acceso a internet en este momento. SIRA necesita una conexión activa para sincronizar tus asistencias.</p>
-        <a href="/" class="btn">Reintentar conexión</a>
+      <div class="icon-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3"
+          />
+        </svg>
+      </div>
+      <h1>Estás sin conexión</h1>
+      <p>
+        Parece que no tienes acceso a internet en este momento. SIRA necesita una conexión activa
+        para sincronizar tus asistencias.
+      </p>
+      <a href="/" class="btn">Reintentar conexión</a>
     </div>
     <script>
-        window.addEventListener('online', () => {
-            window.location.reload();
-        });
+      window.addEventListener('online', () => {
+        window.location.reload();
+      });
     </script>
-</body>
+  </body>
 </html>

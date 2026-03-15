@@ -14,29 +14,18 @@ export async function GET() {
     // Get current time and calculate time range (current time ± 4 hours)
     const now = new Date();
 
-    // Get subjects where student is enrolled via Subject.studentIds
-    const subjectsFromSubject = await prisma.subject.findMany({
-      where: { studentIds: { has: session.user.id } },
-      select: { id: true },
-    });
-
-    // Also get subjects where student is enrolled via Group.studentIds
+    // Get groups where student is directly enrolled (via Group.studentIds)
     const groupsWithStudent = await prisma.group.findMany({
       where: { studentIds: { has: session.user.id } },
       select: { subjectId: true },
     });
-
-    // Combine both lists of subject IDs
-    const allSubjectIds = [
-      ...subjectsFromSubject.map(s => s.id),
-      ...groupsWithStudent.map(g => g.subjectId),
-    ];
+    const subjectIds = groupsWithStudent.map(g => g.subjectId);
 
     // Find the current class for the student
     const currentClass = await prisma.class.findFirst({
       where: {
         status: 'SCHEDULED' as any,
-        subjectId: { in: allSubjectIds },
+        subjectId: { in: subjectIds },
         OR: [
           // Class is in progress
           {
