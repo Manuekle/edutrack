@@ -20,7 +20,7 @@ This skill generates professional SVG logos from design specifications, providin
 
 ### Wordmark
 
-Text-based logos (Google, Coca-Cola style)
+text-xsd logos (Google, Coca-Cola style)
 
 - Typography-focused
 - Brand name as primary element

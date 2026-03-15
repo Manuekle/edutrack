@@ -512,7 +512,7 @@ export default function AdminSalasPage() {
                           <div className="bg-muted/30 p-4 rounded-full mb-4">
                             <Layout className="h-10 w-10 text-muted-foreground/40" />
                           </div>
-                          <h4 className="text-[17px] font-semibold tracking-card text-foreground mb-1">
+                          <h4 className="sm:text-[17px] text-xs font-semibold tracking-card text-foreground mb-1">
                             Sin información para cargar
                           </h4>
                           <p className="text-xs text-muted-foreground max-w-xs mx-auto">
@@ -682,7 +682,7 @@ export default function AdminSalasPage() {
                     <div className="h-20 w-20 bg-muted/50 rounded-full flex items-center justify-center mb-6">
                       <Layout className="h-10 w-10 text-muted-foreground/40" />
                     </div>
-                    <p className="text-[17px] tracking-card font-semibold text-foreground">Sin resultados</p>
+                    <p className="sm:text-[17px] text-xs tracking-card font-semibold text-foreground">Sin resultados</p>
                     <p className="text-muted-foreground text-[14px] mt-2 max-w-xs">
                       {searchTerm
                         ? 'No encontramos salas que coincidan con tu búsqueda.'
@@ -720,7 +720,7 @@ export default function AdminSalasPage() {
                                   title="Inactivo"
                                 />
                               )}
-                              <p className="text-[15px] font-medium text-foreground truncate">
+                              <p className="sm:text-[15px] text-xs font-medium text-foreground truncate">
                                 {room.name}
                               </p>
                             </div>

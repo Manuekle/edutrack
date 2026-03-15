@@ -19,7 +19,7 @@ export default function EstudianteDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground sm:text-sm text-xs mt-1">
           Resumen de tu progreso académico y asistencia.
         </p>
       </div>

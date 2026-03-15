@@ -149,7 +149,7 @@ export default function StudentAttendancePage() {
         <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Registrar Asistencia
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="sm:text-sm text-xs text-muted-foreground">
           Escanea el código QR o ingresa el código manualmente
         </p>
       </div>
@@ -158,14 +158,14 @@ export default function StudentAttendancePage() {
         <TabsList className="grid grid-cols-2 w-full bg-muted/40 p-1 rounded-full shadow-inner h-auto">
           <TabsTrigger
             value="qr"
-            className="flex gap-2 rounded-full py-2.5 text-[15px] font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+            className="flex gap-2 rounded-full py-2.5 sm:text-[15px] text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
           >
             <QrCode className="h-4 w-4" />
             Escanear QR
           </TabsTrigger>
           <TabsTrigger
             value="codigo"
-            className="flex gap-2 rounded-full py-2.5 text-[15px] font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
+            className="flex gap-2 rounded-full py-2.5 sm:text-[15px] text-xs font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm transition-all"
           >
             <Send className="h-4 w-4" />
             Código
@@ -185,7 +185,7 @@ export default function StudentAttendancePage() {
                 <CardTitle className="text-emerald-700 dark:text-emerald-400 text-xl">
                   ¡Asistencia Registrada!
                 </CardTitle>
-                <CardDescription className="text-[15px]">
+                <CardDescription className="sm:text-[15px] text-xs">
                   Tu asistencia ha sido registrada correctamente
                 </CardDescription>
               </CardHeader>
@@ -195,15 +195,15 @@ export default function StudentAttendancePage() {
                     <span className="text-[13px] font-medium text-muted-foreground">
                       Asignatura
                     </span>
-                    <span className="font-semibold text-[15px]">{qrData.subject}</span>
+                    <span className="font-semibold sm:text-[15px] text-xs">{qrData.subject}</span>
                   </div>
                   <div className="h-px bg-border/40 my-2" />
-                  <div className="flex justify-between items-center text-[15px]">
+                  <div className="flex justify-between items-center sm:text-[15px] text-xs">
                     <span className="text-muted-foreground">Clase</span>
                     <span className="font-medium">{qrData.class}</span>
                   </div>
                   <div className="h-px bg-border/40 my-2" />
-                  <div className="flex justify-between items-center text-[15px]">
+                  <div className="flex justify-between items-center sm:text-[15px] text-xs">
                     <span className="text-muted-foreground">Hora</span>
                     <span className="font-medium">{qrData.recordedAt}</span>
                   </div>
@@ -214,7 +214,7 @@ export default function StudentAttendancePage() {
                     setQrData(null);
                   }}
                   variant="outline"
-                  className="w-full rounded-full h-12 text-[15px] font-medium shadow-sm hover:bg-muted/50"
+                  className="w-full rounded-full h-12 sm:text-[15px] text-xs font-medium shadow-sm hover:bg-muted/50"
                 >
                   Escanear otro código
                 </Button>
@@ -269,7 +269,7 @@ export default function StudentAttendancePage() {
                   ¡Registrado!
                 </CardTitle>
               </CardHeader>
-              <CardContent className="px-6 pb-6 space-y-3 text-[15px] text-center">
+              <CardContent className="px-6 pb-6 space-y-3 sm:text-[15px] text-xs text-center">
                 <div className="bg-background rounded-2xl p-4 border border-border/40 shadow-sm space-y-2">
                   <div>
                     <span className="text-muted-foreground">Clase: </span>
@@ -283,7 +283,7 @@ export default function StudentAttendancePage() {
                       <span className="font-medium">{manualSuccess.subjectName}</span>
                     </div>
                   )}
-                  <div className="text-sm text-muted-foreground pt-2 mt-2 border-t border-border/40 font-mono">
+                  <div className="sm:text-sm text-xs text-muted-foreground pt-2 mt-2 border-t border-border/40 font-mono">
                     {new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>

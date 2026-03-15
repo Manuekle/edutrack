@@ -81,7 +81,7 @@ export default function MicrocurriculoPage() {
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Microcurrículo
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground sm:text-sm text-xs">
           Carga el catálogo de asignaturas por CSV o una a una; luego consúltalas en el listado.
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function MicrocurriculoPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="sm:text-sm text-xs font-medium text-muted-foreground">
                   Total Asignaturas
                 </CardTitle>
               </CardHeader>
@@ -113,7 +113,7 @@ export default function MicrocurriculoPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="sm:text-sm text-xs font-medium text-muted-foreground">
                   Programas Académicos
                 </CardTitle>
               </CardHeader>
@@ -125,7 +125,7 @@ export default function MicrocurriculoPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="sm:text-sm text-xs font-medium text-muted-foreground">
                   Semestres Diferentes
                 </CardTitle>
               </CardHeader>
@@ -189,7 +189,7 @@ export default function MicrocurriculoPage() {
                     <TableRow>
                       <TableCell colSpan={4} className="py-10">
                         <div className="flex flex-col items-center justify-center text-center gap-2">
-                          <p className="text-sm font-medium text-foreground">
+                          <p className="sm:text-sm text-xs font-medium text-foreground">
                             {search
                               ? 'No hay resultados para esa búsqueda.'
                               : 'No hay asignaturas cargadas aún.'}
@@ -212,7 +212,7 @@ export default function MicrocurriculoPage() {
                             {subject.code}
                           </code>
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
+                        <TableCell className="sm:text-sm text-xs text-muted-foreground">
                           {subject.program ?? '—'}
                         </TableCell>
                         <TableCell className="text-right">{subject.semester ?? '—'}</TableCell>

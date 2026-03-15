@@ -23,7 +23,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
     <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-lg text-base font-semibold tracking-card text-foreground">
+          <CardTitle className="sm:text-lg text-xs font-semibold tracking-card text-foreground">
             Mis Asignaturas
           </CardTitle>
         </div>
@@ -46,7 +46,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <h4 className="text-sm font-semibold truncate text-foreground">
+                        <h4 className="sm:text-sm text-xs font-semibold truncate text-foreground">
                           {subject.name}
                         </h4>
                       </div>
@@ -76,7 +76,7 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
 
                     <div className="flex flex-col items-end pt-1 justify-center shrink-0">
                       <div className="text-right flex flex-col items-center justify-center p-3 rounded-xl bg-background/50 border border-border/40 min-w-[64px]">
-                        <div className="text-[17px] font-semibold text-foreground tracking-card">
+                        <div className="sm:text-[17px] text-xs font-semibold text-foreground tracking-card">
                           {Math.round(progress)}%
                         </div>
                         <div className="text-[9px] uppercase font-semibold text-muted-foreground mt-0.5">

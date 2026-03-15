@@ -140,7 +140,7 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
             <p
               aria-current={isToday(day) ? 'date' : undefined}
               className={cn(
-                'text-base font-semibold h-8 w-8 mx-auto flex items-center justify-center rounded-full',
+                'text-xs font-semibold h-8 w-8 mx-auto flex items-center justify-center rounded-full',
                 isToday(day) ? 'bg-primary text-primary-foreground' : 'text-foreground'
               )}
             >
@@ -273,7 +273,7 @@ const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
                       }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <p className="text-sm font-bold tracking-card line-clamp-1">
+                        <p className="sm:text-sm text-xs font-bold tracking-card line-clamp-1">
                           {event.subject || event.room}
                         </p>
                         <Clock className="h-4 w-4 opacity-70 shrink-0" aria-hidden="true" />
@@ -310,7 +310,7 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/30 mb-4">
             <Clock className="h-8 w-8 text-muted-foreground/40" aria-hidden="true" />
           </div>
-          <p className="text-[15px] font-semibold tracking-card text-foreground/60">
+          <p className="sm:text-[15px] text-xs font-semibold tracking-card text-foreground/60">
             Sin programaciones para este período
           </p>
         </div>
@@ -451,7 +451,7 @@ export const CustomCalendar = ({
             <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </Button>
 
-          <h2 aria-live="polite" className="text-sm md:text-base tracking-card font-semibold ml-6 text-foreground/90 truncate capitalize">
+          <h2 aria-live="polite" className="sm:text-sm text-xs md:text-xs tracking-card font-semibold ml-6 text-foreground/90 truncate capitalize">
             {getLabel()}
           </h2>
         </div>

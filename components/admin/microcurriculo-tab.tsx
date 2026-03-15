@@ -619,7 +619,7 @@ export function MicrocurriculoTab() {
                   <div className="bg-muted/30 p-4 rounded-full mb-4">
                     <BookOpen className="h-10 w-10 text-muted-foreground/40" />
                   </div>
-                  <h4 className="text-[17px] font-semibold tracking-card text-foreground mb-1">
+                  <h4 className="sm:text-[17px] text-xs font-semibold tracking-card text-foreground mb-1">
                     Sin información para cargar
                   </h4>
                   <p className="text-xs text-muted-foreground max-w-xs mx-auto">

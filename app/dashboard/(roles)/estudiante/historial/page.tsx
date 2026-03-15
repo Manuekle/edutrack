@@ -87,7 +87,7 @@ export default function HistorialAsistenciasPage() {
         <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Mi Historial de Asistencia
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground sm:text-sm text-xs mt-1">
           Registro de tus asistencias durante el período académico actual.
         </p>
       </div>
@@ -100,7 +100,7 @@ export default function HistorialAsistenciasPage() {
                 <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
               </div>
               <div className="ml-3">
-                <h3 className="text-[15px] font-medium text-destructive">
+                <h3 className="sm:text-[15px] text-xs font-medium text-destructive">
                   Error al cargar el historial
                 </h3>
                 <div className="mt-2 text-[14px] text-destructive/90">
@@ -126,7 +126,7 @@ export default function HistorialAsistenciasPage() {
             <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
               <History className="h-7 w-7 text-muted-foreground/40" />
             </div>
-            <p className="text-[15px] font-semibold text-foreground tracking-card">
+            <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
               Sin historial disponible
             </p>
             <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">

@@ -16,7 +16,7 @@ No,Category,Guideline,Description,Do,Don't,Code Good,Code Bad,Severity,Docs URL
 15,Images,Responsive images,Serve appropriate image sizes,srcset and sizes attributes,Same large image all devices,srcset with multiple sizes,4000px image everywhere,High,
 16,Typography,Prose plugin,Use @tailwindcss/typography for rich text,prose prose-lg for article content,Custom styles for markdown,prose prose-lg max-w-none,Custom text styling,Medium,https://tailwindcss.com/docs/typography-plugin
 17,Typography,Line height,Use appropriate line height for readability,leading-relaxed for body text,Default tight line height,leading-relaxed (1.625),leading-none or leading-tight,Medium,https://tailwindcss.com/docs/line-height
-18,Typography,Font size scale,Use consistent text size scale,text-sm text-base text-lg text-xl,Arbitrary font sizes,text-lg,text-[17px],Low,https://tailwindcss.com/docs/font-size
+18,Typography,Font size scale,Use consistent text size scale,sm:text-sm text-xs text-xs text-lg text-xl,Arbitrary font sizes,text-lg,sm:text-[17px] text-xs,Low,https://tailwindcss.com/docs/font-size
 19,Typography,Text truncation,Handle long text gracefully,truncate or line-clamp-*,Overflow breaking layout,line-clamp-2,No overflow handling,Medium,https://tailwindcss.com/docs/text-overflow
 20,Colors,Opacity utilities,Use color opacity utilities,bg-black/50 text-white/80,Separate opacity class,bg-black/50,bg-black opacity-50,Low,https://tailwindcss.com/docs/background-color
 21,Colors,Dark mode,Support dark mode with dark: prefix,dark:bg-gray-900 dark:text-white,No dark mode support,dark:bg-gray-900,Only light theme,Medium,https://tailwindcss.com/docs/dark-mode
@@ -28,10 +28,10 @@ No,Category,Guideline,Description,Do,Don't,Code Good,Code Bad,Severity,Docs URL
 27,Forms,Input sizing,Consistent input dimensions,h-10 px-3 for inputs,Inconsistent input heights,h-10 w-full px-3,Various heights per input,Medium,
 28,Forms,Disabled states,Clear disabled styling,disabled:opacity-50 disabled:cursor-not-allowed,No disabled indication,disabled:opacity-50,Same style as enabled,Medium,
 29,Forms,Placeholder styling,Style placeholder text appropriately,placeholder:text-gray-400,Dark placeholder text,placeholder:text-gray-400,Default dark placeholder,Low,
-30,Responsive,Mobile-first approach,Start with mobile styles and add breakpoints,Default mobile + md: lg: xl:,Desktop-first approach,text-sm md:text-base,text-base max-md:text-sm,Medium,https://tailwindcss.com/docs/responsive-design
+30,Responsive,Mobile-first approach,Start with mobile styles and add breakpoints,Default mobile + md: lg: xl:,Desktop-first approach,sm:text-sm text-xs md:text-xs,text-xs max-md:sm:text-sm text-xs,Medium,https://tailwindcss.com/docs/responsive-design
 31,Responsive,Breakpoint testing,Test at standard breakpoints,320 375 768 1024 1280 1536,Only test on development device,Test all breakpoints,Single device testing,High,
 32,Responsive,Hidden/shown utilities,Control visibility per breakpoint,hidden md:block,Different content per breakpoint,hidden md:flex,Separate mobile/desktop components,Low,https://tailwindcss.com/docs/display
-33,Buttons,Button sizing,Consistent button dimensions,px-4 py-2 or px-6 py-3,Inconsistent button sizes,px-4 py-2 text-sm,Various padding per button,Medium,
+33,Buttons,Button sizing,Consistent button dimensions,px-4 py-2 or px-6 py-3,Inconsistent button sizes,px-4 py-2 sm:text-sm text-xs,Various padding per button,Medium,
 34,Buttons,Touch targets,Minimum 44px touch target on mobile,min-h-[44px] on mobile,Small buttons on mobile,min-h-[44px] min-w-[44px],h-8 w-8 on mobile,High,
 35,Buttons,Loading states,Show loading feedback,disabled + spinner icon,Clickable during loading,<Button disabled><Spinner/></Button>,Button without loading state,High,
 36,Buttons,Icon buttons,Accessible icon-only buttons,aria-label on icon buttons,Icon button without label,<button aria-label='Close'><XIcon/></button>,<button><XIcon/></button>,High,

@@ -97,7 +97,7 @@ export default function HorarioEstudiantePage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-card text-foreground">Mi Horario</h1>
-          <p className="text-muted-foreground text-sm max-w-md">
+          <p className="text-muted-foreground sm:text-sm text-xs max-w-md">
             Consulta tu programación académica semanal y salones asignados.
           </p>
         </div>
@@ -111,7 +111,7 @@ export default function HorarioEstudiantePage() {
           <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
             <CalendarDays className="h-7 w-7 text-muted-foreground/40" />
           </div>
-          <p className="text-[15px] font-semibold text-foreground tracking-card">
+          <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
             Sin programación disponible
           </p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">

@@ -32,7 +32,6 @@ import { uploadSignature } from '@/lib/actions/user.actions';
 import { Loader2, Lock, PenLine, User } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import { sileo } from 'sileo';
@@ -488,7 +487,7 @@ export default function ProfilePage() {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-semibold">{session?.user?.name}</p>
+                <p className="sm:text-sm text-xs font-semibold">{session?.user?.name}</p>
                 <p className="text-xs text-muted-foreground">{session?.user?.role}</p>
               </div>
             </CardContent>
@@ -498,7 +497,7 @@ export default function ProfilePage() {
             <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
               <Card className="p-0">
                 <CardHeader className="border-b px-5 py-4">
-                  <CardTitle className="text-sm font-semibold">Información de Perfil</CardTitle>
+                  <CardTitle className="sm:text-sm text-xs font-semibold">Información de Perfil</CardTitle>
                   <CardDescription className="text-xs">
                     Actualiza los datos de tu cuenta.
                   </CardDescription>
@@ -623,7 +622,7 @@ export default function ProfilePage() {
             <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
               <Card className="p-0">
                 <CardHeader className="border-b px-5 py-4">
-                  <CardTitle className="text-sm font-semibold">Cambiar Contraseña</CardTitle>
+                  <CardTitle className="sm:text-sm text-xs font-semibold">Cambiar Contraseña</CardTitle>
                   <CardDescription className="text-xs">
                     Recomendamos cambiar tu contraseña periódicamente.
                   </CardDescription>
@@ -703,7 +702,7 @@ export default function ProfilePage() {
           <TabsContent value="signature" className="space-y-4">
             <Card className="p-0">
               <CardHeader className="border-b px-5 py-4">
-                <CardTitle className="text-sm font-semibold">Firma Digital</CardTitle>
+                <CardTitle className="sm:text-sm text-xs font-semibold">Firma Digital</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground">
                   Gestiona tu firma oficial para certificados y documentos.
                 </CardDescription>
@@ -761,7 +760,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="border-t border-border/80 pt-6">
-                  <p className="text-sm font-medium text-foreground mb-3">Vista previa</p>
+                  <p className="sm:text-sm text-xs font-medium text-foreground mb-3">Vista previa</p>
                   <div className="flex flex-col sm:flex-row gap-6 items-stretch sm:items-center">
                     <div className="shrink-0 w-full sm:w-56 h-32 rounded-xl bg-muted/30 dark:bg-muted/10 border border-border/80 shadow-sm overflow-hidden flex items-center justify-center ring-1 ring-black/4 dark:ring-white/6">
                       {signaturePreview ? (

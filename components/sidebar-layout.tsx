@@ -69,13 +69,13 @@ const UserMenuButton = React.forwardRef<
       type="button"
       className="w-full flex items-center p-2 sm:p-3 rounded-lg hover:bg-sidebar-accent transition-colors duration-200 active:scale-[0.98] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center"
     >
-      <Avatar className="h-8 w-8 sm: sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
+      <Avatar className="h-8 w-8 sm: sm:w-9 border-2 border-primary/20 sm:text-sm text-xs font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
         <AvatarFallback className="bg-primary/10 text-primary">
           {session?.user?.name?.charAt(0) || 'U'}
         </AvatarFallback>
       </Avatar>
       <div className="ml-2 sm:ml-3 text-left overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden">
-        <p className="text-sm font-semibold truncate font-sans">
+        <p className="sm:text-sm text-xs font-semibold truncate font-sans">
           {session?.user?.name?.split(' ')[0] || 'Usuario'}
         </p>
         <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
@@ -186,7 +186,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                     <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
                   </div>
                   <div className="grid flex-1 text-left">
-                    <span className="truncate font-semibold text-sm tracking-card">SIRA</span>
+                    <span className="truncate font-semibold sm:text-sm text-xs tracking-card">SIRA</span>
                     <span className="truncate text-[11px] text-muted-foreground">
                       Facultad de Ingeniería
                     </span>
@@ -257,13 +257,13 @@ function AppSidebar({ homePath }: { homePath: string }) {
             {mounted ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger className="w-full flex items-center p-2 sm:p-3 rounded-xl hover:bg-sidebar-accent transition-all duration-200 active:scale-[0.97] mx-1 sm:mx-2 my-1 min-h-11 sm:min-h-12 group-data-[collapsible=icon]:mx-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:min-h-0 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:justify-center data-[state=open]:bg-sidebar-accent">
-                  <Avatar className="h-8 w-8 sm: sm:w-9 border-2 border-primary/20 text-sm font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
+                  <Avatar className="h-8 w-8 sm: sm:w-9 border-2 border-primary/20 sm:text-sm text-xs font-semibold group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8 shrink-0">
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {session?.user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-2 sm:ml-3 text-left overflow-hidden min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-semibold truncate font-sans">
+                    <p className="sm:text-sm text-xs font-semibold truncate font-sans">
                       {session?.user?.name?.split(' ')[0] || 'Usuario'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate font-sans hidden sm:block">
@@ -494,14 +494,14 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                     <React.Fragment key={link.href}>
                       <BreadcrumbItem>
                         {index === breadcrumbLinks.length - 1 ? (
-                          <BreadcrumbPage className="text-sm sm:text-base font-semibold tracking-card">
+                          <BreadcrumbPage className="sm:text-sm text-xs sm:text-xs font-semibold tracking-card">
                             {link.label}
                           </BreadcrumbPage>
                         ) : (
                           <BreadcrumbLink asChild>
                             <Link
                               href={link.href}
-                              className="text-sm sm:text-base text-muted-foreground hover:text-primary transition-colors"
+                              className="sm:text-sm text-xs sm:text-xs text-muted-foreground hover:text-primary transition-colors"
                             >
                               {link.label}
                             </Link>

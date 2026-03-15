@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
@@ -146,7 +145,7 @@ export default function GrupoDetailPage() {
           <div className="flex w-full sm:w-auto items-center gap-3">
             <Button
               variant="default"
-              className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
+              className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 sm:text-sm text-xs font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
               onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/bitacora`)}
             >
               Planear Temas y Bitácora
@@ -154,7 +153,7 @@ export default function GrupoDetailPage() {
 
             <Button
               variant="outline"
-              className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium gap-2"
+              className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors sm:text-sm text-xs font-medium gap-2"
               onClick={() => router.push(`/dashboard/docente/grupos/${grupoId}/preview`)}
             >
               <Eye className="h-4 w-4" />
@@ -163,7 +162,7 @@ export default function GrupoDetailPage() {
 
             <Button
               variant="outline"
-              className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors text-sm font-medium"
+              className="w-full sm:w-auto rounded-xl shadow-none h-10 border-transparent bg-muted/40 hover:bg-muted/60 transition-colors sm:text-sm text-xs font-medium"
               onClick={() => setIsReportModalOpen(true)}
               disabled={hasScheduledClasses || reportExistsForCurrentPeriod}
               title={
@@ -184,7 +183,7 @@ export default function GrupoDetailPage() {
           <NotebookPen className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-primary">
+          <h3 className="sm:text-sm text-xs font-semibold text-primary">
             ¿Cómo subir los temas de tus clases?
           </h3>
           <p className="text-[13px] text-muted-foreground mt-0.5">

@@ -161,7 +161,7 @@ function JustificarAusenciaContent() {
           </CardHeader>
           <CardContent className="text-center space-y-6 px-10 pb-12">
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/40">
-              <p className="text-sm text-muted-foreground">
+              <p className="sm:text-sm text-xs text-muted-foreground">
                 Serás redirigido al panel en <span className="font-semibold text-foreground font-mono">{redirectIn}s</span>
               </p>
             </div>
@@ -228,7 +228,7 @@ function JustificarAusenciaContent() {
               <CardTitle className="text-3xl font-semibold tracking-card">
                 Justificar ausencia
               </CardTitle>
-              <CardDescription className="text-[15px]">
+              <CardDescription className="sm:text-[15px] text-xs">
                 Cuéntanos el motivo de tu inasistencia para que el docente pueda validarlo.
               </CardDescription>
             </div>
@@ -244,14 +244,14 @@ function JustificarAusenciaContent() {
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <div className="flex justify-between items-center px-1">
-                      <FormLabel className="text-sm font-semibold text-foreground/80">Motivo de la ausencia</FormLabel>
+                      <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">Motivo de la ausencia</FormLabel>
                       <span className="text-[11px] text-muted-foreground uppercase tracking-card font-semibold">Máximo 500 caracteres</span>
                     </div>
                     <FormControl>
                       <div className="relative">
                         <Textarea
                           placeholder="Ej: Tenía una cita médica programada (adjunto soporte por otros medios si es necesario)..."
-                          className="min-h-[160px] rounded-2xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all p-5 text-[15px] resize-none leading-relaxed"
+                          className="min-h-[160px] rounded-2xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all p-5 sm:text-[15px] text-xs resize-none leading-relaxed"
                           disabled={isSubmitting}
                           {...field}
                         />

@@ -102,7 +102,7 @@ const AdminDashboardComponent = () => {
               <AlertCircle className="h-6 w-6 text-destructive" />
             </div>
             <div>
-              <p className="text-sm font-semibold">Error al cargar datos</p>
+              <p className="sm:text-sm text-xs font-semibold">Error al cargar datos</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {error || 'No se pudieron obtener los datos'}
               </p>
@@ -133,7 +133,7 @@ const AdminDashboardComponent = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-card">Panel de Administración</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground sm:text-sm text-xs mt-1">
             Estado general del sistema académico.
           </p>
         </div>
@@ -161,7 +161,7 @@ const AdminDashboardComponent = () => {
                   <Icon className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium leading-none">{label}</p>
+                  <p className="sm:text-sm text-xs font-medium leading-none">{label}</p>
                   <p className="text-xs text-muted-foreground mt-1 truncate">{desc}</p>
                 </div>
               </CardContent>
@@ -196,7 +196,7 @@ const AdminDashboardComponent = () => {
         {/* Role Distribution */}
         <Card className="border-border/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold tracking-card">
+            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
               Distribución de Usuarios
             </CardTitle>
           </CardHeader>
@@ -235,7 +235,7 @@ const AdminDashboardComponent = () => {
         {/* Monthly Classes */}
         <Card className="border-border/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold tracking-card">Clases por Mes</CardTitle>
+            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">Clases por Mes</CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={{}} className="mx-auto aspect-square max-h-[260px] w-full">
@@ -272,7 +272,7 @@ const AdminDashboardComponent = () => {
         {/* Attendance Distribution */}
         <Card className="border-border/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold tracking-card">
+            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
               Estado de Asistencias
             </CardTitle>
           </CardHeader>
@@ -306,7 +306,7 @@ const AdminDashboardComponent = () => {
         {/* Classroom Occupancy */}
         <Card className="border-border/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold tracking-card">
+            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
               Uso de Salones
             </CardTitle>
             <p className="text-xs text-muted-foreground">Por cantidad de clases realizadas</p>
@@ -350,7 +350,7 @@ const AdminDashboardComponent = () => {
       <Card className="border-border/30">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-semibold tracking-card">
+            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
               Materias con Más Estudiantes
             </CardTitle>
           </div>
@@ -379,7 +379,7 @@ const AdminDashboardComponent = () => {
                           {subject.code}
                         </p>
                       </div>
-                      <span className="text-sm font-semibold tabular-nums ml-3 shrink-0">
+                      <span className="sm:text-sm text-xs font-semibold tabular-nums ml-3 shrink-0">
                         {subject.students}
                       </span>
                     </div>

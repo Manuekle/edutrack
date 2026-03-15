@@ -52,7 +52,7 @@ function shouldShowSignature(status: string) {
 export default async function PreviewPage({ params }: PageProps) {
   const session = await getServerSession(authOptions);
 
-  if (!session || session.user.role !== 'DOCENTE') {
+  if (!session || session.user.role !== 'ADMIN') {
     redirect('/login');
   }
 
@@ -128,19 +128,7 @@ export default async function PreviewPage({ params }: PageProps) {
     );
   }
 
-  const isAuthorized =
-    subject.teacherIds.includes(session.user.id) ||
-    (await db.group.findFirst({ where: { id, teacherIds: { has: session.user.id } } }));
-
-  if (!isAuthorized) {
-    return (
-      <div className="p-6">
-        <h1 className="sm:text-2xl text-xs font-semibold text-red-600 dark:text-red-400">
-          No autorizado
-        </h1>
-      </div>
-    );
-  }
+  // Admin tiene acceso a todos los grupos, no necesita verificación de teacherIds
 
   // Consolidar docentes (dar prioridad a los del grupo)
   const allTeachers = [...(grupoData?.teachers ?? []), ...(subject?.teachers ?? [])];
@@ -160,7 +148,7 @@ export default async function PreviewPage({ params }: PageProps) {
       <div className="pb-6 w-full flex flex-col gap-3">
         <div>
           <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
-            Vista Previa de Bitácora
+            Bitácora Docente
           </h1>
           <CardDescription className="text-xs dark:text-gray-300">
             Visualiza el reporte de asistencia para {subject.name}
@@ -378,12 +366,12 @@ export default async function PreviewPage({ params }: PageProps) {
                         ) : (
                           <div
                             className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-card ${cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA'
-                                ? finalizada
-                                  ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-400' // Finalizada
-                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' // Programada
-                                : cls.status === 'SIGNED' || cls.status === 'COMPLETED'
-                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' // Firmada
-                                  : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400' // Cancelada
+                              ? finalizada
+                                ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-400' // Finalizada
+                                : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400' // Programada
+                              : cls.status === 'SIGNED' || cls.status === 'COMPLETED'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400' // Firmada
+                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400' // Cancelada
                               }`}
                           >
                             {cls.status === 'SCHEDULED' || cls.status === 'PROGRAMADA'

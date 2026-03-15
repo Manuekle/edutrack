@@ -83,20 +83,20 @@ export async function GET(
     const dateRange = periodToDateRange(periodParam);
 
     // Recuperar clases impartidas por el docente
+    // Buscar por ambas relaciones: subject.teacherIds O group.teacherIds
+    const dateFilter = dateRange
+      ? { date: { gte: dateRange.start, lte: dateRange.end } }
+      : {};
+    const subjectFilterClause = subjectFilter ? { subjectId: subjectFilter } : {};
+
     const classes = await db.class.findMany({
       where: {
-        subject: {
-          teacherIds: { has: docenteId },
-          ...(subjectFilter ? { id: subjectFilter } : {}),
-        },
-        ...(dateRange
-          ? {
-              date: {
-                gte: dateRange.start,
-                lte: dateRange.end,
-              },
-            }
-          : {}),
+        ...dateFilter,
+        ...subjectFilterClause,
+        OR: [
+          { subject: { teacherIds: { has: docenteId } } },
+          { group: { teacherIds: { has: docenteId } } },
+        ],
       },
       include: {
         subject: true,

@@ -97,7 +97,7 @@ export function TeacherStatsCards({
         <CardContent className="px-5 pb-5 mt-2">
           {nextClass ? (
             <div className="flex flex-col gap-1">
-              <h4 className="text-sm font-semibold tracking-card text-foreground line-clamp-1">
+              <h4 className="sm:text-sm text-xs font-semibold tracking-card text-foreground line-clamp-1">
                 {nextClass.subjectName}
               </h4>
               <div className="flex flex-col gap-0.5 text-[11px] font-medium text-amber-700/80 dark:text-amber-400/80">

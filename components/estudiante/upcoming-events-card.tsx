@@ -37,7 +37,7 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
     <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-lg text-base font-semibold tracking-card text-foreground">
+          <CardTitle className="sm:text-lg text-xs font-semibold tracking-card text-foreground">
             Próximas Clases
           </CardTitle>
         </div>
@@ -53,7 +53,7 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm font-semibold truncate text-foreground">
+                      <h4 className="sm:text-sm text-xs font-semibold truncate text-foreground">
                         {item.title}
                       </h4>
                     </div>

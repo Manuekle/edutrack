@@ -129,7 +129,7 @@ export function QRViewer({
                   : "bg-primary/5 border-primary/10 text-primary"
               )}>
                 <Clock className="w-3.5 h-3.5" />
-                <span className="font-mono text-sm font-black tracking-card leading-none">
+                <span className="font-mono sm:text-sm text-xs font-black tracking-card leading-none">
                   {formatTime(timeLeft)}
                 </span>
               </div>
@@ -137,7 +137,7 @@ export function QRViewer({
 
             <div className="px-4 py-2 bg-muted/40 rounded-full border border-border/20">
               <div className="flex items-center justify-between gap-3">
-                <code className="font-mono text-sm font-bold tracking-card text-foreground truncate select-all">
+                <code className="font-mono sm:text-sm text-xs font-bold tracking-card text-foreground truncate select-all">
                   {qrToken || '........'}
                 </code>
                 <Button variant="ghost" size="icon" onClick={copyToken} className="h-8 w-8 shrink-0 hover:bg-background">

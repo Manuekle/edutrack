@@ -243,7 +243,7 @@ export default function AsignacionPage() {
     <div className="space-y-6">
       <div className="">
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">Ajustes</h1>
-        <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
+        <p className="text-muted-foreground sm:text-sm text-xs mt-1 max-w-2xl">
           Configura cada grupo: asigna sala, docentes y estudiantes. Puedes buscar usuarios
           existentes o cargar un CSV para asignar en masa.
         </p>
@@ -348,7 +348,7 @@ export default function AsignacionPage() {
               <div className="bg-muted/30 p-4 rounded-full mb-3">
                 <Users className="h-8 w-8 text-muted-foreground/40" />
               </div>
-              <p className="text-[15px] font-medium text-foreground">No hay grupos</p>
+              <p className="sm:text-[15px] text-xs font-medium text-foreground">No hay grupos</p>
               <p className="text-[13px] text-muted-foreground mt-1 mb-4 max-w-sm">
                 Primero importa la programación en el paso 1. Programación. Luego vuelve aquí para
                 hacer ajustes manuales.
@@ -365,7 +365,7 @@ export default function AsignacionPage() {
                     variant="outline"
                     role="combobox"
                     aria-expanded={grupoComboOpen}
-                    className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border hover:bg-muted/60 focus:bg-background focus:border-primary/50 transition-colors justify-between font-normal"
+                    className="w-full h-11 rounded-xl sm:text-sm text-xs px-4 shadow-none bg-muted/40 border hover:bg-muted/60 focus:bg-background focus:border-primary/50 transition-colors justify-between font-normal"
                   >
                     {currentGrupo ? (
                       <span className="flex items-center gap-2 truncate">
@@ -395,7 +395,7 @@ export default function AsignacionPage() {
                   >
                     <CommandInput placeholder="Buscar grupo, código o asignatura..." className="h-11" />
                     <CommandList className="max-h-80">
-                      <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                      <CommandEmpty className="py-6 text-center sm:text-sm text-xs text-muted-foreground">
                         No se encontró ningún grupo.
                       </CommandEmpty>
                       <CommandGroup>
@@ -423,7 +423,7 @@ export default function AsignacionPage() {
                                 </span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-sm truncate">{g.subject.name}</span>
+                                <span className="font-medium sm:text-sm text-xs truncate">{g.subject.name}</span>
                                 <span className="text-muted-foreground text-xs shrink-0">
                                   {g.subject.code}
                                 </span>
@@ -446,7 +446,7 @@ export default function AsignacionPage() {
                 </PopoverContent>
               </Popover>
               {currentGrupo && (
-                <div className="flex flex-wrap items-center gap-2 mt-4 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 text-sm">
+                <div className="flex flex-wrap items-center gap-2 mt-4 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 sm:text-sm text-xs">
                   <div className="w-full sm:w-auto mb-1 sm:mb-0 mr-2 flex flex-col gap-0.5">
                     <span className="font-semibold text-foreground">
                       {currentGrupo.subject.name}
@@ -577,7 +577,7 @@ export default function AsignacionPage() {
                           placeholder="Buscar por nombre o código..."
                           value={studentSearch}
                           onChange={e => setStudentSearch(e.target.value)}
-                          className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none text-sm"
+                          className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none sm:text-sm text-xs"
                         />
                       </div>
                       <div className="bg-card rounded-xl border overflow-hidden shadow-none">
@@ -686,7 +686,7 @@ export default function AsignacionPage() {
                           placeholder="Buscar por nombre o código..."
                           value={docenteSearch}
                           onChange={e => setDocenteSearch(e.target.value)}
-                          className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none text-sm"
+                          className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none sm:text-sm text-xs"
                         />
                       </div>
                       <div className="bg-card rounded-xl border overflow-hidden shadow-none">
@@ -771,13 +771,13 @@ export default function AsignacionPage() {
                     value={salaId || 'none'}
                     onValueChange={v => setSalaId(v === 'none' ? '' : v)}
                   >
-                    <SelectTrigger className="w-full rounded-full border text-sm px-4 shadow-none bg-muted/40 focus:bg-background focus:border-primary/50 transition-colors">
+                    <SelectTrigger className="w-full rounded-full border sm:text-sm text-xs px-4 shadow-none bg-muted/40 focus:bg-background focus:border-primary/50 transition-colors">
                       <SelectValue placeholder="Seleccionar sala..." />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl shadow-lg border-muted-foreground/10 max-h-80">
                       <SelectItem
                         value="none"
-                        className="py-2.5 pl-10 rounded-full mx-1 my-0.5 text-sm text-muted-foreground"
+                        className="py-2.5 pl-10 rounded-full mx-1 my-0.5 sm:text-sm text-xs text-muted-foreground"
                       >
                         Sin sala asignada
                       </SelectItem>
@@ -785,7 +785,7 @@ export default function AsignacionPage() {
                         <SelectItem
                           key={s.id}
                           value={s.id}
-                          className="py-2.5 pl-10 rounded-full mx-1 my-0.5 text-sm"
+                          className="py-2.5 pl-10 rounded-full mx-1 my-0.5 sm:text-sm text-xs"
                         >
                           <span className="font-medium">{s.name}</span>
                           {s.capacity != null ? (

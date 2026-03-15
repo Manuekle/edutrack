@@ -112,10 +112,10 @@ export default function ScanPage() {
 
       const attendanceRecord = data.attendance
         ? {
-            ...data.attendance,
-            subjectName: data.subjectName,
-            className: data.className,
-          }
+          ...data.attendance,
+          subjectName: data.subjectName,
+          className: data.className,
+        }
         : undefined;
 
       let status: ScanStatus = 'error';
@@ -265,7 +265,7 @@ export default function ScanPage() {
             {scanState.status === 'error' && scanState.error?.error === 'CLASS_NOT_STARTED' && (
               <div className="pt-4 border-t border-border/40">
                 <p className="text-[13px] text-muted-foreground">Clase inicia a las:</p>
-                <p className="font-semibold text-[15px]">
+                <p className="font-semibold sm:text-[15px] text-xs">
                   {formatTime(scanState.error.classStartsAt)}
                 </p>
               </div>

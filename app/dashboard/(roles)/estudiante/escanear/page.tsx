@@ -91,7 +91,7 @@ export default function ScannerPage() {
         <h1 className="text-2xl font-semibold tracking-card text-foreground">
           Escanear Asistencia
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="sm:text-sm text-xs text-muted-foreground">
           Apunta tu cámara al código QR generado por el docente
         </p>
       </div>
@@ -108,7 +108,7 @@ export default function ScannerPage() {
               <CardTitle className="text-emerald-700 dark:text-emerald-400 text-xl">
                 ¡Asistencia Registrada!
               </CardTitle>
-              <CardDescription className="text-[15px]">
+              <CardDescription className="sm:text-[15px] text-xs">
                 Tu asistencia ha sido registrada correctamente
               </CardDescription>
             </CardHeader>
@@ -116,15 +116,15 @@ export default function ScannerPage() {
               <div className="bg-background rounded-2xl p-5 border border-border/40 shadow-sm space-y-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-[13px] font-medium text-muted-foreground">Asignatura</span>
-                  <span className="font-semibold text-[15px]">{attendanceData.subject}</span>
+                  <span className="font-semibold sm:text-[15px] text-xs">{attendanceData.subject}</span>
                 </div>
                 <div className="h-px bg-border/40 my-2" />
-                <div className="flex justify-between items-center text-[15px]">
+                <div className="flex justify-between items-center sm:text-[15px] text-xs">
                   <span className="text-muted-foreground">Clase</span>
                   <span className="font-medium">{attendanceData.class}</span>
                 </div>
                 <div className="h-px bg-border/40 my-2" />
-                <div className="flex justify-between items-center text-[15px]">
+                <div className="flex justify-between items-center sm:text-[15px] text-xs">
                   <span className="text-muted-foreground">Hora</span>
                   <span className="font-medium">{attendanceData.recordedAt}</span>
                 </div>

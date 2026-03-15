@@ -93,7 +93,7 @@ export default function PeriodosPage() {
           <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2 text-foreground">
             Configuración de Periodos
           </h1>
-          <p className="text-muted-foreground text-sm max-w-2xl">
+          <p className="text-muted-foreground sm:text-sm text-xs max-w-2xl">
             Gestiona los ciclos académicos y sus fechas de inicio/fin. Estas fechas determinan cómo
             se generan las planeaciones de 16 semanas.
           </p>
@@ -121,7 +121,7 @@ export default function PeriodosPage() {
                   placeholder="Ej: 2026-1 o 20261"
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  className="rounded-xl h-10 text-sm shadow-none bg-muted/20 border-transparent focus:bg-background focus:border-primary/50"
+                  className="rounded-xl h-10 sm:text-sm text-xs shadow-none bg-muted/20 border-transparent focus:bg-background focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -130,7 +130,7 @@ export default function PeriodosPage() {
                   type="date"
                   value={newStart}
                   onChange={e => setNewStart(e.target.value)}
-                  className="rounded-xl h-10 text-sm shadow-none bg-muted/20 border-transparent focus:bg-background focus:border-primary/50"
+                  className="rounded-xl h-10 sm:text-sm text-xs shadow-none bg-muted/20 border-transparent focus:bg-background focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -139,7 +139,7 @@ export default function PeriodosPage() {
                   type="date"
                   value={newEnd}
                   onChange={e => setNewEnd(e.target.value)}
-                  className="rounded-xl h-10 text-sm shadow-none bg-muted/20 border-transparent focus:bg-background focus:border-primary/50"
+                  className="rounded-xl h-10 sm:text-sm text-xs shadow-none bg-muted/20 border-transparent focus:bg-background focus:border-primary/50"
                 />
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function PeriodosPage() {
               <div className="bg-muted/30 p-4 rounded-full mb-4">
                 <CalendarDays className="h-10 w-10 text-muted-foreground/40" />
               </div>
-              <h4 className="text-sm font-semibold text-foreground mb-1">
+              <h4 className="sm:text-sm text-xs font-semibold text-foreground mb-1">
                 No hay periodos configurados
               </h4>
               <p className="text-xs text-muted-foreground max-w-xs mx-auto">
@@ -196,7 +196,7 @@ export default function PeriodosPage() {
               <TableBody>
                 {periods.map(p => (
                   <TableRow key={p.id} className="hover:bg-muted/30 transition-colors group">
-                    <TableCell className="px-5 font-medium text-sm">
+                    <TableCell className="px-5 font-medium sm:text-sm text-xs">
                       {p.name}
                     </TableCell>
                     <TableCell className="px-5 text-xs text-muted-foreground">

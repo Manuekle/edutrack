@@ -35,7 +35,7 @@ When a user requests a logo, gather comprehensive design requirements:
 
 2. **Design Preferences**
    - Logo type:
-     - **Wordmark**: Text-based logo (Google, Coca-Cola style)
+     - **Wordmark**: text-xsd logo (Google, Coca-Cola style)
      - **Lettermark**: Initials/abbreviation (IBM, HBO style)
      - **Pictorial Mark**: Icon/symbol (Apple, Twitter style)
      - **Abstract Mark**: Abstract geometric form (Pepsi, Adidas style)
@@ -46,7 +46,7 @@ When a user requests a logo, gather comprehensive design requirements:
 3. **Style Guidelines**
    - Color palette (specific colors or let AI choose)
    - Color psychology considerations
-   - Font preferences (if text-based)
+   - Font preferences (if text-xsd)
    - Visual style:
      - Minimalist
      - Geometric

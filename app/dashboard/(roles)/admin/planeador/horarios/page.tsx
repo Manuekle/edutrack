@@ -329,7 +329,7 @@ export default function ProgramacionPage() {
           <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
             Programación
           </h1>
-          <p className="text-muted-foreground text-sm max-w-2xl">
+          <p className="text-muted-foreground sm:text-sm text-xs max-w-2xl">
             Sube el archivo CSV con la programación del semestre. El sistema creará automáticamente los
             horarios, grupos, y asignará los docentes y salones en un solo paso.
           </p>
@@ -587,7 +587,7 @@ export default function ProgramacionPage() {
                         <div className="bg-muted/30 p-4 rounded-full mb-4">
                           <FileSpreadsheet className="h-10 w-10 text-muted-foreground/40" />
                         </div>
-                        <h4 className="text-[17px] font-semibold tracking-card text-foreground mb-1">
+                        <h4 className="sm:text-[17px] text-xs font-semibold tracking-card text-foreground mb-1">
                           Sin información para cargar
                         </h4>
                         <p className="text-xs text-muted-foreground max-w-xs mx-auto">
@@ -731,7 +731,7 @@ export default function ProgramacionPage() {
                       <TableRow>
                         <TableCell colSpan={7} className="py-10">
                           <div className="flex flex-col items-center justify-center text-center gap-2">
-                            <p className="text-sm font-medium text-foreground">
+                            <p className="sm:text-sm text-xs font-medium text-foreground">
                               {search
                                 ? 'No hay resultados para esa búsqueda.'
                                 : 'No hay grupos cargados aún.'}

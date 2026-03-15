@@ -128,7 +128,7 @@ export default function DocenteDashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-muted-foreground sm:text-sm text-xs mt-1">
             Resumen del día — clases activas, próximas clases y estadísticas generales.
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function DocenteDashboard() {
           <Button
             type="button"
             variant="outline"
-            className="w-full sm:w-auto rounded-xl h-10 px-4 shadow-none bg-muted/40 border-transparent hover:bg-muted/60 transition-colors text-sm font-medium"
+            className="w-full sm:w-auto rounded-xl h-10 px-4 shadow-none bg-muted/40 border-transparent hover:bg-muted/60 transition-colors sm:text-sm text-xs font-medium"
             onClick={() => router.push('/dashboard/docente/grupos')}
           >
             Ver todos los grupos

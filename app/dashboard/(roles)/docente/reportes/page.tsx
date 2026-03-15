@@ -9,7 +9,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AlertCircle, CheckCircle, Clock, Download, FileText, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -160,7 +159,7 @@ export default function ReportsPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-card text-foreground">Mis Reportes</h1>
-          <p className="text-muted-foreground text-sm max-w-xl">
+          <p className="text-muted-foreground sm:text-sm text-xs max-w-xl">
             Historial de reportes de asistencia — solicítalos desde el detalle de una asignatura y
             descárgalos aquí cuando estén listos.
           </p>
@@ -173,7 +172,7 @@ export default function ReportsPage() {
             <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
               <FileText className="h-7 w-7 text-muted-foreground/40" />
             </div>
-            <p className="text-[15px] font-semibold text-foreground tracking-card">
+            <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
               Aún no has solicitado reportes
             </p>
             <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
@@ -197,7 +196,7 @@ export default function ReportsPage() {
                         {report.format}
                       </Badge>
                     </div>
-                    <CardTitle className="text-base truncate group-hover:text-primary transition-colors">
+                    <CardTitle className="text-xs truncate group-hover:text-primary transition-colors">
                       {report.subject?.name}
                     </CardTitle>
                   </div>

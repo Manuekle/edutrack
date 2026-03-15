@@ -109,13 +109,13 @@ export function ClassTableRow({
                   {canTakeAttendance ? (
                     <Link
                       href={`/dashboard/docente/grupos/${subjectId}/clase/${cls.id}/asistencia`}
-                      className="text-[15px] font-semibold text-foreground tracking-card hover:text-primary transition-colors truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                      className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card hover:text-primary transition-colors truncate focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
                       aria-label={`Registrar asistencia para ${cls.topic || 'Sin tema'}`}
                     >
                       {cls.topic || 'Sin tema'}
                     </Link>
                   ) : (
-                    <span className="text-[15px] font-semibold text-foreground tracking-card truncate">
+                    <span className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card truncate">
                       {cls.topic || 'Sin tema evaluado'}
                     </span>
                   )}

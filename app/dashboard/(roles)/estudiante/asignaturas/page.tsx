@@ -47,7 +47,7 @@ export default function MisAsignaturasEstudiantePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-card text-foreground">Mis Asignaturas</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground sm:text-sm text-xs mt-1">
           Asignaturas matriculadas en el período académico actual.
         </p>
       </div>
@@ -64,7 +64,7 @@ export default function MisAsignaturasEstudiantePage() {
           <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
             <GraduationCap className="h-7 w-7 text-muted-foreground/40" />
           </div>
-          <p className="text-[15px] font-semibold text-foreground tracking-card">
+          <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
             No estás matriculado en ninguna asignatura.
           </p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
@@ -87,13 +87,13 @@ export default function MisAsignaturasEstudiantePage() {
                       </Badge>
                       <Badge variant="secondary">{a.periodoAcademico}</Badge>
                     </div>
-                    <CardTitle className="text-base">{a.subject.name}</CardTitle>
+                    <CardTitle className="text-xs">{a.subject.name}</CardTitle>
                     <code className="text-xs text-muted-foreground">{a.subject.code}</code>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 gap-2 text-sm">
+                <div className="grid grid-cols-1 gap-2 sm:text-sm text-xs">
                   {a.subject.program && (
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <GraduationCap className="h-3.5 w-3.5 shrink-0" />

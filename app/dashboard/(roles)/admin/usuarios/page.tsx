@@ -252,7 +252,7 @@ export default function AdminUsuariosPage() {
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Gestión de Usuarios
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground sm:text-sm text-xs">
           Administra los roles, accesos y datos personales de toda la comunidad académica.
         </p>
       </div>
@@ -395,7 +395,7 @@ export default function AdminUsuariosPage() {
               {stats.map(stat => (
                 <Card key={stat.label}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <CardTitle className="sm:text-sm text-xs font-medium text-muted-foreground">
                       {stat.label}
                     </CardTitle>
                   </CardHeader>
@@ -458,7 +458,7 @@ export default function AdminUsuariosPage() {
                         <TableCell colSpan={4} className="py-20 text-center">
                           <div className="flex flex-col items-center justify-center gap-2">
                             <Users className="h-8 w-8 text-muted-foreground/30" />
-                            <p className="text-sm font-semibold text-foreground">No hay usuarios</p>
+                            <p className="sm:text-sm text-xs font-semibold text-foreground">No hay usuarios</p>
                             <p className="text-xs text-muted-foreground">
                               {searchTerm ? 'No hay resultados para tu búsqueda.' : 'Aún no hay usuarios registrados.'}
                             </p>
@@ -531,7 +531,7 @@ export default function AdminUsuariosPage() {
                   <AlertDialogTitle className="text-lg tracking-card font-semibold text-destructive">
                     ¿Eliminar usuario?
                   </AlertDialogTitle>
-                  <AlertDialogDescription className="text-sm">
+                  <AlertDialogDescription className="sm:text-sm text-xs">
                     Estás por eliminar a <strong className="text-foreground">{userToDelete?.name}</strong>. Esta acción es irreversible.
                   </AlertDialogDescription>
                 </AlertDialogHeader>

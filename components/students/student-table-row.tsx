@@ -11,7 +11,7 @@ export function StudentTableRow({ student }: StudentTableRowProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3.5 px-5 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors group">
       <div className="flex items-center gap-4 flex-1 min-w-0">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold sm:text-sm text-xs">
           {student.name ? student.name.charAt(0).toUpperCase() : '?'}
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">

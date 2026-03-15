@@ -158,7 +158,7 @@ export default function PlaneacionPage() {
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2 text-foreground">
           Planeación del semestre
         </h1>
-        <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
+        <p className="text-muted-foreground sm:text-sm text-xs mt-1 max-w-2xl">
           Aquí defines el calendario de 16 semanas para cada grupo. El docente verá esas semanas en
           su Bitácora para registrar el avance de cada clase semana a semana.
         </p>
@@ -265,7 +265,7 @@ export default function PlaneacionPage() {
             <div className="space-y-2.5">
               <Label className="text-xs font-semibold ml-0.5">Elige el grupo</Label>
               <Select value={selectedGrupo} onValueChange={setSelectedGrupo} disabled={loading}>
-                <SelectTrigger className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/40 border border-muted-foreground/10 focus:bg-background focus:border-primary/50 transition-colors">
+                <SelectTrigger className="w-full h-11 rounded-xl sm:text-sm text-xs px-4 shadow-none bg-muted/40 border border-muted-foreground/10 focus:bg-background focus:border-primary/50 transition-colors">
                   <SelectValue placeholder="Seleccionar grupo..." />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl shadow-lg border-muted-foreground/10 max-h-80">
@@ -284,7 +284,7 @@ export default function PlaneacionPage() {
                         <span className="font-mono text-muted-foreground mr-1 text-xs">
                           [Grupo: {g.codigo}]
                         </span>
-                        <span className="font-medium truncate text-sm">{g.subject.name}</span>
+                        <span className="font-medium truncate sm:text-sm text-xs">{g.subject.name}</span>
                       </span>
                     </SelectItem>
                   ))}
@@ -301,7 +301,7 @@ export default function PlaneacionPage() {
 
               {/* Info del grupo seleccionado */}
               {currentGrupo && (
-                <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-blue-50/50 dark:bg-blue-500/5 text-sm border border-blue-100 dark:border-blue-500/10 mt-4">
+                <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-blue-50/50 dark:bg-blue-500/5 sm:text-sm text-xs border border-blue-100 dark:border-blue-500/10 mt-4">
                   <div className="flex items-center gap-2 mb-0.5">
                     <BookOpen className="h-4 w-4 text-primary shrink-0" />
                     <span className="font-semibold text-[13px] text-foreground truncate">
@@ -336,7 +336,7 @@ export default function PlaneacionPage() {
             {/* Paso 2 — Fecha (Automática) */}
             <div className="space-y-2.5">
               <Label className="text-xs font-semibold ml-0.5">Fechas del semestre</Label>
-              <div className="w-full h-11 rounded-xl text-sm px-4 shadow-none bg-muted/20 border border-muted flex items-center gap-3">
+              <div className="w-full h-11 rounded-xl sm:text-sm text-xs px-4 shadow-none bg-muted/20 border border-muted flex items-center gap-3">
                 <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                 {matchingPeriod ? (
                   <span className="text-foreground font-medium">
@@ -411,7 +411,7 @@ export default function PlaneacionPage() {
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-semibold">
             2
           </span>
-          <h2 className="text-sm font-semibold tracking-card">Planeaciones activas</h2>
+          <h2 className="sm:text-sm text-xs font-semibold tracking-card">Planeaciones activas</h2>
         </div>
         <p className="text-[12px] text-muted-foreground sm:ml-8 mb-6 max-w-lg">
           Puedes eliminar una planeación desde aquí si ocurrió un error en las fechas.
@@ -458,7 +458,7 @@ export default function PlaneacionPage() {
                     {/* Encabezado de la tarjeta */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex flex-col gap-0.5">
-                        <span className="font-semibold text-sm text-foreground tracking-card line-clamp-1">
+                        <span className="font-semibold sm:text-sm text-xs text-foreground tracking-card line-clamp-1">
                           {g.subject.name}
                         </span>
                         <Badge

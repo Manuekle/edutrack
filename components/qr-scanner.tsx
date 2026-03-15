@@ -116,7 +116,7 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
         <CardDescription>Apunta la cámara hacia el código QR de asistencia</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {error && <p className="text-sm text-destructive text-center">{error}</p>}
+        {error && <p className="sm:text-sm text-xs text-destructive text-center">{error}</p>}
 
         {hasCamera ? (
           <>

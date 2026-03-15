@@ -338,7 +338,7 @@ input[type='number'] {
   color: var(--card-foreground) !important;
 }
 
-/* Title: font-semibold text-sm — same as CardTitle */
+/* Title: font-semibold sm:text-sm text-xs — same as CardTitle */
 .sira-theme-driver .driver-popover-title {
   font-size: 0.875rem !important;
   font-weight: 600 !important;

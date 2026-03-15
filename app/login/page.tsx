@@ -95,7 +95,7 @@ function LoginForm() {
 
         <div className="space-y-1.5">
           <CardTitle className="text-3xl font-semibold tracking-card">Bienvenido</CardTitle>
-          <CardDescription className="text-muted-foreground text-[15px]">
+          <CardDescription className="text-muted-foreground sm:text-[15px] text-xs">
             Ingresa al sistema de registro académico
           </CardDescription>
         </div>
@@ -116,7 +116,7 @@ function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem className="space-y-2.5">
-                  <FormLabel className="text-sm font-semibold ml-1 text-foreground/80">Correo institucional</FormLabel>
+                  <FormLabel className="sm:text-sm text-xs font-semibold ml-1 text-foreground/80">Correo institucional</FormLabel>
                   <FormControl>
                     <div className="relative group">
                       <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
@@ -140,7 +140,7 @@ function LoginForm() {
               render={({ field }) => (
                 <FormItem className="space-y-2.5">
                   <div className="flex items-center justify-between px-1">
-                    <FormLabel className="text-sm font-semibold text-foreground/80">Contraseña</FormLabel>
+                    <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">Contraseña</FormLabel>
                     <Link
                       href="/forgot-password"
                       className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
@@ -155,7 +155,7 @@ function LoginForm() {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="••••••••"
                         disabled={isLoading}
-                        className="pl-12 pr-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all text-[15px]"
+                        className="pl-12 pr-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                         autoComplete="current-password"
                         {...field}
                       />

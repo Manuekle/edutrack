@@ -57,7 +57,7 @@ export default function HomePageMobile() {
             <img src="/icons/favicon-192x192.png" alt="SIRA Logo" className="w-full h-full" />
           </div>
           <h1 className="text-3xl font-semibold tracking-card text-center">SIRA</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="sm:text-sm text-xs text-muted-foreground mt-1">
             Sistema Integral de Registro Académico
           </p>
         </motion.div>
@@ -76,7 +76,7 @@ export default function HomePageMobile() {
               <div className="mb-4 p-4 bg-muted/30 rounded-full border border-border/50">
                 {features[currentFeature].icon}
               </div>
-              <h2 className="text-base tracking-card font-semibold mb-2">
+              <h2 className="text-xs tracking-card font-semibold mb-2">
                 {features[currentFeature].title}
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -106,7 +106,7 @@ export default function HomePageMobile() {
         <div className="flex flex-col gap-3">
           <Button
             size="lg"
-            className="w-full text-sm font-semibold"
+            className="w-full sm:text-sm text-xs font-semibold"
             onClick={() => router.push('/login')}
           >
             Iniciar Sesión

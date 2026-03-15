@@ -100,7 +100,7 @@ export default function ForgotPasswordPage() {
                 name="correo"
                 render={({ field }) => (
                   <FormItem className="space-y-2.5">
-                    <FormLabel className="text-sm font-medium ml-1">Correo Institucional / Personal</FormLabel>
+                    <FormLabel className="sm:text-sm text-xs font-medium ml-1">Correo Institucional / Personal</FormLabel>
                     <FormControl>
                       <div className="relative group">
                         <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
@@ -137,7 +137,7 @@ export default function ForgotPasswordPage() {
               <div className="pt-4 flex justify-center">
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+                  className="inline-flex items-center gap-2 sm:text-sm text-xs font-medium text-muted-foreground hover:text-primary transition-colors py-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Volver al inicio de sesión

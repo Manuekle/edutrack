@@ -95,7 +95,7 @@ export function PWAInstaller() {
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-6 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full -ml-12 -mb-12 blur-2xl" />
-        
+
         <div className="relative flex items-start gap-4">
           <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-primary to-primary/60 rounded-2xl shadow-lg shadow-primary/20 flex items-center justify-center">
             <svg
@@ -114,7 +114,7 @@ export function PWAInstaller() {
           </div>
           <div className="flex-1 pt-1">
             <h3 className="font-bold text-lg text-slate-900 dark:text-white leading-tight">Instalar SIRA</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+            <p className="sm:text-sm text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
               Consigue la experiencia completa instalando nuestra app en tu dispositivo.
             </p>
           </div>
@@ -136,13 +136,13 @@ export function PWAInstaller() {
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleInstall}
-            className="flex-[2] bg-primary text-white hover:bg-primary/90 text-sm font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+            className="flex-[2] bg-primary text-white hover:bg-primary/90 sm:text-sm text-xs font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
           >
             Instalar ahora
           </button>
           <button
             onClick={handleDismiss}
-            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-semibold py-3.5 px-6 rounded-2xl transition-all active:scale-[0.98]"
+            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 sm:text-sm text-xs font-semibold py-3.5 px-6 rounded-2xl transition-all active:scale-[0.98]"
           >
             Quizás pronto
           </button>

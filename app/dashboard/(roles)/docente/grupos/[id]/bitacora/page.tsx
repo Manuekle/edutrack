@@ -5,13 +5,12 @@ import { CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { useQueryClient } from '@tanstack/react-query';
 import { format, isAfter, startOfToday } from 'date-fns';
 import { BookOpen, CalendarDays, Clock, Save } from 'lucide-react';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { sileo } from 'sileo';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface ClaseBitacora {
   id: string;
@@ -278,7 +277,7 @@ export default function BitacoraTablaPage() {
         {!data.planning ? (
           <div className="bg-background rounded-2xl p-12 text-center flex flex-col items-center justify-center">
             <BookOpen className="h-10 w-10 text-muted-foreground/30 mb-3" />
-            <p className="text-[15px] font-medium text-foreground">No hay planeación académica.</p>
+            <p className="sm:text-[15px] text-xs font-medium text-foreground">No hay planeación académica.</p>
             <p className="text-[13px] text-muted-foreground mt-1 max-w-sm">
               El administrador debe generar la planeación de 16 semanas primero para habilitar la
               bitácora.
@@ -297,13 +296,12 @@ export default function BitacoraTablaPage() {
               return (
                 <div
                   key={row.claseId}
-                  className={`flex flex-col md:flex-row md:items-start gap-4 p-4 transition-colors ${
-                    row.tema.trim()
+                  className={`flex flex-col md:flex-row md:items-start gap-4 p-4 transition-colors ${row.tema.trim()
                       ? 'bg-primary/5 dark:bg-primary/10'
                       : row.dirty
                         ? 'bg-amber-500/5 dark:bg-amber-500/10'
                         : ''
-                  } hover:bg-muted/50 dark:hover:bg-white/[0.02]`}
+                    } hover:bg-muted/50 dark:hover:bg-white/[0.02]`}
                 >
                   {/* Info and Time block */}
                   <div className="flex items-center gap-3 md:w-56 shrink-0">
@@ -387,7 +385,7 @@ export default function BitacoraTablaPage() {
               <span className="text-[13px] font-medium text-muted-foreground">
                 Total horas acumuladas:
               </span>
-              <span className="font-mono font-semibold text-[15px] bg-muted/50 px-3 py-1 rounded-lg border">
+              <span className="font-mono font-semibold sm:text-[15px] text-xs bg-muted/50 px-3 py-1 rounded-lg border">
                 {totalHorasAcum > 0 ? totalHorasAcum.toFixed(1) : '0.0'}
               </span>
             </div>

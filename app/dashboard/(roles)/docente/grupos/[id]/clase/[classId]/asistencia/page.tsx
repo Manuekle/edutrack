@@ -34,7 +34,6 @@ import {
   UserMinus,
   Users,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { sileo } from 'sileo';
@@ -242,7 +241,7 @@ export default function AttendancePage() {
     : null;
   const classEndDate = classInfo
     ? toLocalTime(classInfo.endTime) ||
-      (classStartDate ? new Date(classStartDate.getTime() + 2 * 60 * 60 * 1000) : null)
+    (classStartDate ? new Date(classStartDate.getTime() + 2 * 60 * 60 * 1000) : null)
     : null;
 
   const bufferMs = 10 * 60 * 1000;
@@ -297,11 +296,10 @@ export default function AttendancePage() {
               onClick={() => handleQRAction(false)}
               disabled={isGenerating}
               variant="outline"
-              className={`w-full sm:w-auto rounded-xl h-10 border-transparent transition-all text-sm font-medium gap-2 ${
-                qrData
+              className={`w-full sm:w-auto rounded-xl h-10 border-transparent transition-all sm:text-sm text-xs font-medium gap-2 ${qrData
                   ? 'bg-primary/10 text-primary hover:bg-primary/20'
                   : 'bg-muted/40 hover:bg-muted/60'
-              }`}
+                }`}
             >
               <QrCode className="h-4 w-4" />
               {qrData ? 'Ver código QR' : 'Generar código QR'}
@@ -310,7 +308,7 @@ export default function AttendancePage() {
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 text-sm font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
+              className="w-full sm:w-auto rounded-xl shadow-lg shadow-primary/20 h-10 px-6 sm:text-sm text-xs font-semibold transition-all gap-2 bg-primary hover:bg-primary/90"
             >
               <Save className="h-4 w-4" />
               {isSaving ? 'Guardando...' : 'Guardar Cambios'}
@@ -386,11 +384,11 @@ export default function AttendancePage() {
                       className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 px-6 hover:bg-muted/50 dark:hover:bg-white/[0.02] transition-colors"
                     >
                       <div className="flex items-center gap-4 flex-1 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold sm:text-sm text-xs">
                           {student.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold text-foreground truncate">
+                          <span className="sm:text-sm text-xs font-semibold text-foreground truncate">
                             {student.name}
                           </span>
                           <span className="text-xs text-muted-foreground truncate">
@@ -438,7 +436,7 @@ export default function AttendancePage() {
                     <Users className="h-8 w-8 text-muted-foreground/40" />
                   </div>
                   <h3 className="text-lg font-semibold">No se encontraron estudiantes</h3>
-                  <p className="text-sm text-muted-foreground max-w-xs mt-1">
+                  <p className="sm:text-sm text-xs text-muted-foreground max-w-xs mt-1">
                     {searchQuery
                       ? `No hay resultados para "${searchQuery}"`
                       : 'No hay estudiantes matriculados en esta clase.'}
@@ -452,7 +450,7 @@ export default function AttendancePage() {
         {/* Sidebar Summary */}
         <div className="space-y-6">
           <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl p-6 shadow-sm border">
-            <h4 className="text-sm font-semibold mb-6 flex items-center gap-2">
+            <h4 className="sm:text-sm text-xs font-semibold mb-6 flex items-center gap-2">
               <History className="h-4 w-4 text-primary" />
               Resumen de Asistencia
             </h4>
@@ -495,9 +493,9 @@ export default function AttendancePage() {
                     >
                       <s.icon className={`h-4 w-4 ${s.color}`} />
                     </div>
-                    <span className="text-sm font-medium">{s.label}</span>
+                    <span className="sm:text-sm text-xs font-medium">{s.label}</span>
                   </div>
-                  <span className={`text-sm font-bold ${s.color}`}>{s.val}</span>
+                  <span className={`sm:text-sm text-xs font-bold ${s.color}`}>{s.val}</span>
                 </div>
               ))}
 
@@ -506,7 +504,7 @@ export default function AttendancePage() {
                   <span className="text-xs font-bold uppercase tracking-card text-muted-foreground">
                     Total Estudiantes
                   </span>
-                  <span className="text-sm font-black">{stats.total}</span>
+                  <span className="sm:text-sm text-xs font-black">{stats.total}</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-1.5 mt-3 overflow-hidden">
                   <div
@@ -519,7 +517,7 @@ export default function AttendancePage() {
           </div>
 
           <div className="bg-primary/5 border border-primary/10 rounded-3xl p-6">
-            <h4 className="text-sm font-semibold text-primary mb-3 flex items-center gap-2">
+            <h4 className="sm:text-sm text-xs font-semibold text-primary mb-3 flex items-center gap-2">
               <Info className="h-4 w-4" />
               Recordatorio
             </h4>

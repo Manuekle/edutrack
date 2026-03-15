@@ -65,7 +65,7 @@ No,Category,Issue,Platform,Description,Do,Don't,Code Example Good,Code Example B
 64,Responsive,Mobile First,Web,Design for mobile then enhance for larger,Start with mobile styles then add breakpoints,Desktop-first causing mobile issues,Default mobile + md: lg: xl:,Desktop default + max-width queries,Medium
 65,Responsive,Breakpoint Testing,Web,Test at all common screen sizes,Test at 320 375 414 768 1024 1440,Only test on your device,Multiple device testing,Single device development,Medium
 66,Responsive,Touch Friendly,Web,Mobile layouts need touch-sized targets,Increase touch targets on mobile,Same tiny buttons on mobile,Larger buttons on mobile,Desktop-sized targets on mobile,High
-67,Responsive,Readable Font Size,All,Text must be readable on all devices,Minimum 16px body text on mobile,Tiny text on mobile,text-base or larger,text-xs for body text,High
+67,Responsive,Readable Font Size,All,Text must be readable on all devices,Minimum 16px body text on mobile,Tiny text on mobile,text-xs or larger,text-xs for body text,High
 68,Responsive,Viewport Meta,Web,Set viewport for mobile devices,Use width=device-width initial-scale=1,Missing or incorrect viewport,<meta name='viewport'...>,No viewport meta tag,High
 69,Responsive,Horizontal Scroll,Web,Avoid horizontal scrolling,Ensure content fits viewport width,Content wider than viewport,max-w-full overflow-x-hidden,Horizontal scrollbar on mobile,High
 70,Responsive,Image Scaling,Web,Images should scale with container,Use max-width: 100% on images,Fixed width images overflow,max-w-full h-auto,width='800' fixed,Medium

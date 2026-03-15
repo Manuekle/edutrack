@@ -173,7 +173,7 @@ function ResetPasswordContent() {
             <CardTitle className="text-3xl font-semibold tracking-card">
               Nueva contraseña
             </CardTitle>
-            <CardDescription className="text-muted-foreground text-[15px]">
+            <CardDescription className="text-muted-foreground sm:text-[15px] text-xs">
               Estás restableciendo la contraseña para:<br />
               <span className="font-medium text-foreground">{userEmail}</span>
             </CardDescription>
@@ -188,14 +188,14 @@ function ResetPasswordContent() {
                 name="password"
                 render={({ field }) => (
                   <FormItem className="space-y-2.5">
-                    <FormLabel className="text-sm font-medium ml-1">Nueva Contraseña</FormLabel>
+                    <FormLabel className="sm:text-sm text-xs font-medium ml-1">Nueva Contraseña</FormLabel>
                     <FormControl>
                       <div className="relative group">
                         <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Mínimo 8 caracteres"
-                          className="h-12 pl-12 pr-12 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all text-[15px]"
+                          className="h-12 pl-12 pr-12 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                           disabled={isSubmitting}
                           {...field}
                         />
@@ -220,14 +220,14 @@ function ResetPasswordContent() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem className="space-y-2.5">
-                    <FormLabel className="text-sm font-medium ml-1">Confirmar Contraseña</FormLabel>
+                    <FormLabel className="sm:text-sm text-xs font-medium ml-1">Confirmar Contraseña</FormLabel>
                     <FormControl>
                       <div className="relative group">
                         <CheckCircle2 className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                         <Input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="Repite tu contraseña"
-                          className="h-12 pl-12 pr-12 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all text-[15px]"
+                          className="h-12 pl-12 pr-12 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                           disabled={isSubmitting}
                           {...field}
                         />
