@@ -3,13 +3,12 @@
 import { TablePagination } from '@/components/shared/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Bookmark, CalendarDays, History, RefreshCw, XCircle } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 // Tipo de dato para la asistencia, ahora enriquecido
@@ -122,15 +121,19 @@ export default function HistorialAsistenciasPage() {
             </div>
           </div>
         ) : attendances.length === 0 ? (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <History className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">Aún no hay asistencias registradas.</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                No tienes asistencias registradas para este período académico.
-              </p>
-            </CardContent>
-          </Card>
+
+          <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
+            <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <History className="h-7 w-7 text-muted-foreground/40" />
+            </div>
+            <p className="text-[15px] font-semibold text-foreground tracking-card">
+              Sin historial disponible
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+              No se han encontrado asistencias registradas para este periodo académico en tu perfil de
+              estudiante.
+            </p>
+          </div>
         ) : (
           <Card className="rounded-2xl border-border/50 shadow-sm overflow-hidden bg-card">
             <div className="divide-y divide-border/50">

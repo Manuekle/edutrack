@@ -157,11 +157,13 @@ export default function DocenteDashboard() {
       />
 
       <div className="grid gap-5 md:grid-cols-2">
-        {/* Próximas Clases */}
-        <UpcomingClassesCard classes={upcomingClasses} />
 
         {/* Asignaturas Recientes */}
         <TeacherSubjectsList subjects={subjects} />
+        {/* Próximas Clases */}
+        <UpcomingClassesCard classes={upcomingClasses} />
+
+
       </div>
     </div>
   );

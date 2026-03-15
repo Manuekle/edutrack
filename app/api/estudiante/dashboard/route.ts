@@ -61,8 +61,8 @@ export async function GET() {
     let weeklyTotalClasses = 0;
     let weeklyAttendedClasses = 0;
 
-    // Get all subjects for the student
-    const subjects = await db.subject.findMany({
+    // Get subjects where student is enrolled via Subject.studentIds
+    const subjectsFromSubject = await db.subject.findMany({
       where: {
         studentIds: {
           has: session.user.id,
@@ -78,6 +78,32 @@ export async function GET() {
       },
     });
 
+    // Also get subjects where student is enrolled via Group.studentIds
+    const groupsWithStudent = await db.group.findMany({
+      where: { studentIds: { has: session.user.id } },
+      select: { subjectId: true },
+    });
+    const groupSubjectIds = groupsWithStudent.map(g => g.subjectId);
+
+    // Get all unique subject IDs
+    const allSubjectIds = [...new Set([...subjectsFromSubject.map(s => s.id), ...groupSubjectIds])];
+
+    // Get subjects that weren't already fetched
+    const additionalSubjects = await db.subject.findMany({
+      where: {
+        id: { in: groupSubjectIds.filter(id => !subjectsFromSubject.some(s => s.id === id)) },
+      },
+      include: {
+        teachers: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const subjects = [...subjectsFromSubject, ...additionalSubjects];
     const subjectIds = subjects.map(s => s.id);
 
     // OPTIMIZATION: Get all classes for all subjects in a single query
@@ -164,19 +190,21 @@ export async function GET() {
     });
 
     // OPTIMIZATION: Get next classes for all subjects in a single query
+    // Only show SCHEDULED classes (created by teacher), same as docente dashboard
     const nextClasses = await db.class.findMany({
       where: {
         subjectId: {
           in: subjectIds,
         },
         date: { gte: now },
-        status: { not: 'CANCELLED' as any },
+        status: 'SCHEDULED',
       },
       select: {
         id: true,
         subjectId: true,
         date: true,
         topic: true,
+        status: true,
       },
       orderBy: { date: 'asc' },
     });

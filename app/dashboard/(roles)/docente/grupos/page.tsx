@@ -67,15 +67,19 @@ export default function MisGruposPage() {
       {loading ? (
         <LoadingPage />
       ) : grupos.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <Users className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No tienes grupos asignados.</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Verifica con el administrador que el período académico esté activo.
-            </p>
-          </CardContent>
-        </Card>
+
+
+        <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
+          <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <Users className="h-7 w-7 text-muted-foreground/40" />
+          </div>
+          <p className="text-[15px] font-semibold text-foreground tracking-card">
+            No tienes grupos asignados.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+            Verifica con el administrador que el período académico esté activo.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {grupos.map(g => (

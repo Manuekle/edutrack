@@ -106,6 +106,12 @@ export async function POST(request: Request) {
     select: { studentIds: true },
   });
 
+  // Get all groups for this subject
+  const groups = await db.group.findMany({
+    where: { subjectId },
+    select: { id: true },
+  });
+
   if (!subject) {
     return NextResponse.json(
       { message: 'Asignatura no encontrada o no pertenece al docente' },
@@ -130,15 +136,21 @@ export async function POST(request: Request) {
     );
   }
 
-  // Matricular al estudiante actualizando ambos modelos en una transacción
+  // Matricular al estudiante actualizando Subject y Groups en una transacción
   try {
-    await db.$transaction([
+    const updateOperations = [
       db.subject.update({
         where: { id: subjectId },
         data: { studentIds: { push: studentId } },
       }),
-      // Also update groups if necessary - for now we just update top-level subject
-    ]);
+      ...groups.map(group =>
+        db.group.update({
+          where: { id: group.id },
+          data: { studentIds: { push: studentId } },
+        })
+      ),
+    ];
+    await db.$transaction(updateOperations);
     return NextResponse.json({ message: 'Estudiante matriculado con éxito' }, { status: 201 });
   } catch (error: unknown) {
     return NextResponse.json({ message: 'Error al matricular al estudiante' }, { status: 500 });

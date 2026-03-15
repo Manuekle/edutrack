@@ -1,13 +1,10 @@
 'use client';
 
 import { CalendarEvent, CustomCalendar } from '@/components/calendar/custom-calendar';
-import { Card, CardContent } from '@/components/ui/card';
 import { LoadingPage } from '@/components/ui/loading';
-import { addDays, setHours, setMinutes, startOfWeek } from 'date-fns';
+import { addDays, addMonths, startOfWeek, subDays, subMonths } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { addMonths, subDays, subMonths } from 'date-fns';
 
 interface HorarioItem {
   grupoId: string;
@@ -58,8 +55,12 @@ export default function HorarioEstudiantePage() {
       const [startH, startM] = h.horaInicio.split(':').map(Number);
       const [endH, endM] = h.horaFin.split(':').map(Number);
 
-      const start = setMinutes(setHours(eventDate, startH), startM);
-      const end = setMinutes(setHours(eventDate, endH), endM);
+      // Create dates in local timezone to avoid offset issues
+      const year = eventDate.getFullYear();
+      const month = eventDate.getMonth();
+      const day = eventDate.getDate();
+      const start = new Date(year, month, day, startH, startM);
+      const end = new Date(year, month, day, endH, endM);
 
       events.push({
         id: `${h.grupoId}-${idx}`,
@@ -105,18 +106,19 @@ export default function HorarioEstudiantePage() {
       {loading ? (
         <LoadingPage />
       ) : horarios.length === 0 ? (
-        <Card className="border shadow-none rounded-3xl overflow-hidden bg-muted/20">
-          <CardContent className="py-24 text-center flex flex-col items-center justify-center">
-            <div className="bg-background p-6 rounded-full shadow-lg mb-6 ring-1 ring-border/50">
-              <CalendarDays className="h-12 w-12 text-primary/40" />
-            </div>
-            <h3 className="text-xl font-semibold text-foreground">Sin programación disponible</h3>
-            <p className="text-muted-foreground mt-2 max-w-xs">
-              No se han encontrado clases registradas para este periodo académico en tu perfil de
-              estudiante.
-            </p>
-          </CardContent>
-        </Card>
+
+        <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
+          <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <CalendarDays className="h-7 w-7 text-muted-foreground/40" />
+          </div>
+          <p className="text-[15px] font-semibold text-foreground tracking-card">
+            Sin programación disponible
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+            No se han encontrado clases registradas para este periodo académico en tu perfil de
+            estudiante.
+          </p>
+        </div>
       ) : (
         <CustomCalendar
           date={currentDate}

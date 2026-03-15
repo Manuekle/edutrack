@@ -18,12 +18,7 @@ import {
 } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  User,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, User, MapPin } from 'lucide-react';
 import React from 'react';
 
 // --- CUSTOM CALENDAR COMPONENTS ---
@@ -99,17 +94,22 @@ const MonthView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =>
   );
 };
 
-const HOUR_HEIGHT = 64; // h-16 = 4rem = 64px
+const HOUR_HEIGHT = 64;
 const WEEK_START_HOUR = 7;
+
+const getEventHour = (date: Date) => date.getHours();
+const getEventMinute = (date: Date) => date.getMinutes();
+
+const formatEventTime = (date: Date) => {
+  const h = date.getHours();
+  const m = date.getMinutes();
+  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+};
 
 const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
   const start = startOfWeek(date, { locale: es });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(start, i));
-  const totalHours = 22 - WEEK_START_HOUR; // 7am to 10pm
-  const hours = eachHourOfInterval({
-    start: new Date(2024, 0, 1, WEEK_START_HOUR, 0),
-    end: new Date(2024, 0, 1, 22, 0),
-  });
+  const hours = Array.from({ length: 22 - WEEK_START_HOUR }, (_, i) => WEEK_START_HOUR + i);
 
   return (
     <div className="flex flex-col border rounded-3xl overflow-hidden bg-background">
@@ -139,10 +139,10 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
           <div className="row-span-full">
             {hours.map(hour => (
               <div
-                key={hour.toISOString()}
+                key={hour}
                 className="h-16 px-2 py-1 text-right text-[11px] font-semibold text-muted-foreground/60 border-r border-b"
               >
-                {format(hour, 'h a')}
+                {hour.toString().padStart(2, '0')}:00
               </div>
             ))}
           </div>
@@ -151,21 +151,18 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
             <div
               key={day.toISOString()}
               className="relative border-r last:border-r-0"
-              style={{ height: `${totalHours * HOUR_HEIGHT}px` }}
+              style={{ height: `${hours.length * HOUR_HEIGHT}px` }}
             >
               {/* Hour grid lines */}
               {hours.map(hour => (
-                <div
-                  key={hour.toISOString()}
-                  className="h-16 border-b"
-                />
+                <div key={hour} className="h-16 border-b" />
               ))}
               {/* Events */}
               {events
                 .filter(e => isSameDay(e.start, day))
                 .map((event, idx) => {
-                  const startMinutes = event.start.getHours() * 60 + event.start.getMinutes();
-                  const endMinutes = event.end.getHours() * 60 + event.end.getMinutes();
+                  const startMinutes = getEventHour(event.start) * 60 + getEventMinute(event.start);
+                  const endMinutes = getEventHour(event.end) * 60 + getEventMinute(event.end);
                   const durationMinutes = Math.max(endMinutes - startMinutes, 30);
                   const topPx = ((startMinutes - WEEK_START_HOUR * 60) / 60) * HOUR_HEIGHT;
                   const heightPx = (durationMinutes / 60) * HOUR_HEIGHT;
@@ -173,20 +170,27 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                   return (
                     <div
                       key={event.id || `${day.toISOString()}-${idx}`}
-                      className="absolute left-0.5 right-0.5 p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 z-10 overflow-hidden"
+                      className="absolute left-0.5 right-0.5 p-2 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 text-white border border-primary/30 z-10 overflow-hidden shadow-lg shadow-primary/20"
                       style={{ top: `${topPx}px`, height: `${heightPx}px` }}
                     >
-                      <p className="text-[11px] font-semibold truncate leading-tight">
+                      <p className="text-[11px] font-bold truncate leading-tight">
                         {event.subject || event.title}
                       </p>
-                      {heightPx >= 48 && (
-                        <p className="text-[10px] font-medium opacity-70 truncate mt-0.5">
-                          Grupo: {event.reason || event.room}
+                      {heightPx >= 40 && (
+                        <p className="text-[10px] font-medium opacity-90 truncate mt-0.5 flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {event.teacher || event.reason || 'Sin docente'}
                         </p>
                       )}
-                      {heightPx >= 64 && (
-                        <p className="text-[10px] opacity-50 truncate mt-0.5">
-                          {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
+                      {heightPx >= 55 && (
+                        <p className="text-[10px] opacity-80 truncate mt-0.5 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {event.room || 'Salón por asignar'}
+                        </p>
+                      )}
+                      {heightPx >= 70 && (
+                        <p className="text-[9px] opacity-70 truncate mt-0.5">
+                          {formatEventTime(event.start)} - {formatEventTime(event.end)}
                         </p>
                       )}
                     </div>
@@ -220,22 +224,36 @@ const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
         {hours.map(hour => (
           <React.Fragment key={hour.toISOString()}>
             <div className="h-24 p-6 text-right text-xs font-semibold text-muted-foreground/40 border-b bg-muted/5">
-              {format(hour, 'hh:mm a')}
+              {format(hour, 'HH:mm')}
             </div>
             <div className="h-24 p-4 border-b relative">
               {events
-                .filter(e => isSameDay(e.start, date) && format(e.start, 'H') === format(hour, 'H'))
+                .filter(e => {
+                  const eventHour = getEventHour(e.start);
+                  const hourHour = hour.getHours();
+                  return isSameDay(e.start, date) && eventHour === hourHour;
+                })
                 .map((event, idx) => (
                   <div
                     key={event.id || `${hour.toISOString()}-${idx}`}
-                    className="absolute inset-x-4 inset-y-2 rounded-2xl bg-primary text-primary-foreground p-4 shadow-xl shadow-primary/20 flex flex-col justify-center"
+                    className="absolute inset-x-4 inset-y-2 rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-4 shadow-xl shadow-primary/25 flex flex-col"
                   >
-                    <div className="flex justify-between items-start">
-                      <p className="text-xs font-semibold tracking-card">{event.subject || event.room}</p>
-                      <Clock className="h-4 w-4 opacity-50" />
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="text-sm font-bold tracking-card line-clamp-1">
+                        {event.subject || event.room}
+                      </p>
+                      <Clock className="h-4 w-4 opacity-70 shrink-0" />
                     </div>
-                    <p className="text-xs font-semibold mt-1">{event.teacher || event.reason}</p>
-                    <p className="text-xs opacity-70 mt-1 line-clamp-1">{event.reason || event.room}</p>
+                    <div className="flex items-center gap-3 text-xs opacity-90">
+                      <span className="flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        {event.teacher || event.reason || 'Sin docente'}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {event.room || 'Salón por asignar'}
+                      </span>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -271,7 +289,7 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
 
             <div className="w-40 shrink-0">
               <p className="text-xs font-semibold tracking-card text-primary mb-1">
-                {format(event.start, 'hh:mm a')}
+                {formatEventTime(event.start)}
               </p>
               <p className="text-xs font-semibold text-muted-foreground uppercase">
                 {format(event.start, 'dd MMM yyyy', { locale: es })}
@@ -281,23 +299,30 @@ const AgendaView = ({ date, events }: { date: Date; events: CalendarEvent[] }) =
             <div className="flex-1 bg-card border rounded-3xl p-6 transition-all duration-300 hover:shadow-md">
               <div className="flex justify-between items-start mb-4">
                 <div className="space-y-1">
-                  <h4 className="text-md font-semibold tracking-card">{event.subject || event.room}</h4>
-                  <div className="flex items-center gap-2">
-                    <User className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      {event.teacher || event.room}
+                  <h4 className="text-md font-bold tracking-card">{event.subject || event.room}</h4>
+                  <div className="flex items-center gap-3 text-xs">
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <User className="h-3 w-3" />
+                      {event.teacher || 'Sin docente'}
+                    </span>
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      {event.room || 'Salón por asignar'}
                     </span>
                   </div>
                 </div>
-                <Badge className="rounded-full px-3 py-1 font-semibold text-xs tracking-card bg-primary/5 text-primary border-none shadow-none hover:bg-primary/10 hover:text-primary">
-                  {format(event.start, 'hh:mm a')} - {format(event.end, 'hh:mm a')}
+                <Badge className="rounded-full px-3 py-1 font-semibold text-xs tracking-card bg-primary text-primary-foreground border-none shadow-none">
+                  {formatEventTime(event.start)} - {formatEventTime(event.end)}
                 </Badge>
               </div>
-              {event.reason && (
-                <p className="text-xs font-normal text-muted-foreground/80 leading-relaxed italic">
-                  "{event.reason}"
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
+                  Grupo: {event.reason || 'Sin grupo'}
                 </p>
-              )}
+                <p className="text-xs text-muted-foreground">
+                  {format(event.start, 'EEEE d', { locale: es })}
+                </p>
+              </div>
             </div>
           </div>
         ))

@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarDays, GraduationCap, Layout, User } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 interface AsignaturaEstudiante {
@@ -60,15 +59,18 @@ export default function MisAsignaturasEstudiantePage() {
           ))}
         </div>
       ) : asignaturas.length === 0 ? (
-        <Card className="rounded-3xl border-dashed shadow-sm">
-          <CardContent className="py-16 flex flex-col items-center text-center">
-            <GraduationCap className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No estás matriculado en ninguna asignatura.</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Contacta al coordinador de tu programa para gestionar tu matrícula.
-            </p>
-          </CardContent>
-        </Card>
+
+        <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
+          <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <GraduationCap className="h-7 w-7 text-muted-foreground/40" />
+          </div>
+          <p className="text-[15px] font-semibold text-foreground tracking-card">
+            No estás matriculado en ninguna asignatura.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+            Contacta al coordinador de tu programa para gestionar tu matrícula.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {asignaturas.map(a => (

@@ -9,8 +9,27 @@ export async function GET() {
     if (!session || session.user?.role !== 'ESTUDIANTE') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-    const groups = await db.group.findMany({
+
+    // Get subjects where student is enrolled (via Subject.studentIds)
+    const subjects = await db.subject.findMany({
       where: { studentIds: { has: session.user.id } },
+      select: { id: true },
+    });
+    const subjectIds = subjects.map(s => s.id);
+
+    // Also get groups where student is enrolled (via Group.studentIds)
+    const groupsFromGroup = await db.group.findMany({
+      where: { studentIds: { has: session.user.id } },
+      select: { subjectId: true },
+    });
+    const groupSubjectIds = groupsFromGroup.map(g => g.subjectId);
+
+    // Combine both lists of subject IDs
+    const allSubjectIds = [...new Set([...subjectIds, ...groupSubjectIds])];
+
+    // Get all groups from these subjects
+    const groups = await db.group.findMany({
+      where: { subjectId: { in: allSubjectIds } },
       include: {
         subject: {
           select: { name: true, code: true, credits: true, program: true, semester: true },
@@ -37,11 +56,13 @@ export async function GET() {
       periodoAcademico: g.academicPeriod,
       subject: g.subject,
       docentes: g.teachers,
-      horario: g.schedule ? {
-        diaSemana: dayMap[g.schedule.dayOfWeek] || g.schedule.dayOfWeek,
-        horaInicio: g.schedule.startTime,
-        horaFin: g.schedule.endTime,
-      } : null,
+      horario: g.schedule
+        ? {
+            diaSemana: dayMap[g.schedule.dayOfWeek] || g.schedule.dayOfWeek,
+            horaInicio: g.schedule.startTime,
+            horaFin: g.schedule.endTime,
+          }
+        : null,
       sala: g.room,
     }));
 

@@ -30,24 +30,17 @@ export default function EstudianteDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
-          title="Asistencia"
-          value={`${stats.globalAttendancePercentage}%`}
-          subtitle={`${stats.attendedClasses} de ${stats.totalClasses}`}
-          icon={Calendar}
-          color="blue"
-        />
-        <StatCard
           title="Activas"
           value={stats.totalSubjects}
           subtitle="asignaturas"
           icon={BookOpen}
         />
         <StatCard
-          title="En riesgo"
-          value={stats.subjectsAtRisk}
-          subtitle="asignaturas"
-          icon={AlertTriangle}
-          color="amber"
+          title="Asistencia"
+          value={`${stats.globalAttendancePercentage}%`}
+          subtitle={`${stats.attendedClasses} de ${stats.totalClasses}`}
+          icon={Calendar}
+          color="blue"
         />
         <StatCard
           title="Semanal"
@@ -56,13 +49,23 @@ export default function EstudianteDashboard() {
           icon={BarChart3}
           color="green"
         />
+        <StatCard
+          title="En riesgo"
+          value={stats.subjectsAtRisk}
+          subtitle="asignaturas"
+          icon={AlertTriangle}
+          color="amber"
+        />
+      </div>
+      <div className="grid gap-5 md:grid-cols-2">
+
+        {/* Asignaturas */}
+        <SubjectsCard subjects={subjects} />
+
+        {/* Próximas Clases */}
+        <UpcomingEventsCard upcomingClasses={upcomingClasses} isLoading={isLoading} />
       </div>
 
-      {/* Asignaturas */}
-      <SubjectsCard subjects={subjects} />
-
-      {/* Próximas Clases */}
-      <UpcomingEventsCard upcomingClasses={upcomingClasses} isLoading={isLoading} />
     </div>
   );
 }

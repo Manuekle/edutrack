@@ -1,7 +1,7 @@
-import { Badge } from '@/components/ui/badge';
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 type EventType = 'EXAMEN' | 'TRABAJO' | 'LIMITE' | 'ANUNCIO' | 'INFO';
 
@@ -34,70 +34,76 @@ const TYPE_COLORS: Record<EventType, string> = {
 
 export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEventsCardProps) {
   return (
-    <Card className="mb-8 border-0 shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.15)] rounded-3xl overflow-hidden">
-      <CardHeader className="px-6 pt-6 pb-4">
-        <CardTitle className="text-[15px] font-semibold tracking-card text-foreground">
-          Próximas Fechas
-        </CardTitle>
+    <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
+      <CardHeader className="px-6 pt-6 pb-2">
+        <div className="flex items-center gap-2">
+          <CardTitle className="sm:text-lg text-base font-semibold tracking-card text-foreground">
+            Próximas Clases
+          </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="px-6 pb-6">
-        {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-28 rounded-2xl" />
-            ))}
-          </div>
-        ) : upcomingClasses.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {upcomingClasses.map((item, index) => (
-              <Card
+        {upcomingClasses.length > 0 ? (
+          <div className="space-y-3">
+            {upcomingClasses.slice(0, 3).map((item, index) => (
+              <div
                 key={`${item.id}-${index}`}
-                className="rounded-2xl border-border/50 shadow-sm hover:shadow-md hover:border-border transition-all duration-200 overflow-hidden"
+                className="group relative rounded-2xl border-0 transition-all duration-300 bg-muted/40 p-4"
               >
-                <CardContent className="p-5 flex flex-col h-full justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-semibold text-[14px] tracking-card text-foreground line-clamp-2 flex-1">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-semibold truncate text-foreground">
                         {item.title}
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] font-medium uppercase px-1.5 py-0 shrink-0 ${TYPE_COLORS[item.type] || TYPE_COLORS.INFO}`}
-                      >
-                        {item.type}
-                      </Badge>
+                      </h4>
                     </div>
                     {item.subjectName && (
-                      <p className="text-[12px] text-muted-foreground font-medium">
+                      <p className="text-[12px] text-muted-foreground font-medium mb-1">
                         {item.subjectName}
                       </p>
                     )}
                     {item.description && (
-                      <p className="text-[12px] text-muted-foreground line-clamp-2">
+                      <p className="text-[13px] text-muted-foreground line-clamp-1 mb-2">
                         {item.description}
                       </p>
                     )}
+                    <div className="flex items-center gap-2 text-[12px] text-muted-foreground font-medium">
+                      <span className="flex items-center gap-1 text-primary">
+                        <Calendar className="h-3 w-3" />
+                        {item.date
+                          ? new Date(item.date).toLocaleDateString('es-ES', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            timeZone: 'UTC',
+                          })
+                          : 'Sin fecha'}
+                      </span>
+                      {item.startTime && (
+                        <>
+                          <span className="w-1 h-1 rounded-full bg-border" />
+                          <span>
+                            {(() => {
+                              const d = new Date(item.startTime);
+                              const h = d.getUTCHours();
+                              const m = d.getUTCMinutes();
+                              return !isNaN(h) && !isNaN(m)
+                                ? `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+                                : 'Sin hora';
+                            })()}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-border/40 text-[12px] text-muted-foreground">
-                    <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-                    <span className="font-medium">
-                      {new Date(item.date).toLocaleDateString('es-ES', {
-                        day: '2-digit',
-                        month: 'long',
-                      })}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="h-16 w-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
-              <CalendarDays className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-[15px] font-medium text-foreground">No hay eventos programados</p>
-            <p className="text-sm text-muted-foreground mt-1">
+          <div className="flex flex-col text-center py-16 items-center justify-center h-[calc(50vh-200px)]">
+            <p className="text-xs">No hay eventos programados</p>
+            <p className="text-xs text-muted-foreground mt-1">
               Los próximos eventos aparecerán aquí
             </p>
           </div>

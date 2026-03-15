@@ -34,11 +34,10 @@ export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
       <CardContent className="px-6 pb-6">
         {classes.length > 0 ? (
           <div className="space-y-3">
-            {classes.map(cls => (
+            {classes.slice(0, 3).map(cls => (
               <div
                 key={cls.id}
                 className="group relative rounded-2xl border-0 transition-all duration-300 bg-muted/40 p-4"
-
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
