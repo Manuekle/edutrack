@@ -12,8 +12,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { BookOpen, CheckCircle2, Download, FileUp, Loader2, UserPlus } from 'lucide-react';
-import { useCallback, useState } from 'react';
 import Papa from 'papaparse';
+import { useCallback, useState } from 'react';
 import { sileo } from 'sileo';
 
 interface BulkEnrollmentUser {
@@ -105,91 +105,91 @@ export function BulkEnrollmentUpload({
   }, [file, allUsers, currentlyAssignedIds]);
 
   const processResults = useCallback((results: Papa.ParseResult<Record<string, string>>) => {
-        const headers = results.meta.fields || [];
-        const docHeader = findHeader(headers, ['documento', 'document', 'cedula', 'identificacion', 'id']);
-        const nameHeader = findHeader(headers, ['nombre', 'name', 'nombrecompleto', 'nombres']);
-        const emailHeader = findHeader(headers, ['correo', 'email', 'correopersonal', 'correoinstitucional']);
+    const headers = results.meta.fields || [];
+    const docHeader = findHeader(headers, ['documento', 'document', 'cedula', 'identificacion', 'id']);
+    const nameHeader = findHeader(headers, ['nombre', 'name', 'nombrecompleto', 'nombres']);
+    const emailHeader = findHeader(headers, ['correo', 'email', 'correopersonal', 'correoinstitucional']);
 
-        if (!docHeader) {
-          setMatchedRows([{
-            document: '',
-            status: 'not_found',
-            message: `No se encontr\u00f3 columna "documento" en el CSV. Columnas: ${headers.join(', ')}`,
-          }]);
-          setProcessing(false);
-          return;
-        }
+    if (!docHeader) {
+      setMatchedRows([{
+        document: '',
+        status: 'not_found',
+        message: `No se encontr\u00f3 columna "documento" en el CSV. Columnas: ${headers.join(', ')}`,
+      }]);
+      setProcessing(false);
+      return;
+    }
 
-        const userByDoc = new Map<string, BulkEnrollmentUser>();
-        for (const u of allUsers) {
-          if (u.document) {
-            userByDoc.set(u.document.toLowerCase().trim(), u);
-          }
-        }
+    const userByDoc = new Map<string, BulkEnrollmentUser>();
+    for (const u of allUsers) {
+      if (u.document) {
+        userByDoc.set(u.document.toLowerCase().trim(), u);
+      }
+    }
 
-        const assignedSet = new Set(currentlyAssignedIds);
-        const seenDocs = new Set<string>();
-        const rows: MatchedRow[] = [];
+    const assignedSet = new Set(currentlyAssignedIds);
+    const seenDocs = new Set<string>();
+    const rows: MatchedRow[] = [];
 
-        for (const row of results.data) {
-          const docRaw = (row[docHeader] || '').trim();
-          if (!docRaw) continue;
+    for (const row of results.data) {
+      const docRaw = (row[docHeader] || '').trim();
+      if (!docRaw) continue;
 
-          const docKey = docRaw.toLowerCase();
-          const name = nameHeader ? (row[nameHeader] || '').trim() : '';
-          const email = emailHeader ? (row[emailHeader] || '').trim() : '';
+      const docKey = docRaw.toLowerCase();
+      const name = nameHeader ? (row[nameHeader] || '').trim() : '';
+      const email = emailHeader ? (row[emailHeader] || '').trim() : '';
 
-          if (seenDocs.has(docKey)) {
-            rows.push({ document: docRaw, status: 'duplicate', message: 'Duplicado en el archivo.' });
-            continue;
-          }
-          seenDocs.add(docKey);
+      if (seenDocs.has(docKey)) {
+        rows.push({ document: docRaw, status: 'duplicate', message: 'Duplicado en el archivo.' });
+        continue;
+      }
+      seenDocs.add(docKey);
 
-          const user = userByDoc.get(docKey);
-          if (!user) {
-            if (name && email) {
-              rows.push({
-                document: docRaw,
-                name,
-                email,
-                status: 'will_create',
-                userName: name,
-                message: 'Se crear\u00e1 y asignar\u00e1 al grupo.',
-              });
-            } else {
-              rows.push({
-                document: docRaw,
-                status: 'not_found',
-                message: name || email
-                  ? 'Falta nombre o correo para crear el usuario.'
-                  : 'No encontrado. Agrega nombre y correo en el CSV para crearlo.',
-              });
-            }
-            continue;
-          }
-
-          if (assignedSet.has(user.id)) {
-            rows.push({
-              document: docRaw,
-              userId: user.id,
-              userName: user.name,
-              status: 'already',
-              message: 'Ya asignado a este grupo.',
-            });
-            continue;
-          }
-
+      const user = userByDoc.get(docKey);
+      if (!user) {
+        if (name && email) {
           rows.push({
             document: docRaw,
-            userId: user.id,
-            userName: user.name,
-            status: 'new',
-            message: 'Se asignar\u00e1 al grupo.',
+            name,
+            email,
+            status: 'will_create',
+            userName: name,
+            message: 'Se crear\u00e1 y asignar\u00e1 al grupo.',
+          });
+        } else {
+          rows.push({
+            document: docRaw,
+            status: 'not_found',
+            message: name || email
+              ? 'Falta nombre o correo para crear el usuario.'
+              : 'No encontrado. Agrega nombre y correo en el CSV para crearlo.',
           });
         }
+        continue;
+      }
 
-        setMatchedRows(rows);
-        setProcessing(false);
+      if (assignedSet.has(user.id)) {
+        rows.push({
+          document: docRaw,
+          userId: user.id,
+          userName: user.name,
+          status: 'already',
+          message: 'Ya asignado a este grupo.',
+        });
+        continue;
+      }
+
+      rows.push({
+        document: docRaw,
+        userId: user.id,
+        userName: user.name,
+        status: 'new',
+        message: 'Se asignar\u00e1 al grupo.',
+      });
+    }
+
+    setMatchedRows(rows);
+    setProcessing(false);
   }, [allUsers, currentlyAssignedIds]);
 
   const existingNewIds = matchedRows.filter(r => r.status === 'new' && r.userId).map(r => r.userId!);
@@ -280,7 +280,7 @@ export function BulkEnrollmentUpload({
         </div>
         <div className="flex flex-col justify-between gap-3">
           <a href="/formatos/plantilla_asignacion.csv" download>
-            <Button variant="outline" size="sm" className="w-full justify-start text-xs">
+            <Button variant="outline" size="default" className="w-full justify-start text-xs">
               <Download className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
               Descargar Plantilla CSV
             </Button>

@@ -146,7 +146,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
             <div className="space-y-2">
               <p className="text-xs font-semibold">1. Descarga la plantilla</p>
               <a href={templateHref} download>
-                <Button variant="outline" className="w-full justify-start  text-xs">
+                <Button variant="default" size="default" className="w-full justify-start  text-xs">
                   <Download className="mr-2 h-4 w-4 text-muted-foreground" />
                   Descargar Plantilla CSV
                 </Button>
