@@ -100,6 +100,7 @@ export async function GET(
       },
       include: {
         subject: true,
+        attendances: { select: { status: true } },
       },
       orderBy: {
         date: 'asc',
@@ -153,16 +154,18 @@ export async function GET(
         number
       >;
 
-      // attendance stats from class metrics
-      stats.present = cls.presentCount;
-      stats.absent = cls.absentCount;
-      stats.late = cls.lateCount;
-      stats.justified = cls.justifiedCount;
+      // Compute stats from real Attendance records (cached counts may be stale/zero)
+      for (const att of cls.attendances) {
+        if (att.status === 'PRESENT') stats.present++;
+        else if (att.status === 'ABSENT') stats.absent++;
+        else if (att.status === 'LATE') stats.late++;
+        else if (att.status === 'JUSTIFIED') stats.justified++;
+      }
 
-      subjectEntry.attendanceTotals.present += cls.presentCount;
-      subjectEntry.attendanceTotals.absent += cls.absentCount;
-      subjectEntry.attendanceTotals.late += cls.lateCount;
-      subjectEntry.attendanceTotals.justified += cls.justifiedCount;
+      subjectEntry.attendanceTotals.present += stats.present;
+      subjectEntry.attendanceTotals.absent += stats.absent;
+      subjectEntry.attendanceTotals.late += stats.late;
+      subjectEntry.attendanceTotals.justified += stats.justified;
 
       subjectEntry.classes.push({
         id: cls.id,

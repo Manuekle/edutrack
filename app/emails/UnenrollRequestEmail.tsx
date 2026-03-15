@@ -2,7 +2,6 @@ import {
   Body,
   Button,
   Container,
-  Font,
   Head,
   Heading,
   Hr,
@@ -33,152 +32,123 @@ const UnenrollRequestEmail = ({
   supportEmail,
   loginUrl,
 }: UnenrollRequestEmailProps) => {
-  const previewText = `Nueva solicitud de desmatriculación - ${subjectName}`;
+  const previewText = `Nueva solicitud de desmatriculación — ${subjectName}`;
+
+  const formattedRequestDate = new Date(requestDate).toLocaleDateString('es-CO', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   return (
     <Html lang="es" dir="ltr">
       <Tailwind>
-        <Head>
-          <Font
-            fontFamily="Geist"
-            fallbackFontFamily="sans-serif"
-            webFont={{
-              url: 'https://cdn.jsdelivr.net/npm/@vercel/style-guide@6.0.0/fonts/GeistVF.woff2',
-              format: 'woff2',
-            }}
-            fontWeight={400}
-            fontStyle="normal"
-          />
-        </Head>
+        <Head />
         <Preview>{previewText}</Preview>
-        <Body className="bg-[#F7F8F0] font-sans py-[40px]">
-          <Container className="mx-auto max-w-[580px] bg-white border border-[#7AAACE] rounded-[12px] overflow-hidden">
+        <Body className="bg-[#EEF2F7] font-sans py-[48px]">
+          <Container className="mx-auto max-w-[600px] bg-white border border-[#E2E8F0] rounded-[16px] overflow-hidden">
+
             {/* Header */}
-            <Section className="bg-[#355872] px-[32px] py-[24px]">
-              <Heading className="text-[20px] font-semibold text-white m-0 leading-[28px]">
-                Solicitud de Desmatriculación
+            <Section className="bg-[#1E3A52] px-[40px] py-[32px]">
+              <Text className="text-[11px] font-semibold text-[#7EC8E3] uppercase tracking-card m-0 mb-[16px]">
+                SIRA · Sistema de Asistencias FUP
+              </Text>
+              <Heading className="text-[26px] font-bold text-white m-0 leading-[34px]">
+                Solicitud de desmatriculación
               </Heading>
-              <Text className="text-[#9CD5FF] text-xs m-0 mt-[4px] leading-[20px]">
+              <Text className="text-sm text-[#93C5E0] m-0 mt-[6px] leading-[22px]">
                 Nueva solicitud pendiente de revisión
               </Text>
             </Section>
 
-            {/* Content */}
-            <Section className="px-[32px] py-[32px]">
-              <Text className="text-[#7AAACE] text-xs leading-[24px] m-0 mb-[24px]">
-                Se ha recibido una nueva solicitud de desmatriculación que requiere su revisión.
+            {/* Body */}
+            <Section className="px-[40px] py-[40px]">
+              <Text className="text-sm text-[#4A5568] leading-[24px] m-0 mb-[32px]">
+                Se ha recibido una nueva solicitud de desmatriculación que requiere revisión y
+                gestión desde el panel de administrador.
               </Text>
 
-              {/* Student Details Card */}
-              <Section className="mb-[24px]">
-                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
-                  Detalles del estudiante
-                </Text>
-                <div className="space-y-[12px]">
-                  <div>
-                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
-                      Nombre completo
-                    </Text>
-                    <Text className="text-xs text-[#355872] m-0 leading-[24px]">{studentName}</Text>
-                  </div>
-
-                  <div>
-                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
-                      Correo electrónico
-                    </Text>
-                    <Text className="text-xs text-[#7AAACE] m-0 leading-[20px]">
-                      {studentEmail}
-                    </Text>
-                  </div>
-
-                  <div>
-                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
-                      Asignatura
-                    </Text>
-                    <Text className="text-xs text-[#355872] m-0 leading-[24px]">{subjectName}</Text>
-                  </div>
+              {/* Student + subject card */}
+              <div className="bg-[#F7FAFC] border border-[#E2E8F0] rounded-[10px] overflow-hidden mb-[24px]">
+                <div className="px-[20px] py-[14px]">
+                  <Text className="text-[11px] font-bold uppercase tracking-card text-[#718096] m-0 mb-[4px]">
+                    Estudiante
+                  </Text>
+                  <Text className="text-sm font-semibold text-[#2D3748] m-0 leading-[22px]">
+                    {studentName}
+                  </Text>
                 </div>
-              </Section>
-
-              <Hr className="border-[#7AAACE] my-[24px]" />
-
-              {/* Request Details */}
-              <Section className="mb-[24px]">
-                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[12px]">
-                  Detalles de la solicitud
-                </Text>
-                <div className="space-y-[12px]">
-                  <div>
-                    <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[4px]">
-                      Fecha de solicitud
-                    </Text>
-                    <Text className="text-xs text-[#355872] m-0 leading-[20px]">
-                      {new Date(requestDate).toLocaleDateString('es-CO', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </Text>
-                  </div>
+                <Hr className="border-[#E2E8F0] m-0" />
+                <div className="px-[20px] py-[14px]">
+                  <Text className="text-[11px] font-bold uppercase tracking-card text-[#718096] m-0 mb-[4px]">
+                    Correo electrónico
+                  </Text>
+                  <Text className="text-sm text-[#2D3748] m-0 leading-[22px]">{studentEmail}</Text>
                 </div>
-              </Section>
+                <Hr className="border-[#E2E8F0] m-0" />
+                <div className="px-[20px] py-[14px]">
+                  <Text className="text-[11px] font-bold uppercase tracking-card text-[#718096] m-0 mb-[4px]">
+                    Asignatura
+                  </Text>
+                  <Text className="text-sm text-[#2D3748] m-0 leading-[22px]">{subjectName}</Text>
+                </div>
+                <Hr className="border-[#E2E8F0] m-0" />
+                <div className="px-[20px] py-[14px]">
+                  <Text className="text-[11px] font-bold uppercase tracking-card text-[#718096] m-0 mb-[4px]">
+                    Fecha de solicitud
+                  </Text>
+                  <Text className="text-sm text-[#2D3748] m-0 leading-[22px]">
+                    {formattedRequestDate}
+                  </Text>
+                </div>
+              </div>
 
               {/* Reason */}
-              <Section className="mb-[32px]">
-                <Text className="text-xs font-semibold text-[#355872] tracking-normal m-0 mb-[8px]">
-                  Motivo de la solicitud
+              <Text className="text-[11px] font-bold uppercase tracking-card text-[#718096] m-0 mb-[10px]">
+                Motivo de la solicitud
+              </Text>
+              <div style={{ borderLeft: '3px solid #EA580C', backgroundColor: '#FFF7ED', padding: '14px 16px', borderRadius: '0 8px 8px 0', marginBottom: '24px' }}>
+                <Text className="text-sm text-[#7C2D12] m-0 leading-[24px] italic">
+                  &ldquo;{reason}&rdquo;
                 </Text>
-                <div className="bg-[#F7F8F0] border-l-[4px] border-[#7AAACE] px-[16px] py-[12px]">
-                  <Text className="text-xs text-[#355872] leading-[20px] m-0 italic">
-                    "{reason}"
-                  </Text>
-                </div>
-              </Section>
+              </div>
 
-              {/* Action Required */}
-              <Section className="mb-[24px]">
-                <div className="bg-[#F7F8F0] border border-[#7AAACE] rounded-[8px] px-[16px] py-[12px]">
-                  <Text className="text-xs text-[#355872] m-0 leading-[20px]">
-                    <strong>Acción requerida:</strong> Por favor, ingrese al sistema para revisar y
-                    gestionar esta solicitud de desmatriculación.
-                  </Text>
-                </div>
-              </Section>
+              {/* Action required */}
+              <div style={{ borderLeft: '3px solid #3B82F6', backgroundColor: '#EFF6FF', padding: '14px 16px', borderRadius: '0 8px 8px 0', marginBottom: '32px' }}>
+                <Text className="text-sm text-[#1E40AF] m-0 leading-[22px]">
+                  <strong>Acción requerida:</strong> Ingresa al sistema para revisar y gestionar
+                  esta solicitud de desmatriculación.
+                </Text>
+              </div>
 
               {loginUrl && (
-                <Section className="mb-[24px] text-center">
+                <Section className="text-center">
                   <Button
                     href={loginUrl}
-                    className="bg-[#355872] text-white text-xs font-semibold px-[24px] py-[12px] rounded-[8px] box-border inline-block text-center no-underline leading-[20px]"
+                    className="bg-[#2563EB] text-white text-sm font-semibold px-[32px] py-[14px] rounded-[8px] box-border inline-block no-underline leading-[24px]"
                   >
                     Ir al sistema
                   </Button>
                 </Section>
               )}
-
-              <Hr className="border-[#7AAACE] my-[24px]" />
-
-              <Text className="text-xs text-[#355872] m-0">
-                Si no reconoces esta actividad o necesitas ayuda, contáctanos en{' '}
-                <Link href={`mailto:${supportEmail}`} className="text-[#7AAACE] underline">
-                  {supportEmail}
-                </Link>
-              </Text>
             </Section>
 
             {/* Footer */}
-            <Section className="bg-[#F7F8F0] px-[32px] py-[16px] border-t border-[#7AAACE]">
-              <Text className="text-xs text-[#355872] text-center m-0">
-                Este es un correo automático, por favor no respondas a este mensaje.
+            <Section className="bg-[#F7FAFC] px-[40px] py-[24px] border-t border-[#E2E8F0]">
+              <Text className="text-[13px] text-[#718096] text-center m-0">
+                ¿Necesitas ayuda? Escríbenos a{' '}
+                <Link href={`mailto:${supportEmail}`} className="text-[#2563EB]">
+                  {supportEmail}
+                </Link>
               </Text>
-              <Text className="text-xs text-[#7AAACE] text-center m-0 mt-[4px]">
-                © {new Date().getFullYear()} SIRA - Sistema Integral de Registro Académico. Todos
-                los derechos reservados.
+              <Text className="text-[12px] text-[#A0AEC0] text-center m-0 mt-[8px]">
+                © {new Date().getFullYear()} SIRA — Sistema Integral de Registro Académico
               </Text>
             </Section>
+
           </Container>
         </Body>
       </Tailwind>

@@ -66,8 +66,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: 'Error al enviar el correo de restablecimiento',
-          // Incluimos más detalles en desarrollo
-          debug: process.env.NODE_ENV === 'development' ? String(error) : undefined,
+          detail: error instanceof Error ? error.message : String(error),
         },
         { status: 500 }
       );

@@ -210,14 +210,9 @@ function JustificarAusenciaContent() {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-background overflow-hidden font-sans">
-      {/* Background Decor */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-primary/5 blur-[100px] animate-pulse" />
-        <div className="absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[100px] animate-pulse delay-1000" />
-      </div>
 
       <Card className="w-full max-w-lg relative z-10 border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl rounded-[2.5rem] overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/40 via-primary to-primary/40" />
+
 
         <CardHeader className="pt-12 pb-6 px-10 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -265,7 +260,7 @@ function JustificarAusenciaContent() {
               <div className="flex flex-col gap-4">
                 <Button
                   type="submit"
-                  className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-[16px] font-semibold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                  className="w-full bg-primary hover:bg-primary/90 text-xs shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

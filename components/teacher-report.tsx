@@ -441,7 +441,7 @@ function SubjectDetailPanel({ subject }: { subject: SubjectHistoric }) {
           {/* ── Class list ── */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <h4 className="text-xs font-semibold uppercase tracking-card text-muted-foreground">
                 Clases impartidas
               </h4>
               <Badge variant="outline" className="text-xs bg-muted/30">
@@ -527,7 +527,7 @@ function SubjectDetailPanel({ subject }: { subject: SubjectHistoric }) {
           {/* ── Donut ── */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <h4 className="text-xs font-semibold uppercase tracking-card text-muted-foreground">
                 Distribución
               </h4>
               <Badge variant="outline" className="text-xs bg-muted/30">
@@ -639,9 +639,16 @@ export function TeacherReport() {
     );
     const opts = Array.from(set).sort((a, b) => b.localeCompare(a));
     setPeriodOptions(opts);
-    const now = new Date();
-    const cur = `${now.getFullYear()}-${now.getMonth() < 6 ? '1' : '2'}`;
-    setPeriod(opts.includes(cur) ? cur : opts[0] ?? '');
+    // Only auto-set period from the unfiltered (all-data) response.
+    // When historicData.period is null it means no period filter was applied,
+    // so this is the right moment to pick the default period.
+    // If historicData.period has a value, the user (or a previous auto-set) already
+    // selected a period — don't override it.
+    if (historicData.period === null) {
+      const now = new Date();
+      const cur = `${now.getFullYear()}-${now.getMonth() < 6 ? '1' : '2'}`;
+      setPeriod(opts.includes(cur) ? cur : opts[0] ?? '');
+    }
   }, [historicData]);
 
   // Load teachers
@@ -770,6 +777,7 @@ export function TeacherReport() {
                     onClick={() => {
                       setSelectedTeacher(teacher);
                       setSelectedSubjectId(null);
+                      setPeriod(''); // Reset period so the initial fetch is always unfiltered
                     }}
                     className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 ${isSelected ? 'bg-blue-500/5' : ''
                       }`}
@@ -1008,7 +1016,7 @@ export function TeacherReport() {
                           </div>
                         </div>
 
-                        <Button asChild size="default" variant="default" className="w-full text-xs h-8 mt-auto">
+                        <Button asChild size="default" variant="default" className="w-full text-xs mt-2">
                           <Link href={`/dashboard/admin/reportes/bitacora/${g.id}`}>
                             Ver Bitácora
                           </Link>
