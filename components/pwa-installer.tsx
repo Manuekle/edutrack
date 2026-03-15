@@ -91,7 +91,7 @@ export function PWAInstaller() {
   }
 
   return (
-    <div className="fixed bottom-6 left-4 right-4 z-[100] mx-auto max-w-md animate-in fade-in slide-in-from-bottom-5 duration-700">
+    <div className="fixed bottom-[max(1.5rem,calc(env(safe-area-inset-bottom)+0.5rem))] left-4 right-4 z-[100] mx-auto max-w-md animate-in fade-in slide-in-from-bottom-5 duration-700">
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] p-6 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full -ml-12 -mb-12 blur-2xl" />

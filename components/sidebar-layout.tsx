@@ -174,7 +174,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
   return (
     <Sidebar
       variant="inset"
-      className="h-screen fixed font-sans bg-sidebar/80 backdrop-blur-2xl pt-[env(safe-area-inset-top)]"
+      className="h-[100dvh] fixed font-sans bg-sidebar/80 backdrop-blur-2xl pt-[env(safe-area-inset-top)]"
     >
       <SidebarHeader>
         <SidebarMenu>
@@ -251,7 +251,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border/20">
+      <SidebarFooter className="border-t border-border/20 pb-[env(safe-area-inset-bottom)]">
         <SidebarMenu>
           <SidebarMenuItem>
             {mounted ? (
@@ -485,7 +485,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <SidebarProvider>
         <AppSidebar homePath={homePath} />
         <SidebarInset>
-          <header className="flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 px-4 sm:px-6 font-sans pt-[env(safe-area-inset-top)] transition-all duration-200">
+          <header className="flex min-h-14 sm:min-h-16 shrink-0 items-center justify-between gap-2 px-4 sm:px-6 font-sans transition-all duration-200">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <SidebarTrigger className="-ml-1 rounded-xl hover:bg-accent/60 active:scale-95 transition-all" />
               <Breadcrumb className="flex-1 mt-0.5 truncate">
@@ -518,7 +518,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               <TutorialButton />
             </div>
           </header>
-          <main className="flex-1 p-4 sm:p-5 md:p-8 font-sans">{children}</main>
+          <main className="flex-1 p-4 sm:p-5 md:p-8 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1rem))] font-sans">{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

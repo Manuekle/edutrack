@@ -130,9 +130,9 @@ const AdminDashboardComponent = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-card">Panel de Administración</h1>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
           <p className="text-muted-foreground sm:text-sm text-xs mt-1">
             Estado general del sistema académico.
           </p>
