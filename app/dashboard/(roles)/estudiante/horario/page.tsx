@@ -2,7 +2,7 @@
 
 import { CalendarEvent, CustomCalendar } from '@/components/calendar/custom-calendar';
 import { LoadingPage } from '@/components/ui/loading';
-import { addDays, addMonths, startOfWeek, subDays, subMonths } from 'date-fns';
+import { addDays, addMonths, eachDayOfInterval, endOfMonth, startOfMonth, subDays, subMonths } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -43,35 +43,36 @@ export default function HorarioEstudiantePage() {
   }, []);
 
   const calendarEvents = useMemo(() => {
-    const monday = startOfWeek(currentDate, { weekStartsOn: 1 });
+    const rangeStart = startOfMonth(subMonths(currentDate, 3));
+    const rangeEnd = endOfMonth(addMonths(currentDate, 3));
+    const allDays = eachDayOfInterval({ start: rangeStart, end: rangeEnd });
     const events: CalendarEvent[] = [];
 
-    horarios.forEach((h, idx) => {
-      const dayOffset = DIA_MAP[h.diaSemana] - 1; // 0 for Monday
-      const eventDate = addDays(monday, dayOffset);
-
-      if (!h.horaInicio || !h.horaFin) return;
+    horarios.forEach(h => {
+      const targetDow = DIA_MAP[h.diaSemana];
+      if (!h.horaInicio || !h.horaFin || !targetDow) return;
 
       const [startH, startM] = h.horaInicio.split(':').map(Number);
       const [endH, endM] = h.horaFin.split(':').map(Number);
 
-      // Create dates in local timezone to avoid offset issues
-      const year = eventDate.getFullYear();
-      const month = eventDate.getMonth();
-      const day = eventDate.getDate();
-      const start = new Date(year, month, day, startH, startM);
-      const end = new Date(year, month, day, endH, endM);
+      allDays.forEach(day => {
+        const dow = day.getDay() === 0 ? 7 : day.getDay();
+        if (dow !== targetDow) return;
 
-      events.push({
-        id: `${h.grupoId}-${idx}`,
-        title: h.subjectName,
-        subject: h.subjectName,
-        start,
-        end,
-        room: h.salaName || 'Sala por asignar',
-        teacher: h.docenteName || 'Docente por asignar',
-        reason: `Grupo ${h.grupoCodigo}`,
-        type: 'CLASE',
+        const start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), startH, startM);
+        const end = new Date(day.getFullYear(), day.getMonth(), day.getDate(), endH, endM);
+
+        events.push({
+          id: `${h.grupoId}-${day.toISOString()}`,
+          title: h.subjectName,
+          subject: h.subjectName,
+          start,
+          end,
+          room: h.salaName || 'Sala por asignar',
+          teacher: h.docenteName || 'Docente por asignar',
+          reason: `Grupo ${h.grupoCodigo}`,
+          type: 'CLASE',
+        });
       });
     });
 

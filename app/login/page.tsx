@@ -124,7 +124,7 @@ function LoginForm() {
                         type="email"
                         placeholder="ejemplo@fup.edu.co"
                         disabled={isLoading}
-                        className="pl-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all text-xs"
+                        className="pl-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                         {...field}
                       />
                     </div>

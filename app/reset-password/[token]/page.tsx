@@ -156,17 +156,12 @@ function ResetPasswordContent() {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-background overflow-hidden font-sans">
-      {/* Background Decor */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
-        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-blue-500/10 blur-[120px] animate-pulse delay-700" />
-      </div>
+
 
       <Card className="w-full max-w-md relative z-10 border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl rounded-[2rem] overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
 
         <CardHeader className="space-y-4 pt-10 pb-6 text-center">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-2 rotate-3 hover:rotate-0 transition-transform duration-300">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-2 transition-transform duration-300">
             <KeyRound className="h-8 w-8 text-primary" />
           </div>
           <div className="space-y-1.5">
@@ -195,7 +190,7 @@ function ResetPasswordContent() {
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Mínimo 8 caracteres"
-                          className="h-12 pl-12 pr-12 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
+                          className="pl-12 pr-12 rounded-full bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                           disabled={isSubmitting}
                           {...field}
                         />
@@ -227,7 +222,7 @@ function ResetPasswordContent() {
                         <Input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="Repite tu contraseña"
-                          className="h-12 pl-12 pr-12 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
+                          className="pl-12 pr-12 rounded-full bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                           disabled={isSubmitting}
                           {...field}
                         />
@@ -249,7 +244,8 @@ function ResetPasswordContent() {
 
               <Button
                 type="submit"
-                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                size="default"
+                className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -274,5 +270,6 @@ export default function ResetPasswordPage() {
     <Suspense fallback={<LoadingPage />}>
       <ResetPasswordContent />
     </Suspense>
+
   );
 }

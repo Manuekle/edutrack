@@ -109,6 +109,24 @@ export const navLinkGroups: NavLinkGroup[] = [
   },
 
   // ─────────────────────────────────────────
+  // HORARIOS (Admin)
+  // ─────────────────────────────────────────
+  {
+    title: 'Horarios',
+    roles: ['ADMIN'],
+    icon: CalendarDays,
+    links: [
+      {
+        href: '/dashboard/admin/horarios',
+        icon: CalendarDays,
+        label: 'Ver Horarios',
+        roles: ['ADMIN'],
+        description: 'Consultar horarios por grupo y semestre',
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
   // SALAS Y RESERVAS (Admin)
   // ─────────────────────────────────────────
   {

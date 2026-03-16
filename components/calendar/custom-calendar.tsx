@@ -28,6 +28,24 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Clock, MapPin, User } from 'lucide-react';
 import React, { useState } from 'react';
 
+// --- HELPERS ---
+
+function assignColumns(evs: CalendarEvent[]): Array<{ event: CalendarEvent; col: number; total: number }> {
+  const sorted = [...evs].sort((a, b) => a.start.getTime() - b.start.getTime());
+  const result: Array<{ event: CalendarEvent; col: number }> = [];
+  const colEnds: Date[] = [];
+
+  sorted.forEach(ev => {
+    let col = colEnds.findIndex(e => e <= ev.start);
+    if (col === -1) { col = colEnds.length; colEnds.push(ev.end); }
+    else colEnds[col] = ev.end;
+    result.push({ event: ev, col });
+  });
+
+  const total = colEnds.length;
+  return result.map(r => ({ ...r, total }));
+}
+
 // --- CUSTOM CALENDAR COMPONENTS ---
 
 export interface CalendarEvent {
@@ -191,22 +209,27 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                 {hours.map(hour => (
                   <div key={hour} className="h-16 border-b" />
                 ))}
-                {events
-                  .filter(e => isSameDay(e.start, day))
-                  .map((event, idx) => {
+                {assignColumns(events.filter(e => isSameDay(e.start, day))).map(({ event, col, total }) => {
                     const startOfEventDay = startOfDay(event.start);
                     const startMinutes = differenceInMinutes(event.start, startOfEventDay);
                     const durationMinutes = Math.max(differenceInMinutes(event.end, event.start), 30);
                     const topRem = ((startMinutes - WEEK_START_HOUR * 60) / 60) * 4;
                     const heightRem = (durationMinutes / 60) * 4;
+                    const widthPct = 100 / total;
+                    const leftPct = (col / total) * 100;
 
                     return (
                       <div
-                        key={event.id || `${day.toISOString()}-${idx}`}
+                        key={event.id || `${day.toISOString()}-${col}`}
                         tabIndex={0}
                         aria-label={`${event.subject || event.title} de ${formatEventTime(event.start)} a ${formatEventTime(event.end)}`}
-                        className="absolute left-0.5 right-0.5 p-1.5 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 text-white border border-primary/30 z-10 overflow-hidden shadow-lg shadow-primary/20 focus:ring-2 focus:ring-offset-1 focus:ring-primary outline-none"
-                        style={{ top: `${topRem}rem`, height: `${heightRem}rem` }}
+                        className="absolute p-1.5 rounded-lg bg-gradient-to-br from-primary/90 to-primary/70 text-white border border-primary/30 z-10 overflow-hidden shadow-lg shadow-primary/20 focus:ring-2 focus:ring-offset-1 focus:ring-primary outline-none"
+                        style={{
+                          top: `${topRem}rem`,
+                          height: `${heightRem}rem`,
+                          left: `calc(${leftPct}% + 2px)`,
+                          width: `calc(${widthPct}% - 4px)`,
+                        }}
                       >
                         <p className="text-[10px] font-bold truncate leading-tight">
                           {event.subject || event.title}
@@ -240,8 +263,11 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
       {/* Vista de 3 días — visible solo en móvil */}
       <div className="sm:hidden flex flex-col border rounded-3xl overflow-hidden bg-background">
         {(() => {
-          // Mostrar el día actual + siguiente y anterior (ventana de 3 días)
-          const threeDays = [allDays[0], allDays[1], allDays[2]].filter(Boolean);
+          // Centrar en hoy si está en la semana, si no mostrar los primeros 3 días
+          const todayIdx = allDays.findIndex(d => isToday(d));
+          const center = todayIdx >= 0 ? todayIdx : 1;
+          const from = Math.max(0, Math.min(center, 4));
+          const threeDays = allDays.slice(from, from + 3).filter(Boolean);
           return (
             <>
               <div
@@ -296,22 +322,27 @@ const WeekView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => 
                       {hours.map(hour => (
                         <div key={hour} className="h-14 border-b" />
                       ))}
-                      {events
-                        .filter(e => isSameDay(e.start, day))
-                        .map((event, idx) => {
+                      {assignColumns(events.filter(e => isSameDay(e.start, day))).map(({ event, col, total }) => {
                           const startOfEventDay = startOfDay(event.start);
                           const startMinutes = differenceInMinutes(event.start, startOfEventDay);
                           const durationMinutes = Math.max(differenceInMinutes(event.end, event.start), 30);
                           const topRem = ((startMinutes - WEEK_START_HOUR * 60) / 60) * 3.5;
                           const heightRem = (durationMinutes / 60) * 3.5;
+                          const widthPct = 100 / total;
+                          const leftPct = (col / total) * 100;
 
                           return (
                             <div
-                              key={event.id || `${day.toISOString()}-${idx}`}
+                              key={event.id || `${day.toISOString()}-${col}`}
                               tabIndex={0}
                               aria-label={`${event.subject || event.title}`}
-                              className="absolute left-0.5 right-0.5 p-1 rounded-md bg-gradient-to-br from-primary/90 to-primary/70 text-white border border-primary/30 z-10 overflow-hidden shadow-md focus:ring-2 focus:ring-primary outline-none"
-                              style={{ top: `${topRem}rem`, height: `${heightRem}rem` }}
+                              className="absolute p-1 rounded-md bg-gradient-to-br from-primary/90 to-primary/70 text-white border border-primary/30 z-10 overflow-hidden shadow-md focus:ring-2 focus:ring-primary outline-none"
+                              style={{
+                                top: `${topRem}rem`,
+                                height: `${heightRem}rem`,
+                                left: `calc(${leftPct}% + 1px)`,
+                                width: `calc(${widthPct}% - 2px)`,
+                              }}
                             >
                               <p className="text-[9px] font-bold truncate leading-tight">
                                 {event.subject || event.title}
@@ -366,22 +397,23 @@ const DayView = ({ date, events }: { date: Date; events: CalendarEvent[] }) => {
                 {format(hour, 'HH:mm')}
               </div>
               <div className="h-20 sm:h-24 p-2 sm:p-4 border-b relative">
-                {hourEvents.map((event, idx) => {
+                {assignColumns(hourEvents).map(({ event, col, total }) => {
                   const startMins = event.start.getMinutes();
                   const durationMins = Math.max(differenceInMinutes(event.end, event.start), 30);
 
                   const topRem = (startMins / 60) * 5;
                   const heightRem = (durationMins / 60) * 5;
-
                   return (
                     <div
-                      key={event.id || `${hour.toISOString()}-${idx}`}
+                      key={event.id || `${hour.toISOString()}-${col}`}
                       tabIndex={0}
                       aria-label={`${event.subject || event.room} de ${formatEventTime(event.start)} a ${formatEventTime(event.end)}`}
-                      className="absolute inset-x-2 sm:inset-x-4 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-2 sm:p-4 shadow-xl shadow-primary/25 flex flex-col z-10 focus:ring-2 focus:ring-white outline-none"
+                      className="absolute rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-2 sm:p-4 shadow-xl shadow-primary/25 flex flex-col z-10 focus:ring-2 focus:ring-white outline-none"
                       style={{
                         top: `calc(${topRem}rem + 0.25rem)`,
-                        height: `calc(${heightRem}rem - 0.5rem)`
+                        height: `calc(${heightRem}rem - 0.5rem)`,
+                        left: `calc(8px + ${col} * (100% - 16px) / ${total})`,
+                        width: `calc((100% - 16px) / ${total} - 4px)`,
                       }}
                     >
                       <div className="flex justify-between items-start mb-1 sm:mb-2">

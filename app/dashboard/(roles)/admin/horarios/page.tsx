@@ -2,11 +2,12 @@
 
 import { CalendarEvent, CustomCalendar } from '@/components/calendar/custom-calendar';
 import { LoadingPage } from '@/components/ui/loading';
-import { addDays, addMonths, eachDayOfInterval, endOfMonth, startOfMonth, startOfWeek, subDays, subMonths } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { addDays, addMonths, eachDayOfInterval, endOfMonth, startOfMonth, subDays, subMonths } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-interface HorarioClase {
+interface HorarioGrupo {
   groupId: string;
   groupCode: string;
   subjectName: string;
@@ -15,8 +16,8 @@ interface HorarioClase {
   startTime: string;
   endTime: string;
   roomName: string | null;
-  academicPeriod: string;
   teacherName: string | null;
+  academicPeriod: string;
 }
 
 const DIA_MAP: Record<string, number> = {
@@ -27,7 +28,6 @@ const DIA_MAP: Record<string, number> = {
   FRIDAY: 5,
   SATURDAY: 6,
   SUNDAY: 7,
-  // Fallback español
   LUNES: 1,
   MARTES: 2,
   MIERCOLES: 3,
@@ -37,18 +37,35 @@ const DIA_MAP: Record<string, number> = {
   DOMINGO: 7,
 };
 
-export default function MiHorarioPage() {
-  const [horarios, setHorarios] = useState<HorarioClase[]>([]);
+export default function AdminHorariosPage() {
+  const [horarios, setHorarios] = useState<HorarioGrupo[]>([]);
+  const [periodos, setPeriodos] = useState<string[]>([]);
+  const [selectedPeriodo, setSelectedPeriodo] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentView, setCurrentView] = useState<string>('week');
 
+  // Initial load: get all periods
   useEffect(() => {
-    fetch('/api/docente/horario')
+    fetch('/api/admin/horarios')
+      .then(r => r.json())
+      .then(d => {
+        setPeriodos(d.periodos ?? []);
+        setHorarios(d.horarios ?? []);
+        if (d.periodos?.length > 0) setSelectedPeriodo(d.periodos[0]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Re-fetch when period filter changes
+  useEffect(() => {
+    if (!selectedPeriodo) return;
+    setLoading(true);
+    fetch(`/api/admin/horarios?periodo=${encodeURIComponent(selectedPeriodo)}`)
       .then(r => r.json())
       .then(d => setHorarios(d.horarios ?? []))
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedPeriodo]);
 
   const calendarEvents = useMemo(() => {
     const rangeStart = startOfMonth(subMonths(currentDate, 3));
@@ -76,7 +93,7 @@ export default function MiHorarioPage() {
           subject: h.subjectName,
           start,
           end,
-          room: h.roomName || 'Aula por asignar',
+          room: h.roomName || 'Sala por asignar',
           teacher: h.teacherName || 'Sin docente',
           reason: h.groupCode,
           type: 'CLASE',
@@ -91,25 +108,49 @@ export default function MiHorarioPage() {
     if (action === 'TODAY') {
       setCurrentDate(new Date());
     } else if (action === 'PREV') {
-      if (currentView === 'month') setCurrentDate(subMonths(currentDate, 1));
-      else if (currentView === 'week') setCurrentDate(subDays(currentDate, 7));
-      else setCurrentDate(subDays(currentDate, 1));
-    } else if (action === 'NEXT') {
-      if (currentView === 'month') setCurrentDate(addMonths(currentDate, 1));
-      else if (currentView === 'week') setCurrentDate(addDays(currentDate, 7));
-      else setCurrentDate(addDays(currentDate, 1));
+      if (currentView === 'month') setCurrentDate(d => subMonths(d, 1));
+      else if (currentView === 'week') setCurrentDate(d => subDays(d, 7));
+      else setCurrentDate(d => subDays(d, 1));
+    } else {
+      if (currentView === 'month') setCurrentDate(d => addMonths(d, 1));
+      else if (currentView === 'week') setCurrentDate(d => addDays(d, 7));
+      else setCurrentDate(d => addDays(d, 1));
     }
   };
 
+  const uniqueSubjects = new Set(horarios.map(h => h.subjectCode)).size;
+  const totalGrupos = horarios.length;
+
   return (
     <div className="space-y-8 pb-20">
-      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-card text-foreground">Mi Horario</h1>
+          <h1 className="text-2xl font-semibold tracking-card text-foreground">Horarios</h1>
           <p className="text-muted-foreground sm:text-sm text-xs max-w-md">
-            Consulta tu programación académica semanal y aulas asignadas.
+            Visualiza el calendario de clases por periodo académico y grupo.
           </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {selectedPeriodo && (
+            <span className="text-xs font-semibold text-muted-foreground bg-muted/30 border rounded-full px-3 py-1.5">
+              {totalGrupos} grupos · {uniqueSubjects} asignaturas
+            </span>
+          )}
+          {periodos.length > 0 && (
+            <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
+              <SelectTrigger className="w-40 h-9 rounded-full text-xs font-semibold">
+                <SelectValue placeholder="Seleccionar periodo" />
+              </SelectTrigger>
+              <SelectContent>
+                {periodos.map(p => (
+                  <SelectItem key={p} value={p} className="text-xs">
+                    {p}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
 
@@ -121,11 +162,10 @@ export default function MiHorarioPage() {
             <CalendarDays className="h-7 w-7 text-muted-foreground/40" />
           </div>
           <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
-            Sin programación disponible
+            Sin horarios disponibles
           </p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-            No se han encontrado clases registradas para este periodo académico en tu perfil
-            docente.
+            No se encontraron grupos con horario asignado para este periodo.
           </p>
         </div>
       ) : (
@@ -135,7 +175,7 @@ export default function MiHorarioPage() {
           events={calendarEvents}
           onNavigate={handleNavigate}
           onView={setCurrentView}
-          label="Horario Académico"
+          label={`Horarios — ${selectedPeriodo}`}
         />
       )}
     </div>

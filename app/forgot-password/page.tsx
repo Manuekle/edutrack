@@ -107,7 +107,7 @@ export default function ForgotPasswordPage() {
                         <Input
                           type="email"
                           placeholder="nombre@ejemplo.com"
-                          className="pl-12 pr-4 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all text-xs"
+                          className="pl-12 pr-4 rounded-xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
                           disabled={isLoading}
                           {...field}
                         />
