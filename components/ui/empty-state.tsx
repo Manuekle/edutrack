@@ -20,7 +20,7 @@ export function EmptyState({ icon: Icon, title, description, action, className }
     >
       {Icon && (
         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-          <Icon className="h-6 w-6" aria-hidden />
+          <Icon className="h-6 w-6" aria-hidden="true" />
         </div>
       )}
       <p className="sm:text-sm text-xs font-medium text-foreground">{title}</p>

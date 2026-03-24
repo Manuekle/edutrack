@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Teacher {
   id: string;
@@ -85,6 +86,7 @@ type CreateSubjectFormValues = z.infer<typeof createSubjectSchema>;
 
 export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: CreateSubjectModalProps) {
   const [isCreating, setIsCreating] = useState(false);
+  const queryClient = useQueryClient();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loadingTeachers, setLoadingTeachers] = useState(false);
 
@@ -151,6 +153,7 @@ export function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }: Create
       }
 
       sileo.success({ title: 'Asignatura creada con éxito.' });
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
       onSubjectCreated(createdSubject);
       onClose();
       form.reset();

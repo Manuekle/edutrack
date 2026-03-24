@@ -19,6 +19,31 @@ const createTestQueryClient = () =>
 // Mock de fetch
 global.fetch = jest.fn() as jest.Mock;
 
+jest.mock('sileo', () => ({
+  sileo: {
+    success: jest.fn(),
+    error: jest.fn(),
+    warning: jest.fn(),
+    info: jest.fn(),
+  },
+}));
+
+jest.mock('@prisma/client', () => ({
+  Role: {
+    ADMIN: 'ADMIN',
+    DOCENTE: 'DOCENTE',
+    ESTUDIANTE: 'ESTUDIANTE',
+  },
+}));
+
+jest.mock('@/hooks/use-unsaved-changes', () => ({
+  useUnsavedChanges: () => ({
+    hasUnsavedChanges: false,
+    markAsSaved: jest.fn(),
+    markAsDirty: jest.fn(),
+  }),
+}));
+
 describe('Flujo de integración de usuario', () => {
   let queryClient: QueryClient;
 

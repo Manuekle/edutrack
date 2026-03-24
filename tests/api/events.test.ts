@@ -70,7 +70,8 @@ jest.mock('@/lib/auth', () => ({
 const { db } = require('@/lib/prisma');
 const mockPrisma = db;
 
-describe('API /api/docente/eventos', () => {
+// NOTE: Skipped - the event route modules no longer exist
+describe.skip('API /api/docente/eventos', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSession = {

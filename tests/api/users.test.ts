@@ -94,8 +94,8 @@ describe('API /api/admin/users', () => {
         {
           id: '1',
           name: 'Test User',
-          correoPersonal: 'test@example.com',
-          correoInstitucional: 'test@institution.com',
+          personalEmail: 'test@example.com',
+          institutionalEmail: 'test@institution.com',
           role: 'ESTUDIANTE',
           isActive: true,
           createdAt: new Date(),
@@ -213,8 +213,8 @@ describe('API /api/admin/users', () => {
       const newUser = {
         id: 'new-user-id',
         name: 'New User',
-        correoPersonal: 'newuser@example.com',
-        correoInstitucional: null,
+        personalEmail: 'newuser@example.com',
+        institutionalEmail: null,
         role: 'ESTUDIANTE',
         isActive: true,
         createdAt: new Date(),
@@ -232,7 +232,7 @@ describe('API /api/admin/users', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'New User',
-          correoPersonal: 'newuser@example.com',
+          personalEmail: 'newuser@example.com',
           password: 'password123',
           role: 'ESTUDIANTE',
         }),
@@ -277,7 +277,8 @@ describe('API /api/admin/users', () => {
           name: 'New User',
           password: 'password123',
           role: 'ESTUDIANTE',
-          // No hay correoPersonal ni correoInstitucional
+          personalEmail: '',
+          institutionalEmail: '',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -296,7 +297,7 @@ describe('API /api/admin/users', () => {
       const existingUser = {
         id: 'existing-user-id',
         name: 'Existing User',
-        correoPersonal: 'existing@example.com',
+        personalEmail: 'existing@example.com',
       };
 
       mockPrisma.user.findFirst.mockResolvedValue(existingUser);
@@ -305,7 +306,7 @@ describe('API /api/admin/users', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'New User',
-          correoPersonal: 'existing@example.com',
+          personalEmail: 'existing@example.com',
           password: 'password123',
           role: 'ESTUDIANTE',
         }),
@@ -334,7 +335,7 @@ describe('API /api/admin/users', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'New User',
-          correoPersonal: 'newuser@example.com',
+          personalEmail: 'newuser@example.com',
           password: 'password123',
           role: 'ESTUDIANTE',
         }),
@@ -356,7 +357,7 @@ describe('API /api/admin/users', () => {
       const newUser = {
         id: 'new-user-id',
         name: 'New User',
-        correoPersonal: 'newuser@example.com',
+        personalEmail: 'newuser@example.com',
         password: 'hashed_password123',
         role: 'ESTUDIANTE',
         isActive: true,
@@ -370,7 +371,7 @@ describe('API /api/admin/users', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'New User',
-          correoPersonal: 'newuser@example.com',
+          personalEmail: 'newuser@example.com',
           password: 'password123',
           role: 'ESTUDIANTE',
         }),
@@ -397,8 +398,8 @@ describe('API /api/admin/users', () => {
       const updatedUser = {
         id: 'user-id',
         name: 'Updated User',
-        correoPersonal: 'updated@example.com',
-        correoInstitucional: 'updated@institution.com',
+        personalEmail: 'updated@example.com',
+        institutionalEmail: 'updated@institution.com',
         role: 'ESTUDIANTE',
         isActive: true,
         document: '1234567890',
@@ -415,7 +416,7 @@ describe('API /api/admin/users', () => {
         method: 'PATCH',
         body: JSON.stringify({
           name: 'Updated User',
-          correoPersonal: 'updated@example.com',
+          personalEmail: 'updated@example.com',
           role: 'ESTUDIANTE',
         }),
         headers: {
@@ -439,8 +440,8 @@ describe('API /api/admin/users', () => {
         method: 'PATCH',
         body: JSON.stringify({
           name: 'Updated User',
-          correoPersonal: '',
-          correoInstitucional: '',
+          personalEmail: '',
+          institutionalEmail: '',
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -460,7 +461,7 @@ describe('API /api/admin/users', () => {
     it('debería retornar 409 si el correo ya está en uso por otro usuario', async () => {
       const existingUser = {
         id: 'other-user-id',
-        correoPersonal: 'existing@example.com',
+        personalEmail: 'existing@example.com',
       };
 
       mockPrisma.user.findFirst.mockResolvedValue(existingUser);
@@ -468,7 +469,7 @@ describe('API /api/admin/users', () => {
       const request = new NextRequest('http://localhost:3000/api/admin/users/user-id', {
         method: 'PATCH',
         body: JSON.stringify({
-          correoPersonal: 'existing@example.com',
+          personalEmail: 'existing@example.com',
         }),
         headers: {
           'Content-Type': 'application/json',

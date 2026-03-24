@@ -49,6 +49,8 @@ function LoginForm() {
       email: '',
       password: '',
     },
+    // H5-D: Validación en tiempo real (onChange en lugar de solo onSubmit)
+    mode: 'onChange',
   });
 
   const searchParams = useSearchParams();
@@ -86,11 +88,15 @@ function LoginForm() {
 
   return (
     <Card className="w-full max-w-md relative z-10 border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl rounded-[2.5rem] overflow-hidden">
-
-
       <CardHeader className="space-y-4 pt-10 pb-4 text-center">
-        <div className='flex items-center justify-center'>
-          <Image src="/icons/favicon-96x96.png" alt="SIRA" width={40} height={40} className="object-contain rounded-full" />
+        <div className="flex items-center justify-center">
+          <Image
+            src="/icons/favicon-96x96.png"
+            alt="SIRA"
+            width={40}
+            height={40}
+            className="object-contain rounded-full"
+          />
         </div>
 
         <div className="space-y-1.5">
@@ -105,7 +111,10 @@ function LoginForm() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="grid gap-6 px-8 py-6">
             {error && (
-              <Alert variant="destructive" className="rounded-2xl bg-destructive/5 border-destructive/20 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Alert
+                variant="destructive"
+                className="rounded-2xl bg-destructive/5 border-destructive/20 animate-in fade-in slide-in-from-top-2 duration-300"
+              >
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-[13px]">{error}</AlertDescription>
               </Alert>
@@ -116,7 +125,9 @@ function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem className="space-y-2.5">
-                  <FormLabel className="sm:text-sm text-xs font-semibold ml-1 text-foreground/80">Correo institucional</FormLabel>
+                  <FormLabel className="sm:text-sm text-xs font-semibold ml-1 text-foreground/80">
+                    Correo institucional
+                  </FormLabel>
                   <FormControl>
                     <div className="relative group">
                       <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
@@ -140,7 +151,9 @@ function LoginForm() {
               render={({ field }) => (
                 <FormItem className="space-y-2.5">
                   <div className="flex items-center justify-between px-1">
-                    <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">Contraseña</FormLabel>
+                    <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">
+                      Contraseña
+                    </FormLabel>
                     <Link
                       href="/forgot-password"
                       className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
@@ -166,7 +179,11 @@ function LoginForm() {
                         aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                         disabled={isLoading}
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </FormControl>

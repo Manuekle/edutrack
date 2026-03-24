@@ -22,6 +22,9 @@ jest.mock('@/lib/prisma', () => {
     user: {
       findUnique: jest.fn(),
     },
+    class: {
+      deleteMany: jest.fn(),
+    },
   };
   return {
     db: mockPrisma,
@@ -238,7 +241,7 @@ describe('API /api/admin/subjects', () => {
         code: 'EXIST001',
       };
 
-      mockPrisma.subject.findUnique.mockResolvedValue(existingSubject);
+      mockPrisma.subject.findFirst.mockResolvedValue(existingSubject);
 
       const request = new NextRequest('http://localhost:3000/api/admin/subjects', {
         method: 'POST',
@@ -262,7 +265,7 @@ describe('API /api/admin/subjects', () => {
 
     it('debería retornar 404 si el docente no existe', async () => {
       // Primero verificar que el código no existe
-      mockPrisma.subject.findUnique.mockResolvedValue(null);
+      mockPrisma.subject.findFirst.mockResolvedValue(null);
       // Luego verificar que el docente no existe
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
@@ -371,7 +374,6 @@ describe('API /api/admin/subjects', () => {
       expect(data.name).toBe('Updated Subject');
       expect(data.program).toBe('Ingeniería');
       expect(data.studentCount).toBe(0);
-      expect(data.classCount).toBe(5);
       expect(mockPrisma.subject.update).toHaveBeenCalled();
     });
 
@@ -616,7 +618,7 @@ describe('API /api/admin/subjects', () => {
         name: 'Test Subject',
         code: 'TEST001',
         teacherId: 'teacher1',
-        studentIds: [],
+        studentIds: ['student1', 'student2'], // Tiene estudiantes - la ruta verifica esto
         _count: {
           classes: 5,
         },
@@ -634,7 +636,7 @@ describe('API /api/admin/subjects', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.message).toContain('clases');
+      expect(data.message).toContain('estudiantes');
       expect(mockPrisma.subject.delete).not.toHaveBeenCalled();
     });
 

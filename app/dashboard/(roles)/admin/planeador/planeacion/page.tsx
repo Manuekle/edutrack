@@ -13,6 +13,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -20,11 +32,13 @@ import {
   AlertTriangle,
   BookOpen,
   CalendarIcon,
+  CalendarOff,
   CheckCircle2,
   ClipboardList,
   Loader2,
   Trash2,
   Users,
+  Info,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -64,6 +78,10 @@ export default function PlaneacionPage() {
   const [selectedGrupo, setSelectedGrupo] = useState('');
   const [generating, setGenerating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [observation, setObservation] = useState(''); // Observación para días festivos/cancelaciones
+  const [showObservationDialog, setShowObservationDialog] = useState(false);
+  const [planeacionToObserve, setPlaneacionToObserve] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
@@ -88,6 +106,15 @@ export default function PlaneacionPage() {
     const pName = currentGrupo.periodoAcademico?.replace(/[-\s]/g, '') || '';
     return periods.find(p => p.name.replace(/[-\s]/g, '') === pName);
   }, [currentGrupo, periods]);
+
+  // Abrir diálogo de confirmación si ya tiene planeación
+  const handleGenerateClick = () => {
+    if (currentGrupo?.planning) {
+      setShowConfirmDialog(true);
+    } else {
+      generatePlaneacion();
+    }
+  };
 
   async function generatePlaneacion() {
     if (!selectedGrupo) return;
@@ -119,9 +146,53 @@ export default function PlaneacionPage() {
       }
       sileo.success({ description: 'Planeación de 16 semanas generada' });
       setSelectedGrupo('');
-      load();
+      setObservation('');
+      // Solo actualizar el grupo afectado en lugar de recargar todo
+      loadSingleGrupo(selectedGrupo);
     } catch {
       sileo.error({ description: 'Error al generar planeación' });
+    } finally {
+      setGenerating(false);
+      setShowConfirmDialog(false);
+    }
+  }
+
+  // Cargar solo un grupo específico sin recargar todo
+  async function loadSingleGrupo(grupoId: string) {
+    try {
+      const res = await fetch(`/api/admin/planeador/grupos?includePlaneacion=true`).then(r =>
+        r.json()
+      );
+      setGrupos(res.grupos ?? []);
+    } catch {
+      // En caso de error, recargar todo
+      load();
+    }
+  }
+
+  // Agregar observación a una planeación
+  async function saveObservation() {
+    if (!planeacionToObserve) return;
+
+    setGenerating(true);
+    try {
+      const res = await fetch(`/api/admin/planeador/planeacion/${planeacionToObserve}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ observation }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        sileo.error({ description: data.error ?? 'Error al guardar observación' });
+        return;
+      }
+      sileo.success({ description: 'Observación guardada' });
+      setShowObservationDialog(false);
+      setObservation('');
+      setPlaneacionToObserve(null);
+      load();
+    } catch {
+      sileo.error({ description: 'Error al guardar observación' });
     } finally {
       setGenerating(false);
     }
@@ -284,7 +355,9 @@ export default function PlaneacionPage() {
                         <span className="font-mono text-muted-foreground mr-1 text-xs">
                           [Grupo: {g.codigo}]
                         </span>
-                        <span className="font-medium truncate sm:text-sm text-xs">{g.subject.name}</span>
+                        <span className="font-medium truncate sm:text-sm text-xs">
+                          {g.subject.name}
+                        </span>
                       </span>
                     </SelectItem>
                   ))}
@@ -385,7 +458,7 @@ export default function PlaneacionPage() {
 
           <div className="pt-6">
             <Button
-              onClick={generatePlaneacion}
+              onClick={handleGenerateClick}
               disabled={!selectedGrupo || generating || loading || !matchingPeriod}
               className="w-full sm:w-auto rounded-xl shadow-none h-10 px-8 text-xs font-medium transition-all"
             >
@@ -404,6 +477,88 @@ export default function PlaneacionPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Diálogo de confirmación para regenerar planeación */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              ¿Regenerar planeación?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>Este grupo ya tiene una planeación de 16 semanas creada. Si continúas:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>
+                  Se <strong>eliminará la planeación actual</strong>
+                </li>
+                <li>
+                  El docente <strong>perderá su calendario</strong> de clases
+                </li>
+                <li>
+                  Se <strong>creará una nueva</strong> con las mismas fechas
+                </li>
+              </ul>
+              <p className="text-amber-600 dark:text-amber-400 font-medium">
+                Esta acción no se puede deshacer.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={generatePlaneacion}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sí, regenerar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Diálogo para agregar observación (días festivos/cancelaciones) */}
+      <AlertDialog open={showObservationDialog} onOpenChange={setShowObservationDialog}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <CalendarOff className="h-5 w-5 text-primary" />
+              Agregar observación
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Registra días festivos, cancelaciones de clase u otras observaciones importantes. Esta
+              información será visible para el docente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Textarea
+              value={observation}
+              onChange={e => setObservation(e.target.value)}
+              placeholder="Ej: Semana del 15 al 19 de julio - Suspensión de clases por vacaciones universitarias..."
+              className="min-h-[120px] rounded-xl"
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground mt-2 text-right">
+              {observation.length}/500 caracteres
+            </p>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={saveObservation}
+              disabled={!observation.trim() || generating}
+            >
+              {generating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                'Guardar observación'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Bloque B: Planeaciones ya creadas */}
       <div className="space-y-4 w-full pt-6">
@@ -424,7 +579,7 @@ export default function PlaneacionPage() {
             ))}
           </div>
         ) : gruposConPlaneacion.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center bg-muted/10 border-none rounded-3xl sm:ml-8 p-6">
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-muted/10 border-none rounded-3xl p-6">
             <div className="bg-background p-3 rounded-2xl shadow-sm mb-3">
               <ClipboardList className="h-6 w-6 text-muted-foreground/50" />
             </div>
@@ -436,28 +591,27 @@ export default function PlaneacionPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-0 sm:ml-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             {gruposConPlaneacion.map(g => {
               const semanas = g.planning!.weeks;
               // Sumamos todas las clases de todas las semanas de la planeación
               const todasLasClases = semanas.flatMap(s => s.classes);
               const totalClases = todasLasClases.length || 16; // Fallback a 16 si no hay clases registradas aún
-              const clasesCompletadas = todasLasClases.filter(
-                c => c.status === 'SIGNED' || c.status === 'CANCELADA'
-              ).length;
+              const clasesCompletadas = todasLasClases.filter(c => c.status === 'SIGNED').length;
+              const clasesCanceladas = todasLasClases.filter(c => c.status === 'CANCELADA').length;
+              const clasesPendientes = totalClases - clasesCompletadas - clasesCanceladas;
 
-              const progress = (clasesCompletadas / totalClases) * 100;
+              const progress = ((clasesCompletadas + clasesCanceladas) / totalClases) * 100;
 
               return (
                 <div
                   key={g.id}
                   className="group relative flex flex-col justify-between bg-card text-card-foreground p-5 rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] border-0 hover:shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] transition-all overflow-hidden"
                 >
-
                   <div className="space-y-3.5 z-10">
                     {/* Encabezado de la tarjeta */}
                     <div className="flex items-start justify-between gap-2">
-                      <div className="flex flex-col gap-0.5">
+                      <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                         <span className="font-semibold sm:text-sm text-xs text-foreground tracking-card line-clamp-1">
                           {g.subject.name}
                         </span>
@@ -469,21 +623,38 @@ export default function PlaneacionPage() {
                         </Badge>
                       </div>
 
-                      {/* Botón eliminar */}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 rounded-full text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive shrink-0 opacity-0 group-hover:opacity-100 transition-all -mt-1 -mr-1"
-                        onClick={() => deletePlaneacion(g.planning!.id)}
-                        disabled={deletingId === g.planning!.id}
-                        title="Eliminar planeación"
-                      >
-                        {deletingId === g.planning!.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
-                      </Button>
+                      {/* Botones de acción */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        {/* Botón observación */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 rounded-full text-muted-foreground/40 hover:bg-primary/10 hover:text-primary"
+                          onClick={() => {
+                            setPlaneacionToObserve(g.planning!.id);
+                            setObservation('');
+                            setShowObservationDialog(true);
+                          }}
+                          title="Agregar observación (días festivos/cancelaciones)"
+                        >
+                          <CalendarOff className="h-3.5 w-3.5" />
+                        </Button>
+                        {/* Botón eliminar */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 rounded-full text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => deletePlaneacion(g.planning!.id)}
+                          disabled={deletingId === g.planning!.id}
+                          title="Eliminar planeación"
+                        >
+                          {deletingId === g.planning!.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5 text-xs text-muted-foreground mt-1">
@@ -511,18 +682,56 @@ export default function PlaneacionPage() {
                       </p>
                     </div>
 
-                    {/* Barra de semanas configuradas */}
+                    {/* Totales de clases mejorados */}
+                    <div className="grid grid-cols-3 gap-2 pt-1">
+                      <div className="flex flex-col items-center p-2 rounded-lg bg-blue-500/5 border border-blue-500/10">
+                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          {totalClases}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                          Programadas
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-2 rounded-lg bg-green-500/5 border border-green-500/10">
+                        <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                          {clasesCompletadas}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                          Completadas
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-2 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                        <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
+                          {clasesCanceladas}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                          Canceladas
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Barra de progreso */}
                     <div className="pt-2">
-                      <div className="flex items-center justify-between text-[10px] uppercase font-semibold text-muted-foreground mb-1">
-                        <span>Progreso Académico</span>
-                        <span>
-                          {clasesCompletadas} / {totalClases} Clases
+                      <div className="flex items-center justify-between text-[10px] uppercase font-semibold text-muted-foreground mb-1.5">
+                        <span className="flex items-center gap-1">
+                          <Info className="h-3 w-3" />
+                          Progreso
+                        </span>
+                        <span className="font-mono">
+                          {clasesCompletadas + clasesCanceladas}/{totalClases} (
+                          {Math.round(progress)}%)
                         </span>
                       </div>
                       <Progress
                         value={progress}
-                        className="h-1.5 bg-muted/40 rounded-full overflow-hidden"
+                        className="h-2 bg-muted/40 rounded-full overflow-hidden"
                       />
+                      {clasesPendientes > 0 && (
+                        <p className="text-[10px] text-muted-foreground mt-1 text-right">
+                          {clasesPendientes} clase{clasesPendientes !== 1 ? 's' : ''} pendiente
+                          {clasesPendientes !== 1 ? 's' : ''}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

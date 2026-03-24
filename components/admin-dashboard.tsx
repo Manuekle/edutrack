@@ -10,7 +10,7 @@ import {
   Layout,
   Percent,
   TrendingUp,
-  Users
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -150,9 +150,24 @@ const AdminDashboardComponent = () => {
       {/* Quick Links */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[
-          { href: '/dashboard/admin/planeador', icon: CalendarDays, label: 'Planeador', desc: 'Configurar semestre' },
-          { href: '/dashboard/admin/salas', icon: Layout, label: 'Salas', desc: 'Gestionar espacios' },
-          { href: '/dashboard/admin/reportes', icon: TrendingUp, label: 'Reportes', desc: 'Ver avance docentes' },
+          {
+            href: '/dashboard/admin/planeador',
+            icon: CalendarDays,
+            label: 'Planeador',
+            desc: 'Configurar semestre',
+          },
+          {
+            href: '/dashboard/admin/salas',
+            icon: Layout,
+            label: 'Salas',
+            desc: 'Gestionar espacios',
+          },
+          {
+            href: '/dashboard/admin/reportes',
+            icon: TrendingUp,
+            label: 'Reportes',
+            desc: 'Ver avance docentes',
+          },
         ].map(({ href, icon: Icon, label, desc }) => (
           <Link key={href} href={href}>
             <Card className="h-full transition-all hover:bg-muted/40 cursor-pointer border-border/30">
@@ -235,7 +250,9 @@ const AdminDashboardComponent = () => {
         {/* Monthly Classes */}
         <Card className="border-border/30">
           <CardHeader className="pb-2">
-            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">Clases por Mes</CardTitle>
+            <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
+              Clases por Mes
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer config={{}} className="mx-auto aspect-square max-h-[260px] w-full">
@@ -278,8 +295,16 @@ const AdminDashboardComponent = () => {
           </CardHeader>
           <CardContent>
             {data.charts.attendanceDistribution.length === 0 ? (
-              <div className="flex items-center justify-center h-40">
-                <p className="text-muted-foreground text-xs">No hay datos disponibles</p>
+              <div className="flex flex-col items-center justify-center h-40 gap-3">
+                <AlertCircle className="h-8 w-8 text-muted-foreground/40" aria-hidden="true" />
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    Sin registros de asistencia
+                  </p>
+                  <p className="text-[11px] text-muted-foreground/60 mt-1">
+                    Los registros aparecerán cuando los docentes tomen asistencia
+                  </p>
+                </div>
               </div>
             ) : (
               <ChartContainer config={{}} className="mx-auto aspect-square max-h-[260px] w-full">
@@ -313,8 +338,16 @@ const AdminDashboardComponent = () => {
           </CardHeader>
           <CardContent>
             {data.charts.classroomOccupancy.length === 0 ? (
-              <div className="flex items-center justify-center h-40">
-                <p className="text-muted-foreground text-xs">No hay salones registrados</p>
+              <div className="flex flex-col items-center justify-center h-40 gap-3">
+                <Layout className="h-8 w-8 text-muted-foreground/40" aria-hidden="true" />
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground font-medium">
+                    No hay salones registrados
+                  </p>
+                  <p className="text-[11px] text-muted-foreground/60 mt-1">
+                    Agrega salones para ver su uso
+                  </p>
+                </div>
               </div>
             ) : (
               <ChartContainer config={{}} className="mx-auto max-h-[260px] w-full">
@@ -354,15 +387,20 @@ const AdminDashboardComponent = () => {
               Materias con Más Estudiantes
             </CardTitle>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Estudiantes matriculados por grupo
-          </p>
+          <p className="text-xs text-muted-foreground">Estudiantes matriculados por grupo</p>
         </CardHeader>
         <CardContent>
           {data.charts.topSubjects.length === 0 || maxStudents === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-2">
-              <BookOpen className="h-8 w-8 text-muted-foreground/30" />
-              <p className="text-xs text-muted-foreground">No hay matriculas registradas</p>
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <BookOpen className="h-8 w-8 text-muted-foreground/30" aria-hidden="true" />
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground font-medium">
+                  Sin matrículas registradas
+                </p>
+                <p className="text-[11px] text-muted-foreground/60 mt-1">
+                  Las matrículas de estudiantes aparecerán aquí
+                </p>
+              </div>
             </div>
           ) : (
             <div className="space-y-3">

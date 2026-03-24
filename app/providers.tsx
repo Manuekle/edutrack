@@ -15,11 +15,11 @@ export default function Providers({ children }: Props) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5 * 60 * 1000,
-            refetchOnWindowFocus: false,
+            staleTime: 30 * 1000,
+            refetchOnWindowFocus: true,
             retry: 1,
-            gcTime: 10 * 60 * 1000,
-            refetchOnMount: false,
+            gcTime: 5 * 60 * 1000,
+            refetchOnMount: true,
             refetchOnReconnect: true,
             retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
           },

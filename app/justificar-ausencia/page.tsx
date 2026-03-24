@@ -23,7 +23,9 @@ import { Suspense, useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
 const justifyAbsenceSchema = z.object({
-  reason: z.string().min(10, 'Por favor ingresa una justificación más detallada (mínimo 10 caracteres)'),
+  reason: z
+    .string()
+    .min(10, 'Por favor ingresa una justificación más detallada (mínimo 10 caracteres)'),
 });
 
 type JustifyAbsenceFormValues = z.infer<typeof justifyAbsenceSchema>;
@@ -34,6 +36,8 @@ function JustificarAusenciaContent() {
   const [isJustificationSubmitted, setIsJustificationSubmitted] = useState(false);
   const [redirectIn, setRedirectIn] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [submittedReason, setSubmittedReason] = useState<string>(''); // H3-B: Track submitted reason for editing
+  const [isEditing, setIsEditing] = useState(false); // H3-B: Allow editing mode
   const router = useRouter();
 
   const classId = searchParams.get('classId');
@@ -73,6 +77,11 @@ function JustificarAusenciaContent() {
         const response = await fetch(
           `/api/justificar-ausencia/check?classId=${classId}&studentId=${studentId}`
         );
+
+        if (!response.ok) {
+          throw new Error(`Error al verificar: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.exists) {
@@ -80,7 +89,13 @@ function JustificarAusenciaContent() {
           startCountdown(10);
         }
       } catch (error) {
-        // Error silenciado
+        // H9-B: Error visible al usuario en lugar de silencioso
+        console.error('Error al verificar justificación existente:', error);
+        sileo.error({
+          title: 'Error de conexión',
+          description:
+            'No se pudo verificar el estado de tu justificación. Por favor, intenta de nuevo.',
+        });
       } finally {
         setIsLoading(false);
       }
@@ -109,10 +124,11 @@ function JustificarAusenciaContent() {
         throw new Error(responseData.message || 'Error al procesar la justificación');
       }
 
-      sileo.success({ title: 'Justificación enviada correctamente.' });
-      setIsJustificationSubmitted(true);
+      sileo.success({ title: 'Justificación actualizada correctamente.' });
+      setSubmittedReason(data.reason); // H3-B: Save submitted reason
+      setIsEditing(false);
 
-      // Iniciar cuenta regresiva para redirección
+      // Reiniciar cuenta regresiva para redirección
       setRedirectIn(10);
       const timer = setInterval(() => {
         setRedirectIn(prev => {
@@ -138,6 +154,92 @@ function JustificarAusenciaContent() {
     return <LoadingPage />;
   }
 
+  // H3-B: Estado de edición - permite modificar la justificación
+  if (isEditing && submittedReason) {
+    return (
+      <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-background overflow-hidden font-sans">
+        <Card className="w-full max-w-lg relative z-10 border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl rounded-[2.5rem] overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-amber-500" />
+          <CardHeader className="pt-12 pb-6 px-10 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                <FileText className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="space-y-1">
+                <CardTitle className="text-3xl font-semibold tracking-card">
+                  Editar justificación
+                </CardTitle>
+                <CardDescription className="sm:text-[15px] text-xs">
+                  Modifica el motivo de tu inasistencia. Los cambios serán enviados nuevamente.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-10 pb-12">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                  control={form.control}
+                  name="reason"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <div className="flex justify-between items-center px-1">
+                        <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">
+                          Motivo de la ausencia
+                        </FormLabel>
+                        <span className="text-[11px] text-muted-foreground uppercase tracking-card font-semibold">
+                          Máximo 500 caracteres
+                        </span>
+                      </div>
+                      <FormControl>
+                        <div className="relative">
+                          <Textarea
+                            placeholder="Ej: Tenía una cita médica programada..."
+                            className="min-h-[160px] rounded-2xl bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all p-5 sm:text-[15px] text-xs resize-none leading-relaxed"
+                            disabled={isSubmitting}
+                            defaultValue={submittedReason}
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage className="px-1" />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex flex-col gap-4">
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90 text-xs shadow-xl shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Actualizando...
+                      </>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Send className="h-5 w-5" /> Actualizar justificación
+                      </span>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsEditing(false)}
+                    className="w-full text-muted-foreground hover:text-foreground"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Estado: Ya enviado
   if (isJustificationSubmitted) {
     return (
@@ -160,17 +262,40 @@ function JustificarAusenciaContent() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-6 px-10 pb-12">
+            {/* H3-B: Show submitted reason */}
+            {submittedReason && (
+              <div className="p-4 rounded-2xl bg-muted/30 border border-border/40 text-left">
+                <p className="text-[11px] font-medium text-muted-foreground mb-1.5 uppercase tracking-wide">
+                  Justificación enviada:
+                </p>
+                <p className="sm:text-sm text-xs text-foreground/80 leading-relaxed">
+                  {submittedReason}
+                </p>
+              </div>
+            )}
             <div className="p-4 rounded-2xl bg-muted/30 border border-border/40">
               <p className="sm:text-sm text-xs text-muted-foreground">
-                Serás redirigido al panel en <span className="font-semibold text-foreground font-mono">{redirectIn}s</span>
+                Serás redirigido al panel en{' '}
+                <span className="font-semibold text-foreground font-mono">{redirectIn}s</span>
               </p>
             </div>
-            <Button
-              onClick={() => router.push('/dashboard')}
-              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20 transition-all"
-            >
-              Ir al Panel ahora
-            </Button>
+            <div className="flex flex-col gap-3">
+              {/* H3-B: Edit button */}
+              <Button
+                variant="outline"
+                onClick={() => setIsEditing(true)}
+                className="w-full h-12 rounded-xl border-border/60 hover:bg-muted/50"
+              >
+                <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
+                Editar justificación
+              </Button>
+              <Button
+                onClick={() => router.push('/dashboard')}
+                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20 transition-all"
+              >
+                Ir al Panel ahora
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -210,10 +335,7 @@ function JustificarAusenciaContent() {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-background overflow-hidden font-sans">
-
       <Card className="w-full max-w-lg relative z-10 border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl rounded-[2.5rem] overflow-hidden">
-
-
         <CardHeader className="pt-12 pb-6 px-10 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -239,8 +361,12 @@ function JustificarAusenciaContent() {
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <div className="flex justify-between items-center px-1">
-                      <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">Motivo de la ausencia</FormLabel>
-                      <span className="text-[11px] text-muted-foreground uppercase tracking-card font-semibold">Máximo 500 caracteres</span>
+                      <FormLabel className="sm:text-sm text-xs font-semibold text-foreground/80">
+                        Motivo de la ausencia
+                      </FormLabel>
+                      <span className="text-[11px] text-muted-foreground uppercase tracking-card font-semibold">
+                        Máximo 500 caracteres
+                      </span>
                     </div>
                     <FormControl>
                       <div className="relative">

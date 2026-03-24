@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -31,8 +32,9 @@ import {
 } from '@/components/ui/select';
 import type { User } from '@/types';
 import { Role } from '@prisma/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -65,6 +67,12 @@ type CreateUserFormValues = z.infer<typeof createUserSchema>;
 
 export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserModalProps) {
   const [isCreating, setIsCreating] = useState(false);
+  const queryClient = useQueryClient();
+
+  // H5-C: Detectar cambios sin guardar
+  const { hasUnsavedChanges, markAsSaved, markAsDirty } = useUnsavedChanges({
+    message: '¿Estás seguro de cerrar? Los cambios sin guardar se perderán.',
+  });
 
   const form = useForm<CreateUserFormValues>({
     resolver: zodResolver(createUserSchema),
@@ -80,6 +88,26 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
       codigoDocente: '',
     },
   });
+
+  // H5-C: Marcar dirty cuando el formulario tiene cambios
+  useEffect(() => {
+    if (isOpen && form.formState.isDirty) {
+      markAsDirty();
+    }
+  }, [isOpen, form.formState.isDirty, markAsDirty]);
+
+  // H5-C: Manejar cierre con cambios sin guardar
+  const handleClose = () => {
+    if (hasUnsavedChanges) {
+      const confirmed = window.confirm(
+        '¿Estás seguro de cerrar? Los cambios sin guardar se perderán.'
+      );
+      if (!confirmed) return;
+    }
+    markAsSaved();
+    form.reset();
+    onClose();
+  };
 
   const role = form.watch('role');
 
@@ -114,9 +142,12 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
       }
 
       sileo.success({ title: 'Usuario creado con éxito.' });
-      onUserCreated(createdUser);
-      onClose();
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      // H5-C: Marcar como guardado después de éxito
+      markAsSaved();
       form.reset();
+      onClose();
+      onUserCreated(createdUser);
     } catch (err) {
       if (err instanceof Error) {
         sileo.error({ title: err.message });
@@ -129,7 +160,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
       <DialogContent className="sm:max-w-lg font-sans">
         <DialogHeader>
           <DialogTitle className="tracking-card sm:text-2xl text-xs">
@@ -137,6 +168,11 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
           </DialogTitle>
           <DialogDescription className="text-xs">
             Completa los datos para crear un nuevo usuario. Al menos un correo es requerido.
+            {hasUnsavedChanges && (
+              <span className="block mt-1 text-amber-600 dark:text-amber-500 font-medium">
+                ⚠ Tienes cambios sin guardar
+              </span>
+            )}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -300,7 +336,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose} disabled={isCreating}>
+              <Button type="button" variant="outline" onClick={handleClose} disabled={isCreating}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isCreating}>

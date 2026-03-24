@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { BookOpen, Calendar, Clock } from 'lucide-react';
 
 interface StatsProps {
@@ -13,6 +14,7 @@ interface StatsProps {
     topic: string;
     classroom?: string | null;
   };
+  isLoading?: boolean;
 }
 
 export function TeacherStatsCards({
@@ -21,9 +23,31 @@ export function TeacherStatsCards({
   completedClasses,
   upcomingClassesCount,
   nextClass,
+  isLoading = false,
 }: StatsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[1, 2, 3, 4].map(i => (
+          <Card
+            key={i}
+            className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.02] rounded-2xl"
+          >
+            <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-8 w-8 rounded-xl" />
+            </CardHeader>
+            <CardContent className="px-5 pb-5">
+              <Skeleton className="h-9 w-20" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.02] rounded-2xl">
         <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-[13px] font-medium text-muted-foreground flex items-center gap-2 tracking-card uppercase">

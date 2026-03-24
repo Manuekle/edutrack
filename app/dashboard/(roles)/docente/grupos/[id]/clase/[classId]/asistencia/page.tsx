@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { sileo } from 'sileo';
 
 // --- Types ---
@@ -100,6 +101,7 @@ const AttendanceStatusMap = {
 export default function AttendancePage() {
   const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
   const classId = params?.classId as string;
   const groupId = params?.id as string;
 
@@ -185,6 +187,8 @@ export default function AttendancePage() {
 
       if (!res.ok) throw new Error('Error al guardar la asistencia');
       sileo.success({ title: 'Asistencia guardada correctamente' });
+      queryClient.invalidateQueries({ queryKey: ['attendance'] });
+      queryClient.invalidateQueries({ queryKey: ['classes'] });
     } catch (error) {
       sileo.error({ title: 'Error', description: 'No se pudo guardar la asistencia.' });
     } finally {

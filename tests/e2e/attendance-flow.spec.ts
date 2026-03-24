@@ -4,8 +4,9 @@ import { test, expect } from '@playwright/test';
 async function loginAsTeacher(page: any) {
   await page.goto('/login');
   await page.waitForLoadState('networkidle');
-  await page.getByPlaceholder(/tu@email.com/i).fill('elustondo129@gmail.com');
-  await page.getByPlaceholder(/ingresa tu contraseña/i).fill('docente123');
+  // Usar locators directos para los inputs
+  await page.locator('input[name="email"]').fill('elustondo129@gmail.com');
+  await page.locator('input[name="password"]').fill('password123');
 
   await Promise.all([
     page.waitForURL(/\/dashboard/, { timeout: 15000 }).catch(() => {}),
@@ -20,8 +21,9 @@ async function loginAsTeacher(page: any) {
 async function loginAsStudent(page: any) {
   await page.goto('/login');
   await page.waitForLoadState('networkidle');
-  await page.getByPlaceholder(/tu@email.com/i).fill('manuel.erazo@estudiante.fup.edu.co');
-  await page.getByPlaceholder(/ingresa tu contraseña/i).fill('estudiante123');
+  // Usar locators directos para los inputs
+  await page.locator('input[name="email"]').fill('manuel.erazo@estudiante.fup.edu.co');
+  await page.locator('input[name="password"]').fill('password123');
 
   await Promise.all([
     page.waitForURL(/\/dashboard/, { timeout: 15000 }).catch(() => {}),
