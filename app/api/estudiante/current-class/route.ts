@@ -129,7 +129,7 @@ export async function GET() {
       date: currentClass.date,
       startTime: currentClass.startTime,
       endTime: currentClass.endTime,
-      qrToken: currentClass.qrToken,
+      hasQrToken: !!currentClass.qrToken,
       attendanceStats: stats,
       totalStudents: subject?.studentIds.length || 0,
       myStatus: statusMap[(currentClass as any).attendances[0]?.status] || 'AUSENTE',

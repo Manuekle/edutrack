@@ -38,6 +38,7 @@ export async function GET(request: Request) {
       { status: 200 }
     );
   } catch (error) {
+    console.error('Error in verify-reset-token:', error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }

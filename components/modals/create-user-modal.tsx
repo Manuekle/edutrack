@@ -45,8 +45,8 @@ interface CreateUserModalProps {
 const createUserSchema = z
   .object({
     name: z.string().min(1, 'El nombre es requerido'),
-    correoPersonal: z.string().email('Correo personal inválido').optional().or(z.literal('')),
-    correoInstitucional: z
+    personalEmail: z.string().email('Correo personal inválido').optional().or(z.literal('')),
+    institutionalEmail: z
       .string()
       .email('Correo institucional inválido')
       .optional()
@@ -54,13 +54,13 @@ const createUserSchema = z
     password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
     role: z.nativeEnum(Role),
     document: z.string().optional(),
-    telefono: z.string().optional(),
+    phone: z.string().optional(),
     studentCode: z.string().optional(),
-    codigoDocente: z.string().optional(),
+    teacherCode: z.string().optional(),
   })
-  .refine(data => data.correoPersonal || data.correoInstitucional, {
+  .refine(data => data.personalEmail || data.institutionalEmail, {
     message: 'Debes proporcionar al menos un correo (personal o institucional)',
-    path: ['correoPersonal'],
+    path: ['personalEmail'],
   });
 
 type CreateUserFormValues = z.infer<typeof createUserSchema>;
@@ -78,14 +78,14 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
     resolver: zodResolver(createUserSchema),
     defaultValues: {
       name: '',
-      correoPersonal: '',
-      correoInstitucional: '',
+      personalEmail: '',
+      institutionalEmail: '',
       password: '',
       role: Role.ESTUDIANTE,
       document: '',
-      telefono: '',
+      phone: '',
       studentCode: '',
-      codigoDocente: '',
+      teacherCode: '',
     },
   });
 
@@ -119,13 +119,15 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...data,
-          correoPersonal: data.correoPersonal || undefined,
-          correoInstitucional: data.correoInstitucional || undefined,
+          name: data.name,
+          password: data.password,
+          role: data.role,
+          personalEmail: data.personalEmail || undefined,
+          institutionalEmail: data.institutionalEmail || undefined,
           document: data.document || undefined,
-          telefono: data.telefono || undefined,
+          phone: data.phone || undefined,
           studentCode: data.studentCode || undefined,
-          codigoDocente: data.codigoDocente || undefined,
+          teacherCode: data.teacherCode || undefined,
         }),
       });
 
@@ -194,7 +196,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="correoPersonal"
+                name="personalEmail"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Correo Personal</FormLabel>
@@ -213,7 +215,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
               />
               <FormField
                 control={form.control}
-                name="correoInstitucional"
+                name="institutionalEmail"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Correo Institucional</FormLabel>
@@ -267,7 +269,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
               />
               <FormField
                 control={form.control}
-                name="telefono"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Teléfono</FormLabel>
@@ -322,7 +324,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
             {role === 'DOCENTE' && (
               <FormField
                 control={form.control}
-                name="codigoDocente"
+                name="teacherCode"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Código de Docente</FormLabel>

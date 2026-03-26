@@ -21,8 +21,11 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { message: 'No se encontró un usuario con ese correo electrónico' },
-        { status: 404 }
+        {
+          message:
+            'Si el correo existe en nuestro sistema, recibirás un enlace para restablecer tu contraseña.',
+        },
+        { status: 200 }
       );
     }
 

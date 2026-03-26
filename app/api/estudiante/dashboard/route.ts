@@ -185,6 +185,7 @@ export async function GET() {
         id: true,
         subjectId: true,
         date: true,
+        startTime: true,
         topic: true,
         status: true,
       },
@@ -329,7 +330,9 @@ export async function GET() {
         code: subjects.find(s => s.id === cls.subjectId)?.code || '',
         teacher: subjects.find(s => s.id === cls.subjectId)?.teachers[0]?.name || 'Docente',
         date: cls.date.toISOString(),
-        startTime: cls.date.toISOString().split('T')[1].substring(0, 5),
+        startTime: cls.startTime
+          ? cls.startTime.toISOString().split('T')[1].substring(0, 5)
+          : cls.date.toISOString().split('T')[1].substring(0, 5),
         description: cls.topic || 'Sesión programada',
         subjectName: subjects.find(s => s.id === cls.subjectId)?.name,
         type: 'INFO',

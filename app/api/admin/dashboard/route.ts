@@ -1,8 +1,15 @@
-import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
+import { db } from '@/lib/prisma';
 import { AttendanceStatus, ClassStatus, Role } from '@prisma/client';
+import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user?.role !== Role.ADMIN) {
+    return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
+  }
+
   try {
     const [
       totalUsers,
@@ -17,30 +24,30 @@ export async function GET() {
       groupsWithStudents,
       classroomData,
     ] = await Promise.all([
-      prisma.user.count({ where: { isActive: true } }),
-      prisma.subject.count(),
-      prisma.group.count(),
-      prisma.class.count(),
-      prisma.report.count(),
+      db.user.count({ where: { isActive: true } }),
+      db.subject.count(),
+      db.group.count(),
+      db.class.count(),
+      db.report.count(),
 
-      prisma.user.groupBy({
+      db.user.groupBy({
         by: ['role'],
         where: { isActive: true },
         _count: { role: true },
       }),
 
-      prisma.attendance.groupBy({
+      db.attendance.groupBy({
         by: ['status'],
         _count: { status: true },
       }),
 
-      prisma.class.groupBy({
+      db.class.groupBy({
         by: ['status'],
         _count: { status: true },
       }),
 
       // Classes in the last 6 months
-      prisma.class.findMany({
+      db.class.findMany({
         where: {
           date: { gte: new Date(new Date().setMonth(new Date().getMonth() - 6)) },
         },
@@ -49,7 +56,7 @@ export async function GET() {
       }),
 
       // Groups with student counts and subject info
-      prisma.group.findMany({
+      db.group.findMany({
         select: {
           studentIds: true,
           subject: { select: { name: true, code: true } },
@@ -58,7 +65,7 @@ export async function GET() {
       }),
 
       // Classroom usage from classes
-      prisma.class.groupBy({
+      db.class.groupBy({
         by: ['classroom'],
         where: { classroom: { not: null } },
         _count: { id: true },
@@ -211,7 +218,5 @@ export async function GET() {
     });
   } catch (error) {
     return NextResponse.json({ error: 'Error al obtener datos del dashboard' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }

@@ -70,7 +70,7 @@ function ResetPasswordContent() {
         }
 
         setIsValidToken(true);
-        setUserEmail(data.correoInstitucional || data.correoPersonal || '');
+        setUserEmail(data.institutionalEmail || data.personalEmail || '');
       } catch (error: unknown) {
         setIsValidToken(false);
         sileo.error({

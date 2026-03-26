@@ -1,5 +1,5 @@
 import { db } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     // Hashear la nueva contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     // Actualizar la contraseña y limpiar el token
     await db.user.update({
@@ -65,6 +65,7 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
+    console.error('Error in reset-password:', error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }

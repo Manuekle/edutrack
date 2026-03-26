@@ -36,6 +36,15 @@ export async function POST(request: Request) {
 
     const { classId, studentId, reason } = validation.data;
 
+    // Solo ADMIN/DOCENTE pueden justificar a otros; ESTUDIANTE solo a sí mismo
+    const userRole = session.user?.role;
+    if (userRole !== 'ADMIN' && userRole !== 'DOCENTE' && session.user?.id !== studentId) {
+      return NextResponse.json(
+        { message: 'No tienes permiso para justificar ausencias de otro estudiante' },
+        { status: 403 }
+      );
+    }
+
     // Verificar que el estudiante existe y está matriculado en la clase
     const classInfo = await db.class.findUnique({
       where: { id: classId },
