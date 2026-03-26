@@ -5,6 +5,21 @@ import bcrypt from 'bcryptjs';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
+function isPlaceholderEmail(email?: string | null) {
+  return typeof email === 'string' && email.endsWith('@placeholder.local');
+}
+
+function formatUserForResponse<
+  T extends { personalEmail?: string | null; institutionalEmail?: string | null },
+>(user: T) {
+  return {
+    ...user,
+    personalEmail: isPlaceholderEmail(user.personalEmail)
+      ? user.institutionalEmail || ''
+      : user.personalEmail,
+  };
+}
+
 // GET: Obtener lista de usuarios con paginación
 export async function GET(req: NextRequest) {
   try {
@@ -68,10 +83,11 @@ export async function GET(req: NextRequest) {
       db.user.count({ where: whereClause }),
     ]);
 
+    const formattedUsers = users.map(user => formatUserForResponse(user));
     const totalPages = Math.ceil(total / pageSize);
 
     return NextResponse.json({
-      data: users,
+      data: formattedUsers,
       pagination: {
         page: pageNumber,
         limit: pageSize,
@@ -104,8 +120,7 @@ export async function POST(req: NextRequest) {
     const document: unknown = body?.document ?? body?.documento;
     const phone: unknown = body?.phone ?? body?.telefono;
     const personalEmailRaw: unknown = body?.personalEmail ?? body?.correoPersonal;
-    const institutionalEmailRaw: unknown =
-      body?.institutionalEmail ?? body?.correoInstitucional;
+    const institutionalEmailRaw: unknown = body?.institutionalEmail ?? body?.correoInstitucional;
     const studentCode: unknown = body?.studentCode ?? body?.codigoEstudiante;
     const teacherCode: unknown = body?.teacherCode ?? body?.codigoDocente;
 
@@ -161,20 +176,17 @@ export async function POST(req: NextRequest) {
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9._-]/g, '');
 
-      const uniqueSuffix =
-        (typeof document === 'string' && document.trim() !== ''
+      const uniqueSuffix = (
+        typeof document === 'string' && document.trim() !== ''
           ? document.trim()
           : Date.now().toString()
-        ).replace(/[^a-zA-Z0-9._-]/g, '');
+      ).replace(/[^a-zA-Z0-9._-]/g, '');
 
       personalEmail = `${localPart || 'usuario'}+${uniqueSuffix}@placeholder.local`.toLowerCase();
     }
 
     console.log('[POST /api/admin/users] personalEmail final:', personalEmail);
-    console.log(
-      '[POST /api/admin/users] institutionalEmail final:',
-      institutionalEmail
-    );
+    console.log('[POST /api/admin/users] institutionalEmail final:', institutionalEmail);
 
     // Verificar duplicados en ambos campos
     const emailsToCheck = [personalEmail, institutionalEmail].filter(Boolean) as string[];
@@ -197,9 +209,7 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         {
-          message: `Uno de los correos ya está en uso por '${
-            existingUser.name ?? 'usuario'
-          }'.`,
+          message: `Uno de los correos ya está en uso por '${existingUser.name ?? 'usuario'}'.`,
         },
         { status: 409 }
       );
@@ -220,13 +230,22 @@ export async function POST(req: NextRequest) {
         teacherCode: sanitize(teacherCode),
         isActive: true,
       },
+      select: {
+        id: true,
+        name: true,
+        personalEmail: true,
+        institutionalEmail: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        document: true,
+        phone: true,
+        studentCode: true,
+        teacherCode: true,
+      },
     });
 
-    // No devolver la contraseña hasheada
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...userWithoutPassword } = newUser;
-
-    return NextResponse.json(userWithoutPassword, { status: 201 });
+    return NextResponse.json(formatUserForResponse(newUser), { status: 201 });
   } catch (error) {
     console.error('[POST /api/admin/users] Error al crear usuario:', error);
 
@@ -235,10 +254,7 @@ export async function POST(req: NextRequest) {
       'code' in error &&
       (error as { code?: unknown }).code === 'P2002'
     ) {
-      return NextResponse.json(
-        { message: 'Uno de los correos ya está en uso.' },
-        { status: 409 }
-      );
+      return NextResponse.json({ message: 'Uno de los correos ya está en uso.' }, { status: 409 });
     }
 
     if (error instanceof Prisma.PrismaClientValidationError) {
