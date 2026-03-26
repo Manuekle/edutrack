@@ -98,26 +98,40 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const {
-      name,
-      password,
-      role,
-      document,
-      phone,
-      personalEmail,
-      institutionalEmail,
-      studentCode,
-      teacherCode,
-    } = body;
+    const name: unknown = body?.name;
+    const password: unknown = body?.password;
+    const role: unknown = body?.role;
+    // Compatibilidad con payload legado/espanol
+    const document: unknown = body?.document ?? body?.documento;
+    const phone: unknown = body?.phone ?? body?.telefono;
+    const personalEmail: unknown = body?.personalEmail ?? body?.correoPersonal;
+    const institutionalEmail: unknown =
+      body?.institutionalEmail ?? body?.correoInstitucional;
+    const studentCode: unknown = body?.studentCode ?? body?.codigoEstudiante;
+    const teacherCode: unknown = body?.teacherCode ?? body?.codigoDocente;
 
-    if (!name || !password || !role) {
+    if (typeof name !== 'string' || name.trim() === '') {
+      return NextResponse.json({ message: 'Falta el campo requerido: nombre.' }, { status: 400 });
+    }
+
+    if (typeof password !== 'string' || password.trim() === '') {
       return NextResponse.json(
-        { message: 'Faltan campos requeridos: nombre, contraseña y rol.' },
+        { message: 'Falta el campo requerido: contraseña.' },
         { status: 400 }
       );
     }
 
-    if (!personalEmail && !institutionalEmail) {
+    if (typeof role !== 'string' || !Object.values(Role).includes(role as Role)) {
+      return NextResponse.json(
+        { message: 'Rol inválido. Debe ser ADMIN, DOCENTE o ESTUDIANTE.' },
+        { status: 400 }
+      );
+    }
+
+    if (
+      (typeof personalEmail !== 'string' || personalEmail.trim() === '') &&
+      (typeof institutionalEmail !== 'string' || institutionalEmail.trim() === '')
+    ) {
       return NextResponse.json(
         {
           message:
@@ -128,9 +142,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Verificar unicidad de los correos
-    const orConditions = [];
-    if (personalEmail) orConditions.push({ personalEmail });
-    if (institutionalEmail) orConditions.push({ institutionalEmail });
+    const orConditions: Prisma.UserWhereInput[] = [];
+    if (typeof personalEmail === 'string' && personalEmail.trim() !== '') {
+      orConditions.push({ personalEmail: personalEmail.trim() });
+    }
+    if (typeof institutionalEmail === 'string' && institutionalEmail.trim() !== '') {
+      orConditions.push({ institutionalEmail: institutionalEmail.trim() });
+    }
 
     if (orConditions.length > 0) {
       const existingUser = await db.user.findFirst({
@@ -146,18 +164,21 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const sanitize = (val: string | undefined | null): string | undefined =>
+      val && val.trim() !== '' ? val.trim() : undefined;
 
     const newUser = await db.user.create({
       data: {
-        name,
+        name: name.trim(),
         password: hashedPassword,
-        role,
-        document,
-        phone,
-        personalEmail,
-        institutionalEmail,
-        studentCode,
-        teacherCode,
+        role: role as Role,
+        document: typeof document === 'string' ? sanitize(document) : undefined,
+        phone: typeof phone === 'string' ? sanitize(phone) : undefined,
+        personalEmail: typeof personalEmail === 'string' ? sanitize(personalEmail) : undefined,
+        institutionalEmail:
+          typeof institutionalEmail === 'string' ? sanitize(institutionalEmail) : undefined,
+        studentCode: typeof studentCode === 'string' ? sanitize(studentCode) : undefined,
+        teacherCode: typeof teacherCode === 'string' ? sanitize(teacherCode) : undefined,
         isActive: true,
       },
     });
@@ -168,6 +189,46 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error) {
+    console.error('[POST /api/admin/users] Error al crear usuario:', error);
+
+    if (
+      error instanceof Error &&
+      'code' in error &&
+      (error as { code: unknown }).code === 'P2002'
+    ) {
+      const meta = (error as { meta?: { target?: unknown } }).meta;
+      const target = meta?.target;
+      const field = Array.isArray(target)
+        ? target.join(', ')
+        : typeof target === 'string'
+          ? target
+          : 'campo';
+      return NextResponse.json(
+        { message: `El valor del campo '${field}' ya está en uso.` },
+        { status: 409 }
+      );
+    }
+
+    if (error instanceof Prisma.PrismaClientValidationError) {
+      return NextResponse.json(
+        { message: 'Datos inválidos para crear el usuario.' },
+        { status: 400 }
+      );
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      return NextResponse.json(
+        {
+          message: 'Error interno del servidor',
+          debug:
+            error instanceof Error
+              ? { name: error.name, message: error.message }
+              : { value: String(error) },
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
