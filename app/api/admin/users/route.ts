@@ -20,9 +20,8 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || '';
 
-    // Validar parámetros de paginación
     const pageNumber = Math.max(1, page);
-    const pageSize = Math.min(Math.max(1, limit), 100); // Máximo 100 items por página
+    const pageSize = Math.min(Math.max(1, limit), 100);
     const skip = (pageNumber - 1) * pageSize;
 
     const whereClause: Prisma.UserWhereInput = {};
@@ -35,7 +34,6 @@ export async function GET(req: NextRequest) {
       whereClause.isActive = isActiveParam === 'true';
     }
 
-    // Agregar búsqueda si existe
     if (search) {
       whereClause.OR = [
         { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
@@ -45,7 +43,6 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    // Obtener usuarios con paginación
     const [users, total] = await Promise.all([
       db.user.findMany({
         where: whereClause,
@@ -85,6 +82,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
+    console.error('[GET /api/admin/users] Error:', error);
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -98,17 +96,30 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+
     const name: unknown = body?.name;
     const password: unknown = body?.password;
     const role: unknown = body?.role;
-    // Compatibilidad con payload legado/espanol
+
     const document: unknown = body?.document ?? body?.documento;
     const phone: unknown = body?.phone ?? body?.telefono;
-    const personalEmail: unknown = body?.personalEmail ?? body?.correoPersonal;
-    const institutionalEmail: unknown =
+    const personalEmailRaw: unknown = body?.personalEmail ?? body?.correoPersonal;
+    const institutionalEmailRaw: unknown =
       body?.institutionalEmail ?? body?.correoInstitucional;
     const studentCode: unknown = body?.studentCode ?? body?.codigoEstudiante;
     const teacherCode: unknown = body?.teacherCode ?? body?.codigoDocente;
+
+    const normalizeEmail = (val: unknown): string | undefined => {
+      if (typeof val !== 'string') return undefined;
+      const clean = val.trim().toLowerCase();
+      return clean === '' ? undefined : clean;
+    };
+
+    const sanitize = (val: unknown): string | undefined => {
+      if (typeof val !== 'string') return undefined;
+      const clean = val.trim();
+      return clean === '' ? undefined : clean;
+    };
 
     if (typeof name !== 'string' || name.trim() === '') {
       return NextResponse.json({ message: 'Falta el campo requerido: nombre.' }, { status: 400 });
@@ -128,10 +139,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (
-      (typeof personalEmail !== 'string' || personalEmail.trim() === '') &&
-      (typeof institutionalEmail !== 'string' || institutionalEmail.trim() === '')
-    ) {
+    let personalEmail = normalizeEmail(personalEmailRaw);
+    const institutionalEmail = normalizeEmail(institutionalEmailRaw);
+
+    if (!personalEmail && !institutionalEmail) {
       return NextResponse.json(
         {
           message:
@@ -141,44 +152,72 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificar unicidad de los correos
-    const orConditions: Prisma.UserWhereInput[] = [];
-    if (typeof personalEmail === 'string' && personalEmail.trim() !== '') {
-      orConditions.push({ personalEmail: personalEmail.trim() });
-    }
-    if (typeof institutionalEmail === 'string' && institutionalEmail.trim() !== '') {
-      orConditions.push({ institutionalEmail: institutionalEmail.trim() });
+    // Si no envían correo personal, generar uno placeholder único
+    if (!personalEmail) {
+      const baseSource = institutionalEmail ?? String(name).trim().toLowerCase();
+      const localPart = baseSource
+        .split('@')[0]
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9._-]/g, '');
+
+      const uniqueSuffix =
+        (typeof document === 'string' && document.trim() !== ''
+          ? document.trim()
+          : Date.now().toString()
+        ).replace(/[^a-zA-Z0-9._-]/g, '');
+
+      personalEmail = `${localPart || 'usuario'}+${uniqueSuffix}@placeholder.local`.toLowerCase();
     }
 
-    if (orConditions.length > 0) {
-      const existingUser = await db.user.findFirst({
-        where: { OR: orConditions },
-      });
+    console.log('[POST /api/admin/users] personalEmail final:', personalEmail);
+    console.log(
+      '[POST /api/admin/users] institutionalEmail final:',
+      institutionalEmail
+    );
 
-      if (existingUser) {
-        return NextResponse.json(
-          { message: 'Uno de los correos electrónicos ya está en uso.' },
-          { status: 409 }
-        );
-      }
+    // Verificar duplicados en ambos campos
+    const emailsToCheck = [personalEmail, institutionalEmail].filter(Boolean) as string[];
+
+    const existingUser = await db.user.findFirst({
+      where: {
+        OR: [
+          { personalEmail: { in: emailsToCheck } },
+          { institutionalEmail: { in: emailsToCheck } },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        personalEmail: true,
+        institutionalEmail: true,
+      },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        {
+          message: `Uno de los correos ya está en uso por '${
+            existingUser.name ?? 'usuario'
+          }'.`,
+        },
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const sanitize = (val: string | undefined | null): string | undefined =>
-      val && val.trim() !== '' ? val.trim() : undefined;
 
     const newUser = await db.user.create({
       data: {
         name: name.trim(),
         password: hashedPassword,
         role: role as Role,
-        document: typeof document === 'string' ? sanitize(document) : undefined,
-        phone: typeof phone === 'string' ? sanitize(phone) : undefined,
-        personalEmail: typeof personalEmail === 'string' ? sanitize(personalEmail) : undefined,
-        institutionalEmail:
-          typeof institutionalEmail === 'string' ? sanitize(institutionalEmail) : undefined,
-        studentCode: typeof studentCode === 'string' ? sanitize(studentCode) : undefined,
-        teacherCode: typeof teacherCode === 'string' ? sanitize(teacherCode) : undefined,
+        document: sanitize(document),
+        phone: sanitize(phone),
+        personalEmail,
+        institutionalEmail: institutionalEmail ?? undefined,
+        studentCode: sanitize(studentCode),
+        teacherCode: sanitize(teacherCode),
         isActive: true,
       },
     });
@@ -194,17 +233,10 @@ export async function POST(req: NextRequest) {
     if (
       error instanceof Error &&
       'code' in error &&
-      (error as { code: unknown }).code === 'P2002'
+      (error as { code?: unknown }).code === 'P2002'
     ) {
-      const meta = (error as { meta?: { target?: unknown } }).meta;
-      const target = meta?.target;
-      const field = Array.isArray(target)
-        ? target.join(', ')
-        : typeof target === 'string'
-          ? target
-          : 'campo';
       return NextResponse.json(
-        { message: `El valor del campo '${field}' ya está en uso.` },
+        { message: 'Uno de los correos ya está en uso.' },
         { status: 409 }
       );
     }
@@ -213,19 +245,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { message: 'Datos inválidos para crear el usuario.' },
         { status: 400 }
-      );
-    }
-
-    if (process.env.NODE_ENV !== 'production') {
-      return NextResponse.json(
-        {
-          message: 'Error interno del servidor',
-          debug:
-            error instanceof Error
-              ? { name: error.name, message: error.message }
-              : { value: String(error) },
-        },
-        { status: 500 }
       );
     }
 
