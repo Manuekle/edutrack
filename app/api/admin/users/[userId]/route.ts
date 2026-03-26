@@ -18,6 +18,7 @@ export async function PATCH(
 
     const { userId } = await params;
     const body = await request.json();
+
     const {
       name,
       role,
@@ -30,31 +31,61 @@ export async function PATCH(
       teacherCode,
     } = body;
 
+    const normalizeEmail = (val?: string | null) => {
+      if (typeof val !== 'string') return undefined;
+      const clean = val.trim().toLowerCase();
+      return clean === '' ? undefined : clean;
+    };
+
+    const sanitize = (val?: string | null) => {
+      if (typeof val !== 'string') return undefined;
+      const clean = val.trim();
+      return clean === '' ? undefined : clean;
+    };
+
+    const normalizedPersonalEmail = normalizeEmail(personalEmail);
+    const normalizedInstitutionalEmail = normalizeEmail(institutionalEmail);
+
+    console.log('[PATCH /api/admin/users/[userId]] emails:', {
+      userId,
+      personalEmail,
+      normalizedPersonalEmail,
+      institutionalEmail,
+      normalizedInstitutionalEmail,
+    });
+
     // Validar que al menos un correo esté presente solo si se envían campos de correo
     const sendingEmails = 'personalEmail' in body || 'institutionalEmail' in body;
-    if (
-      sendingEmails &&
-      (body.personalEmail === '' || body.personalEmail == null) &&
-      (body.institutionalEmail === '' || body.institutionalEmail == null)
-    ) {
+
+    if (sendingEmails && !normalizedPersonalEmail && !normalizedInstitutionalEmail) {
       return NextResponse.json(
         { message: 'El usuario debe tener al menos un correo electrónico.' },
         { status: 400 }
       );
     }
 
-    // Verificar unicidad de los correos si se proporcionan
-    const orConditions = [];
-    if (personalEmail) orConditions.push({ personalEmail });
-    if (institutionalEmail) orConditions.push({ institutionalEmail });
+    // Verificar unicidad cruzada de los correos si se proporcionan
+    const emailsToCheck = [normalizedPersonalEmail, normalizedInstitutionalEmail].filter(
+      Boolean
+    ) as string[];
 
-    if (orConditions.length > 0) {
+    if (emailsToCheck.length > 0) {
       const existingUser = await db.user.findFirst({
         where: {
           id: { not: userId },
-          OR: orConditions,
+          OR: [
+            { personalEmail: { in: emailsToCheck } },
+            { institutionalEmail: { in: emailsToCheck } },
+          ],
+        },
+        select: {
+          id: true,
+          name: true,
+          personalEmail: true,
+          institutionalEmail: true,
         },
       });
+
       if (existingUser) {
         return NextResponse.json(
           { message: 'Uno de los correos electrónicos ya está en uso.' },
@@ -64,15 +95,28 @@ export async function PATCH(
     }
 
     const updateData: Record<string, unknown> = {};
-    if (name !== undefined) updateData.name = name;
+
+    if (name !== undefined) updateData.name = sanitize(name) ?? name;
     if (role !== undefined) updateData.role = role;
     if (isActive !== undefined) updateData.isActive = isActive;
-    if (document !== undefined) updateData.document = document;
-    if (phone !== undefined) updateData.phone = phone;
-    if (personalEmail !== undefined) updateData.personalEmail = personalEmail;
-    if (institutionalEmail !== undefined) updateData.institutionalEmail = institutionalEmail;
-    if (studentCode !== undefined) updateData.studentCode = studentCode;
-    if (teacherCode !== undefined) updateData.teacherCode = teacherCode;
+    if (document !== undefined) updateData.document = sanitize(document);
+    if (phone !== undefined) updateData.phone = sanitize(phone);
+
+    if (personalEmail !== undefined) {
+      updateData.personalEmail = normalizedPersonalEmail;
+    }
+
+    if (institutionalEmail !== undefined) {
+      updateData.institutionalEmail = normalizedInstitutionalEmail;
+    }
+
+    if (studentCode !== undefined) {
+      updateData.studentCode = sanitize(studentCode);
+    }
+
+    if (teacherCode !== undefined) {
+      updateData.teacherCode = sanitize(teacherCode);
+    }
 
     const updatedUser = await db.user.update({
       where: { id: userId },
@@ -83,6 +127,17 @@ export async function PATCH(
     const { password: _, ...userWithoutPassword } = updatedUser;
     return NextResponse.json(userWithoutPassword);
   } catch (error) {
+    console.error('[PATCH /api/admin/users/[userId]] Error:', error);
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return NextResponse.json(
+          { message: 'Uno de los correos electrónicos ya está en uso.' },
+          { status: 409 }
+        );
+      }
+    }
+
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
@@ -121,6 +176,7 @@ export async function DELETE(
         );
       }
     }
+
     return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
   }
 }
