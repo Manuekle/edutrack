@@ -1,6 +1,16 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -54,6 +64,7 @@ export function BulkEnrollmentUpload({
   const [matchedRows, setMatchedRows] = useState<MatchedRow[]>([]);
   const [processing, setProcessing] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const roleLabel = role === 'DOCENTE' ? 'docentes' : 'estudiantes';
   const isEstudiante = role === 'ESTUDIANTE';
@@ -407,7 +418,7 @@ export function BulkEnrollmentUpload({
               {notFoundCount > 0 && ` \u00b7 ${notFoundCount} sin datos`}
             </span>
             <Button
-              onClick={handleConfirm}
+              onClick={() => setShowConfirmDialog(true)}
               disabled={actionableCount === 0 || confirming}
               size="default"
               className="text-xs px-5"
@@ -426,6 +437,35 @@ export function BulkEnrollmentUpload({
                   : `Asignar ${actionableCount} ${roleLabel}`}
             </Button>
           </div>
+
+          <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Confirmar asignación masiva?</AlertDialogTitle>
+                <AlertDialogDescription className="space-y-1">
+                  {createCount > 0 && (
+                    <span className="block">
+                      Se crearán <strong>{createCount}</strong> usuario{createCount !== 1 ? 's' : ''} nuevo{createCount !== 1 ? 's' : ''} en el sistema.
+                    </span>
+                  )}
+                  <span className="block">
+                    Se asignarán <strong>{actionableCount}</strong> {roleLabel} al grupo. Esta acción no se puede deshacer fácilmente.
+                  </span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setShowConfirmDialog(false);
+                    handleConfirm();
+                  }}
+                >
+                  Confirmar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </div>

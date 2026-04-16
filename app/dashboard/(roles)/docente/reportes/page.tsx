@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingPage } from '@/components/ui/loading';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -139,7 +139,41 @@ export default function ReportsPage() {
   };
 
   if (isLoading) {
-    return <LoadingPage />;
+    return (
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-40 rounded-lg" />
+          <Skeleton className="h-4 w-96 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl overflow-hidden">
+              <CardHeader className="pb-3 bg-muted/10">
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-5 w-20 rounded-md" />
+                    <Skeleton className="h-5 w-12 rounded-md" />
+                  </div>
+                  <Skeleton className="h-4 w-3/4 rounded" />
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-3.5 w-32 rounded" />
+                    <Skeleton className="h-3 w-16 rounded ml-4" />
+                  </div>
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </div>
+                <div className="pt-2 border-t border-border/40 flex justify-end">
+                  <Skeleton className="h-8 w-28 rounded-xl" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -183,9 +217,9 @@ export default function ReportsPage() {
           reports.map(report => (
             <Card
               key={report.id}
-              className="hover:shadow-md transition-all duration-300 border-border/50 group overflow-hidden"
+              className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl group overflow-hidden transition-colors hover:bg-muted/30"
             >
-              <CardHeader className="pb-3 bg-muted/5 group-hover:bg-muted/10 transition-colors">
+              <CardHeader className="pb-3 bg-muted/10 group-hover:bg-muted/20 transition-colors">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">

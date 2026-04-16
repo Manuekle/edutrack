@@ -1,6 +1,16 @@
 'use client';
 
 import { SubjectFileUpload } from '@/components/subject-file-upload';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,6 +53,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [previewData, setPreviewData] = useState<UserPreview[]>([]);
   const [finalResults, setFinalResults] = useState<{ created: number; alreadyExisted: number } | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handlePreview = async () => {
     if (!file) return;
@@ -327,7 +338,7 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                   </span>
                 </div>
                 <Button
-                  onClick={handleConfirmUpload}
+                  onClick={() => setShowConfirmDialog(true)}
                   disabled={isUploading || validCount === 0}
                   className=" px-6 text-xs min-w-[150px]"
                 >
@@ -340,6 +351,32 @@ export function CargarUsuarioTab({ type: role }: CargarUsuarioTabProps) {
                     'Confirmar y Crear'
                   )}
                 </Button>
+
+                <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>¿Confirmar creación masiva?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Se crearán <strong>{validCount}</strong> usuario{validCount !== 1 ? 's' : ''} nuevo{validCount !== 1 ? 's' : ''} en el sistema.
+                        {warningCount > 0 && (
+                          <> {warningCount} ya exist{warningCount !== 1 ? 'en' : 'e'} y se omitirán.</>
+                        )}{' '}
+                        Esta acción no se puede deshacer fácilmente.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          setShowConfirmDialog(false);
+                          handleConfirmUpload();
+                        }}
+                      >
+                        Confirmar y Crear
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )}
           </CardContent>

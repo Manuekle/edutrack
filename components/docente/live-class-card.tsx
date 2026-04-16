@@ -1,11 +1,15 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LiveClassData } from '@/services/dashboardService';
+import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface LiveClassCardProps {
   liveClass: LiveClassData;
 }
 
 export function LiveClassCard({ liveClass }: LiveClassCardProps) {
+  const router = useRouter();
   return (
     <Card className="mb-8 border-0 shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.15)] bg-card rounded-3xl overflow-hidden relative">
       <div className="absolute top-0 left-0 w-1.5 h-full bg-red-500/80 animate-pulse"></div>
@@ -79,12 +83,23 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
                 </div>
               </div>
             </div>
-            <p className="text-[11px] font-medium text-muted-foreground text-right uppercase tracking-card">
-              Total matriculados:{' '}
-              <span className="font-semibold text-foreground mx-1 text-xs">
-                {liveClass.totalStudents}
-              </span>
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-card">
+                Total matriculados:{' '}
+                <span className="font-semibold text-foreground mx-1 text-xs">
+                  {liveClass.totalStudents}
+                </span>
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-3 rounded-xl shadow-none border-transparent bg-muted/60 hover:bg-muted transition-colors gap-1.5 text-xs font-semibold"
+                onClick={() => router.push('/dashboard/docente/grupos')}
+              >
+                Ir a mis grupos
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

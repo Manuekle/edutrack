@@ -1,7 +1,7 @@
 'use client';
 
 import { CalendarEvent, CustomCalendar } from '@/components/calendar/custom-calendar';
-import { LoadingPage } from '@/components/ui/loading';
+import { Skeleton } from '@/components/ui/skeleton';
 import { addDays, addMonths, eachDayOfInterval, endOfMonth, startOfMonth, startOfWeek, subDays, subMonths } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -114,7 +114,48 @@ export default function MiHorarioPage() {
       </div>
 
       {loading ? (
-        <LoadingPage />
+        <div className="space-y-4">
+          {/* Calendar nav skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-9 rounded-xl" />
+              <Skeleton className="h-9 w-9 rounded-xl" />
+              <Skeleton className="h-9 w-20 rounded-xl" />
+            </div>
+            <Skeleton className="h-6 w-40 rounded-lg" />
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-16 rounded-xl" />
+              <Skeleton className="h-9 w-16 rounded-xl" />
+              <Skeleton className="h-9 w-16 rounded-xl" />
+            </div>
+          </div>
+          {/* Calendar grid skeleton */}
+          <div className="rounded-3xl bg-muted/20 dark:bg-white/[0.02] overflow-hidden">
+            {/* Header row */}
+            <div className="grid grid-cols-7 border-b border-border/30">
+              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
+                <div key={d} className="py-3 flex justify-center">
+                  <Skeleton className="h-4 w-8 rounded" />
+                </div>
+              ))}
+            </div>
+            {/* Time slots */}
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(row => (
+              <div key={row} className="grid grid-cols-7 border-b border-border/20 min-h-[56px]">
+                {[1, 2, 3, 4, 5, 6, 7].map(col => (
+                  <div key={col} className="border-r border-border/20 p-1">
+                    {row === 3 && col === 2 && (
+                      <Skeleton className="h-10 w-full rounded-lg" />
+                    )}
+                    {row === 5 && col === 4 && (
+                      <Skeleton className="h-10 w-full rounded-lg" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       ) : horarios.length === 0 ? (
         <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
           <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { sileo } from 'sileo';
 import { CHART_COLORS } from '@/lib/chart-colors';
 import {
   AlertTriangle,
@@ -106,7 +107,7 @@ const areaStroke = (p: number) =>
   p >= 80
     ? CHART_COLORS.attendance.present
     : p >= 75
-      ? '#f59e0b'
+      ? 'hsl(38 92% 50%)'
       : 'hsl(var(--destructive))';
 
 // ─── Sparkline tooltip ────────────────────────────────────────────────────────
@@ -724,8 +725,18 @@ export function TeacherReport() {
     }
     setLoadingGrupos(true);
     fetch(`/api/admin/docentes/${selectedTeacher.id}/grupos`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`Error ${r.status}`);
+        return r.json();
+      })
       .then(d => setDocenteGrupos(d.grupos ?? []))
+      .catch(() => {
+        sileo.error({
+          title: 'Error',
+          description: 'No se pudieron cargar los grupos del docente.',
+        });
+        setDocenteGrupos([]);
+      })
       .finally(() => setLoadingGrupos(false));
   }, [selectedTeacher]);
 

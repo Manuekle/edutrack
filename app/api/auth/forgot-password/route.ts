@@ -67,10 +67,7 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json(
-        {
-          message: 'Error al enviar el correo de restablecimiento',
-          detail: error instanceof Error ? error.message : String(error),
-        },
+        { message: 'Error al enviar el correo de restablecimiento. Por favor, intenta de nuevo.' },
         { status: 500 }
       );
     }
@@ -87,7 +84,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message: 'Error interno del servidor',
-        debug: process.env.NODE_ENV === 'development' ? String(error) : undefined,
       },
       { status: 500 }
     );

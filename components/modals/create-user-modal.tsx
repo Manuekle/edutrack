@@ -133,7 +133,13 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || errorData.error || 'No se pudo crear el usuario.');
+        const msg: string = errorData.message || errorData.error || 'No se pudo crear el usuario.';
+        if (response.status === 409) {
+          form.setError('personalEmail', { message: msg });
+          form.setError('institutionalEmail', { message: msg });
+          return;
+        }
+        throw new Error(msg);
       }
 
       const responseData = await response.json();

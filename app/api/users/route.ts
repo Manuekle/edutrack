@@ -107,7 +107,14 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const data = UserCreateSchema.parse(body);
+    const parsed = UserCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: 'Datos de entrada inválidos', errors: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+    const data = parsed.data;
 
     // Verificar si ya existe un usuario con el mismo correo institucional o personal
     const existingUser = await db.user.findFirst({
@@ -202,7 +209,14 @@ export async function PUT(req: NextRequest) {
       );
     }
     const body = await req.json();
-    const data = UserUpdateSchema.parse({ ...body, id: userId });
+    const parsedUpdate = UserUpdateSchema.safeParse({ ...body, id: userId });
+    if (!parsedUpdate.success) {
+      return NextResponse.json(
+        { message: 'Datos de entrada inválidos', errors: parsedUpdate.error.issues },
+        { status: 400 }
+      );
+    }
+    const data = parsedUpdate.data;
     const updateData: {
       name?: string;
       institutionalEmail?: string;

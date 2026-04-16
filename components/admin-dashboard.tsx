@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingPage } from '@/components/ui/loading';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CHART_COLORS } from '@/lib/chart-colors';
 import {
   AlertCircle,
@@ -91,7 +91,39 @@ const AdminDashboardComponent = () => {
     })();
   }, []);
 
-  if (loading) return <LoadingPage />;
+  if (loading) {
+    return (
+      <div className="space-y-6 pb-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-8 w-44" />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 rounded-xl" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="rounded-2xl border-border/50">
+              <CardContent className="pt-6 pb-5 px-5">
+                <Skeleton className="h-4 w-24 mb-3" />
+                <Skeleton className="h-8 w-16 mb-1" />
+                <Skeleton className="h-3 w-32" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-64 rounded-2xl" />
+          <Skeleton className="h-64 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
 
   if (error || !data) {
     return (

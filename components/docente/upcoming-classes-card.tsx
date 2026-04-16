@@ -1,8 +1,8 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Calendar } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 interface UpcomingClass {
   id: string;
@@ -17,22 +17,36 @@ interface UpcomingClass {
 
 interface UpcomingClassesCardProps {
   classes: UpcomingClass[];
+  isLoading?: boolean;
 }
 
-export function UpcomingClassesCard({ classes }: UpcomingClassesCardProps) {
-  const router = useRouter();
+export function UpcomingClassesCard({ classes, isLoading = false }: UpcomingClassesCardProps) {
 
   return (
     <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-lg text-xs font-semibold tracking-card text-foreground">
+          <CardTitle className="sm:text-lg text-sm font-semibold tracking-card text-foreground">
             Próximas Clases
           </CardTitle>
         </div>
       </CardHeader>
       <CardContent className="px-6 pb-6">
-        {classes.length > 0 ? (
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="rounded-2xl bg-muted/40 p-4 space-y-2">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-3 w-1/2" />
+                <div className="flex items-center gap-2 pt-0.5">
+                  <Skeleton className="h-3 w-3 rounded-full" />
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : classes.length > 0 ? (
           <div className="space-y-3">
             {classes.slice(0, 3).map(cls => (
               <div

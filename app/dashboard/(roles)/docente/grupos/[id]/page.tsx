@@ -10,7 +10,7 @@ import { GenerateReportModal } from '@/components/subjects/generate-report-modal
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { CardDescription } from '@/components/ui/card';
-import { LoadingPage } from '@/components/ui/loading';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useClassManagement } from '@/hooks/use-class-management';
 import { useSubjectDetail } from '@/hooks/use-subject-detail';
 import { toTableClass } from '@/lib/class-converters';
@@ -100,7 +100,56 @@ export default function GrupoDetailPage() {
   const isLoading = isLoadingSubject || isLoadingClasses || isLoadingStudents;
 
   if (isLoading) {
-    return <LoadingPage />;
+    return (
+      <div className="space-y-6">
+        {/* Header skeleton */}
+        <div className="pb-6 space-y-3">
+          <div className="flex sm:flex-row flex-col sm:items-center items-start gap-4 justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-64 rounded-lg" />
+              <Skeleton className="h-4 w-80 rounded-lg" />
+            </div>
+            <div className="flex gap-3">
+              <Skeleton className="h-10 w-44 rounded-xl" />
+              <Skeleton className="h-10 w-28 rounded-xl" />
+              <Skeleton className="h-10 w-36 rounded-xl" />
+            </div>
+          </div>
+        </div>
+        {/* Info banner skeleton */}
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        {/* Students table skeleton */}
+        <div className="space-y-3">
+          <Skeleton className="h-6 w-36 rounded-lg" />
+          <div className="rounded-2xl bg-muted/20 overflow-hidden">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-border/20">
+                <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-4 w-48 rounded" />
+                  <Skeleton className="h-3 w-32 rounded" />
+                </div>
+                <Skeleton className="h-6 w-20 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Classes table skeleton */}
+        <div className="space-y-3">
+          <Skeleton className="h-6 w-28 rounded-lg" />
+          <div className="rounded-2xl bg-muted/20 overflow-hidden">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-border/20">
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-4 flex-1 rounded" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-8 w-28 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -138,7 +187,7 @@ export default function GrupoDetailPage() {
             <h1 className="sm:text-2xl text-xl font-semibold tracking-card text-foreground">
               {subject?.name}
             </h1>
-            <CardDescription className="text-xs dark:text-gray-300">
+            <CardDescription className="text-xs text-muted-foreground">
               Gestiona estudiantes y <strong>planea los temas de tus clases</strong> en la bitácora.
             </CardDescription>
           </div>

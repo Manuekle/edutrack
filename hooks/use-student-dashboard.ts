@@ -95,28 +95,30 @@ export function useStudentDashboard() {
     queryFn: async () => {
       const response = await fetch('/api/estudiante/dashboard');
       if (!response.ok) {
+        if (response.status === 401) throw new Error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+        if (response.status === 403) throw new Error('No tienes permiso para ver este contenido.');
+        if (response.status >= 500) throw new Error('El servidor no está disponible. Intenta más tarde.');
         throw new Error('Error al cargar los datos del dashboard');
       }
       return response.json();
     },
-    staleTime: 5 * 60 * 1000, // 5 minutos (aligned with server cache)
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
     retry: 1,
   });
 
-  // Live class query - refreshes every 2 minutes
-  // React Query will handle caching and only refetch when data is stale
   const liveClassQuery = useQuery<LiveClassResponse>({
     queryKey: ['student-live-class'],
     queryFn: async () => {
       const response = await fetch('/api/estudiante/current-class');
       if (!response.ok) {
+        if (response.status >= 500) throw new Error('Error del servidor al cargar la clase en vivo.');
         throw new Error('Error al cargar la clase en vivo');
       }
       return response.json();
     },
-    staleTime: 30 * 1000, // 30 segundos - data is considered stale after 30s
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    staleTime: 30 * 1000,
+    refetchInterval: 2 * 60 * 1000,
     retry: 1,
   });
 

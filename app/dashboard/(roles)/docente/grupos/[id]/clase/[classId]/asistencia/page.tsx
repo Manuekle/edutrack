@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { LoadingPage } from '@/components/ui/loading';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -265,7 +265,44 @@ export default function AttendancePage() {
     return () => clearTimeout(timer);
   }, [classEndDate, groupId, router]);
 
-  if (isLoading) return <LoadingPage />;
+  if (isLoading) return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-56 rounded-lg" />
+          <Skeleton className="h-4 w-80 rounded-lg" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-28 rounded-xl" />
+          <Skeleton className="h-9 w-28 rounded-xl" />
+        </div>
+      </div>
+      {/* Stats row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="rounded-2xl bg-muted/30 p-4 space-y-2">
+            <Skeleton className="h-3 w-16 rounded" />
+            <Skeleton className="h-8 w-12 rounded-lg" />
+          </div>
+        ))}
+      </div>
+      {/* Student list skeleton */}
+      <div className="rounded-2xl bg-muted/20 overflow-hidden">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+          <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-border/20">
+            <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+            <div className="flex-1 space-y-1.5">
+              <Skeleton className="h-4 w-40 rounded" />
+              <Skeleton className="h-3 w-28 rounded" />
+            </div>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4].map(j => <Skeleton key={j} className="h-8 w-8 rounded-lg" />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (isTooEarly || isPast || isCompleted) {
     const message = isTooEarly

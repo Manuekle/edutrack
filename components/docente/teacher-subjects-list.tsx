@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 
 interface SubjectStats {
@@ -14,22 +15,44 @@ interface SubjectStats {
 
 interface TeacherSubjectsListProps {
   subjects: SubjectStats[];
+  isLoading?: boolean;
 }
 
-export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
+export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubjectsListProps) {
   const router = useRouter();
 
   return (
     <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-lg text-xs font-semibold tracking-card text-foreground">
+          <CardTitle className="sm:text-lg text-sm font-semibold tracking-card text-foreground">
             Mis Asignaturas
           </CardTitle>
         </div>
       </CardHeader>
       <CardContent className="px-6 pb-6">
-        {subjects.length > 0 ? (
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="rounded-2xl bg-muted/40 p-4 space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/3" />
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex justify-between">
+                        <Skeleton className="h-2.5 w-24" />
+                        <Skeleton className="h-2.5 w-10" />
+                      </div>
+                      <Skeleton className="h-1.5 w-full rounded-full" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-16 w-16 rounded-xl shrink-0" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : subjects.length > 0 ? (
           <div className="space-y-3">
             {subjects.slice(0, 3).map(subject => {
               const progress =
@@ -40,8 +63,15 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
                 <div
                   role="button"
                   tabIndex={0}
-                  key={subject.id}
-                  className="group relative rounded-2xl border-0 transition-all duration-300 bg-muted/40 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  key={subject.groupId}
+                  onClick={() => router.push(`/dashboard/docente/grupos/${subject.groupId}`)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      router.push(`/dashboard/docente/grupos/${subject.groupId}`);
+                    }
+                  }}
+                  className="group relative rounded-2xl border-0 transition-all duration-200 bg-muted/40 hover:bg-muted/60 cursor-pointer p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -101,3 +131,4 @@ export function TeacherSubjectsList({ subjects }: TeacherSubjectsListProps) {
     </Card>
   );
 }
+

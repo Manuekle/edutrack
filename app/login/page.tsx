@@ -101,7 +101,7 @@ function LoginForm() {
 
         <div className="space-y-1.5">
           <CardTitle className="text-3xl font-semibold tracking-card">Bienvenido</CardTitle>
-          <CardDescription className="text-muted-foreground sm:text-[15px] text-xs">
+          <CardDescription className="text-muted-foreground sm:text-sm text-xs">
             Ingresa al sistema de registro académico
           </CardDescription>
         </div>
@@ -116,7 +116,7 @@ function LoginForm() {
                 className="rounded-2xl bg-destructive/5 border-destructive/20 animate-in fade-in slide-in-from-top-2 duration-300"
               >
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="text-[13px]">{error}</AlertDescription>
+                <AlertDescription className="text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
@@ -135,7 +135,7 @@ function LoginForm() {
                         type="email"
                         placeholder="ejemplo@fup.edu.co"
                         disabled={isLoading}
-                        className="pl-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
+                        className="pl-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-sm text-xs"
                         {...field}
                       />
                     </div>
@@ -156,7 +156,7 @@ function LoginForm() {
                     </FormLabel>
                     <Link
                       href="/forgot-password"
-                      className="text-[13px] font-medium text-primary hover:text-primary/80 transition-colors"
+                      className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                     >
                       ¿Olvidaste tu contraseña?
                     </Link>
@@ -210,7 +210,7 @@ function LoginForm() {
               )}
             </Button>
 
-            <p className="text-center text-[13px] text-muted-foreground font-medium">
+            <p className="text-center text-sm text-muted-foreground font-medium">
               ¿No tienes cuenta? Contacta con administración académmica.
             </p>
           </CardFooter>

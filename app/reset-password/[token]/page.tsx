@@ -53,6 +53,20 @@ function ResetPasswordContent() {
     },
   });
 
+  const passwordValue = form.watch('password');
+  const passwordStrength = (() => {
+    if (!passwordValue) return 0;
+    let score = 0;
+    if (passwordValue.length >= 8) score++;
+    if (passwordValue.length >= 12) score++;
+    if (/[A-Z]/.test(passwordValue)) score++;
+    if (/[0-9]/.test(passwordValue)) score++;
+    if (/[^A-Za-z0-9]/.test(passwordValue)) score++;
+    return score;
+  })();
+  const strengthLabel = ['', 'Muy débil', 'Débil', 'Aceptable', 'Fuerte', 'Muy fuerte'][passwordStrength] || '';
+  const strengthColor = ['', 'bg-destructive', 'bg-orange-400', 'bg-amber-400', 'bg-emerald-400', 'bg-emerald-500'][passwordStrength] || '';
+
   // Verificar si el token es válido al cargar la página
   useEffect(() => {
     const verifyToken = async () => {
@@ -168,7 +182,7 @@ function ResetPasswordContent() {
             <CardTitle className="text-3xl font-semibold tracking-card">
               Nueva contraseña
             </CardTitle>
-            <CardDescription className="text-muted-foreground sm:text-[15px] text-xs">
+            <CardDescription className="text-muted-foreground sm:text-sm text-xs">
               Estás restableciendo la contraseña para:<br />
               <span className="font-medium text-foreground">{userEmail}</span>
             </CardDescription>
@@ -190,7 +204,7 @@ function ResetPasswordContent() {
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="Mínimo 8 caracteres"
-                          className="pl-12 pr-12 rounded-full bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
+                          className="pl-12 pr-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-sm text-xs"
                           disabled={isSubmitting}
                           {...field}
                         />
@@ -205,6 +219,21 @@ function ResetPasswordContent() {
                         </button>
                       </div>
                     </FormControl>
+                    {passwordValue && (
+                      <div className="px-1 space-y-1">
+                        <div className="flex gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < passwordStrength ? strengthColor : 'bg-muted'}`}
+                            />
+                          ))}
+                        </div>
+                        <p className={`text-[11px] font-medium ${passwordStrength <= 2 ? 'text-destructive' : passwordStrength <= 3 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                          {strengthLabel}
+                        </p>
+                      </div>
+                    )}
                     <FormMessage className="ml-1" />
                   </FormItem>
                 )}
@@ -222,7 +251,7 @@ function ResetPasswordContent() {
                         <Input
                           type={showConfirmPassword ? 'text' : 'password'}
                           placeholder="Repite tu contraseña"
-                          className="pl-12 pr-12 rounded-full bg-muted/30 border-border/40 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-[15px] text-xs"
+                          className="pl-12 pr-12 rounded-xl bg-muted/40 border-border/60 focus:border-primary/50 focus:ring-primary/20 transition-all sm:text-sm text-xs"
                           disabled={isSubmitting}
                           {...field}
                         />

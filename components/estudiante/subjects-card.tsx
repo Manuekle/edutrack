@@ -49,7 +49,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
     <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-lg text-xs font-semibold tracking-card text-foreground">
+          <CardTitle className="sm:text-lg text-sm font-semibold tracking-card text-foreground">
             Mis Asignaturas
           </CardTitle>
         </div>
@@ -89,16 +89,8 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
                         <div className="relative">
                           <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
                             <div
-                              className="h-full rounded-full transition-all duration-500 ease-out"
-                              style={{
-                                width: `${progress}%`,
-                                backgroundColor:
-                                  progress >= 80
-                                    ? '#10b981'
-                                    : progress >= 60
-                                      ? '#f59e0b'
-                                      : '#f43f5e',
-                              }}
+                              className={`h-full rounded-full transition-all duration-500 ease-out ${getAttendanceColor(progress)}`}
+                              style={{ width: `${progress}%` }}
                             />
                           </div>
                         </div>

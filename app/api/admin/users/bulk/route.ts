@@ -190,31 +190,41 @@ export async function POST(req: Request) {
     );
 
     let createdCount = 0;
-    let errorCount = 0;
-
-    await db.$transaction(
-      itemsWithPasswords.map(item =>
-        db.user.create({
-          data: {
-            name: item.name,
-            document: item.document,
-            personalEmail: item.email,
-            institutionalEmail: item.email || undefined,
-            password: item.hashedPassword,
-            role: forceRole,
-            isActive: true,
-            mustChangePassword: true,
-          },
-        })
-      )
-    ).then(results => {
-      createdCount = results.length;
-    }).catch(e => {
-      console.error(e);
-      errorCount = itemsWithPasswords.length;
-    });
-
     const alreadyExisted = previews.filter(p => p.status === 'warning').length;
+
+    try {
+      const results = await db.$transaction(
+        itemsWithPasswords.map(item =>
+          db.user.create({
+            data: {
+              name: item.name,
+              document: item.document,
+              personalEmail: item.email,
+              institutionalEmail: item.email || undefined,
+              password: item.hashedPassword,
+              role: forceRole,
+              isActive: true,
+              mustChangePassword: true,
+            },
+          })
+        )
+      );
+      createdCount = results.length;
+    } catch (e) {
+      console.error('Transaction error in bulk user creation:', e);
+      return NextResponse.json(
+        {
+          error: 'Error al crear los usuarios en la base de datos. Ningún usuario fue creado.',
+          summary: {
+            total: previews.length,
+            created: 0,
+            alreadyExisted,
+            errors: itemsWithPasswords.length,
+          },
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -222,8 +232,8 @@ export async function POST(req: Request) {
         total: previews.length,
         created: createdCount,
         alreadyExisted,
-        errors: errorCount,
-        skipped: previews.length - createdCount - alreadyExisted - errorCount,
+        errors: 0,
+        skipped: previews.length - createdCount - alreadyExisted,
       },
     });
 

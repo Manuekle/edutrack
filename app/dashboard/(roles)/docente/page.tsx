@@ -5,7 +5,6 @@ import { TeacherStatsCards } from '@/components/docente/teacher-stats-cards';
 import { TeacherSubjectsList } from '@/components/docente/teacher-subjects-list';
 import { UpcomingClassesCard } from '@/components/docente/upcoming-classes-card';
 import { Button } from '@/components/ui/button';
-import { LoadingPage } from '@/components/ui/loading';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   getLiveClassData,
@@ -120,10 +119,6 @@ export default function DocenteDashboard() {
     fetchDashboardData(true);
   };
 
-  if (loading) {
-    return <LoadingPage />;
-  }
-
   // Calculate generic stats
   const totalClasses = subjects.reduce((sum, subj) => sum + subj.totalClasses, 0);
   const completedClasses = subjects.reduce((sum, subj) => sum + subj.completedClasses, 0);
@@ -142,14 +137,22 @@ export default function DocenteDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
-          <p className="text-muted-foreground sm:text-sm text-xs mt-1">
-            Resumen del día — clases activas, próximas clases y estadísticas generales.
-          </p>
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-24 rounded-lg" />
+              <Skeleton className="h-4 w-72 rounded-lg" />
+            </div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
+              <p className="text-muted-foreground sm:text-sm text-xs mt-1">
+                Resumen del día — clases activas, próximas clases y estadísticas generales.
+              </p>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          {/* Indicador de última actualización */}
-          {lastUpdated && (
+          {lastUpdated && !loading && (
             <span className="text-[11px] text-muted-foreground hidden sm:block">
               Actualizado hace{' '}
               {Math.floor((Date.now() - lastUpdated.getTime()) / 1000) < 60
@@ -157,14 +160,13 @@ export default function DocenteDashboard() {
                 : `${Math.floor((Date.now() - lastUpdated.getTime()) / 60000)}min`}
             </span>
           )}
-          {/* Botón de refresh manual */}
           <Button
             type="button"
             variant="outline"
             size="sm"
             className="rounded-xl h-9 px-3 shadow-none bg-muted/40 border-transparent hover:bg-muted/60 transition-colors"
             onClick={handleRefresh}
-            disabled={refreshing}
+            disabled={refreshing || loading}
           >
             <RefreshCw className={`h-4 w-4 mr-1.5 ${refreshing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">
@@ -183,7 +185,7 @@ export default function DocenteDashboard() {
       </div>
 
       {/* Clase en Vivo */}
-      {liveClass && <LiveClassCard liveClass={liveClass} />}
+      {!loading && liveClass && <LiveClassCard liveClass={liveClass} />}
 
       {/* Estadísticas Rápidas */}
       <TeacherStatsCards
@@ -192,14 +194,12 @@ export default function DocenteDashboard() {
         completedClasses={completedClasses}
         upcomingClassesCount={upcomingClasses.length}
         nextClass={nextClass}
-        isLoading={refreshing}
+        isLoading={loading || refreshing}
       />
 
       <div className="grid gap-5 md:grid-cols-2">
-        {/* Asignaturas Recientes */}
-        <TeacherSubjectsList subjects={subjects} />
-        {/* Próximas Clases */}
-        <UpcomingClassesCard classes={upcomingClasses} />
+        <TeacherSubjectsList subjects={subjects} isLoading={loading} />
+        <UpcomingClassesCard classes={upcomingClasses} isLoading={loading} />
       </div>
     </div>
   );

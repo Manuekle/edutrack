@@ -2,7 +2,7 @@
 
 import { navLinkGroups } from '@/config/navigation';
 import type { Role } from '@/types';
-import { ChevronDown, LogOut, Moon, Settings, Sun } from 'lucide-react';
+import { ChevronDown, LogOut, Moon, Settings, Sun, X } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -40,6 +40,7 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
@@ -92,8 +93,13 @@ function AppSidebar({ homePath }: { homePath: string }) {
   const router = useRouter();
   const { data: session, status } = useSession();
   const { theme, setTheme } = useTheme();
+  const { isMobile, setOpenMobile } = useSidebar();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
+
+  const closeMobile = React.useCallback(() => {
+    if (isMobile) setOpenMobile(false);
+  }, [isMobile, setOpenMobile]);
 
   const handleSignOut = async () => {
     try {
@@ -179,21 +185,33 @@ function AppSidebar({ homePath }: { homePath: string }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="default" asChild className="h-auto py-4 rounded-xl">
-              <Link href={homePath}>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center">
-                    <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
+            <div className="flex items-center gap-2 px-1">
+              <SidebarMenuButton size="default" asChild className="h-auto py-4 rounded-xl flex-1">
+                <Link href={homePath} onClick={closeMobile}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center shrink-0">
+                      <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
+                    </div>
+                    <div className="grid flex-1 text-left">
+                      <span className="truncate font-semibold sm:text-sm text-xs tracking-card">SIRA</span>
+                      <span className="truncate text-[11px] text-muted-foreground">
+                        Facultad de Ingeniería
+                      </span>
+                    </div>
                   </div>
-                  <div className="grid flex-1 text-left">
-                    <span className="truncate font-semibold sm:text-sm text-xs tracking-card">SIRA</span>
-                    <span className="truncate text-[11px] text-muted-foreground">
-                      Facultad de Ingeniería
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            </SidebarMenuButton>
+                </Link>
+              </SidebarMenuButton>
+              {isMobile && (
+                <button
+                  type="button"
+                  onClick={closeMobile}
+                  className="shrink-0 flex items-center justify-center h-8 w-8 rounded-xl text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
+                  aria-label="Cerrar menú"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -231,7 +249,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                             : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
                             }`}
                         >
-                          <Link href={link.href} className="flex items-center gap-3 w-full">
+                          <Link href={link.href} onClick={closeMobile} className="flex items-center gap-3 w-full">
                             {Icon && (
                               <Icon
                                 className={`h-[18px] w-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'
@@ -273,11 +291,11 @@ function AppSidebar({ homePath }: { homePath: string }) {
                   <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="font-sans w-64 sm:w-80"
-                  side="bottom"
+                  className="font-sans w-64 sm:w-72"
+                  side={isMobile ? 'top' : 'bottom'}
                   align="end"
                   sideOffset={8}
-                  alignOffset={-20}
+                  alignOffset={isMobile ? 0 : -20}
                   collisionPadding={16}
                 >
                   <div className="px-4 py-1.5 my-1">
@@ -289,7 +307,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
                     </p>
                   </div>
                   <DropdownMenuItem
-                    onClick={() => router.push('/dashboard/profile')}
+                    onClick={() => { router.push('/dashboard/profile'); closeMobile(); }}
                     className="cursor-pointer gap-2 py-2.5 rounded-lg text-primary focus:bg-primary/10"
                   >
                     <Settings className="mr-3 h-4 w-4 shrink-0 text-foreground" />

@@ -4,12 +4,14 @@ import { LiveClassCard } from '@/components/estudiante/live-class-card';
 import { StatCard } from '@/components/estudiante/stat-card';
 import { SubjectsCard } from '@/components/estudiante/subjects-card';
 import { UpcomingEventsCard } from '@/components/estudiante/upcoming-events-card';
+import { Button } from '@/components/ui/button';
 import { LoadingPage } from '@/components/ui/loading';
 import { useStudentDashboard } from '@/hooks/use-student-dashboard';
-import { AlertTriangle, BarChart3, BookOpen, Calendar } from 'lucide-react';
+import { AlertTriangle, BarChart3, BookOpen, Calendar, RefreshCw } from 'lucide-react';
 
 export default function EstudianteDashboard() {
-  const { subjects, upcomingClasses, liveClass, stats, isLoading } = useStudentDashboard();
+  const { subjects, upcomingClasses, liveClass, stats, isLoading, error, refetchDashboard } =
+    useStudentDashboard();
 
   if (isLoading) {
     return <LoadingPage />;
@@ -23,6 +25,24 @@ export default function EstudianteDashboard() {
           Resumen de tu progreso académico y asistencia.
         </p>
       </div>
+
+      {error && (
+        <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+          <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+          <p className="text-sm text-destructive flex-1">
+            No se pudieron cargar los datos del dashboard. Verifica tu conexión.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetchDashboard()}
+            className="shrink-0 gap-1.5 text-xs"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Reintentar
+          </Button>
+        </div>
+      )}
 
       {/* Live Class Card */}
       {liveClass && <LiveClassCard liveClass={liveClass} />}

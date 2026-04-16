@@ -1,10 +1,9 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingPage } from '@/components/ui/loading';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarDays, GraduationCap, Layout, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -65,7 +64,28 @@ export default function MisGruposPage() {
       </div>
 
       {loading ? (
-        <LoadingPage />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl">
+              <CardHeader className="pb-3">
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Skeleton className="h-5 w-24 rounded-md" />
+                    <Skeleton className="h-5 w-20 rounded-md" />
+                  </div>
+                  <Skeleton className="h-4 w-3/4 rounded" />
+                  <Skeleton className="h-3 w-1/3 rounded" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-4 w-full rounded" />
+                <Skeleton className="h-4 w-2/3 rounded" />
+                <Skeleton className="h-4 w-1/2 rounded" />
+                <Skeleton className="h-9 w-full rounded-xl mt-2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : grupos.length === 0 ? (
 
 
@@ -81,9 +101,9 @@ export default function MisGruposPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {grupos.map(g => (
-            <Card key={g.id} className="hover:shadow-md transition-shadow">
+            <Card key={g.id} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl transition-colors hover:bg-muted/30">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div>

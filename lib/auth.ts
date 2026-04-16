@@ -3,7 +3,7 @@ import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { clearUserCache } from './cache';
+import { clearAllUserCache } from './cache';
 import { CACHE_TTL, redis } from './redis';
 
 // 🔧 Configuración según entorno
@@ -38,6 +38,11 @@ export const authOptions: NextAuthOptions = {
           if (cachedAuth && typeof cachedAuth === 'string') {
             try {
               const { user, hash } = JSON.parse(cachedAuth);
+              // Reject cached inactive users immediately (forces DB re-check on next attempt)
+              if (!user.isActive) {
+                await redis.del(cacheKey).catch(() => {});
+                return null;
+              }
               const isValid = await bcrypt.compare(credentials.password, hash);
               if (isValid) return user;
               // If cache exists but password is wrong, it might be stale. Fallback to DB.
@@ -114,9 +119,11 @@ export const authOptions: NextAuthOptions = {
 
   events: {
     async signOut({ token }) {
-      // Limpiar caché cuando se cierre sesión
       if (token?.id) {
-        await clearUserCache(token.id as string);
+        const emails = [token.personalEmail, token.institutionalEmail].filter(
+          (e): e is string => typeof e === 'string' && e.length > 0
+        );
+        await clearAllUserCache(token.id as string, emails);
       }
     },
   },

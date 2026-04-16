@@ -27,7 +27,16 @@ export function QRViewer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [isDark, setIsDark] = useState(false);
   const qrContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains('dark'));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const qrSize = isFullscreen ? 500 : 260;
 
@@ -117,7 +126,8 @@ export function QRViewer({
         {/* QR Frame - Standard Centered */}
         <div
           className={cn(
-            'bg-white p-6 rounded-2xl shadow-sm border border-border/40 transition-all',
+            'p-6 rounded-2xl shadow-sm border border-border/40 transition-all',
+            isDark ? 'bg-[#0a0a0a]' : 'bg-white',
             isFullscreen ? 'scale-110' : 'scale-100'
           )}
         >
@@ -126,8 +136,8 @@ export function QRViewer({
               value={qrUrl}
               size={qrSize}
               level="M"
-              fgColor="#000000"
-              bgColor="#ffffff"
+              fgColor={isDark ? '#ffffff' : '#000000'}
+              bgColor={isDark ? '#0a0a0a' : '#ffffff'}
             />
           ) : (
             <div

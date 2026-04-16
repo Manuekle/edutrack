@@ -35,6 +35,9 @@ interface UseSubjectDetailOptions {
   enabled?: boolean;
 }
 
+const EMPTY_CLASSES: LocalClassWithStatus[] = [];
+const EMPTY_STUDENTS: Student[] = [];
+
 export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetailOptions) {
   const queryClient = useQueryClient();
 
@@ -168,8 +171,8 @@ export function useSubjectDetail({ subjectId, enabled = true }: UseSubjectDetail
           code: subjectQuery.data.data.code || 'N/A',
         }
       : null,
-    enrolledStudents: studentsQuery.data?.data || [],
-    classes: classesQuery.data?.data || [],
+    enrolledStudents: studentsQuery.data?.data ?? EMPTY_STUDENTS,
+    classes: classesQuery.data?.data ?? EMPTY_CLASSES,
     isLoadingSubject: subjectQuery.isLoading,
     isLoadingStudents: studentsQuery.isLoading,
     isLoadingClasses: classesQuery.isLoading,
