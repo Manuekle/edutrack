@@ -162,7 +162,7 @@ const AdminDashboardComponent = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+      <div id="tour-dashboard-title" className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
           <p className="text-muted-foreground sm:text-sm text-xs mt-1">
@@ -218,7 +218,7 @@ const AdminDashboardComponent = () => {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div id="tour-dashboard-metrics" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {data.cards.map((card, i) => {
           const Icon = CARD_ICONS[i];
           return (
@@ -241,7 +241,7 @@ const AdminDashboardComponent = () => {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Role Distribution */}
-        <Card className="border-border/30">
+        <Card id="tour-dashboard-users-chart" className="border-border/30">
           <CardHeader className="pb-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
               Distribución de Usuarios
@@ -280,7 +280,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Monthly Classes */}
-        <Card className="border-border/30">
+        <Card id="tour-dashboard-classes-chart" className="border-border/30">
           <CardHeader className="pb-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-card">
               Clases por Mes

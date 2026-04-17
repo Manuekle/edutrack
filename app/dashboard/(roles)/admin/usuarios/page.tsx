@@ -255,7 +255,7 @@ export default function AdminUsuariosPage() {
 
   return (
     <div className="mx-auto space-y-6 pb-12 animate-in fade-in duration-500">
-      <div className="flex flex-col gap-1">
+      <div id="tour-users-title" className="flex flex-col gap-1">
         <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-card">
           Gestión de Usuarios
         </h1>
@@ -288,7 +288,7 @@ export default function AdminUsuariosPage() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <Button className="gap-2 px-4 shadow-sm">
+                  <Button id="tour-users-create" className="gap-2 px-4 shadow-sm">
                     <Plus className="h-4 w-4" />
                     <span className="text-xs font-semibold">Nuevo Usuario</span>
                   </Button>
@@ -428,7 +428,7 @@ export default function AdminUsuariosPage() {
               ))}
             </div>
 
-            <Card>
+            <Card id="tour-users-filters">
               <CardHeader className="px-5 py-4">
                 <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                   <div className="relative w-full sm:max-w-md">
@@ -465,7 +465,7 @@ export default function AdminUsuariosPage() {
                 </div>
               </CardHeader>
 
-              <CardContent className="p-0">
+              <CardContent id="tour-users-table" className="p-0">
                 <Table>
                   <TableHeader className="bg-muted/30">
                     <TableRow>

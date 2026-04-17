@@ -76,8 +76,7 @@ export default function MicrocurriculoPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-1">
-
+      <div id="tour-microcurriculo-title" className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-card flex items-center gap-2">
           Microcurrículo
         </h1>
@@ -87,7 +86,7 @@ export default function MicrocurriculoPage() {
       </div>
 
       <Tabs defaultValue="carga">
-        <TabsList className="mb-4">
+        <TabsList id="tour-microcurriculo-mode" className="mb-4">
           <TabsTrigger value="carga">Cargar asignaturas</TabsTrigger>
           <TabsTrigger value="listado">Ver listado</TabsTrigger>
         </TabsList>
@@ -98,7 +97,7 @@ export default function MicrocurriculoPage() {
 
         <TabsContent value="listado" className="space-y-4">
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div id="tour-microcurriculo-preview" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="sm:text-sm text-xs font-medium text-muted-foreground">

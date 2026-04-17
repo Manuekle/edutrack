@@ -1,9 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useTutorial } from '@/hooks/use-tutorial';
-import { CircleHelp } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export function TutorialButton() {
@@ -13,26 +17,37 @@ export function TutorialButton() {
   if (!hasTutorial) return null;
 
   return (
-    <TooltipProvider delayDuration={300}>
+    <TooltipProvider delayDuration={400}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={startTutorial}
-            className="h-8 w-8 sm: sm:w-9 text-muted-foreground hover:text-primary transition-colors duration-200"
-            aria-label="Iniciar tutorial de esta página"
+            aria-label="Ver tutorial interactivo de esta pantalla"
+            className="group inline-flex items-center gap-1.5 h-8 pl-2 pr-2.5 sm:pr-3 rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/15 hover:border-primary/35 transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
-            <CircleHelp className="h-5 w-5" />
-          </Button>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 shrink-0">
+              <Sparkles className="h-3 w-3" />
+            </span>
+            <span className="hidden sm:inline text-[11px] font-semibold tracking-wide">
+              TUTORIAL
+            </span>
+          </button>
         </TooltipTrigger>
         <TooltipContent
           side="bottom"
           align="end"
-          className="font-sans text-xs bg-popover border text-popover-foreground shadow-sm"
+          sideOffset={8}
+          className="font-sans p-0 overflow-hidden border-0 shadow-lg"
         >
-          <p className="font-semibold">¿Cómo usar esta pantalla?</p>
-          <p className="text-muted-foreground">Ver tutorial interactivo</p>
+          <div className="flex flex-col gap-1 px-3 py-2.5 max-w-[200px]">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <Sparkles className="h-3 w-3 text-primary shrink-0" />
+              <p className="text-xs font-semibold">¿Cómo usar esta pantalla?</p>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Inicia un recorrido guiado paso a paso por las funciones de esta sección.
+            </p>
+          </div>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

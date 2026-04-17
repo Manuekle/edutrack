@@ -391,7 +391,7 @@ export default function AdminSalasPage() {
         {/* TAB: ESPACIOS (Carga masiva + Listado) */}
         <TabsContent value="list" className="m-0 focus-visible:outline-none">
           <Tabs defaultValue="listado" className="space-y-6">
-            <TabsList className="mb-4 flex items-center p-1 gap-2 bg-muted/20 rounded-full border border-muted/50">
+            <TabsList id="tour-salas-tabs" className="mb-4 flex items-center p-1 gap-2 bg-muted/20 rounded-full border border-muted/50">
               <TabsTrigger
                 value="carga"
                 className="rounded-full px-6 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"

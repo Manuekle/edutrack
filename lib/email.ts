@@ -109,7 +109,7 @@ export async function sendEmail({
       if (errorMessage.includes('not verified') || errorMessage.includes('domain')) {
         console.warn('Resend domain not verified, falling back to Gmail SMTP');
       } else {
-        throw error;
+        throw new Error(`Error al enviar el correo con Resend: ${errorMessage}`);
       }
     }
   }
