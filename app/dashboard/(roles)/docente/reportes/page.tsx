@@ -147,7 +147,7 @@ export default function ReportsPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl overflow-hidden">
+            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-2xl overflow-hidden">
               <CardHeader className="pb-3 bg-muted/10">
                 <div className="space-y-2">
                   <div className="flex gap-2">
@@ -217,7 +217,7 @@ export default function ReportsPage() {
           reports.map(report => (
             <Card
               key={report.id}
-              className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl group overflow-hidden transition-colors hover:bg-muted/30"
+              className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-2xl group overflow-hidden transition-colors hover:bg-muted/30"
             >
               <CardHeader className="pb-3 bg-muted/10 group-hover:bg-muted/20 transition-colors">
                 <div className="flex justify-between items-start">

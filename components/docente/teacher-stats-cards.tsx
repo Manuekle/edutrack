@@ -31,7 +31,7 @@ export function TeacherStatsCards({
         {[1, 2, 3, 4].map(i => (
           <Card
             key={i}
-            className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.02] rounded-2xl"
+            className="shadow-none border-0 bg-muted/50 dark:bg-white/[0.06] rounded-2xl"
           >
             <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
               <Skeleton className="h-4 w-32" />
@@ -48,7 +48,7 @@ export function TeacherStatsCards({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.02] rounded-2xl">
+      <Card className="shadow-none border-0 bg-muted/50 dark:bg-white/[0.06] rounded-2xl">
         <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-[13px] font-medium text-muted-foreground flex items-center gap-2 tracking-card uppercase">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">

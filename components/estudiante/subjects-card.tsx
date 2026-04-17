@@ -46,7 +46,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
   );
 
   return (
-    <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-3xl shrink-0 h-fit">
+    <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-3xl shrink-0 h-fit">
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex items-center gap-2">
           <CardTitle className="sm:text-lg text-sm font-semibold tracking-card text-foreground">

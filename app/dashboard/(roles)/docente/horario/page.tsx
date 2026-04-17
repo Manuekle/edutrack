@@ -130,7 +130,7 @@ export default function MiHorarioPage() {
             </div>
           </div>
           {/* Calendar grid skeleton */}
-          <div className="rounded-3xl bg-muted/20 dark:bg-white/[0.02] overflow-hidden">
+          <div className="rounded-3xl bg-muted/20 dark:bg-white/[0.06] overflow-hidden">
             {/* Header row */}
             <div className="grid grid-cols-7 border-b border-border/30">
               {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (

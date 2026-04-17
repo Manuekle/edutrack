@@ -10,7 +10,7 @@ interface StatCardProps {
 
 const colorMap = {
   default: {
-    card: 'bg-muted/30 dark:bg-white/[0.02]',
+    card: 'bg-muted/50 dark:bg-white/[0.06]',
     icon: 'bg-blue-500/10 text-blue-500',
     title: 'text-muted-foreground',
     value: 'text-foreground',

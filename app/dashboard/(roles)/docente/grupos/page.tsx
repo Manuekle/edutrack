@@ -66,7 +66,7 @@ export default function MisGruposPage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl">
+            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-2xl">
               <CardHeader className="pb-3">
                 <div className="space-y-2">
                   <div className="flex gap-2">
@@ -103,7 +103,7 @@ export default function MisGruposPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {grupos.map(g => (
-            <Card key={g.id} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.02] rounded-2xl transition-colors hover:bg-muted/30">
+            <Card key={g.id} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-2xl transition-colors hover:bg-muted/30">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div>

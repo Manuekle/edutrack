@@ -22,13 +22,12 @@ interface ResetPasswordEmailProps {
 const ResetPasswordEmail = ({ resetUrl, userEmail, supportEmail }: ResetPasswordEmailProps) => {
   return (
     <Html lang="es" dir="ltr" style={{ colorScheme: 'light' }}>
+      <Head>
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+      </Head>
+      <Preview>Restablece tu contraseña de SIRA</Preview>
       <Tailwind>
-        <Head>
-          <meta name="color-scheme" content="light" />
-          <meta name="supported-color-schemes" content="light" />
-        </Head>
-        <Preview>Restablece tu contraseña de SIRA</Preview>
-
         <Body
           className="font-sans py-[40px]"
           style={{ backgroundColor: '#f0f3fa', colorScheme: 'light', margin: 0 }}

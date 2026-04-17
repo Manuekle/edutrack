@@ -180,7 +180,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
   return (
     <Sidebar
       variant="inset"
-      className="h-[100dvh] fixed font-sans bg-sidebar/80 backdrop-blur-2xl pt-[env(safe-area-inset-top)]"
+      className="h-[100dvh] fixed font-sans bg-sidebar/80 dark:bg-sidebar backdrop-blur-2xl dark:backdrop-blur-none pt-[env(safe-area-inset-top)]"
     >
       <SidebarHeader>
         <SidebarMenu>

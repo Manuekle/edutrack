@@ -56,7 +56,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
         <div className="mt-4">
           {isLoading ? (
             <div
-              className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1"
+              className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1"
               role="status"
               aria-label="Cargando estudiantes"
             >
@@ -79,7 +79,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               </div>
             </div>
           ) : allStudents.length > 0 ? (
-            <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 relative">
+            <div className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1 relative">
               <div className="divide-y divide-border/40">
                 {currentStudents.map(student => (
                   <StudentTableRow

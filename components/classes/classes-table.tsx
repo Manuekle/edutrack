@@ -96,7 +96,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
         <div className="mt-4">
           {isLoading ? (
             <div
-              className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1"
+              className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1"
               role="status"
               aria-label="Cargando clases"
             >
@@ -119,7 +119,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               </div>
             </div>
           ) : allClasses.length > 0 ? (
-            <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 relative">
+            <div className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1 relative">
               <div className="divide-y divide-border/40">
                 {currentItems.map(cls => {
                   const statusInfo = calculateClassStatus(cls, dateUtils);

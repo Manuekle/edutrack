@@ -214,7 +214,7 @@ export default function BitacoraTablaPage() {
       {/* Encabezado del documento */}
       <div
         ref={tableRef}
-        className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1"
+        className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1"
       >
         {/* Header */}
         <div className="bg-background rounded-2xl p-5 mb-1">

@@ -237,7 +237,7 @@ export default function PlaneacionPage() {
 
       {/* Resumen de estado */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-        <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.02] rounded-2xl">
+        <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.06] rounded-2xl">
           <CardHeader className="pb-1 pt-5 px-5">
             <CardTitle className="text-[13px] font-medium text-muted-foreground flex items-center gap-2 tracking-card uppercase">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">

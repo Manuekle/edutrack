@@ -426,7 +426,7 @@ export default function AttendancePage() {
             </Button>
           </div>
 
-          <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl overflow-hidden shadow-sm p-1 border">
+          <div className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1 border">
             <div className="divide-y divide-border/40">
               {filteredStudents.length > 0 ? (
                 filteredStudents.map(student => {
@@ -502,7 +502,7 @@ export default function AttendancePage() {
 
         {/* Sidebar Summary */}
         <div className="space-y-6">
-          <div className="bg-muted/30 dark:bg-white/[0.02] rounded-3xl p-6 shadow-sm border">
+          <div className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl p-6 shadow-sm border">
             <h4 className="sm:text-sm text-xs font-semibold mb-6 flex items-center gap-2">
               <History className="h-4 w-4 text-primary" />
               Resumen de Asistencia

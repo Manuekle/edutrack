@@ -252,7 +252,7 @@ export default function AsignacionPage() {
       {/* Resumen */}
       {!loading && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.02] rounded-2xl">
+          <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.06] rounded-2xl">
             <CardHeader className="pb-1 pt-5 px-5">
               <CardTitle className="text-[13px] font-medium text-muted-foreground flex items-center gap-2 tracking-card uppercase">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-500/10 text-slate-500">
