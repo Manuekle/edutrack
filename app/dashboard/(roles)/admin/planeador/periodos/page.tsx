@@ -56,6 +56,10 @@ export default function PeriodosPage() {
       sileo.error({ description: 'Completa todos los campos' });
       return;
     }
+    if (new Date(newStart) >= new Date(newEnd)) {
+      sileo.error({ description: 'La fecha de inicio debe ser anterior a la fecha fin' });
+      return;
+    }
 
     setSaving(true);
     try {

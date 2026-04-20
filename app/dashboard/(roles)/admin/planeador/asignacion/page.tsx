@@ -689,6 +689,7 @@ export default function AsignacionPage() {
                           className="pl-10 h-10 rounded-xl bg-muted/40 border-transparent focus-visible:bg-background shadow-none sm:text-sm text-xs"
                         />
                       </div>
+                      <p className="text-[11px] text-muted-foreground mb-2">Solo se puede asignar un docente por grupo.</p>
                       <div className="bg-card rounded-xl border overflow-hidden shadow-none">
                         <div className="max-h-[400px] overflow-y-auto">
                           {filteredDocentes.length === 0 ? (

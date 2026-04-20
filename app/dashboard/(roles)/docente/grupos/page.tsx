@@ -99,6 +99,9 @@ export default function MisGruposPage() {
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
             Verifica con el administrador que el período académico esté activo.
           </p>
+          <Link href="/dashboard/docente/horario" className="inline-block mt-4 text-xs font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
+            Ver mi horario
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
