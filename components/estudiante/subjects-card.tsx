@@ -124,15 +124,18 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
             <button
               onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
               disabled={currentPage === 0}
+              aria-label="Página anterior"
               className="p-1.5 rounded-lg bg-muted/40 hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </button>
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }).map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i)}
+                  aria-label={`Página ${i + 1}`}
+                  aria-current={currentPage === i ? 'page' : undefined}
                   className={`w-2 h-2 rounded-full transition-colors ${currentPage === i ? 'bg-primary' : 'bg-muted/40 hover:bg-muted'
                     }`}
                 />
@@ -141,9 +144,10 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={currentPage === totalPages - 1}
+              aria-label="Página siguiente"
               className="p-1.5 rounded-lg bg-muted/40 hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         )}

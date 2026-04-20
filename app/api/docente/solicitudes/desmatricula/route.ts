@@ -113,7 +113,7 @@ export async function POST(request: Request) {
 
       // Notificar al administrador por correo electrónico
       try {
-        const supportEmail = process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co';
+        const supportEmail = process.env.SUPPORT_EMAIL || 'soporte@sira-fup.online';
         const adminEmail = process.env.ADMIN_EMAIL || 'elustondo129@gmail.com';
 
         // Get subject name from the database

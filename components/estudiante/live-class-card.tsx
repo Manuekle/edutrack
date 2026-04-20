@@ -96,7 +96,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-muted/30 rounded-2xl p-4">
             <div className="flex items-center space-x-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500" aria-hidden="true" />
               <div className="flex flex-col">
                 <span className="text-lg font-semibold leading-none text-foreground">
                   {liveClass.attendanceStats.present}
@@ -105,7 +105,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               </div>
             </div>
             <div className="flex items-center space-x-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500" aria-hidden="true" />
               <div className="flex flex-col">
                 <span className="text-lg font-semibold leading-none text-foreground">
                   {liveClass.attendanceStats.absent}
@@ -114,7 +114,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               </div>
             </div>
             <div className="flex items-center space-x-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
               <div className="flex flex-col">
                 <span className="text-lg font-semibold leading-none text-foreground">
                   {liveClass.attendanceStats.late}
@@ -123,7 +123,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               </div>
             </div>
             <div className="flex items-center space-x-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-500" aria-hidden="true" />
               <div className="flex flex-col">
                 <span className="text-lg font-semibold leading-none text-foreground">
                   {liveClass.attendanceStats.justified}

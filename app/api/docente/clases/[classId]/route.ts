@@ -174,7 +174,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ clas
               teacherName,
               classDate: classToCancel.date.toISOString(),
               reason,
-              supportEmail: process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co',
+              supportEmail: process.env.SUPPORT_EMAIL || 'soporte@sira-fup.online',
               loginUrl: `${process.env.NEXTAUTH_URL}/login`,
             });
 

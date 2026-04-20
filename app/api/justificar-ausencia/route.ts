@@ -164,7 +164,7 @@ export async function POST(request: Request) {
                 })
               : 'Hora no especificada',
             justification: reason,
-            supportEmail: process.env.SUPPORT_EMAIL || 'soporte@fup.edu.co',
+            supportEmail: process.env.SUPPORT_EMAIL || 'soporte@sira-fup.online',
             submissionDate: new Date().toISOString(),
           }),
         });

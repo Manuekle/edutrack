@@ -831,15 +831,18 @@ export function TeacherReport() {
               size="icon"
               onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
               disabled={currentPage === 1}
+              aria-label="Página anterior"
               className="h-7 w-7 rounded-lg"
             >
-              <span className="text-xs">←</span>
+              <span className="text-xs" aria-hidden="true">←</span>
             </Button>
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }).map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
+                  aria-label={`Página ${i + 1}`}
+                  aria-current={currentPage === i + 1 ? 'page' : undefined}
                   className={`h-1.5 rounded-full transition-all duration-200 ${currentPage === i + 1
                     ? 'w-4 bg-primary'
                     : 'w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40'
@@ -852,9 +855,10 @@ export function TeacherReport() {
               size="icon"
               onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
               disabled={currentPage === totalPages}
+              aria-label="Página siguiente"
               className="h-7 w-7 rounded-lg"
             >
-              <span className="text-xs">→</span>
+              <span className="text-xs" aria-hidden="true">→</span>
             </Button>
           </div>
         )}
