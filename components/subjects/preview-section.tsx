@@ -283,7 +283,7 @@ export function PreviewSection({
                                     {(() => {
                                       const date = parseDateString(cls.fechaClase);
                                       if (!date) return cls.fechaClase;
-                                      return date.toLocaleDateString('es-ES', {
+                                      return date.toLocaleDateString('es-CO', {
                                         day: 'numeric',
                                         month: 'short',
                                         year: 'numeric',

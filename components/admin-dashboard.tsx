@@ -170,7 +170,7 @@ const AdminDashboardComponent = () => {
           </p>
         </div>
         <Badge variant="outline" className="text-xs font-normal px-3 py-1.5 capitalize shrink-0">
-          {new Date().toLocaleDateString('es-ES', {
+          {new Date().toLocaleDateString('es-CO', {
             weekday: 'long',
             day: 'numeric',
             month: 'long',

@@ -25,7 +25,7 @@ function formatDate(date: Date | undefined): string {
   }
 
   // Format: "01 de junio de 2025" (Spanish format)
-  return date.toLocaleDateString('es-ES', {
+  return date.toLocaleDateString('es-CO', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',

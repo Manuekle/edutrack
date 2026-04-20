@@ -120,7 +120,7 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
             })}
           </div>
         ) : (
-          <div className="flex flex-col text-center py-16 items-center justify-center h-[calc(50vh-200px)]">
+          <div className="flex flex-col text-center py-16 items-center justify-center min-h-[200px]">
             <p className="text-xs">No tienes asignaturas asignadas</p>
             <p className="text-xs text-muted-foreground mt-1">
               Registra una asignatura para comenzar

@@ -46,7 +46,7 @@ function formatTimeString(timeString: string): string {
   if (isNaN(hours) || isNaN(minutes)) return timeString;
 
   const date = new Date(2000, 0, 1, hours, minutes, 0, 0);
-  return date.toLocaleTimeString('es-ES', {
+  return date.toLocaleTimeString('es-CO', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,

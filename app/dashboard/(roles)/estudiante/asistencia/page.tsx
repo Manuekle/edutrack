@@ -288,7 +288,7 @@ export default function StudentAttendancePage() {
                     </div>
                   )}
                   <div className="sm:text-sm text-xs text-muted-foreground pt-2 mt-2 border-t border-border/40 font-mono">
-                    {new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
               </CardContent>

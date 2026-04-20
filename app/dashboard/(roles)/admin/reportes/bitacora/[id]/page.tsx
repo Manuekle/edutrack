@@ -137,7 +137,7 @@ export default async function PreviewPage({ params }: PageProps) {
   const signatureUrl = allTeachers[0]?.signatureUrl ?? null;
 
   const today = new Date();
-  const metaMonthYear = today.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  const metaMonthYear = today.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth() + 1;
   const currentPeriod = currentMonth <= 6 ? 1 : 2;

@@ -71,7 +71,7 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
                       <span className="flex items-center gap-1 text-primary">
                         <Calendar className="h-3 w-3" />
                         {item.date
-                          ? new Date(item.date).toLocaleDateString('es-ES', {
+                          ? new Date(item.date).toLocaleDateString('es-CO', {
                             weekday: 'short',
                             day: 'numeric',
                             month: 'short',
@@ -101,7 +101,7 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
             ))}
           </div>
         ) : (
-          <div className="flex flex-col text-center py-16 items-center justify-center h-[calc(50vh-200px)]">
+          <div className="flex flex-col text-center py-16 items-center justify-center min-h-[200px]">
             <p className="text-xs">No hay eventos programados</p>
             <p className="text-xs text-muted-foreground mt-1">
               Los próximos eventos aparecerán aquí

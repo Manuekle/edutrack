@@ -100,7 +100,7 @@ export default function ScanPage() {
 
   const formatTime = (dateString?: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleTimeString('es-ES', {
+    return new Date(dateString).toLocaleTimeString('es-CO', {
       hour: '2-digit',
       minute: '2-digit',
     });
