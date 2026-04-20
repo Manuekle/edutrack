@@ -1,197 +1,169 @@
 # SIRA
 
-Sistema Integral de Registro Académico para la Fundación Universitaria de la Popayán.
+Sistema Integral de Registro Académico — Fundación Universitaria de Popayán.
 
-## 🚀 Características Principales
+Gestión de usuarios, asignaturas, asistencia por QR, planificación académica y reportes en PDF.
 
-### 👥 **Gestión de Usuarios**
+## Stack
 
-- ✅ Registro y autenticación de usuarios (Admin, Docente, Estudiante)
-- ✅ Gestión de perfiles y permisos
-- ✅ Carga masiva de usuarios desde archivos Excel/CSV
-- ✅ Gestión de roles y permisos
+- **Frontend/Backend**: Next.js 16 (App Router + API Routes), React 19, TypeScript
+- **Base de datos**: MongoDB vía Prisma 6
+- **Auth**: NextAuth.js 4 (JWT, 30 días)
+- **UI**: Tailwind CSS 4, shadcn/ui, Radix UI
+- **Email**: Nodemailer + React Email
+- **Almacenamiento**: Vercel Blob
+- **Caché**: Redis/Upstash (opcional)
+- **Testing**: Jest + React Testing Library + Playwright
 
-### 📚 **Gestión de Asignaturas**
+## Requisitos
 
-- ✅ Creación y edición de asignaturas
-- ✅ Asignación de docentes a asignaturas
-- ✅ Matriculación de estudiantes
-- ✅ Carga masiva de asignaturas desde archivos Excel/CSV
-- ✅ Gestión de clases y horarios
+- Node.js >= 18
+- pnpm >= 10
+- MongoDB (Atlas o local)
 
-### 📊 **Control de Asistencia**
+## Instalación
 
-- ✅ Registro de asistencia mediante código QR
-- ✅ Escaneo de QR en tiempo real
-- ✅ Justificación de ausencias
-- ✅ Reportes de asistencia
-- ✅ Estadísticas de asistencia por estudiante y asignatura
-
-### 📅 **Eventos y Calendario**
-
-- ✅ Creación y gestión de eventos (exámenes, trabajos, fechas límite)
-- ✅ Visualización de eventos en calendario
-- ✅ Notificaciones de eventos próximos
-
-### 📈 **Dashboard y Reportes**
-
-- ✅ Dashboard personalizado por rol
-- ✅ Estadísticas de asistencia
-- ✅ Reportes de asistencia en PDF
-- ✅ Gráficos y visualizaciones de datos
-
-### 🔔 **Comunicaciones y Notificaciones**
-
-- ✅ Envío de correos a cuentas institucionales y personales.
-
-### 🏫 **Gestión de Aulas y Recursos**
-
-- ✅ Gestión de aulas y recursos
-- ✅ Asignación de recursos a clases
-
-## 🛠️ Stack Tecnológico
-
-- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes, Prisma ORM
-- **Base de Datos**: MongoDB (con Prisma)
-- **Autenticación**: NextAuth.js
-- **UI Components**: Radix UI, shadcn/ui
-- **Formularios**: React Hook Form, Zod
-- **Estado**: React Query (TanStack Query)
-- **Testing**: Jest, React Testing Library, Playwright
-- **Estilos**: Tailwind CSS
-- **Email**: Nodemailer, React Email
-- **Almacenamiento**: Vercel Blob Storage
-- **PDF**: @react-pdf/renderer
-- **QR Codes**: qrcode.react
-- **Caché**: Redis (Upstash)
-
-## 📦 Instalación
-
-1. Clonar el repositorio:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Manuekle/sira.git
 cd sira
-```
-
-2. Instalar dependencias:
-```bash
 pnpm install
 ```
 
-3. Configurar variables de entorno:
+### Variables de entorno
+
 ```bash
 cp .env.example .env
-# Editar .env con tus configuraciones
 ```
 
-4. Configurar la base de datos:
+Editar `.env` con los valores reales:
+
+```env
+DATABASE_URL=""              # MongoDB connection string
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET=""           # openssl rand -base64 32
+
+BLOB_READ_WRITE_TOKEN=""     # Vercel Blob token
+
+# SMTP (requerido para emails)
+SMTP_HOST=""
+SMTP_PORT=""
+SMTP_USER=""
+SMTP_PASS=""
+SMTP_FROM=""
+
+# Redis/Upstash (opcional — la app funciona sin esto)
+KV_REST_API_URL=""
+KV_REST_API_TOKEN=""
+```
+
+### Base de datos y seed
+
 ```bash
 pnpm prisma generate
 pnpm prisma db push
-pnpm prisma db seed
+pnpm seed
 ```
 
-5. Ejecutar el servidor de desarrollo:
+### Servidor de desarrollo
+
 ```bash
 pnpm dev
 ```
 
-## 🧪 Testing
+## Usuarios de prueba
 
-### Tests Unitarios
+El seed crea 3 usuarios. Todos usan contraseña `password123`:
+
+| Rol        | Email                    |
+|------------|--------------------------|
+| Admin      | admin@fup.edu.co         |
+| Docente    | docente@fup.edu.co       |
+| Estudiante | estudiante@fup.edu.co    |
+
+> **Primer login:** Cualquier usuario creado por el admin debe cambiar su contraseña en el primer ingreso. El sistema bloquea el dashboard hasta que lo haga.
+
+## Roles
+
+| Rol        | Acceso |
+|------------|--------|
+| **ADMIN**  | Usuarios, asignaturas, grupos, salones, períodos, carga masiva CSV |
+| **DOCENTE**| Clases, asistencia QR, bitácoras, reportes PDF, firma digital |
+| **ESTUDIANTE** | Horario, historial de asistencia, justificar ausencias |
+
+## Comandos
+
 ```bash
-pnpm test
-pnpm test:watch
-pnpm test:coverage
+pnpm dev              # Servidor de desarrollo (Turbopack)
+pnpm build            # Build de producción
+pnpm type-check       # Verificar tipos TypeScript
+pnpm format           # Formatear código con Prettier
+pnpm seed             # Poblar base de datos con datos de prueba
 ```
 
-### Tests E2E con Playwright
+## Testing
+
 ```bash
-pnpm test:e2e
-pnpm test:e2e:ui
-pnpm test:e2e:headed
+pnpm test             # Jest (95 tests unitarios)
+pnpm test:watch       # Jest en modo watch
+pnpm test:coverage    # Jest con cobertura
+pnpm test:api         # Tests de API específicos
+pnpm test:e2e         # Playwright E2E (requiere servidor corriendo)
+pnpm test:e2e:ui      # Playwright con UI
+pnpm test:all         # Jest + Playwright
 ```
 
-### Ejecutar todos los tests
-```bash
-pnpm test:all
+## Arquitectura
+
+```
+app/
+  api/
+    admin/        # Endpoints solo admin
+    docente/      # Endpoints docente
+    estudiante/   # Endpoints estudiante
+    auth/         # NextAuth + reset/cambio de contraseña
+    asistencia/   # Escaneo QR
+  dashboard/
+    (roles)/
+      admin/
+      docente/
+      estudiante/
+  login/
+
+components/
+  admin/ docente/ estudiante/  # Componentes por dominio
+  ui/                          # Primitivos shadcn/ui (no modificar)
+
+lib/
+  auth.ts           # Configuración NextAuth + Redis cache
+  prisma.ts         # Cliente Prisma
+  cache.ts          # Capa de caché con Redis
+  time-utils.ts     # Cálculos de horarios
+  class-converters.ts
+
+prisma/
+  schema.prisma     # Modelos: User, Group, Class, Attendance, etc.
+  seed.ts           # Datos de prueba
 ```
 
-## 📝 Scripts Disponibles
+### Patrón de API routes
 
-- `pnpm dev` - Inicia el servidor de desarrollo
-- `pnpm build` - Construye la aplicación para producción
-- `pnpm start` - Inicia el servidor de producción
-- `pnpm lint` - Ejecuta el linter
-- `pnpm type-check` - Verifica los tipos de TypeScript
-- `pnpm test` - Ejecuta tests unitarios
-- `pnpm test:e2e` - Ejecuta tests E2E
-- `pnpm test:all` - Ejecuta todos los tests
+Todas las rutas siguen el mismo patrón:
+1. Validar sesión con `getServerSession(authOptions)`
+2. Parsear body con esquema Zod (en `schema.ts` del mismo directorio)
+3. Query Prisma
+4. Devolver `{ data, message }` o `{ error }` con HTTP status
 
-## 🔧 Configuración
+## Documentación adicional
 
-### Variables de Entorno
+Ver carpeta [`docs/`](./docs/):
 
-Ver [Documentación de Variables de Entorno](./docs/ENV_VARIABLES.md) para más detalles.
+- [`INSTALACION_CONFIGURACION.md`](./docs/INSTALACION_CONFIGURACION.md)
+- [`ARQUITECTURA.md`](./docs/ARQUITECTURA.md)
+- [`API_REFERENCE.md`](./docs/API_REFERENCE.md)
+- [`SEGURIDAD.md`](./docs/SEGURIDAD.md)
+- [`TESTING.md`](./docs/TESTING.md)
+- [`DESPLIEGUE_MANTENIMIENTO.md`](./docs/DESPLIEGUE_MANTENIMIENTO.md)
 
-### Redis (Opcional)
+## Licencia
 
-Para usar caché con Redis:
-1. Configurar `KV_REST_API_URL` y `KV_REST_API_TOKEN` en `.env`
-2. La aplicación funciona sin Redis, pero sin caché
-
-## 📚 Documentación
-
-- [README de Documentación](./docs/README.md)
-- [Estado del Proyecto](./docs/06_PROJECT_STATUS.md)
-- [Lista de Verificación](./docs/07_COMPLETION_CHECKLIST.md)
-- [Resumen de Tareas Pendientes](./docs/08_PENDING_TASKS_SUMMARY.md)
-- [Optimizaciones](./docs/05_OPTIMIZATIONS.md)
-
-## 🚧 Estado del Proyecto
-
-### ✅ Completado (95%)
-
-- Gestión de usuarios y asignaturas
-- Control de asistencia con QR
-- Dashboard y reportes
-- Sistema de eventos
-- Notificaciones por email
-- Carga masiva de datos (Excel/CSV)
-- Optimizaciones de rendimiento
-- Migración a React Query (30% - hooks creados, componentes migrados)
-- Migración de formularios a react-hook-form (100%)
-- Tests unitarios (53+ tests pasando)
-- Tests de APIs con mocks completos (Prisma, Next.js, NextAuth)
-- Tests E2E con Playwright (flujos principales configurados)
-
-### 🚧 Funcionalidades en Desarrollo
-
-- Notificaciones por email (parcialmente implementado - 60%)
-- Testing automatizado completo (31 tests unitarios, tests E2E configurados)
-- React Query para caché del lado del cliente (30% - hooks creados, falta migrar más componentes)
-- Migración de formularios a react-hook-form (100% - completado)
-
-### ⏳ Funcionalidades Pendientes
-
-- Integración con WhatsApp Business
-- Panel de gestión de suscripciones de notificaciones
-- Integración con calendario Outlook
-- Módulo de backup automático
-- Autenticación de dos factores (2FA)
-- API pública documentada
-- Webhooks y auditoría de acciones
-- WebSockets/Server-Sent Events para actualizaciones en tiempo real
-- Mejoras de UX/UI (animaciones, accesibilidad, i18n)
-
-Ver [Estado del Proyecto](./docs/06_PROJECT_STATUS.md) para más detalles sobre lo que falta para completar el proyecto al 100%.
-Ver [Resumen de Tareas Pendientes](./docs/08_PENDING_TASKS_SUMMARY.md) para más detalles sobre lo que falta para completar el proyecto al 100%.
-
-## 📄 Licencia
-
-Este proyecto es privado y propiedad de la Fundación Universitaria de la Popayán.
-
-## 👥 Contribuidores
-
-- Equipo de desarrollo SIRA
+Privado — propiedad de la Fundación Universitaria de Popayán.
