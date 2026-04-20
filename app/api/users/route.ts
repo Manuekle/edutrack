@@ -142,6 +142,7 @@ export async function POST(req: NextRequest) {
         personalEmail: data.personalEmail,
         password: hashedPassword,
         role: data.role,
+        mustChangePassword: true,
       },
     });
 

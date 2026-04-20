@@ -229,6 +229,7 @@ export async function POST(req: NextRequest) {
         studentCode: sanitize(studentCode),
         teacherCode: sanitize(teacherCode),
         isActive: true,
+        mustChangePassword: true,
       },
       select: {
         id: true,
