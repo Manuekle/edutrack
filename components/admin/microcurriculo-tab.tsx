@@ -591,7 +591,7 @@ export function MicrocurriculoTab() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                  className="h-10 w-10 text-muted-foreground hover:text-primary hover:bg-primary/5"
                                   onClick={() => handleEditItem(item.id)}
                                   aria-label="Editar elemento"
                                 >
@@ -600,7 +600,7 @@ export function MicrocurriculoTab() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                                  className="h-10 w-10 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
                                   onClick={() => handleDeleteItem(item.id)}
                                   aria-label="Eliminar elemento"
                                 >

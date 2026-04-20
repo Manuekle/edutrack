@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { addDays, addMonths, eachDayOfInterval, endOfMonth, startOfMonth, subDays, subMonths } from 'date-fns';
 import { CalendarDays } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { sileo } from 'sileo';
 
 interface HorarioGrupo {
   groupId: string;
@@ -54,6 +55,7 @@ export default function AdminHorariosPage() {
         setHorarios(d.horarios ?? []);
         if (d.periodos?.length > 0) setSelectedPeriodo(d.periodos[0]);
       })
+      .catch(() => sileo.error({ description: 'Error al cargar horarios' }))
       .finally(() => setLoading(false));
   }, []);
 
@@ -64,6 +66,7 @@ export default function AdminHorariosPage() {
     fetch(`/api/admin/horarios?periodo=${encodeURIComponent(selectedPeriodo)}`)
       .then(r => r.json())
       .then(d => setHorarios(d.horarios ?? []))
+      .catch(() => sileo.error({ description: 'Error al cargar horarios del período' }))
       .finally(() => setLoading(false));
   }, [selectedPeriodo]);
 

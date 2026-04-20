@@ -133,7 +133,7 @@ export default function ProgramacionPage() {
     fetch('/api/admin/planeador/grupos')
       .then(r => r.json())
       .then(d => setGrupos(d.grupos ?? []))
-      .catch(() => { })
+      .catch(() => sileo.error({ description: 'Error al cargar grupos' }))
       .finally(() => setLoadingGrupos(false));
   };
 

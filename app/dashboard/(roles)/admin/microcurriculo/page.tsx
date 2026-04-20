@@ -63,6 +63,7 @@ export default function MicrocurriculoPage() {
           setTotalItems(data.pagination?.total || 0);
         }
       })
+      .catch(() => setSubjects([]))
       .finally(() => setLoading(false));
   }, [page, search, semesterFilter]);
 
