@@ -306,23 +306,23 @@ export default function ProfilePage() {
     try {
       const updateData: {
         name: string;
-        correoPersonal: string | null;
-        correoInstitucional: string;
-        telefono: string | null;
+        personalEmail: string | null;
+        institutionalEmail: string;
+        phone: string | null;
         studentCode?: string | null;
-        codigoDocente?: string | null;
+        teacherCode?: string | null;
       } = {
         name: data.name,
-        correoPersonal: data.correoPersonal || null,
-        correoInstitucional: data.correoInstitucional,
-        telefono: data.telefono || null,
+        personalEmail: data.correoPersonal || null,
+        institutionalEmail: data.correoInstitucional,
+        phone: data.telefono || null,
       };
 
       // Only include the appropriate code based on user role
       if (session?.user?.role === 'ESTUDIANTE') {
         updateData.studentCode = data.studentCode || null;
       } else {
-        updateData.codigoDocente = data.codigoDocente || null;
+        updateData.teacherCode = data.codigoDocente || null;
       }
 
       const response = await fetch(`/api/users?id=${session?.user?.id}`, {

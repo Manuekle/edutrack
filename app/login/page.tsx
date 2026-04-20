@@ -210,6 +210,32 @@ function LoginForm() {
               )}
             </Button>
 
+            {/* Demo credentials */}
+            <div className="w-full rounded-2xl border border-border/40 bg-muted/30 p-4 space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground text-center mb-3">Credenciales de prueba</p>
+              <div className="space-y-1.5">
+                {[
+                  { role: 'Admin', email: 'admin@fup.edu.co' },
+                  { role: 'Docente', email: 'docente@fup.edu.co' },
+                  { role: 'Estudiante', email: 'estudiante@fup.edu.co' },
+                ].map(({ role, email }) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => {
+                      form.setValue('email', email);
+                      form.setValue('password', 'password123');
+                    }}
+                    className="w-full flex items-center justify-between rounded-xl bg-background/60 border border-border/40 px-3 py-2 hover:bg-background/80 transition-colors cursor-pointer group"
+                  >
+                    <span className="text-xs font-medium text-foreground/70 group-hover:text-foreground transition-colors">{role}</span>
+                    <span className="text-[11px] text-muted-foreground font-mono">{email}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground text-center pt-1">Contraseña: <span className="font-mono font-medium">password123</span></p>
+            </div>
+
             <p className="text-center text-sm text-muted-foreground font-medium">
               ¿No tienes cuenta? Contacta con administración académmica.
             </p>

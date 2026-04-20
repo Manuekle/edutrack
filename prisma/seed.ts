@@ -1,11 +1,6 @@
-import {
-  ClassStatus,
-  DayOfWeek,
-  PrismaClient,
-  Role,
-  RoomType,
-  Subject,
-} from '@prisma/client';
+import * as prismaClient from '@prisma/client';
+const { ClassStatus, DayOfWeek, PrismaClient, Role, RoomType } = prismaClient;
+import type { Subject } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -116,85 +111,51 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.academicPeriod.deleteMany();
 
-  console.log('👤 Creating specialized users...');
+  console.log('👤 Creating test users (3 total)...');
   const commonPassword = await hashPassword('password123');
 
+  // Admin user
   await prisma.user.create({
     data: {
       name: 'Jorge Admin',
       document: '1000',
       institutionalEmail: 'admin@fup.edu.co',
-      personalEmail: 'jorge.admin@test.com',
+      personalEmail: 'admin@personal.com',
       password: commonPassword,
       role: Role.ADMIN,
       isActive: true,
     },
   });
 
-  await prisma.user.create({
-    data: {
-      name: 'Patricia Coordinadora',
-      document: '1500',
-      institutionalEmail: 'coordinacion@fup.edu.co',
-      personalEmail: 'patricia@test.com',
-      password: commonPassword,
-      role: Role.ADMIN, // Assuming COORDINADOR was merged or ADMIN is fine for now
-      isActive: true,
-    },
-  });
-
+  // Docente user
   const docente1 = await prisma.user.create({
     data: {
-      name: 'Luis Alfonso Vejarano Sanchez',
+      name: 'Docente Prueba',
       document: 'DOC001',
-      institutionalEmail: 'luis.vejarano@docente.fup.edu.co',
-      personalEmail: 'luis.vejarano@test.com',
+      institutionalEmail: 'docente@fup.edu.co',
+      personalEmail: 'docente@personal.com',
       password: commonPassword,
       role: Role.DOCENTE,
       isActive: true,
-      signatureUrl: 'https://placehold.co/400x200?text=Firma+Resguardo',
+      signatureUrl: 'https://placehold.co/400x200?text=Firma',
     },
   });
 
-  const docente2 = await prisma.user.create({
-    data: {
-      name: 'Daniela Iboth Gutierrez Idrobo',
-      document: 'DOC002',
-      institutionalEmail: 'daniela.gutierrez@docente.fup.edu.co',
-      personalEmail: 'daniela.gutierrez@test.com',
-      password: commonPassword,
-      role: Role.DOCENTE,
-      isActive: true,
-    },
-  });
-
+  // Estudiante user
   const estudiante1 = await prisma.user.create({
     data: {
-      name: 'Manuel Esteban Erazo Medina',
+      name: 'Estudiante Prueba',
       document: '3001',
-      institutionalEmail: 'manuel.erazo@estudiante.fup.edu.co',
-      personalEmail: 'manuel.erazo@test.com',
+      institutionalEmail: 'estudiante@fup.edu.co',
+      personalEmail: 'estudiante@personal.com',
       password: commonPassword,
       role: Role.ESTUDIANTE,
       isActive: true,
-      studentCode: 'COD-ME-001',
-    },
-  });
-
-  const estudiante2 = await prisma.user.create({
-    data: {
-      name: 'Andres Mauricio Peña Guasca',
-      document: '3002',
-      institutionalEmail: 'andres.pena@estudiante.fup.edu.co',
-      personalEmail: 'andres.pena@test.com',
-      password: commonPassword,
-      role: Role.ESTUDIANTE,
-      isActive: true,
-      studentCode: 'COD-AP-002',
+      studentCode: 'COD-EP-001',
     },
   });
   console.log('🏫 Creating institutional spaces (SJ & SC)...');
-  const roomData: { name: string; type: RoomType; capacity: number }[] = [
+  const roomData: { name: string; type: prismaClient.RoomType; capacity: number }[] = [
     { name: 'Sala 101 SJ', type: RoomType.LABORATORIO, capacity: 25 },
     { name: 'Sala 102 SJ', type: RoomType.LABORATORIO, capacity: 25 },
     { name: 'Salón 201 SJ', type: RoomType.SALA_CLASE, capacity: 40 },
@@ -268,7 +229,7 @@ async function main() {
       subjectId: sub1.id,
       academicPeriod: '2022-1',
       teacherIds: [docente1.id],
-      studentIds: [estudiante1.id, estudiante2.id],
+      studentIds: [estudiante1.id],
       scheduleId: schedule1.id,
       roomId: rooms[0].id,
     },
@@ -291,7 +252,7 @@ async function main() {
     where: { id: sub1.id },
     data: {
       teacherIds: [docente1.id],
-      studentIds: [estudiante1.id, estudiante2.id],
+      studentIds: [estudiante1.id],
       classroom: rooms[0].name,
     },
   });
@@ -331,12 +292,9 @@ async function main() {
 
   console.log('\n🚀 FULL SEED COMPLETE!');
   console.log('-----------------------------------------');
-  console.log('Admin:                admin@fup.edu.co');
-  console.log('Coord:                coordinacion@fup.edu.co');
-  console.log('Docente (Luis):       luis.vejarano@docente.fup.edu.co');
-  console.log('Docente (Daniela):    daniela.gutierrez@docente.fup.edu.co');
-  console.log('Estudiante (Manuel):  manuel.erazo@estudiante.fup.edu.co');
-  console.log('Estudiante (Andres):  andres.pena@estudiante.fup.edu.co');
+  console.log('Admin:     admin@fup.edu.co / password123');
+  console.log('Docente:   docente@fup.edu.co / password123');
+  console.log('Estudiante: estudiante@fup.edu.co / password123');
   console.log('-----------------------------------------');
   console.log(`Salas: ${rooms.length} (SJ y SC)`);
   console.log(`Asignaturas: ${ASIGNATURAS.length} con 16 temas cada una`);
