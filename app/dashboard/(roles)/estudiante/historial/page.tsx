@@ -197,7 +197,9 @@ export default function HistorialAsistenciasPage() {
                       <div className="flex items-center gap-1.5">
                         <CalendarDays className="h-3.5 w-3.5 shrink-0" />
                         <span>
-                          {format(new Date(attendance.class.date), 'PPPP', { locale: es })}
+                          {attendance.class.date
+                            ? format(new Date(attendance.class.date), 'PPPP', { locale: es })
+                            : 'Fecha no disponible'}
                         </span>
                       </div>
                     </div>

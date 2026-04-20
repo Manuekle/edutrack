@@ -77,7 +77,9 @@ export function UpcomingClassesCard({ classes, isLoading = false }: UpcomingClas
                         <span className="w-1 h-1 rounded-full bg-border" />
                         <span>
                           {cls.startTime
-                            ? `${String(new Date(cls.startTime).getUTCHours()).padStart(2, '0')}:${String(new Date(cls.startTime).getUTCMinutes()).padStart(2, '0')}`
+                            ? /^\d{2}:\d{2}/.test(cls.startTime)
+                              ? cls.startTime.substring(0, 5)
+                              : (() => { const d = new Date(cls.startTime); return isNaN(d.getTime()) ? cls.startTime : `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`; })()
                             : 'Sin hora definida'}
                         </span>
                         {cls.classroom && (

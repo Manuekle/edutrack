@@ -206,9 +206,15 @@ export default function PeriodosPage() {
                       {format(new Date(p.endDate), 'PPPP', { locale: es })}
                     </TableCell>
                     <TableCell className="px-5">
-                      <Badge className="bg-green-500/10 text-green-600 border-0 shadow-none text-[10px] font-semibold uppercase rounded-sm">
-                        Activo
-                      </Badge>
+                      {p.isActive ? (
+                        <Badge className="bg-green-500/10 text-green-600 border-0 shadow-none text-[10px] font-semibold uppercase rounded-sm">
+                          Activo
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-muted text-muted-foreground border-0 shadow-none text-[10px] font-semibold uppercase rounded-sm">
+                          Inactivo
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell className="px-5 text-right">
                       <Button

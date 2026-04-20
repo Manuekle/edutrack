@@ -85,8 +85,8 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
             <div className="flex items-center gap-3">
               {liveClass.startTime && (
                 <span className="text-[12px] font-mono text-muted-foreground">
-                  {format(new Date(liveClass.startTime), 'h:mm a')}
-                  {liveClass.endTime && ` - ${format(new Date(liveClass.endTime), 'h:mm a')}`}
+                  {format(liveClass.startTime instanceof Date ? liveClass.startTime : new Date(liveClass.startTime), 'h:mm a')}
+                  {liveClass.endTime && ` - ${format(liveClass.endTime instanceof Date ? liveClass.endTime : new Date(liveClass.endTime), 'h:mm a')}`}
                 </span>
               )}
               <Badge variant="outline" className={`text-[10px] uppercase font-medium ${statusInfo.className}`}>
