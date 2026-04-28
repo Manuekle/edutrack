@@ -187,15 +187,51 @@ async function main() {
     createdSubjects.push(subject);
   }
 
-  // Create AcademicPeriod
-  await prisma.academicPeriod.create({
-    data: {
-      name: '2022-1',
-      startDate: new Date('2022-01-01'),
-      endDate: new Date('2022-06-30'),
-      isActive: true,
+  // Create AcademicYear + AcademicPeriods
+  for (const yearData of [
+    {
+      year: 2022,
+      periods: [{ name: '2022-1', start: '2022-01-01', end: '2022-06-30', isActive: false }],
     },
-  });
+    {
+      year: 2026,
+      periods: [{ name: '2026-1', start: '2026-01-01', end: '2026-06-30', isActive: true }],
+    },
+  ]) {
+    const academicYear = await prisma.academicYear.create({ data: { year: yearData.year } });
+
+    for (const p of yearData.periods) {
+      await prisma.academicPeriod.create({
+        data: {
+          name: p.name,
+          startDate: new Date(p.start),
+          endDate: new Date(p.end),
+          isActive: p.isActive,
+          yearId: academicYear.id,
+        },
+      });
+    }
+  }
+
+  // Create special ranges for 2026
+  const year2026 = await prisma.academicYear.findUnique({ where: { year: 2026 } });
+  if (year2026) {
+    const specialRanges = [
+      { name: 'Semana Santa', type: 'HOLIDAY', start: '2026-04-10', end: '2026-04-13' },
+      { name: 'Receso navideño', type: 'RECESS', start: '2026-12-20', end: '2026-12-31' },
+    ];
+    for (const sr of specialRanges) {
+      await prisma.specialRange.create({
+        data: {
+          name: sr.name,
+          type: sr.type as 'HOLIDAY' | 'RECESS',
+          startDate: new Date(sr.start),
+          endDate: new Date(sr.end),
+          yearId: year2026.id,
+        },
+      });
+    }
+  }
 
   console.log('🔗 Assigning demo teachers and groups...');
   const subParaDemo = createdSubjects.slice(0, 6);
