@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays, GraduationCap, Layout, Users } from 'lucide-react';
+import { CalendarDays, GraduationCap, Layout, Users, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -32,7 +32,6 @@ const DIA_LABELS: Record<string, string> = {
   VIERNES: 'Viernes',
   SABADO: 'Sábado',
   DOMINGO: 'Domingo',
-  // Prisma enum variants
   MONDAY: 'Lunes',
   TUESDAY: 'Martes',
   WEDNESDAY: 'Miércoles',
@@ -55,18 +54,20 @@ export default function MisGruposPage() {
 
   return (
     <div className="space-y-6">
-
       <div>
-        <h1 className="text-2xl font-semibold tracking-card">Mis Grupos</h1>
+        <h1 className="text-2xl font-semibold tracking-wide">Mis Grupos</h1>
         <p className="text-muted-foreground sm:text-sm text-xs mt-1">
-          Grupos activos — haz clic en «Ver Bitácora» para registrar las clases de cada grupo.
+          Grupos activos — selecciona uno para gestionar clases y asistencia.
         </p>
       </div>
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <Card key={i} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-2xl">
+            <Card
+              key={i}
+              className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm rounded-2xl"
+            >
               <CardHeader className="pb-3">
                 <div className="space-y-2">
                   <div className="flex gap-2">
@@ -87,67 +88,74 @@ export default function MisGruposPage() {
           ))}
         </div>
       ) : grupos.length === 0 ? (
-
-
-        <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
-          <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
-            <Users className="h-7 w-7 text-muted-foreground/40" />
+        <div className="col-span-full py-16 text-center bg-muted/20 rounded-2xl border border-dashed border-border/30">
+          <div className="h-12 w-12 rounded-xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
+            <Users className="h-6 w-6 text-muted-foreground/40" />
           </div>
-          <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
-            No tienes grupos asignados.
-          </p>
+          <p className="text-sm font-semibold text-foreground">No tienes grupos asignados</p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
             Verifica con el administrador que el período académico esté activo.
           </p>
-          <Link href="/dashboard/docente/horario" className="inline-block mt-4 text-xs font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors">
-            Ver mi horario
-          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {grupos.map(g => (
-            <Card key={g.id} className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-2xl transition-colors hover:bg-muted/30">
-              <CardHeader className="pb-3">
+            <Card
+              key={g.id}
+              className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm hover:shadow-md hover:border-primary/20 transition-all duration-200 rounded-2xl"
+            >
+              <CardHeader className="pb-3 px-4 pt-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="outline" className="font-mono">
-                        Grupo: {g.codigo || g.code}
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="font-mono text-xs">
+                        {g.codigo || g.code}
                       </Badge>
-                      <Badge variant="secondary">{g.periodoAcademico || g.academicPeriod}</Badge>
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20"
+                      >
+                        {g.periodoAcademico || g.academicPeriod}
+                      </Badge>
                     </div>
-                    <CardTitle className="text-xs">{g.subject.name}</CardTitle>
-                    <code className="text-xs text-muted-foreground">{g.subject.code}</code>
+                    <CardTitle className="text-sm">{g.subject.name}</CardTitle>
+                    <code className="text-xs text-muted-foreground font-mono">
+                      {g.subject.code}
+                    </code>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 gap-2 sm:text-sm text-xs">
+              <CardContent className="px-4 pb-4 space-y-3">
+                <div className="grid grid-cols-1 gap-2 text-xs">
                   {(g.horario || g.schedule) && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                      <CalendarDays className="h-3.5 w-3.5 shrink-0 text-blue-500" />
                       <span>
-                        {g.horario?.diaSemana || g.schedule?.dayOfWeek ? DIA_LABELS[g.horario?.diaSemana || g.schedule?.dayOfWeek || ''] : 'Día Pendiente'} · {g.horario?.horaInicio || g.schedule?.startTime} –{' '}
+                        {g.horario?.diaSemana || g.schedule?.dayOfWeek
+                          ? DIA_LABELS[g.horario?.diaSemana || g.schedule?.dayOfWeek || '']
+                          : 'Día Pendiente'}{' '}
+                        · {g.horario?.horaInicio || g.schedule?.startTime} –{' '}
                         {g.horario?.horaFin || g.schedule?.endTime}
                       </span>
                     </div>
                   )}
                   {(g.sala || g.room) && (
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <Layout className="h-3.5 w-3.5 shrink-0" />
+                      <Layout className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
                       <span>{g.sala?.name || g.room?.name}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <GraduationCap className="h-3.5 w-3.5 shrink-0" />
-                    <span>{(g.estudianteIds || g.studentIds)?.length || 0} estudiantes matriculados</span>
+                    <GraduationCap className="h-3.5 w-3.5 shrink-0 text-violet-500" />
+                    <span>{(g.estudianteIds || g.studentIds)?.length || 0} estudiantes</span>
                   </div>
                 </div>
-                <div className="flex gap-2 pt-1">
-                  <Button asChild size="default" variant="default" className="flex-1">
-                    <Link href={`/dashboard/docente/grupos/${g.id}`}>Ver Detalles</Link>
+                <Link href={`/dashboard/docente/grupos/${g.id}`}>
+                  <Button className="w-full mt-1">
+                    Ver Detalles
+                    <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
-                </div>
+                </Link>
               </CardContent>
             </Card>
           ))}

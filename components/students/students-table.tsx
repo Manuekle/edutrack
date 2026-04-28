@@ -45,18 +45,18 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
       <div>
         <div className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="sm:text-lg text-xs font-semibold tracking-card">
+            <CardTitle className="sm:text-lg text-sm font-semibold tracking-wide">
               Gestión de Estudiantes
             </CardTitle>
             <CardDescription className="text-xs">
-              Listado de estudiantes matriculados en esta sección.
+              Listado de estudiantes matriculados.
             </CardDescription>
           </div>
         </div>
         <div className="mt-4">
           {isLoading ? (
             <div
-              className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1"
+              className="bg-card/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-border/20"
               role="status"
               aria-label="Cargando estudiantes"
             >
@@ -79,13 +79,10 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               </div>
             </div>
           ) : allStudents.length > 0 ? (
-            <div className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1 relative">
+            <div className="bg-card/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-border/20">
               <div className="divide-y divide-border/40">
                 {currentStudents.map(student => (
-                  <StudentTableRow
-                    key={student.id}
-                    student={student}
-                  />
+                  <StudentTableRow key={student.id} student={student} />
                 ))}
               </div>
               <TablePagination

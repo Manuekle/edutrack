@@ -85,18 +85,18 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
       <div>
         <div className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="sm:text-lg text-xs font-semibold tracking-card">
+            <CardTitle className="sm:text-lg text-sm font-semibold tracking-wide">
               Gestión de Clases
             </CardTitle>
             <CardDescription className="text-xs">
-              Gestiona las sesiones de clase para esta asignatura.
+              Lista de sesiones de clase programadas.
             </CardDescription>
           </div>
         </div>
         <div className="mt-4">
           {isLoading ? (
             <div
-              className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1"
+              className="bg-card/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-border/20"
               role="status"
               aria-label="Cargando clases"
             >
@@ -119,7 +119,7 @@ export const ClassesTable: React.FC<ClassesTableProps & ClassesTableDialogProps>
               </div>
             </div>
           ) : allClasses.length > 0 ? (
-            <div className="bg-muted/30 dark:bg-white/[0.06] rounded-3xl overflow-hidden shadow-sm p-1 relative">
+            <div className="bg-card/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-border/20">
               <div className="divide-y divide-border/40">
                 {currentItems.map(cls => {
                   const statusInfo = calculateClassStatus(cls, dateUtils);
