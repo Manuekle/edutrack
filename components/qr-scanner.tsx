@@ -86,7 +86,12 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
           (result: { data: string }) => {
             // H5-A: Local validation before sending
             const token = result.data.trim();
-            if (token.length < 32 || token.length > 64) {
+
+            // Also handle URL format: /dashboard/estudiante/escanear/[token]
+            const urlMatch = token.match(/escanear\/([a-f0-9]{32})/i);
+            const finalToken = urlMatch ? urlMatch[1] : token;
+
+            if (finalToken.length < 32 || finalToken.length > 64) {
               const errMsg = 'Código QR no válido. Intenta con otro código.';
               setError(errMsg);
               return;
@@ -103,15 +108,13 @@ export default function QRScanner({ onScan, onError, isLoading = false }: QRScan
 
             // Clear error on successful scan
             setError('');
-            onScan(token);
+            onScan(finalToken);
             stopScanning();
           },
           {
             highlightScanRegion: true,
             highlightCodeOutline: true,
-            preferredCamera: 'environment',
-            maxScansPerSecond: 5,
-            returnDetailedScanResult: true,
+            returnDetailedScanResult: false,
           }
         );
 
