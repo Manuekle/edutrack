@@ -113,6 +113,7 @@
     "framer-motion": "^12.28.1",
     "geist": "^1.5.1",
     "handlebars": "^4.7.8",
+    "html5-qrcode": "^2.3.8",
     "lru-cache": "^11.2.4",
     "lucide-react": "^0.562.0",
     "motion": "^12.28.1",
