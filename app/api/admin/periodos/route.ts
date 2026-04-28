@@ -40,3 +40,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { id, name, startDate, endDate, isActive, yearId } = body;
+
+    const period = await db.academicPeriod.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(startDate && { startDate: new Date(startDate) }),
+        ...(endDate && { endDate: new Date(endDate) }),
+        ...(typeof isActive === 'boolean' && { isActive }),
+        ...(yearId !== undefined && { yearId }),
+      },
+    });
+
+    return NextResponse.json(period);
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}
