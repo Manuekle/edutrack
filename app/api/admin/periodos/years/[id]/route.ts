@@ -3,15 +3,16 @@ import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const { id } = await params;
     const year = await db.academicYear.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         specialRanges: { orderBy: { startDate: 'asc' } },
         periods: { orderBy: { name: 'asc' } },
@@ -25,14 +26,15 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    await db.academicYear.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await db.academicYear.delete({ where: { id } });
     return NextResponse.json({ message: 'Eliminado' });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });

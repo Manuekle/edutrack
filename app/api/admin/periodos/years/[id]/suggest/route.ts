@@ -3,15 +3,16 @@ import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const { id } = await params;
     const year = await db.academicYear.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { periods: true },
     });
 
