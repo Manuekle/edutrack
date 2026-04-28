@@ -48,10 +48,11 @@ export function TeacherStatsCards({
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <Card className="shadow-none border-0 bg-muted/50 dark:bg-white/[0.06] rounded-2xl">
+      {/* Card 1 - Asignaturas Activas */}
+      <Card className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm hover:shadow-md hover:border-primary/20 transition-all duration-200">
         <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-[13px] font-medium text-muted-foreground flex items-center gap-2 tracking-card uppercase">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+          <CardTitle className="text-[11px] font-semibold text-violet-600 dark:text-violet-400 flex items-center gap-2 tracking-wider uppercase">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
               <BookOpen className="h-4 w-4" />
             </div>
             Activas
@@ -59,18 +60,17 @@ export function TeacherStatsCards({
         </CardHeader>
         <CardContent className="px-5 pb-5">
           <div className="flex items-baseline gap-2 mt-2">
-            <div className="text-4xl font-semibold tracking-card text-foreground">
-              {subjectsCount}
-            </div>
+            <div className="text-4xl font-bold tracking-tight text-foreground">{subjectsCount}</div>
             <p className="text-xs font-medium text-muted-foreground">asignaturas</p>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="shadow-none border-0 bg-blue-500/5 dark:bg-blue-500/10 rounded-2xl">
+      {/* Card 2 - Clases Totales */}
+      <Card className="shadow-sm border-border/20 bg-blue-50/50 dark:bg-blue-500/5 backdrop-blur-sm hover:shadow-md hover:border-blue-200/30 transition-all duration-200">
         <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-[13px] font-medium text-blue-700/70 dark:text-blue-400/70 flex items-center gap-2 tracking-card uppercase">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-500">
+          <CardTitle className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-2 tracking-wider uppercase">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
               <Calendar className="h-4 w-4" />
             </div>
             Totales
@@ -78,7 +78,7 @@ export function TeacherStatsCards({
         </CardHeader>
         <CardContent className="px-5 pb-5">
           <div className="flex items-baseline gap-2 mt-2">
-            <div className="text-4xl font-semibold tracking-card text-blue-700 dark:text-blue-400">
+            <div className="text-4xl font-bold tracking-tight text-blue-700 dark:text-blue-400">
               {totalClasses}
             </div>
             <p className="text-xs font-medium text-blue-600/70 dark:text-blue-400/70">
@@ -88,10 +88,11 @@ export function TeacherStatsCards({
         </CardContent>
       </Card>
 
-      <Card className="shadow-none border-0 bg-green-500/5 dark:bg-green-500/10 rounded-2xl">
+      {/* Card 3 - Clases Impartidas */}
+      <Card className="shadow-sm border-border/20 bg-emerald-50/50 dark:bg-emerald-500/5 backdrop-blur-sm hover:shadow-md hover:border-emerald-200/30 transition-all duration-200">
         <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-[13px] font-medium text-green-700/70 dark:text-green-400/70 flex items-center gap-2 tracking-card uppercase">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-500">
+          <CardTitle className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 tracking-wider uppercase">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
               <Clock className="h-4 w-4" />
             </div>
             Impartidas
@@ -99,20 +100,21 @@ export function TeacherStatsCards({
         </CardHeader>
         <CardContent className="px-5 pb-5">
           <div className="flex items-baseline gap-2 mt-2">
-            <div className="text-4xl font-semibold tracking-card text-green-700 dark:text-green-400">
+            <div className="text-4xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400">
               {completedClasses}
             </div>
-            <p className="text-xs font-medium text-green-600/70 dark:text-green-400/70">
+            <p className="text-xs font-medium text-emerald-600/70 dark:text-emerald-400/70">
               completadas
             </p>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="shadow-none border-0 bg-amber-500/5 dark:bg-amber-500/10 rounded-2xl">
+      {/* Card 4 - Próxima Clase */}
+      <Card className="shadow-sm border-border/20 bg-amber-50/50 dark:bg-amber-500/5 backdrop-blur-sm hover:shadow-md hover:border-amber-200/30 transition-all duration-200">
         <CardHeader className="pb-1 pt-5 px-5 flex flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-[13px] font-medium text-amber-700/70 dark:text-amber-400/70 flex items-center gap-2 tracking-card uppercase">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-500">
+          <CardTitle className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-2 tracking-wider uppercase">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
               <Calendar className="h-4 w-4" />
             </div>
             Próxima

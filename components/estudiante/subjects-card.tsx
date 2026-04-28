@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 
 interface NextClass {
@@ -46,17 +46,16 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
   );
 
   return (
-    <Card className="shadow-none border-0 bg-muted/20 dark:bg-white/[0.06] rounded-3xl shrink-0 h-fit">
-      <CardHeader className="px-6 pt-6 pb-2">
-        <div className="flex items-center gap-2">
-          <CardTitle className="sm:text-lg text-sm font-semibold tracking-card text-foreground">
-            Mis Asignaturas
-          </CardTitle>
+    <Card className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm rounded-2xl shrink-0 h-fit">
+      <CardHeader className="px-5 pt-5 pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-semibold text-foreground">Mis Asignaturas</CardTitle>
+          <span className="text-xs text-muted-foreground">{subjects.length}</span>
         </div>
       </CardHeader>
-      <CardContent className="px-6 pb-6">
+      <CardContent className="px-4 pb-4">
         {subjects.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {paginatedSubjects.map(subject => {
               const progress = subject.attendancePercentage;
               return (
@@ -64,32 +63,35 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
                   role="button"
                   tabIndex={0}
                   key={subject.id}
-                  className="group relative rounded-2xl border-0 transition-all duration-300 bg-muted/40 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="group relative rounded-xl border border-border/20 bg-muted/20 hover:bg-muted/40 hover:border-primary/20 hover:shadow-sm p-3.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
+                          <BookOpen className="h-3.5 w-3.5" />
+                        </div>
                         <h4 className="sm:text-sm text-xs font-semibold truncate text-foreground">
                           {subject.name}
                         </h4>
                       </div>
-                      <p className="text-[11px] font-semibold text-muted-foreground font-mono uppercase tracking-card mb-2">
+                      <p className="text-[11px] font-medium text-muted-foreground font-mono uppercase ml-9">
                         {subject.code}
                       </p>
 
-                      <div className="space-y-1.5">
+                      <div className="space-y-1.5 mt-2 ml-9">
                         <div className="flex items-center justify-between text-[11px] font-medium">
-                          <span className="text-muted-foreground uppercase opacity-80">
+                          <span className="text-muted-foreground uppercase opacity-70">
                             Asistencia
                           </span>
-                          <span className="text-foreground">
+                          <span className="text-foreground font-medium">
                             {subject.attendedClasses}/{subject.totalClasses}
                           </span>
                         </div>
                         <div className="relative">
-                          <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
+                          <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all duration-500 ease-out ${getAttendanceColor(progress)}`}
+                              className={`h-full ${getAttendanceColor(progress)} rounded-full transition-all duration-500`}
                               style={{ width: `${progress}%` }}
                             />
                           </div>
@@ -97,14 +99,17 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end pt-1 justify-center shrink-0">
-                      <div className="text-right flex flex-col items-center justify-center p-3 rounded-xl bg-background/50 border border-border/40 min-w-[64px]">
-                        <div className="sm:text-[17px] text-xs font-semibold text-foreground tracking-card">
-                          {Math.round(progress)}%
-                        </div>
-                        <div className="text-[9px] uppercase font-semibold text-muted-foreground mt-0.5">
-                          asistencia
-                        </div>
+                    <div className="flex flex-col items-center justify-center shrink-0">
+                      <div
+                        className={`text-sm font-bold ${
+                          progress >= 80
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : progress >= 60
+                              ? 'text-amber-600 dark:text-amber-400'
+                              : 'text-rose-600 dark:text-rose-400'
+                        }`}
+                      >
+                        {progress}%
                       </div>
                     </div>
                   </div>
@@ -113,41 +118,37 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
             })}
           </div>
         ) : (
-          <div className="flex flex-col text-center py-16 items-center justify-center min-h-[200px]">
-            <p className="text-xs">No tienes asignaturas registradas</p>
-            <p className="text-xs text-muted-foreground mt-1">Tus asignaturas aparecerán aquí</p>
+          <div className="flex flex-col text-center py-12 items-center justify-center min-h-[160px]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/30 mb-3">
+              <BookOpen className="h-5 w-5 text-muted-foreground/40" />
+            </div>
+            <p className="text-sm font-medium">No tienes asignaturas</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Contacta al administrador para matricularte
+            </p>
           </div>
         )}
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/20">
             <button
               onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
               disabled={currentPage === 0}
-              aria-label="Página anterior"
-              className="p-1.5 rounded-lg bg-muted/40 hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
             </button>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i)}
-                  aria-label={`Página ${i + 1}`}
-                  aria-current={currentPage === i ? 'page' : undefined}
-                  className={`w-2 h-2 rounded-full transition-colors ${currentPage === i ? 'bg-primary' : 'bg-muted/40 hover:bg-muted'
-                    }`}
-                />
-              ))}
-            </div>
+            <span className="text-xs text-muted-foreground">
+              {currentPage + 1} / {totalPages}
+            </span>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
               disabled={currentPage === totalPages - 1}
-              aria-label="Página siguiente"
-              className="p-1.5 rounded-lg bg-muted/40 hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              Siguiente
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         )}
