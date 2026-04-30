@@ -40,7 +40,14 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { ChevronLeft, ChevronRight, Loader2, Pencil, Search, Trash2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronLeft, ChevronRight, Loader2, MoreHorizontal, Pencil, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -341,26 +348,35 @@ export default function MicrocurriculoPage() {
                         </TableCell>
                         <TableCell className="text-center">{subject.semester ?? '—'}</TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-foreground/50 hover:text-primary hover:bg-primary/10 transition-colors"
-                              onClick={() => openEdit(subject)}
-                              aria-label={`Editar ${subject.name}`}
-                            >
-                              <Pencil className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
-                              onClick={() => setDeleteSubject(subject)}
-                              aria-label={`Eliminar ${subject.name}`}
-                            >
-                              <Trash2 className="h-4 w-4" aria-hidden="true" />
-                            </Button>
-                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-foreground/50 hover:text-foreground"
+                                aria-label={`Acciones para ${subject.name}`}
+                              >
+                                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem
+                                className="cursor-pointer gap-2 py-2 text-blue-600 dark:text-blue-400 focus:bg-blue-500/10 focus:text-blue-600"
+                                onClick={() => openEdit(subject)}
+                              >
+                                <Pencil className="h-4 w-4" aria-hidden="true" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="cursor-pointer gap-2 py-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                onClick={() => setDeleteSubject(subject)}
+                              >
+                                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                                Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))
