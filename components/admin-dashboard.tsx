@@ -295,7 +295,7 @@ const AdminDashboardComponent = () => {
                     paddingAngle={3}
                     strokeWidth={0}
                     label={({ percent }) =>
-                      percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ''
+                      (percent ?? 0) > 0.05 ? `${((percent ?? 0) * 100).toFixed(0)}%` : ''
                     }
                     labelLine={false}
                   >
