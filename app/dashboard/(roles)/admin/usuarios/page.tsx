@@ -559,7 +559,7 @@ export default function AdminUsuariosPage() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                  className="h-8 w-8 text-foreground/50 hover:text-foreground"
                                   aria-label="Opciones de usuario"
                                 >
                                   <MoreHorizontal className="h-4 w-4" aria-hidden="true" />

@@ -30,7 +30,7 @@ export function TeacherStatsCards({
         {[1, 2, 3, 4].map(i => (
           <div
             key={i}
-            className="rounded-2xl border border-border/20 bg-card/80 p-5"
+            className="rounded-2xl border border-border bg-card p-5"
           >
             <div className="flex items-center justify-between mb-3">
               <Skeleton className="h-3 w-24" />

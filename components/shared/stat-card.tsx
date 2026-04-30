@@ -16,32 +16,39 @@ const colorMap: Record<
   { card: string; icon: string; value: string; subtitle: string }
 > = {
   default: {
-    card: 'bg-card/80 backdrop-blur-sm border-border/20 hover:shadow-md hover:border-primary/20',
-    icon: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+    card: 'bg-card border-border hover:shadow-md hover:border-primary/30',
+    icon: 'bg-violet-500/15 text-violet-600 dark:text-violet-400',
     value: 'text-foreground',
     subtitle: 'text-muted-foreground',
   },
   blue: {
-    card: 'bg-blue-50/50 dark:bg-blue-500/5 backdrop-blur-sm border-border/20 hover:shadow-md hover:border-blue-200/30',
-    icon: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    value: 'text-blue-700 dark:text-blue-400',
-    subtitle: 'text-blue-600/70 dark:text-blue-400/70',
+    card: 'bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900/50 hover:shadow-md hover:border-blue-300/50 dark:hover:border-blue-700/50',
+    icon: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+    value: 'text-blue-700 dark:text-blue-300',
+    subtitle: 'text-blue-600/70 dark:text-blue-400/80',
   },
   green: {
-    card: 'bg-emerald-50/50 dark:bg-emerald-500/5 backdrop-blur-sm border-border/20 hover:shadow-md hover:border-emerald-200/30',
-    icon: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    value: 'text-emerald-700 dark:text-emerald-400',
-    subtitle: 'text-emerald-600/70 dark:text-emerald-400/70',
+    card: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-900/50 hover:shadow-md hover:border-emerald-300/50 dark:hover:border-emerald-700/50',
+    icon: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    value: 'text-emerald-700 dark:text-emerald-300',
+    subtitle: 'text-emerald-600/70 dark:text-emerald-400/80',
   },
   amber: {
-    card: 'bg-amber-50/50 dark:bg-amber-500/5 backdrop-blur-sm border-border/20 hover:shadow-md hover:border-amber-200/30',
-    icon: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-    value: 'text-amber-700 dark:text-amber-400',
-    subtitle: 'text-amber-600/70 dark:text-amber-400/70',
+    card: 'bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900/50 hover:shadow-md hover:border-amber-300/50 dark:hover:border-amber-700/50',
+    icon: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+    value: 'text-amber-700 dark:text-amber-300',
+    subtitle: 'text-amber-600/70 dark:text-amber-400/80',
   },
 };
 
-export function StatCard({ title, value, subtitle, icon: Icon, color = 'default', children }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  subtitle,
+  icon: Icon,
+  color = 'default',
+  children,
+}: StatCardProps) {
   const colors = colorMap[color];
 
   return (
@@ -51,7 +58,9 @@ export function StatCard({ title, value, subtitle, icon: Icon, color = 'default'
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             {title}
           </p>
-          <div className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 ${colors.icon}`}>
+          <div
+            className={`h-8 w-8 rounded-xl flex items-center justify-center shrink-0 ${colors.icon}`}
+          >
             <Icon className="h-4 w-4" aria-hidden="true" />
           </div>
         </div>
@@ -60,9 +69,7 @@ export function StatCard({ title, value, subtitle, icon: Icon, color = 'default'
             <p className={`text-2xl sm:text-3xl font-bold tracking-tight ${colors.value}`}>
               {value}
             </p>
-            {subtitle && (
-              <p className={`text-xs font-medium ${colors.subtitle}`}>{subtitle}</p>
-            )}
+            {subtitle && <p className={`text-xs font-medium ${colors.subtitle}`}>{subtitle}</p>}
           </div>
         )}
       </CardContent>

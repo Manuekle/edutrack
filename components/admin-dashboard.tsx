@@ -190,25 +190,25 @@ const AdminDashboardComponent = () => {
             icon: CalendarDays,
             label: 'Planeador',
             desc: 'Configurar semestre',
-            color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+            color: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
           },
           {
             href: '/dashboard/admin/salas',
             icon: Layout,
             label: 'Salas',
             desc: 'Gestionar espacios',
-            color: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+            color: 'bg-violet-500/15 text-violet-600 dark:text-violet-400',
           },
           {
             href: '/dashboard/admin/reportes',
             icon: TrendingUp,
             label: 'Reportes',
             desc: 'Ver avance docentes',
-            color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+            color: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
           },
         ].map(({ href, icon: Icon, label, desc, color }) => (
           <Link key={href} href={href}>
-            <Card className="h-full transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 cursor-pointer border-border/20 bg-card/80 backdrop-blur-sm">
+            <Card className="h-full transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 cursor-pointer border-border bg-card">
               <CardContent className="py-4 px-4 flex items-center gap-3">
                 <div
                   className={`flex w-10 h-10 items-center justify-center rounded-xl ${color} shrink-0`}
@@ -232,17 +232,17 @@ const AdminDashboardComponent = () => {
         {data.cards.map((card, i) => {
           const Icon = CARD_ICONS[i];
           const colors = [
-            'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-            'bg-violet-500/10 text-violet-600 dark:text-violet-400',
-            'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-            'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+            'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+            'bg-violet-500/15 text-violet-600 dark:text-violet-400',
+            'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+            'bg-amber-500/15 text-amber-600 dark:text-amber-400',
           ];
           const colorClass = colors[i % colors.length];
 
           return (
             <Card
               key={i}
-              className="border-border/20 bg-card/80 backdrop-blur-sm hover:shadow-md hover:border-primary/20 transition-all duration-200"
+              className="border-border bg-card hover:shadow-md hover:border-primary/40 transition-all duration-200"
             >
               <CardContent className="pt-5 pb-4 px-5">
                 <div className="flex items-center justify-between mb-3">
@@ -268,7 +268,7 @@ const AdminDashboardComponent = () => {
         {/* Role Distribution */}
         <Card
           id="tour-dashboard-users-chart"
-          className="border-border/20 bg-card/80 backdrop-blur-sm"
+          className="border-border bg-card"
         >
           <CardHeader className="pb-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-wide text-foreground">
@@ -321,7 +321,7 @@ const AdminDashboardComponent = () => {
         {/* Monthly Classes */}
         <Card
           id="tour-dashboard-classes-chart"
-          className="border-border/20 bg-card/80 backdrop-blur-sm"
+          className="border-border bg-card"
         >
           <CardHeader className="pb-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-wide text-foreground">
@@ -371,7 +371,7 @@ const AdminDashboardComponent = () => {
       {/* Charts Row 2 - Diseño Mejorado */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Attendance Distribution */}
-        <Card className="border-border/20 bg-card/80 backdrop-blur-sm">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-wide text-foreground">
               Estado de Asistencias
@@ -413,7 +413,7 @@ const AdminDashboardComponent = () => {
         </Card>
 
         {/* Classroom Occupancy */}
-        <Card className="border-border/20 bg-card/80 backdrop-blur-sm">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-wide text-foreground">
               Uso de Salones
@@ -464,7 +464,7 @@ const AdminDashboardComponent = () => {
       </div>
 
       {/* Top Subjects - Diseño Mejorado */}
-      <Card className="border-border/20 bg-card/80 backdrop-blur-sm">
+      <Card className="border-border bg-card">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <CardTitle className="sm:text-sm text-xs font-semibold tracking-wide text-foreground">

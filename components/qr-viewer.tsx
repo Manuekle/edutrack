@@ -182,7 +182,7 @@ export function QRViewer({
             </div>
 
             {/* Token display with accessible copy button */}
-            <div className="px-4 py-2 bg-muted/40 rounded-full border border-border/20">
+            <div className="px-4 py-2 bg-muted/50 rounded-full border border-border">
               <div className="flex items-center justify-between gap-3">
                 <code className="font-mono sm:text-sm text-xs font-bold tracking-card text-foreground truncate select-all">
                   {qrToken || '........'}

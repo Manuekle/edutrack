@@ -66,7 +66,7 @@ export default function MisGruposPage() {
           {[1, 2, 3].map(i => (
             <Card
               key={i}
-              className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm rounded-2xl"
+              className="shadow-sm border-border bg-card rounded-2xl"
             >
               <CardHeader className="pb-3">
                 <div className="space-y-2">
@@ -102,7 +102,7 @@ export default function MisGruposPage() {
           {grupos.map(g => (
             <Card
               key={g.id}
-              className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm hover:shadow-md hover:border-primary/20 transition-all duration-200 rounded-2xl"
+              className="shadow-sm border-border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-200 rounded-2xl"
             >
               <CardHeader className="pb-3 px-4 pt-4">
                 <div className="flex items-start justify-between">
