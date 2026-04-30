@@ -22,7 +22,7 @@ interface UpcomingClassesCardProps {
 
 export function UpcomingClassesCard({ classes, isLoading = false }: UpcomingClassesCardProps) {
   return (
-    <Card className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm rounded-2xl shrink-0 h-fit">
+    <Card className="shadow-sm border-border bg-card rounded-2xl shrink-0 h-fit">
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground">Próximas Clases</CardTitle>
@@ -49,7 +49,7 @@ export function UpcomingClassesCard({ classes, isLoading = false }: UpcomingClas
             {classes.slice(0, 3).map(cls => (
               <div
                 key={cls.id}
-                className="group relative rounded-xl border border-border/20 bg-muted/20 hover:bg-muted/40 hover:border-primary/20 hover:shadow-sm p-3.5 transition-all duration-200"
+                className="group relative rounded-xl border border-border bg-muted/30 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm p-3.5 transition-all duration-200"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">

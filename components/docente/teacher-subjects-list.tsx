@@ -23,7 +23,7 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
   const router = useRouter();
 
   return (
-    <Card className="shadow-sm border-border/20 bg-card/80 backdrop-blur-sm rounded-2xl shrink-0 h-fit">
+    <Card className="shadow-sm border-border bg-card rounded-2xl shrink-0 h-fit">
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground">Mis Asignaturas</CardTitle>
@@ -70,7 +70,7 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
                       router.push(`/dashboard/docente/grupos/${subject.groupId}`);
                     }
                   }}
-                  className="group relative rounded-xl border border-border/20 bg-muted/20 hover:bg-muted/40 hover:border-primary/20 hover:shadow-sm cursor-pointer p-3.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="group relative rounded-xl border border-border bg-muted/30 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm cursor-pointer p-3.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">

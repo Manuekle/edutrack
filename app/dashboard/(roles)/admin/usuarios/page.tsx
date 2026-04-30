@@ -438,6 +438,7 @@ export default function AdminUsuariosPage() {
                       className="border-border/40 bg-background pl-9 text-xs"
                       value={searchTerm}
                       onChange={e => setSearchTerm(e.target.value)}
+                      aria-label="Buscar usuarios"
                     />
                   </div>
 
@@ -558,9 +559,10 @@ export default function AdminUsuariosPage() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                  className="h-8 w-8 text-foreground/50 hover:text-foreground"
+                                  aria-label="Opciones de usuario"
                                 >
-                                  <MoreHorizontal className="h-4 w-4" />
+                                  <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                                 </Button>
                               </DropdownMenuTrigger>
 

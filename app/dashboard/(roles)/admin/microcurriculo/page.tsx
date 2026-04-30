@@ -1,9 +1,27 @@
 'use client';
 
 import { MicrocurriculoTab } from '@/components/admin/microcurriculo-tab';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -22,8 +40,16 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ChevronLeft, ChevronRight, Loader2, MoreHorizontal, Pencil, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { sileo } from 'sileo';
 
 interface SubjectRow {
   id: string;
@@ -31,6 +57,15 @@ interface SubjectRow {
   code: string;
   program: string | null;
   semester: number | null;
+  directHours: number | null;
+}
+
+interface EditForm {
+  name: string;
+  code: string;
+  program: string;
+  semester: string;
+  directHours: string;
 }
 
 export default function MicrocurriculoPage() {
@@ -39,13 +74,28 @@ export default function MicrocurriculoPage() {
   const [search, setSearch] = useState('');
   const [semesterFilter, setSemesterFilter] = useState('all');
 
-  // Pagination state
+  // Pagination
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const pageSize = 10;
 
-  useEffect(() => {
+  // Edit state
+  const [editSubject, setEditSubject] = useState<SubjectRow | null>(null);
+  const [editForm, setEditForm] = useState<EditForm>({
+    name: '',
+    code: '',
+    program: '',
+    semester: '',
+    directHours: '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  // Delete state
+  const [deleteSubject, setDeleteSubject] = useState<SubjectRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const fetchSubjects = () => {
     setLoading(true);
     const params = new URLSearchParams({
       page: page.toString(),
@@ -65,12 +115,75 @@ export default function MicrocurriculoPage() {
       })
       .catch(() => setSubjects([]))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchSubjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, semesterFilter]);
 
-  // Reset to first page when filters change
   useEffect(() => {
     setPage(1);
   }, [search, semesterFilter]);
+
+  const openEdit = (subject: SubjectRow) => {
+    setEditSubject(subject);
+    setEditForm({
+      name: subject.name,
+      code: subject.code,
+      program: subject.program ?? '',
+      semester: subject.semester?.toString() ?? '',
+      directHours: subject.directHours?.toString() ?? '',
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editSubject) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/microcurriculo/${editSubject.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          code: editForm.code.trim(),
+          program: editForm.program.trim() || null,
+          semester: editForm.semester ? parseInt(editForm.semester) : null,
+          directHours: editForm.directHours ? parseInt(editForm.directHours) : null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        sileo.error({ title: data.error || 'Error al actualizar la asignatura' });
+        return;
+      }
+      sileo.success({ title: 'Asignatura actualizada correctamente' });
+      setEditSubject(null);
+      fetchSubjects();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteSubject) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/microcurriculo/${deleteSubject.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        sileo.error({ title: data.error || 'Error al eliminar la asignatura' });
+        return;
+      }
+      sileo.success({ title: 'Asignatura eliminada correctamente' });
+      setDeleteSubject(null);
+      fetchSubjects();
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -119,7 +232,9 @@ export default function MicrocurriculoPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-semibold">
-                  {loading && subjects.length === 0 ? '—' : new Set(subjects.map(s => s.program || 'N/A')).size}
+                  {loading && subjects.length === 0
+                    ? '—'
+                    : new Set(subjects.map(s => s.program || 'N/A')).size}
                 </p>
               </CardContent>
             </Card>
@@ -131,7 +246,9 @@ export default function MicrocurriculoPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-semibold">
-                  {loading && subjects.length === 0 ? '—' : new Set(subjects.map(s => s.semester ?? 'N/A')).size}
+                  {loading && subjects.length === 0
+                    ? '—'
+                    : new Set(subjects.map(s => s.semester ?? 'N/A')).size}
                 </p>
               </CardContent>
             </Card>
@@ -148,6 +265,7 @@ export default function MicrocurriculoPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     className="pl-9"
+                    aria-label="Buscar asignatura"
                   />
                 </div>
                 <Select value={semesterFilter} onValueChange={setSemesterFilter}>
@@ -172,22 +290,34 @@ export default function MicrocurriculoPage() {
                     <TableHead>Asignatura</TableHead>
                     <TableHead>Código</TableHead>
                     <TableHead>Programa</TableHead>
-                    <TableHead className="text-right">Semestre</TableHead>
+                    <TableHead className="text-center">Semestre</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {loading ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <TableRow key={i}>
-                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                        <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-                        <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-32" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-20" />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton className="h-4 w-40" />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Skeleton className="h-4 w-8 mx-auto" />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Skeleton className="h-7 w-16 ml-auto" />
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : subjects.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="py-10">
+                      <TableCell colSpan={5} className="py-10">
                         <div className="flex flex-col items-center justify-center text-center gap-2">
                           <p className="sm:text-sm text-xs font-medium text-foreground">
                             {search
@@ -196,8 +326,9 @@ export default function MicrocurriculoPage() {
                           </p>
                           {!search && (
                             <p className="text-xs text-muted-foreground">
-                              Ve a la pestaña <strong>&quot;Cargar asignaturas&quot;</strong> para
-                              subir el catálogo.
+                              Ve a la pestaña{' '}
+                              <strong>&quot;Cargar asignaturas&quot;</strong> para subir el
+                              catálogo.
                             </p>
                           )}
                         </div>
@@ -215,7 +346,38 @@ export default function MicrocurriculoPage() {
                         <TableCell className="sm:text-sm text-xs text-muted-foreground">
                           {subject.program ?? '—'}
                         </TableCell>
-                        <TableCell className="text-right">{subject.semester ?? '—'}</TableCell>
+                        <TableCell className="text-center">{subject.semester ?? '—'}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-foreground/50 hover:text-foreground"
+                                aria-label={`Acciones para ${subject.name}`}
+                              >
+                                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem
+                                className="cursor-pointer gap-2 py-2 text-blue-600 dark:text-blue-400 focus:bg-blue-500/10 focus:text-blue-600"
+                                onClick={() => openEdit(subject)}
+                              >
+                                <Pencil className="h-4 w-4" aria-hidden="true" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="cursor-pointer gap-2 py-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                onClick={() => setDeleteSubject(subject)}
+                              >
+                                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                                Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
                       </TableRow>
                     ))
                   )}
@@ -226,7 +388,8 @@ export default function MicrocurriculoPage() {
               {!loading && totalPages > 1 && (
                 <div className="flex items-center justify-between px-4 py-4 border-t">
                   <p className="text-xs text-muted-foreground">
-                    Mostrando página <span className="font-medium text-foreground">{page}</span> de{' '}
+                    Mostrando página{' '}
+                    <span className="font-medium text-foreground">{page}</span> de{' '}
                     <span className="font-medium text-foreground">{totalPages}</span>
                   </p>
                   <div className="flex items-center gap-2">
@@ -242,13 +405,11 @@ export default function MicrocurriculoPage() {
                     </Button>
                     <div className="flex items-center gap-1">
                       {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-                        // Simple windowing logic
                         let pageNum = i + 1;
                         if (totalPages > 5 && page > 3) {
                           pageNum = page - 3 + i + 1;
                           if (pageNum > totalPages) pageNum = totalPages - (4 - i);
                         }
-
                         return (
                           <Button
                             key={pageNum}
@@ -279,6 +440,117 @@ export default function MicrocurriculoPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editSubject} onOpenChange={open => !open && setEditSubject(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar asignatura</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-name">
+                Nombre <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="edit-name"
+                value={editForm.name}
+                onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="Ej: Cálculo Diferencial"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-code">
+                Código <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="edit-code"
+                value={editForm.code}
+                onChange={e => setEditForm(f => ({ ...f, code: e.target.value }))}
+                placeholder="Ej: MAT101"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-program">Programa académico</Label>
+              <Input
+                id="edit-program"
+                value={editForm.program}
+                onChange={e => setEditForm(f => ({ ...f, program: e.target.value }))}
+                placeholder="Ej: Ingeniería de Sistemas"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-semester">Semestre</Label>
+                <Select
+                  value={editForm.semester}
+                  onValueChange={val => setEditForm(f => ({ ...f, semester: val }))}
+                >
+                  <SelectTrigger id="edit-semester">
+                    <SelectValue placeholder="Seleccionar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(s => (
+                      <SelectItem key={s} value={s.toString()}>
+                        Semestre {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="edit-hours">Horas directas</Label>
+                <Input
+                  id="edit-hours"
+                  type="number"
+                  min={0}
+                  value={editForm.directHours}
+                  onChange={e => setEditForm(f => ({ ...f, directHours: e.target.value }))}
+                  placeholder="Ej: 48"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditSubject(null)} disabled={saving}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={saving || !editForm.name.trim() || !editForm.code.trim()}
+            >
+              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Guardar cambios
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirm */}
+      <AlertDialog open={!!deleteSubject} onOpenChange={open => !open && setDeleteSubject(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar asignatura?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vas a eliminar{' '}
+              <span className="font-semibold text-foreground">{deleteSubject?.name}</span> (
+              {deleteSubject?.code}). Esta acción no se puede deshacer. Solo es posible si la
+              asignatura no tiene grupos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
