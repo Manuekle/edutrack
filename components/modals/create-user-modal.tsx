@@ -76,6 +76,7 @@ export function CreateUserModal({ isOpen, onClose, onUserCreated }: CreateUserMo
 
   const form = useForm<CreateUserFormValues>({
     resolver: zodResolver(createUserSchema),
+    mode: 'onChange',
     defaultValues: {
       name: '',
       personalEmail: '',

@@ -636,8 +636,9 @@ export default function PlaneacionPage() {
                             setShowObservationDialog(true);
                           }}
                           title="Agregar observación (días festivos/cancelaciones)"
+                          aria-label="Agregar observación a planeación"
                         >
-                          <CalendarOff className="h-3.5 w-3.5" />
+                          <CalendarOff className="h-3.5 w-3.5" aria-hidden="true" />
                         </Button>
                         {/* Botón eliminar */}
                         <Button
@@ -647,6 +648,7 @@ export default function PlaneacionPage() {
                           onClick={() => deletePlaneacion(g.planning!.id)}
                           disabled={deletingId === g.planning!.id}
                           title="Eliminar planeación"
+                          aria-label="Eliminar planeación"
                         >
                           {deletingId === g.planning!.id ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />

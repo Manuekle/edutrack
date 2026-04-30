@@ -56,7 +56,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
         <div className="mt-4">
           {isLoading ? (
             <div
-              className="bg-card/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-border/20"
+              className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border"
               role="status"
               aria-label="Cargando estudiantes"
             >
@@ -79,7 +79,7 @@ export const StudentsTable: React.FC<StudentsTableProps> = ({
               </div>
             </div>
           ) : allStudents.length > 0 ? (
-            <div className="bg-card/80 backdrop-blur-sm rounded-2xl overflow-hidden shadow-sm border border-border/20">
+            <div className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border">
               <div className="divide-y divide-border/40">
                 {currentStudents.map(student => (
                   <StudentTableRow key={student.id} student={student} />

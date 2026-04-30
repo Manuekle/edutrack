@@ -269,7 +269,7 @@ function AppSidebar({ homePath }: { homePath: string }) {
         )}
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border/20 pb-[env(safe-area-inset-bottom)]">
+      <SidebarFooter className="border-t border-border pb-[env(safe-area-inset-bottom)]">
         <SidebarMenu>
           <SidebarMenuItem>
             {mounted ? (
