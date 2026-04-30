@@ -51,6 +51,7 @@ export default function DocenteDashboard() {
   const [subjects, setSubjects] = useState<SubjectStats[]>([]);
   const [upcomingClasses, setUpcomingClasses] = useState<UpcomingClass[]>([]);
   const [liveClass, setLiveClass] = useState<LiveClassData | null>(null);
+  const [pollingError, setPollingError] = useState(false);
 
   // Función para cargar datos del dashboard (reutilizable)
   const fetchDashboardData = useCallback(async (isManualRefresh = false) => {
@@ -103,9 +104,14 @@ export default function DocenteDashboard() {
 
       // Polling for live class only (cada 10 segundos)
       const intervalId = setInterval(async () => {
-        const { data } = await getLiveClassData();
-        setLiveClass(data?.liveClass || null);
-        setLastUpdated(new Date());
+        try {
+          const { data } = await getLiveClassData();
+          setLiveClass(data?.liveClass || null);
+          setLastUpdated(new Date());
+          setPollingError(false);
+        } catch {
+          setPollingError(true);
+        }
       }, 10000);
 
       return () => clearInterval(intervalId);
@@ -152,7 +158,13 @@ export default function DocenteDashboard() {
           )}
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          {lastUpdated && !loading && (
+          {pollingError && !loading && (
+            <span className="text-[11px] text-destructive hidden sm:flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-destructive inline-block" />
+              Sin conexión
+            </span>
+          )}
+          {lastUpdated && !loading && !pollingError && (
             <span className="text-[11px] text-muted-foreground hidden sm:block">
               Actualizado hace{' '}
               {Math.floor((Date.now() - lastUpdated.getTime()) / 1000) < 60

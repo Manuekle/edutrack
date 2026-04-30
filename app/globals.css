@@ -25,7 +25,7 @@ body {
   --secondary: #e8edf6;
   --secondary-foreground: #395886;
   --muted: #eef1f8;
-  --muted-foreground: #6b7a99;
+  --muted-foreground: #4e5d80;
   --accent: #d5deef;
   --accent-foreground: #395886;
   --destructive: #e91e63;
@@ -92,7 +92,7 @@ body {
   --destructive-foreground: #ffffff;
   --border: rgba(138, 174, 224, 0.12);
   --input: rgba(138, 174, 224, 0.12);
-  --ring: #638ecb;
+  --ring: #8aaee0;
   --chart-1: #638ecb;
   --chart-2: #8aaee0;
   --chart-3: #b1c9ef;

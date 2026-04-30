@@ -183,7 +183,7 @@ const AdminDashboardComponent = () => {
       </div>
 
       {/* Quick Links - Diseño Mejorado */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {[
           {
             href: '/dashboard/admin/planeador',
@@ -255,7 +255,7 @@ const AdminDashboardComponent = () => {
                     <Icon className="h-4 w-4" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold tracking-tight text-foreground">{card.value}</p>
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">{card.value}</p>
                 <p className="text-[11px] text-muted-foreground mt-1">{card.subtitle}</p>
               </CardContent>
             </Card>
@@ -276,34 +276,45 @@ const AdminDashboardComponent = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={{}} className="mx-auto aspect-square max-h-[260px] w-full">
-              <PieChart>
-                <Pie
-                  data={data.charts.roleDistribution}
-                  dataKey="value"
-                  nameKey="label"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={95}
-                  paddingAngle={3}
-                  strokeWidth={0}
-                >
-                  {data.charts.roleDistribution.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<ChartTooltipContent />} />
-                <Legend
-                  layout="horizontal"
-                  verticalAlign="bottom"
-                  wrapperStyle={{ paddingTop: '16px' }}
-                  formatter={value => (
-                    <span className="text-xs text-muted-foreground">{value}</span>
-                  )}
-                />
-              </PieChart>
-            </ChartContainer>
+            {data.charts.roleDistribution.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 gap-3">
+                <Users className="h-8 w-8 text-muted-foreground/40" aria-hidden="true" />
+                <p className="text-xs text-muted-foreground font-medium">Sin usuarios registrados</p>
+              </div>
+            ) : (
+              <ChartContainer config={{}} className="mx-auto aspect-square max-h-[260px] w-full">
+                <PieChart>
+                  <Pie
+                    data={data.charts.roleDistribution}
+                    dataKey="value"
+                    nameKey="label"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={95}
+                    paddingAngle={3}
+                    strokeWidth={0}
+                    label={({ percent }) =>
+                      percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ''
+                    }
+                    labelLine={false}
+                  >
+                    {data.charts.roleDistribution.map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<ChartTooltipContent />} />
+                  <Legend
+                    layout="horizontal"
+                    verticalAlign="bottom"
+                    wrapperStyle={{ paddingTop: '16px' }}
+                    formatter={value => (
+                      <span className="text-xs text-muted-foreground">{value}</span>
+                    )}
+                  />
+                </PieChart>
+              </ChartContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -318,6 +329,15 @@ const AdminDashboardComponent = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {data.charts.monthlyClasses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 gap-3">
+                <CalendarDays className="h-8 w-8 text-muted-foreground/40" aria-hidden="true" />
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground font-medium">Sin clases registradas</p>
+                  <p className="text-[11px] text-muted-foreground/60 mt-1">Los datos aparecerán cuando se programen clases</p>
+                </div>
+              </div>
+            ) : (
             <ChartContainer config={{}} className="mx-auto aspect-square max-h-[260px] w-full">
               <AreaChart
                 data={data.charts.monthlyClasses}
@@ -343,6 +363,7 @@ const AdminDashboardComponent = () => {
                 />
               </AreaChart>
             </ChartContainer>
+            )}
           </CardContent>
         </Card>
       </div>

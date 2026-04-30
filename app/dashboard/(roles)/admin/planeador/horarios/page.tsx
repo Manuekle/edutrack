@@ -558,8 +558,8 @@ export default function ProgramacionPage() {
                                 <TableCell className="text-right px-4 py-3">
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="icon" className="h-7 w-7">
-                                        <MoreVertical className="h-3.5 w-3.5" />
+                                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Opciones de horario">
+                                        <MoreVertical className="h-3.5 w-3.5" aria-hidden="true" />
                                       </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-32 text-xs">
@@ -793,8 +793,8 @@ export default function ProgramacionPage() {
                           <TableCell className="px-5 text-right">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                  <MoreVertical className="h-4 w-4" />
+                                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Opciones de clase">
+                                  <MoreVertical className="h-4 w-4" aria-hidden="true" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-40">
