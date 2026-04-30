@@ -13,63 +13,63 @@ body {
 }
 
 :root {
-  /* ── iOS Blue Light ── */
-  --background: #f0f3fa;
-  --foreground: #1a1f36;
+  /* ── Clean Modern Light ── */
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #1a1f36;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #1a1f36;
-  --primary: #638ecb;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #e8edf6;
-  --secondary-foreground: #395886;
-  --muted: #eef1f8;
-  --muted-foreground: #4e5d80;
-  --accent: #d5deef;
-  --accent-foreground: #395886;
-  --destructive: #e91e63;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e3a6e;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #dbeafe;
+  --accent-foreground: #1e40af;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   /* ── Accent Library ── */
-  --accent-magenta: #e91e63;
-  --accent-purple: #9c27b0;
-  --accent-blue: #395886;
-  --accent-sky: #8aaee0;
-  --accent-teal: #57dcbe;
-  --accent-green: #34c759;
+  --accent-magenta: #db2777;
+  --accent-purple: #7c3aed;
+  --accent-blue: #1e40af;
+  --accent-sky: #0ea5e9;
+  --accent-teal: #0d9488;
+  --accent-green: #16a34a;
 
-  --border: #d5deef;
-  --input: #d5deef;
-  --ring: #638ecb;
-  --chart-1: #638ecb;
-  --chart-2: #395886;
-  --chart-3: #8aaee0;
-  --chart-4: #b1c9ef;
-  --chart-5: #d5deef;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #2563eb;
+  --chart-1: #2563eb;
+  --chart-2: #0d9488;
+  --chart-3: #7c3aed;
+  --chart-4: #ea580c;
+  --chart-5: #16a34a;
   --sidebar: #ffffff;
-  --sidebar-foreground: #1a1f36;
-  --sidebar-primary: #638ecb;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8edf6;
-  --sidebar-accent-foreground: #1a1f36;
-  --sidebar-border: transparent;
-  --sidebar-ring: #638ecb;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #2563eb;
   --radius: 1rem;
   --shadow-x: 0px;
   --shadow-y: 1px;
   --shadow-blur: 2px;
   --shadow-spread: 0px;
   --shadow-opacity: 0.04;
-  --shadow-color: #395886;
-  --shadow-2xs: 0px 1px 2px 0px rgba(57, 88, 134, 0.03);
-  --shadow-xs: 0px 1px 2px 0px rgba(57, 88, 134, 0.04);
-  --shadow-sm: 0px 1px 3px 0px rgba(57, 88, 134, 0.06);
-  --shadow: 0px 4px 6px -1px rgba(57, 88, 134, 0.06), 0px 2px 4px -2px rgba(57, 88, 134, 0.04);
-  --shadow-md: 0px 10px 15px -3px rgba(57, 88, 134, 0.06), 0px 4px 6px -4px rgba(57, 88, 134, 0.04);
+  --shadow-color: #1e3a6e;
+  --shadow-2xs: 0px 1px 2px 0px rgba(15, 23, 42, 0.04);
+  --shadow-xs: 0px 1px 2px 0px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0px 1px 3px 0px rgba(15, 23, 42, 0.08), 0px 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow: 0px 4px 6px -1px rgba(15, 23, 42, 0.08), 0px 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0px 10px 15px -3px rgba(15, 23, 42, 0.08), 0px 4px 6px -4px rgba(15, 23, 42, 0.04);
   --shadow-lg:
-    0px 20px 25px -5px rgba(57, 88, 134, 0.08), 0px 8px 10px -6px rgba(57, 88, 134, 0.04);
-  --shadow-xl: 0px 25px 50px -12px rgba(57, 88, 134, 0.15);
-  --shadow-2xl: 0px 25px 50px -12px rgba(57, 88, 134, 0.2);
+    0px 20px 25px -5px rgba(15, 23, 42, 0.10), 0px 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0px 25px 50px -12px rgba(15, 23, 42, 0.18);
+  --shadow-2xl: 0px 25px 50px -12px rgba(15, 23, 42, 0.25);
 }
 
 .dark {

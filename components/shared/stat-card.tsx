@@ -16,28 +16,28 @@ const colorMap: Record<
   { card: string; icon: string; value: string; subtitle: string }
 > = {
   default: {
-    card: 'bg-card border-border hover:shadow-md hover:border-primary/30',
-    icon: 'bg-violet-500/15 text-violet-600 dark:text-violet-400',
+    card: 'bg-card border-border hover:shadow-md hover:border-primary/40',
+    icon: 'bg-violet-100 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400',
     value: 'text-foreground',
     subtitle: 'text-muted-foreground',
   },
   blue: {
-    card: 'bg-blue-50 dark:bg-blue-950/40 border-blue-100 dark:border-blue-900/50 hover:shadow-md hover:border-blue-300/50 dark:hover:border-blue-700/50',
-    icon: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+    card: 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/50 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700/50',
+    icon: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400',
     value: 'text-blue-700 dark:text-blue-300',
-    subtitle: 'text-blue-600/70 dark:text-blue-400/80',
+    subtitle: 'text-blue-600/80 dark:text-blue-400/80',
   },
   green: {
-    card: 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-900/50 hover:shadow-md hover:border-emerald-300/50 dark:hover:border-emerald-700/50',
-    icon: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    card: 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/50 hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700/50',
+    icon: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400',
     value: 'text-emerald-700 dark:text-emerald-300',
-    subtitle: 'text-emerald-600/70 dark:text-emerald-400/80',
+    subtitle: 'text-emerald-600/80 dark:text-emerald-400/80',
   },
   amber: {
-    card: 'bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900/50 hover:shadow-md hover:border-amber-300/50 dark:hover:border-amber-700/50',
-    icon: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+    card: 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/50 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700/50',
+    icon: 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400',
     value: 'text-amber-700 dark:text-amber-300',
-    subtitle: 'text-amber-600/70 dark:text-amber-400/80',
+    subtitle: 'text-amber-600/80 dark:text-amber-400/80',
   },
 };
 
