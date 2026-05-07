@@ -5,6 +5,7 @@ import type { Role } from '@/types';
 import { ChevronDown, LogOut, Moon, Settings, Sun, X } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -190,7 +191,13 @@ function AppSidebar({ homePath }: { homePath: string }) {
                 <Link href={homePath} onClick={closeMobile}>
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center shrink-0">
-                      <img src="/icons/favicon-96x96.png" alt="SIRA" className="w-full h-full" />
+                      <Image
+                        src="/icons/favicon-96x96.png"
+                        alt="SIRA"
+                        width={96}
+                        height={96}
+                        className="w-full h-full"
+                      />
                     </div>
                     <div className="grid flex-1 text-left">
                       <span className="truncate font-semibold sm:text-sm text-xs tracking-card">SIRA</span>
@@ -249,7 +256,12 @@ function AppSidebar({ homePath }: { homePath: string }) {
                             : 'text-muted-foreground hover:bg-sidebar-accent hover:text-foreground'
                             }`}
                         >
-                          <Link href={link.href} onClick={closeMobile} className="flex items-center gap-3 w-full">
+                          <Link
+                            href={link.href}
+                            onClick={closeMobile}
+                            aria-current={isActive ? 'page' : undefined}
+                            className="flex items-center gap-3 w-full"
+                          >
                             {Icon && (
                               <Icon
                                 className={`h-[18px] w-[18px] shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'

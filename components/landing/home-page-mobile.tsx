@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Clock, QrCode, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
@@ -54,7 +55,14 @@ export default function HomePageMobile() {
         >
           {/* Logo Icon */}
           <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-primary/25 mb-4 bg-background flex items-center justify-center">
-            <img src="/icons/favicon-192x192.png" alt="SIRA Logo" className="w-full h-full" />
+            <Image
+              src="/icons/favicon-192x192.png"
+              alt="SIRA Logo"
+              width={192}
+              height={192}
+              priority
+              className="w-full h-full"
+            />
           </div>
           <h1 className="text-3xl font-semibold tracking-card text-center">SIRA</h1>
           <p className="sm:text-sm text-xs text-muted-foreground mt-1">

@@ -3,7 +3,7 @@ import { StructuredData } from '@/components/structured-data';
 import { SileoToaster } from '@/components/ui/sileo-toaster';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Providers from './providers';
 
@@ -25,15 +25,6 @@ export const metadata: Metadata = {
     'Popayán',
   ],
   referrer: 'origin-when-cross-origin',
-  themeColor: '#6366F1',
-  colorScheme: 'light dark',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover',
-  },
   creator: 'Fundación Universitaria de Popayán',
   publisher: 'Fundación Universitaria de Popayán',
   category: 'education',
@@ -113,6 +104,14 @@ export const metadata: Metadata = {
     'msapplication-TileColor': '#6366F1',
     'msapplication-TileImage': '/icons/mstile-144x144.png',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#6366F1',
+  colorScheme: 'light dark',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -227,11 +227,6 @@ body {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
-
-  button,
-  a {
-    @apply cursor-pointer;
-  }
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -292,16 +287,6 @@ input[type='number'] {
   /* Mejora el scroll en iOS */
   padding-bottom: 4px;
   /* Espacio para el gradiente */
-}
-
-/* Ocultar scrollbar globalmente */
-* {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-::-webkit-scrollbar {
-  display: none;
 }
 
 .dark {
