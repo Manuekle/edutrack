@@ -17,7 +17,12 @@ export async function GET(
       where: { id: claseId },
       include: {
         group: {
-          select: { id: true, code: true, subject: { select: { name: true, code: true } } },
+          select: {
+            id: true,
+            code: true,
+            teacherIds: true,
+            subject: { select: { name: true, code: true } },
+          },
         },
         week: { select: { number: true } },
         logbook: true,
@@ -27,6 +32,13 @@ export async function GET(
       },
     });
     if (!clase) return NextResponse.json({ error: 'Clase no encontrada' }, { status: 404 });
+
+    if (clase.group?.id !== grupoId) {
+      return NextResponse.json({ error: 'Clase no pertenece al grupo' }, { status: 403 });
+    }
+    if (!clase.group?.teacherIds.includes(session.user.id)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Get all students in group if no attendance records exist
     const group = await db.group.findUnique({
@@ -60,7 +72,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ grupoId: string; claseId: string }> }
 ) {
-  const { claseId } = await params;
+  const { grupoId, claseId } = await params;
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user?.role !== 'DOCENTE') {
@@ -81,8 +93,32 @@ export async function POST(
     } = body;
 
     // 1. Fetch current class data to have a base date
-    const currentClass = await db.class.findUnique({ where: { id: claseId } });
+    const currentClass = await db.class.findUnique({
+      where: { id: claseId },
+      include: {
+        group: { select: { id: true, teacherIds: true, studentIds: true } },
+      },
+    });
     if (!currentClass) return NextResponse.json({ error: 'Clase no encontrada' }, { status: 404 });
+
+    if (currentClass.group?.id !== grupoId) {
+      return NextResponse.json({ error: 'Clase no pertenece al grupo' }, { status: 403 });
+    }
+    if (!currentClass.group?.teacherIds.includes(session.user.id)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    if (asistencias && Array.isArray(asistencias)) {
+      const groupStudentIds = new Set(currentClass.group.studentIds);
+      for (const a of asistencias) {
+        if (!groupStudentIds.has(a.studentId)) {
+          return NextResponse.json(
+            { error: 'Estudiante no pertenece al grupo' },
+            { status: 400 }
+          );
+        }
+      }
+    }
 
     // 2. Prepare class update data
     const updateData: any = {

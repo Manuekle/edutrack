@@ -27,13 +27,19 @@ export async function GET(request: Request) {
       );
     }
 
-    // Si llegamos aquí, el token es válido
+    const maskEmail = (email: string | null | undefined) => {
+      if (!email) return null;
+      const [local, domain] = email.split('@');
+      if (!domain) return null;
+      const visible = local.slice(0, 2);
+      return `${visible}${'*'.repeat(Math.max(local.length - 2, 1))}@${domain}`;
+    };
+
     return NextResponse.json(
       {
         valid: true,
         message: 'Token válido',
-        institutionalEmail: user.institutionalEmail || user.personalEmail || '', // Devolver el correo institucional o personal
-        personalEmail: user.personalEmail,
+        institutionalEmail: maskEmail(user.institutionalEmail || user.personalEmail),
       },
       { status: 200 }
     );

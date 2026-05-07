@@ -15,6 +15,11 @@ function clean(val: string | null | undefined): string | undefined {
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || (session.user.role !== Role.ADMIN && session.user.role !== Role.DOCENTE)) {
+      return NextResponse.json({ message: 'No autorizado', data: [] }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
 
     const query = UserSearchQuerySchema.safeParse({
@@ -133,7 +138,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.password, 12);
 
     const newUser = await db.user.create({
       data: {
@@ -198,26 +203,27 @@ export async function PUT(req: NextRequest) {
     const isUpdatingOwnProfile = sessionUserId === targetUserIdStr;
 
     if (!isUpdatingOwnProfile && !isAdmin) {
-      return NextResponse.json(
-        {
-          message: 'No autorizado para actualizar este perfil',
-          sessionUserId,
-          targetUserId: targetUserIdStr,
-          role: session.user.role,
-          isAdmin,
-        },
-        { status: 403 }
-      );
+      return NextResponse.json({ message: 'No autorizado' }, { status: 403 });
     }
     const body = await req.json();
-    const parsedUpdate = UserUpdateSchema.safeParse({ ...body, id: userId });
+
+    const SafeSelfUpdateSchema = z.object({
+      id: z.string().min(1),
+      name: z.string().optional(),
+      phone: z.string().optional().nullable(),
+      personalEmail: z.string().email().optional().nullable(),
+    });
+
+    const parsedUpdate = isAdmin
+      ? UserUpdateSchema.safeParse({ ...body, id: targetUserIdStr })
+      : SafeSelfUpdateSchema.safeParse({ ...body, id: targetUserIdStr });
     if (!parsedUpdate.success) {
       return NextResponse.json(
         { message: 'Datos de entrada inválidos', errors: parsedUpdate.error.issues },
         { status: 400 }
       );
     }
-    const data = parsedUpdate.data;
+    const data = parsedUpdate.data as z.infer<typeof UserUpdateSchema>;
     const updateData: {
       name?: string;
       institutionalEmail?: string;
@@ -230,15 +236,18 @@ export async function PUT(req: NextRequest) {
     } = {};
 
     if (data.name) updateData.name = data.name;
-    if (data.institutionalEmail) updateData.institutionalEmail = data.institutionalEmail;
     if (data.personalEmail !== undefined) updateData.personalEmail = data.personalEmail;
     if (data.phone !== undefined) updateData.phone = data.phone;
-    if (data.role) updateData.role = data.role;
-    if (data.password) {
-      updateData.password = await bcrypt.hash(data.password, 10);
+
+    if (isAdmin) {
+      if (data.institutionalEmail) updateData.institutionalEmail = data.institutionalEmail;
+      if (data.role) updateData.role = data.role;
+      if (data.password) {
+        updateData.password = await bcrypt.hash(data.password, 12);
+      }
+      if (data.studentCode !== undefined) updateData.studentCode = data.studentCode;
+      if (data.teacherCode !== undefined) updateData.teacherCode = data.teacherCode;
     }
-    if (data.studentCode !== undefined) updateData.studentCode = data.studentCode;
-    if (data.teacherCode !== undefined) updateData.teacherCode = data.teacherCode;
     const updatedUser = await db.user.update({
       where: { id: data.id },
       data: updateData,
