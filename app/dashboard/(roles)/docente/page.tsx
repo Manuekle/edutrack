@@ -102,19 +102,52 @@ export default function DocenteDashboard() {
     if (status === 'authenticated') {
       fetchDashboardData();
 
-      // Polling for live class only (cada 10 segundos)
-      const intervalId = setInterval(async () => {
+      // Polling for live class only (cada 30 segundos, pausado en background)
+      let intervalId: ReturnType<typeof setInterval> | null = null;
+
+      const tick = async () => {
         try {
           const { data } = await getLiveClassData();
           setLiveClass(data?.liveClass || null);
           setLastUpdated(new Date());
           setPollingError(false);
-        } catch {
+        } catch (error) {
+          console.error('Polling error:', error);
           setPollingError(true);
         }
-      }, 10000);
+      };
 
-      return () => clearInterval(intervalId);
+      const startPolling = () => {
+        if (intervalId !== null) return;
+        intervalId = setInterval(tick, 30000);
+      };
+
+      const stopPolling = () => {
+        if (intervalId !== null) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      };
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') {
+          stopPolling();
+        } else {
+          // Refresh immediately on becoming visible, then resume polling
+          tick();
+          startPolling();
+        }
+      };
+
+      if (document.visibilityState !== 'hidden') {
+        startPolling();
+      }
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+
+      return () => {
+        stopPolling();
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
     } else if (status === 'unauthenticated') {
       router.push('/login');
     }

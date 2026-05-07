@@ -1,6 +1,20 @@
 'use client';
 
-import { TeacherReport } from '@/components/teacher-report';
+import { Skeleton } from '@/components/ui/skeleton';
+import dynamic from 'next/dynamic';
+
+const TeacherReport = dynamic(
+  () => import('@/components/teacher-report').then(mod => ({ default: mod.TeacherReport })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+        <Skeleton className="h-64 w-full rounded-xl" />
+      </div>
+    ),
+  }
+);
 
 export default function AdminReportesPage() {
   return (

@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion', 'date-fns'],
+  },
   images: {
     remotePatterns: [
       {

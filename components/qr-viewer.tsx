@@ -4,8 +4,41 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, Clock, Copy, Maximize2, Minimize2, RefreshCw } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { sileo } from 'sileo';
+
+// Memoized QR canvas to prevent re-render on every countdown tick
+interface MemoizedQRCanvasProps {
+  qrUrl: string;
+  qrSize: number;
+  isDark: boolean;
+}
+
+const MemoizedQRCanvas = memo(function MemoizedQRCanvas({
+  qrUrl,
+  qrSize,
+  isDark,
+}: MemoizedQRCanvasProps) {
+  if (!qrUrl) {
+    return (
+      <div
+        className="flex items-center justify-center bg-muted/20"
+        style={{ width: qrSize, height: qrSize }}
+      >
+        <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+  return (
+    <QRCodeCanvas
+      value={qrUrl}
+      size={qrSize}
+      level="M"
+      fgColor={isDark ? '#ffffff' : '#000000'}
+      bgColor={isDark ? '#0a0a0a' : '#ffffff'}
+    />
+  );
+});
 
 interface QRViewerProps {
   qrUrl: string;
@@ -131,22 +164,7 @@ export function QRViewer({
             isFullscreen ? 'scale-110' : 'scale-100'
           )}
         >
-          {qrUrl ? (
-            <QRCodeCanvas
-              value={qrUrl}
-              size={qrSize}
-              level="M"
-              fgColor={isDark ? '#ffffff' : '#000000'}
-              bgColor={isDark ? '#0a0a0a' : '#ffffff'}
-            />
-          ) : (
-            <div
-              className="flex items-center justify-center bg-muted/20"
-              style={{ width: qrSize, height: qrSize }}
-            >
-              <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-            </div>
-          )}
+          <MemoizedQRCanvas qrUrl={qrUrl} qrSize={qrSize} isDark={isDark} />
         </div>
 
         {/* Info & Controls */}
