@@ -186,7 +186,7 @@ export function ClassTableRow({
                       'rounded-lg cursor-pointer text-[13px]',
                       !canTakeAttendance
                         ? 'opacity-50 cursor-not-allowed'
-                        : 'text-blue-600 focus:text-blue-600 focus:bg-blue-50 dark:text-blue-400 dark:focus:bg-blue-500/10'
+                        : 'text-primary focus:text-primary focus:bg-primary/10'
                     )}
                   >
                     <Link
@@ -198,7 +198,7 @@ export function ClassTableRow({
                       <UserCheck
                         className={cn(
                           'mr-2 h-4 w-4',
-                          !canTakeAttendance ? 'text-muted-foreground' : 'text-blue-500 dark:text-blue-400'
+                          !canTakeAttendance ? 'text-muted-foreground' : 'text-primary'
                         )}
                         aria-hidden="true"
                       />

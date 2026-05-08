@@ -367,8 +367,8 @@ export default function ProgramacionPage() {
                       <p className="text-xs font-semibold">1. Descarga la plantilla</p>
                       <a href="/formatos/plantilla_programacion.csv" download>
                         <Button size="default" variant="default" className="w-full justify-start text-xs">
-                          <Download className="mr-2 h-4 w-4 text-muted-foreground" />
-                          Descargar Plantilla CSV
+                          <Download className="mr-2 h-4 w-4" />
+                          Descargar plantilla CSV
                         </Button>
                       </a>
                     </div>
@@ -635,47 +635,47 @@ export default function ProgramacionPage() {
           <TabsContent value="resumen" className="space-y-4">
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Card className="shadow-none border-0 bg-muted/30 dark:bg-white/[0.06] rounded-2xl">
-                <CardHeader className="pb-1 pt-5 px-5">
-                  <CardTitle className="text-[13px] font-medium text-muted-foreground flex items-center gap-2 tracking-card uppercase">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500">
+              <Card>
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Total Grupos
+                    </p>
+                    <div className="h-8 w-8 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
                       <Users className="h-4 w-4" />
                     </div>
-                    Total Grupos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <p className="text-4xl font-semibold tracking-card text-foreground mt-2">
+                  </div>
+                  <p className="text-3xl font-bold tracking-tight text-foreground">
                     {loadingGrupos ? '—' : grupos.length}
                   </p>
                 </CardContent>
               </Card>
-              <Card className="shadow-none border-0 bg-green-500/5 dark:bg-green-500/10 rounded-2xl">
-                <CardHeader className="pb-1 pt-5 px-5">
-                  <CardTitle className="text-[13px] font-medium text-green-700/70 dark:text-green-400/70 flex items-center gap-2 tracking-card uppercase">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-500">
+              <Card>
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Con docente
+                    </p>
+                    <div className="h-8 w-8 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
                       <CheckCircle2 className="h-4 w-4" />
                     </div>
-                    Con docente
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <p className="text-4xl font-semibold tracking-card text-green-700 dark:text-green-400 mt-2">
+                  </div>
+                  <p className="text-3xl font-bold tracking-tight text-foreground">
                     {loadingGrupos ? '—' : grupos.filter(g => (g.docentes?.length ?? 0) > 0).length}
                   </p>
                 </CardContent>
               </Card>
-              <Card className="shadow-none border-0 bg-amber-500/5 dark:bg-amber-500/10 rounded-2xl">
-                <CardHeader className="pb-1 pt-5 px-5">
-                  <CardTitle className="text-[13px] font-medium text-amber-700/70 dark:text-amber-400/70 flex items-center gap-2 tracking-card uppercase">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-500">
+              <Card>
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Con horario
+                    </p>
+                    <div className="h-8 w-8 rounded-xl flex items-center justify-center bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
                       <FileSpreadsheet className="h-4 w-4" />
                     </div>
-                    Con horario
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-5 pb-5">
-                  <p className="text-4xl font-semibold tracking-card text-amber-700 dark:text-amber-400 mt-2">
+                  </div>
+                  <p className="text-3xl font-bold tracking-tight text-foreground">
                     {loadingGrupos ? '—' : grupos.filter(g => g.horario).length}
                   </p>
                 </CardContent>

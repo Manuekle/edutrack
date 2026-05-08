@@ -23,7 +23,7 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
   const router = useRouter();
 
   return (
-    <Card className="shadow-sm border-border bg-card rounded-2xl shrink-0 h-fit">
+    <Card className="shrink-0 h-fit">
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground">Mis Asignaturas</CardTitle>
@@ -52,7 +52,7 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
             ))}
           </div>
         ) : subjects.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {subjects.slice(0, 3).map(subject => {
               const progress =
                 subject.totalClasses > 0
@@ -70,12 +70,12 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
                       router.push(`/dashboard/docente/grupos/${subject.groupId}`);
                     }
                   }}
-                  className="group relative rounded-xl border border-border bg-muted/30 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm cursor-pointer p-3.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="group relative rounded-xl bg-muted/30 hover:bg-muted/50 cursor-pointer p-3.5 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400 shrink-0">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
                           <BookOpen className="h-3.5 w-3.5" />
                         </div>
                         <h4 className="sm:text-sm text-xs font-semibold truncate text-foreground">
@@ -95,22 +95,18 @@ export function TeacherSubjectsList({ subjects, isLoading = false }: TeacherSubj
                             {subject.completedClasses}/{subject.totalClasses} clases
                           </span>
                         </div>
-                        <div className="relative">
-                          <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-full transition-all duration-500 ease-out"
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
+                        <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                            style={{ width: `${progress}%` }}
+                          />
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center shrink-0">
-                      <div className="flex flex-col items-center justify-center p-2.5 rounded-lg bg-violet-50 dark:bg-violet-500/10 min-w-[52px]">
-                        <div className="sm:text-base text-sm font-bold text-violet-700 dark:text-violet-400">
-                          {Math.round(progress)}%
-                        </div>
+                    <div className="flex items-center shrink-0">
+                      <div className="text-sm font-bold text-primary">
+                        {Math.round(progress)}%
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground/40 ml-1 group-hover:translate-x-1 transition-transform" />
                     </div>

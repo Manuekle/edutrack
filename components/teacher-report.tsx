@@ -790,12 +790,12 @@ export function TeacherReport() {
                       setSelectedSubjectId(null);
                       setPeriod(''); // Reset period so the initial fetch is always unfiltered
                     }}
-                    className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 ${isSelected ? 'bg-blue-500/5' : ''
+                    className={`w-full text-left flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 ${isSelected ? 'bg-primary/5' : ''
                       }`}
                   >
                     <div
                       className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isSelected
-                        ? 'bg-blue-500/20 text-blue-700 dark:text-blue-400'
+                        ? 'bg-primary/15 text-primary'
                         : 'bg-muted text-muted-foreground'
                         }`}
                     >
@@ -803,7 +803,7 @@ export function TeacherReport() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-[13px] font-medium truncate ${isSelected ? 'text-blue-700 dark:text-blue-400' : 'text-foreground'
+                        className={`text-[13px] font-medium truncate ${isSelected ? 'text-primary' : 'text-foreground'
                           }`}
                       >
                         {teacher.name}
@@ -815,7 +815,7 @@ export function TeacherReport() {
                       )}
                     </div>
                     {isSelected && (
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                     )}
                   </button>
                 );
@@ -897,7 +897,7 @@ export function TeacherReport() {
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center sm:text-sm text-xs font-bold text-blue-700 dark:text-blue-400 shrink-0">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center sm:text-sm text-xs font-bold text-primary shrink-0">
                       {selectedTeacher.name
                         .split(' ')
                         .map(n => n[0])

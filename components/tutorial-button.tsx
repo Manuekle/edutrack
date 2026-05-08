@@ -23,21 +23,17 @@ export function TutorialButton() {
           <button
             onClick={startTutorial}
             aria-label="Ver tutorial interactivo de esta pantalla"
-            className="group inline-flex items-center gap-1.5 h-8 pl-2 pr-2.5 sm:pr-3 rounded-full bg-primary/10 border border-primary/20 text-primary hover:bg-primary/15 hover:border-primary/35 transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-muted/40 hover:bg-muted/60 text-foreground transition-colors duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 shrink-0">
-              <Sparkles className="h-3 w-3" />
-            </span>
-            <span className="hidden sm:inline text-[11px] font-semibold tracking-wide">
-              TUTORIAL
-            </span>
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <span className="hidden sm:inline text-[11px] font-medium">Tutorial</span>
           </button>
         </TooltipTrigger>
         <TooltipContent
           side="bottom"
           align="end"
           sideOffset={8}
-          className="font-sans p-0 overflow-hidden border-0 shadow-lg"
+          className="font-sans p-0 overflow-hidden border-0"
         >
           <div className="flex flex-col gap-1 px-3 py-2.5 max-w-[200px]">
             <div className="flex items-center gap-1.5 mb-0.5">

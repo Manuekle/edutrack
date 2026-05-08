@@ -18,7 +18,7 @@ export default function EstudianteDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-semibold tracking-card text-foreground">Inicio</h1>
         <p className="text-muted-foreground sm:text-sm text-xs mt-1">
@@ -48,7 +48,7 @@ export default function EstudianteDashboard() {
       {liveClass && <LiveClassCard liveClass={liveClass} />}
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Activas"
           value={stats.totalSubjects}
@@ -77,15 +77,13 @@ export default function EstudianteDashboard() {
           color="amber"
         />
       </div>
-      <div className="grid gap-5 md:grid-cols-2">
-
+      <div className="grid gap-4 md:grid-cols-2">
         {/* Asignaturas */}
         <SubjectsCard subjects={subjects} />
 
         {/* Próximas Clases */}
         <UpcomingEventsCard upcomingClasses={upcomingClasses} isLoading={isLoading} />
       </div>
-
     </div>
   );
 }

@@ -94,30 +94,27 @@ export default function HorarioEstudiantePage() {
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-card text-foreground">Mi Horario</h1>
-          <p className="text-muted-foreground sm:text-sm text-xs max-w-md">
-            Consulta tu programación académica semanal y salones asignados.
-          </p>
-        </div>
+    <div className="space-y-5 pb-12">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-card text-foreground">Mi Horario</h1>
+        <p className="text-muted-foreground sm:text-sm text-xs mt-1">
+          Consulta tu programación académica semanal y salones asignados.
+        </p>
       </div>
 
       {loading ? (
         <LoadingPage />
       ) : horarios.length === 0 ? (
 
-        <div className="col-span-full py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
-          <div className="h-14 w-14 rounded-full bg-background flex items-center justify-center mx-auto mb-4 shadow-sm">
+        <div className="py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-border/40">
+          <div className="h-14 w-14 rounded-2xl bg-card flex items-center justify-center mx-auto mb-4 shadow-xs">
             <CalendarDays className="h-7 w-7 text-muted-foreground/40" />
           </div>
-          <p className="sm:text-[15px] text-xs font-semibold text-foreground tracking-card">
+          <p className="text-sm font-semibold text-foreground tracking-card">
             Sin programación disponible
           </p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-            No se han encontrado clases registradas para este periodo académico en tu perfil de
-            estudiante.
+            No se han encontrado clases registradas para este periodo académico.
           </p>
         </div>
       ) : (

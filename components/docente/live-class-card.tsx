@@ -11,8 +11,8 @@ interface LiveClassCardProps {
 export function LiveClassCard({ liveClass }: LiveClassCardProps) {
   const router = useRouter();
   return (
-    <Card className="mb-8 border border-red-500/20 border-t-4 border-t-red-500 shadow-[0_4px_24px_rgba(239,68,68,0.08)] dark:shadow-[0_4px_24px_rgba(239,68,68,0.15)] bg-card rounded-3xl overflow-hidden relative">
-      <div className="absolute top-4 left-0 w-1 h-[calc(100%-2rem)] bg-red-500/60"></div>
+    <Card className="mb-6 border-border/40 dark:border-white/[0.05] shadow-sm bg-card rounded-3xl overflow-hidden relative">
+      <div className="absolute top-4 left-0 w-1 h-[calc(100%-2rem)] bg-warm rounded-r-full"></div>
       <CardHeader className="px-6 pt-6 pb-2">
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1.5 pl-2">
@@ -29,10 +29,10 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-full shrink-0" role="status" aria-label="Clase en vivo">
+          <div className="flex items-center gap-2 bg-warm/15 text-amber-700 dark:text-warm px-3 py-1.5 rounded-full shrink-0" role="status" aria-label="Clase en vivo">
             <span className="relative flex h-2 w-2 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warm opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-warm"></span>
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-card mt-0.5">
               EN VIVO
@@ -75,7 +75,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
                 </div>
               </div>
               <div className="flex items-center space-x-2.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
                 <div className="flex flex-col">
                   <span className="text-lg font-semibold leading-none text-foreground">
                     {liveClass.attendanceStats.justified}

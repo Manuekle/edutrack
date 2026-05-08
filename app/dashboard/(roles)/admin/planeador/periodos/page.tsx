@@ -35,6 +35,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import { CalendarDays, Loader2, Plus, Sparkles, Trash2, X } from 'lucide-react';
+import { PeriodWeeksEditor } from '@/components/admin/period-weeks-editor';
 import { useEffect, useState } from 'react';
 import { sileo } from 'sileo';
 
@@ -163,10 +164,11 @@ export default function PeriodosPage() {
 
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/periodos/${editingPeriod.id}`, {
+      const res = await fetch(`/api/admin/periodos`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: editingPeriod.id,
           name: editForm.name,
           startDate: editForm.startDate,
           endDate: editForm.endDate,
@@ -292,7 +294,7 @@ export default function PeriodosPage() {
 
   const getTypeBadge = (type: 'VACATION' | 'HOLIDAY' | 'RECESS') => {
     const styles = {
-      VACATION: 'bg-blue-500/10 text-blue-600 border-0',
+      VACATION: 'bg-primary/10 text-primary border-0',
       HOLIDAY: 'bg-red-500/10 text-red-600 border-0',
       RECESS: 'bg-yellow-500/10 text-yellow-600 border-0',
     };
@@ -419,6 +421,9 @@ export default function PeriodosPage() {
             </TabsTrigger>
             <TabsTrigger value="especiales" className="rounded-lg text-xs px-4">
               Fechas Especiales
+            </TabsTrigger>
+            <TabsTrigger value="semanas" className="rounded-lg text-xs px-4">
+              Semanas
             </TabsTrigger>
           </TabsList>
 
@@ -634,6 +639,10 @@ export default function PeriodosPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="semanas" className="mt-6">
+            <PeriodWeeksEditor periods={selectedYear.periods} />
           </TabsContent>
         </Tabs>
       )}

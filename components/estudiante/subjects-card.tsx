@@ -46,7 +46,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
   );
 
   return (
-    <Card className="shadow-sm border-border bg-card rounded-2xl shrink-0 h-fit">
+    <Card className="shrink-0 h-fit">
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground">Mis Asignaturas</CardTitle>
@@ -55,7 +55,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
       </CardHeader>
       <CardContent className="px-4 pb-4">
         {subjects.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {paginatedSubjects.map(subject => {
               const progress = subject.attendancePercentage;
               return (
@@ -63,12 +63,12 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
                   role="button"
                   tabIndex={0}
                   key={subject.id}
-                  className="group relative rounded-xl border border-border bg-muted/30 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm p-3.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="group relative rounded-xl bg-muted/30 hover:bg-muted/50 p-3.5 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
                           <BookOpen className="h-3.5 w-3.5" />
                         </div>
                         <h4 className="sm:text-sm text-xs font-semibold truncate text-foreground">
@@ -130,7 +130,7 @@ export function SubjectsCard({ subjects }: SubjectsCardProps) {
         )}
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
             <button
               onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
               disabled={currentPage === 0}

@@ -252,7 +252,7 @@ export default function LoginPage() {
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[5%] -left-[5%] w-[35%] h-[35%] rounded-full bg-primary/10 blur-[120px] animate-pulse" />
-        <div className="absolute -bottom-[5%] -right-[5%] w-[35%] h-[35%] rounded-full bg-blue-500/10 blur-[120px] animate-pulse delay-700" />
+        <div className="absolute -bottom-[5%] -right-[5%] w-[35%] h-[35%] rounded-full bg-primary/10 blur-[120px] animate-pulse delay-700" />
       </div>
 
       <Suspense

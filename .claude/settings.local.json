@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm type-check *)"
+      "Bash(pnpm type-check *)",
+      "Bash(git pull *)",
+      "Bash(git log *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm prisma *)"
     ]
   }
 }

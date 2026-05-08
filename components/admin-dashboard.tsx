@@ -160,7 +160,7 @@ const AdminDashboardComponent = () => {
   const maxStudents = Math.max(...data.charts.topSubjects.map(s => s.students), 1);
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-5 pb-10">
       {/* Header */}
       <div
         id="tour-dashboard-title"
@@ -190,7 +190,7 @@ const AdminDashboardComponent = () => {
             icon: CalendarDays,
             label: 'Planeador',
             desc: 'Configurar semestre',
-            color: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+            color: 'bg-primary/15 text-primary',
           },
           {
             href: '/dashboard/admin/salas',
@@ -208,7 +208,7 @@ const AdminDashboardComponent = () => {
           },
         ].map(({ href, icon: Icon, label, desc, color }) => (
           <Link key={href} href={href}>
-            <Card className="h-full transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 cursor-pointer border-border bg-card">
+            <Card className="h-full transition-all duration-200 hover:shadow-sm hover:border-primary/20 cursor-pointer">
               <CardContent className="py-4 px-4 flex items-center gap-3">
                 <div
                   className={`flex w-10 h-10 items-center justify-center rounded-xl ${color} shrink-0`}
@@ -232,7 +232,7 @@ const AdminDashboardComponent = () => {
         {data.cards.map((card, i) => {
           const Icon = CARD_ICONS[i];
           const colors = [
-            'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+            'bg-primary/15 text-primary',
             'bg-violet-500/15 text-violet-600 dark:text-violet-400',
             'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
             'bg-amber-500/15 text-amber-600 dark:text-amber-400',
@@ -242,10 +242,10 @@ const AdminDashboardComponent = () => {
           return (
             <Card
               key={i}
-              className="border-border bg-card hover:shadow-md hover:border-primary/40 transition-all duration-200"
+              className="hover:shadow-sm transition-shadow duration-200"
             >
-              <CardContent className="pt-5 pb-4 px-5">
-                <div className="flex items-center justify-between mb-3">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {card.title}
                   </p>

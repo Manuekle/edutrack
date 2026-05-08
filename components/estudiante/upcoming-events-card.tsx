@@ -26,7 +26,7 @@ interface UpcomingEventsCardProps {
 
 const TYPE_COLORS: Record<EventType, string> = {
   EXAMEN: 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20',
-  TRABAJO: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
+  TRABAJO: 'bg-primary/10 text-primary border-primary/20',
   LIMITE: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
   ANUNCIO: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20',
   INFO: 'bg-muted text-muted-foreground border-border/40',
@@ -34,7 +34,7 @@ const TYPE_COLORS: Record<EventType, string> = {
 
 export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEventsCardProps) {
   return (
-    <Card className="shadow-sm border-border bg-card rounded-2xl shrink-0 h-fit">
+    <Card className="shrink-0 h-fit">
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold text-foreground">Próximas Clases</CardTitle>
@@ -43,11 +43,11 @@ export function UpcomingEventsCard({ upcomingClasses, isLoading }: UpcomingEvent
       </CardHeader>
       <CardContent className="px-4 pb-4">
         {upcomingClasses.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {upcomingClasses.slice(0, 3).map((item, index) => (
               <div
                 key={`${item.id}-${index}`}
-                className="group relative rounded-xl border border-border bg-muted/30 hover:bg-muted/50 hover:border-primary/30 hover:shadow-sm p-3.5 transition-all duration-200"
+                className="group relative rounded-xl bg-muted/30 hover:bg-muted/50 p-3.5 transition-colors duration-200"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">

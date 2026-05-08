@@ -368,6 +368,30 @@ model AcademicPeriod {
   updatedAt   DateTime @updatedAt
   year       AcademicYear? @relation(fields: [yearId], references: [id])
   yearId     String?       @db.ObjectId
+  periodWeeks PeriodWeek[]
+}
+
+model PeriodWeek {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  period    AcademicPeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  periodId  String         @db.ObjectId
+  number    Int
+  name      String?
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([periodId, number])
+}
+
+model BitacoraSettings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  codigo    String   @default("FO-DO-005")
+  version   String   @default("08")
+  fecha     String   @default("mayo de 2026")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UnenrollRequest {

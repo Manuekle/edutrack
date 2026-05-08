@@ -20,7 +20,7 @@ body {
   --card-foreground: #0f172a;
   --popover: #ffffff;
   --popover-foreground: #0f172a;
-  --primary: #2563eb;
+  --primary: #1e40af;
   --primary-foreground: #ffffff;
   --secondary: #f1f5f9;
   --secondary-foreground: #1e3a6e;
@@ -37,89 +37,95 @@ body {
   --accent-sky: #0ea5e9;
   --accent-teal: #0d9488;
   --accent-green: #16a34a;
+  --accent-warm: #f0dd58;
+  --accent-warm-foreground: #1a1a1a;
+  --accent-warm-soft: #fef9c3;
 
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
-  --chart-1: #2563eb;
+  --border: #eaecf0;
+  --input: #eaecf0;
+  --ring: #1e40af;
+  --chart-1: #1e40af;
   --chart-2: #0d9488;
   --chart-3: #7c3aed;
   --chart-4: #ea580c;
   --chart-5: #16a34a;
   --sidebar: #ffffff;
   --sidebar-foreground: #0f172a;
-  --sidebar-primary: #2563eb;
+  --sidebar-primary: #1e40af;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f1f5f9;
   --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #2563eb;
-  --radius: 1rem;
+  --sidebar-border: #eaecf0;
+  --sidebar-ring: #1e40af;
+  --radius: 1.125rem;
   --shadow-x: 0px;
   --shadow-y: 1px;
   --shadow-blur: 2px;
   --shadow-spread: 0px;
-  --shadow-opacity: 0.04;
+  --shadow-opacity: 0.03;
   --shadow-color: #1e3a6e;
-  --shadow-2xs: 0px 1px 2px 0px rgba(15, 23, 42, 0.04);
-  --shadow-xs: 0px 1px 2px 0px rgba(15, 23, 42, 0.06);
-  --shadow-sm: 0px 1px 3px 0px rgba(15, 23, 42, 0.08), 0px 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow: 0px 4px 6px -1px rgba(15, 23, 42, 0.08), 0px 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0px 10px 15px -3px rgba(15, 23, 42, 0.08), 0px 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-2xs: 0px 1px 2px 0px rgba(15, 23, 42, 0.025);
+  --shadow-xs: 0px 1px 2px 0px rgba(15, 23, 42, 0.035);
+  --shadow-sm: 0px 1px 3px 0px rgba(15, 23, 42, 0.04), 0px 1px 2px -1px rgba(15, 23, 42, 0.03);
+  --shadow: 0px 2px 8px -2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0px 4px 12px -2px rgba(15, 23, 42, 0.07), 0px 2px 6px -3px rgba(15, 23, 42, 0.04);
   --shadow-lg:
-    0px 20px 25px -5px rgba(15, 23, 42, 0.10), 0px 8px 10px -6px rgba(15, 23, 42, 0.04);
-  --shadow-xl: 0px 25px 50px -12px rgba(15, 23, 42, 0.18);
-  --shadow-2xl: 0px 25px 50px -12px rgba(15, 23, 42, 0.25);
+    0px 12px 24px -8px rgba(15, 23, 42, 0.08), 0px 6px 10px -4px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0px 20px 40px -12px rgba(15, 23, 42, 0.12);
+  --shadow-2xl: 0px 24px 48px -12px rgba(15, 23, 42, 0.18);
 }
 
 .dark {
-  /* ── Dark Mode: Slate Navy ── */
-  --background: #111318;
-  --foreground: #e8eaf0;
-  --card: #1a1e28;
-  --card-foreground: #e8eaf0;
-  --popover: #1e2233;
-  --popover-foreground: #e8eaf0;
-  --primary: #7aa8e0;
-  --primary-foreground: #0d1117;
-  --secondary: #252a38;
-  --secondary-foreground: #c5d3e8;
-  --muted: #1e2233;
-  --muted-foreground: #8892a8;
-  --accent: #252e42;
-  --accent-foreground: #c5d3e8;
+  /* ── Dark Mode: Deep Navy ── */
+  --background: #0a0f1c;
+  --foreground: #e6ebf5;
+  --card: #131a2c;
+  --card-foreground: #e6ebf5;
+  --popover: #161e33;
+  --popover-foreground: #e6ebf5;
+  --primary: #7eaee0;
+  --primary-foreground: #0a0f1c;
+  --secondary: #1a2238;
+  --secondary-foreground: #c8d4e8;
+  --muted: #141b2e;
+  --muted-foreground: #8a98b3;
+  --accent: #1d2640;
+  --accent-foreground: #c8d4e8;
   --destructive: #f4436c;
   --destructive-foreground: #ffffff;
-  --border: #2a3147;
-  --input: #252a38;
-  --ring: #7aa8e0;
-  --chart-1: #7aa8e0;
+  --accent-warm: #f0dd58;
+  --accent-warm-foreground: #1a1a1a;
+  --accent-warm-soft: rgba(240, 221, 88, 0.12);
+  --border: rgba(255, 255, 255, 0.07);
+  --input: #1a2238;
+  --ring: #7eaee0;
+  --chart-1: #7eaee0;
   --chart-2: #57c4b8;
   --chart-3: #a78bfa;
   --chart-4: #fb923c;
   --chart-5: #4ade80;
-  --sidebar: #0e1117;
-  --sidebar-foreground: #e8eaf0;
-  --sidebar-primary: #7aa8e0;
-  --sidebar-primary-foreground: #0d1117;
-  --sidebar-accent: #1e2233;
-  --sidebar-accent-foreground: #c5d3e8;
-  --sidebar-border: #1e2233;
-  --sidebar-ring: #7aa8e0;
+  --sidebar: #070b15;
+  --sidebar-foreground: #e6ebf5;
+  --sidebar-primary: #7eaee0;
+  --sidebar-primary-foreground: #0a0f1c;
+  --sidebar-accent: #141b2e;
+  --sidebar-accent-foreground: #c8d4e8;
+  --sidebar-border: rgba(255, 255, 255, 0.05);
+  --sidebar-ring: #7eaee0;
   --shadow-x: 0px;
   --shadow-y: 2px;
   --shadow-blur: 10px;
   --shadow-spread: 0px;
   --shadow-opacity: 0.02;
   --shadow-color: #000000;
-  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
-  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.25);
-  --shadow-sm: 0px 2px 4px 0px rgba(0, 0, 0, 0.3);
-  --shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0px 8px 16px 0px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0px 12px 24px 0px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0px 20px 40px 0px rgba(0, 0, 0, 0.6);
-  --shadow-2xl: 0px 20px 40px 0px rgba(0, 0, 0, 0.7);
+  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.15);
+  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.18);
+  --shadow-sm: 0px 2px 4px 0px rgba(0, 0, 0, 0.22);
+  --shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.26);
+  --shadow-md: 0px 6px 14px 0px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0px 10px 20px 0px rgba(0, 0, 0, 0.36);
+  --shadow-xl: 0px 16px 32px 0px rgba(0, 0, 0, 0.44);
+  --shadow-2xl: 0px 20px 40px 0px rgba(0, 0, 0, 0.52);
 }
 
 @theme inline {
@@ -159,6 +165,10 @@ body {
   --color-brand-sky: var(--accent-sky);
   --color-brand-teal: var(--accent-teal);
   --color-brand-green: var(--accent-green);
+
+  --color-warm: var(--accent-warm);
+  --color-warm-foreground: var(--accent-warm-foreground);
+  --color-warm-soft: var(--accent-warm-soft);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
@@ -177,6 +187,8 @@ body {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 14px);
 
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
@@ -300,22 +312,21 @@ input[type='number'] {
 .sira-theme-driver {
   background-color: var(--card) !important;
   color: var(--card-foreground) !important;
-  border-radius: 0.75rem !important;
-  border: none !important;
-  /* Minimal shadow — just enough to float above the dark overlay, not glassy */
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.18) !important;
-  padding: 1.25rem !important;
+  border-radius: 1.25rem !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 1.25rem 1.25rem 1rem !important;
   font-family: var(--font-sans) !important;
-  max-width: 320px !important;
+  max-width: 340px !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-/* Explicit dark mode background — var(--card) is already correct but we pin it */
 .dark .sira-theme-driver,
 .sira-driver-dark {
   background-color: var(--card) !important;
   color: var(--card-foreground) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .sira-driver-light {
@@ -323,58 +334,64 @@ input[type='number'] {
   color: var(--card-foreground) !important;
 }
 
-/* Title: font-semibold sm:text-sm text-xs — same as CardTitle */
+/* Title */
 .sira-theme-driver .driver-popover-title {
-  font-size: 0.875rem !important;
+  font-size: 0.9375rem !important;
   font-weight: 600 !important;
-  line-height: 1.25 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
   color: var(--card-foreground) !important;
-  margin-bottom: 0.375rem !important;
+  margin: 0 0 0.375rem 0 !important;
   background: none !important;
   -webkit-background-clip: initial !important;
   -webkit-text-fill-color: initial !important;
   background-clip: initial !important;
   display: block !important;
+  padding-right: 1.5rem !important;
 }
 
-/* Description: text-xs text-muted-foreground — same as CardDescription */
+/* Description */
 .sira-theme-driver .driver-popover-description {
-  font-size: 0.75rem !important;
-  line-height: 1.5 !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.55 !important;
   color: var(--muted-foreground) !important;
   font-weight: 400 !important;
+  margin: 0 !important;
 }
 
 /* Footer */
 .sira-theme-driver .driver-popover-footer {
-  margin-top: 1rem !important;
+  margin-top: 1.125rem !important;
+  padding-top: 0.875rem !important;
+  border-top: 1px solid var(--border) !important;
   display: flex !important;
   align-items: center !important;
   gap: 0.5rem !important;
   flex-wrap: nowrap !important;
 }
 
-/* All buttons — rounded-full, text-xs, h-8, px-4 — mirrors Button size="default" */
+/* Buttons base */
 .sira-theme-driver button {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   height: 2rem !important;
-  padding: 0 0.875rem !important;
+  padding: 0 1rem !important;
   border-radius: 9999px !important;
   font-size: 0.75rem !important;
   font-weight: 500 !important;
   border: none !important;
   cursor: pointer !important;
-  transition: opacity 0.15s ease !important;
+  transition: background-color 0.15s ease, opacity 0.15s ease !important;
   text-transform: none !important;
   letter-spacing: normal !important;
   text-shadow: none !important;
   box-shadow: none !important;
   white-space: nowrap !important;
+  font-family: var(--font-sans) !important;
 }
 
-/* Siguiente — bg-primary */
+/* Next */
 .sira-theme-driver .driver-popover-next-btn {
   background-color: var(--primary) !important;
   color: var(--primary-foreground) !important;
@@ -382,46 +399,85 @@ input[type='number'] {
 }
 
 .sira-theme-driver .driver-popover-next-btn:hover {
-  opacity: 0.88 !important;
+  background-color: color-mix(in srgb, var(--primary) 88%, transparent) !important;
 }
 
-/* Anterior — bg-secondary with visible background */
+/* Prev */
 .sira-theme-driver .driver-popover-prev-btn {
-  background-color: var(--secondary) !important;
-  color: var(--secondary-foreground) !important;
+  background-color: transparent !important;
+  color: var(--muted-foreground) !important;
 }
 
 .sira-theme-driver .driver-popover-prev-btn:hover {
-  opacity: 0.8 !important;
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
 }
 
 /* Close X button */
 .sira-theme-driver .driver-popover-close-btn {
+  position: absolute !important;
+  top: 0.875rem !important;
+  right: 0.875rem !important;
   background: transparent !important;
   color: var(--muted-foreground) !important;
   border: none !important;
-  padding: 0.125rem !important;
-  width: auto !important;
-  height: auto !important;
+  padding: 0 !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
   font-size: 1rem !important;
   line-height: 1 !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0.5 !important;
+  transition: opacity 0.15s ease, background-color 0.15s ease !important;
 }
 
-/* Progress text — "Paso X de N" */
+.sira-theme-driver .driver-popover-close-btn:hover {
+  opacity: 1 !important;
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+
+/* Progress text */
 .sira-theme-driver .driver-popover-progress-text {
-  font-size: 0.75rem !important;
+  font-size: 0.6875rem !important;
   color: var(--muted-foreground) !important;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   white-space: nowrap !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
 }
 
-/* Active element — no ring, no outline, stays invisible */
+/* Highlight ring — soft primary glow on active element */
 .driver-active-element {
-  outline: none !important;
-  box-shadow: none !important;
+  outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent) !important;
+  outline-offset: 4px !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 14%, transparent) !important;
+  transition: outline 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-/* Arrow — show it so the popover has clear direction */
+/* Overlay — soften */
+.driver-overlay {
+  opacity: 0.55 !important;
+}
+
+/* Arrow */
 .driver-popover-arrow {
   display: block !important;
+}
+
+.driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: var(--card) !important;
+}
+.driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: var(--card) !important;
+}
+.driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: var(--card) !important;
+}
+.driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: var(--card) !important;
 }

@@ -301,8 +301,8 @@ export function BulkEnrollmentUpload({
         <div className="flex flex-col justify-between gap-3">
           <a href="/formatos/plantilla_asignacion.csv" download>
             <Button variant="default" size="default" className="w-full justify-start text-xs">
-              <Download className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-              Descargar Plantilla CSV
+              <Download className="mr-2 h-3.5 w-3.5" />
+              Descargar plantilla CSV
             </Button>
           </a>
           <SubjectFileUpload onFileSelect={setFile} file={file} />
@@ -369,7 +369,7 @@ export function BulkEnrollmentUpload({
                         ) : row.status === 'already' ? (
                           <Badge
                             variant="outline"
-                            className="text-[8px] bg-blue-500/10 text-blue-600 border-blue-500/20 px-1.5 py-0 h-4"
+                            className="text-[8px] bg-primary/10 text-primary border-primary/20 px-1.5 py-0 h-4"
                           >
                             Ya
                           </Badge>

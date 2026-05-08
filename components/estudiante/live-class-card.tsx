@@ -42,7 +42,7 @@ const STATUS_MAP: Record<string, { label: string; className: string }> = {
   },
   JUSTIFICADO: {
     label: 'Justificado',
-    className: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
+    className: 'bg-primary/10 text-primary border-primary/20',
   },
 };
 
@@ -50,8 +50,8 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
   const statusInfo = STATUS_MAP[liveClass.myStatus] ?? STATUS_MAP.AUSENTE;
 
   return (
-    <Card className="mb-6 border border-red-500/20 shadow-lg shadow-red-500/5 bg-card rounded-2xl overflow-hidden relative">
-      <div className="absolute top-0 left-0 w-1 h-full bg-red-500 animate-pulse" />
+    <Card className="mb-6 border-border/40 shadow-sm bg-card rounded-2xl overflow-hidden relative">
+      <div className="absolute top-0 left-0 w-1 h-full bg-warm animate-pulse" />
       <CardHeader className="px-5 pt-5 pb-2">
         <div className="flex justify-between items-start gap-4">
           <div className="space-y-1.5 pl-2">
@@ -70,7 +70,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-red-500/10 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-full shrink-0">
+          <div className="flex items-center gap-2 bg-warm/15 text-amber-700 dark:text-warm px-3 py-1.5 rounded-full shrink-0">
             <Video className="h-3 w-3 animate-pulse" />
             <span className="text-[10px] font-semibold uppercase tracking-wider">En vivo</span>
           </div>
@@ -132,7 +132,7 @@ export function LiveClassCard({ liveClass }: LiveClassCardProps) {
               </div>
             </div>
             <div className="flex items-center space-x-2.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-500" aria-hidden="true" />
+              <div className="w-2.5 h-2.5 rounded-full bg-primary" aria-hidden="true" />
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-foreground">
                   {liveClass.attendanceStats.justified}

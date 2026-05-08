@@ -1,10 +1,9 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays, GraduationCap, Layout, Users, ChevronRight } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronRight, GraduationCap, Layout, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -25,20 +24,20 @@ interface GrupoDocente {
 }
 
 const DIA_LABELS: Record<string, string> = {
-  LUNES: 'Lunes',
-  MARTES: 'Martes',
-  MIERCOLES: 'Miércoles',
-  JUEVES: 'Jueves',
-  VIERNES: 'Viernes',
-  SABADO: 'Sábado',
-  DOMINGO: 'Domingo',
-  MONDAY: 'Lunes',
-  TUESDAY: 'Martes',
-  WEDNESDAY: 'Miércoles',
-  THURSDAY: 'Jueves',
-  FRIDAY: 'Viernes',
-  SATURDAY: 'Sábado',
-  SUNDAY: 'Domingo',
+  LUNES: 'Lun',
+  MARTES: 'Mar',
+  MIERCOLES: 'Mié',
+  JUEVES: 'Jue',
+  VIERNES: 'Vie',
+  SABADO: 'Sáb',
+  DOMINGO: 'Dom',
+  MONDAY: 'Lun',
+  TUESDAY: 'Mar',
+  WEDNESDAY: 'Mié',
+  THURSDAY: 'Jue',
+  FRIDAY: 'Vie',
+  SATURDAY: 'Sáb',
+  SUNDAY: 'Dom',
 };
 
 export default function MisGruposPage() {
@@ -53,9 +52,9 @@ export default function MisGruposPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-wide">Mis Grupos</h1>
+        <h1 className="text-2xl font-semibold tracking-card text-foreground">Mis Grupos</h1>
         <p className="text-muted-foreground sm:text-sm text-xs mt-1">
           Grupos activos — selecciona uno para gestionar clases y asistencia.
         </p>
@@ -64,33 +63,13 @@ export default function MisGruposPage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <Card
-              key={i}
-              className="shadow-sm border-border bg-card rounded-2xl"
-            >
-              <CardHeader className="pb-3">
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <Skeleton className="h-5 w-24 rounded-md" />
-                    <Skeleton className="h-5 w-20 rounded-md" />
-                  </div>
-                  <Skeleton className="h-4 w-3/4 rounded" />
-                  <Skeleton className="h-3 w-1/3 rounded" />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Skeleton className="h-4 w-full rounded" />
-                <Skeleton className="h-4 w-2/3 rounded" />
-                <Skeleton className="h-4 w-1/2 rounded" />
-                <Skeleton className="h-9 w-full rounded-xl mt-2" />
-              </CardContent>
-            </Card>
+            <Skeleton key={i} className="h-52 rounded-2xl" />
           ))}
         </div>
       ) : grupos.length === 0 ? (
-        <div className="col-span-full py-16 text-center bg-muted/20 rounded-2xl border border-dashed border-border/30">
-          <div className="h-12 w-12 rounded-xl bg-muted/30 flex items-center justify-center mx-auto mb-4">
-            <Users className="h-6 w-6 text-muted-foreground/40" />
+        <div className="py-16 text-center bg-muted/20 rounded-3xl border border-dashed border-border/40">
+          <div className="h-14 w-14 rounded-2xl bg-card flex items-center justify-center mx-auto mb-4 shadow-xs">
+            <Users className="h-7 w-7 text-muted-foreground/40" />
           </div>
           <p className="text-sm font-semibold text-foreground">No tienes grupos asignados</p>
           <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
@@ -99,66 +78,70 @@ export default function MisGruposPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {grupos.map(g => (
-            <Card
-              key={g.id}
-              className="shadow-sm border-border bg-card hover:shadow-md hover:border-primary/20 transition-all duration-200 rounded-2xl"
-            >
-              <CardHeader className="pb-3 px-4 pt-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="outline" className="font-mono text-xs">
-                        {g.codigo || g.code}
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20"
-                      >
-                        {g.periodoAcademico || g.academicPeriod}
-                      </Badge>
+          {grupos.map(g => {
+            const codigo = g.codigo || g.code || '—';
+            const periodo = g.periodoAcademico || g.academicPeriod || '';
+            const dia = g.horario?.diaSemana || g.schedule?.dayOfWeek || '';
+            const horaInicio = g.horario?.horaInicio || g.schedule?.startTime || '';
+            const horaFin = g.horario?.horaFin || g.schedule?.endTime || '';
+            const sala = g.sala?.name || g.room?.name || '';
+            const studentsCount = (g.estudianteIds || g.studentIds)?.length || 0;
+            return (
+              <Card
+                key={g.id}
+                className="hover:shadow-sm transition-shadow duration-200 group"
+              >
+                <CardContent className="p-5 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+                      <BookOpen className="h-5 w-5" />
                     </div>
-                    <CardTitle className="text-sm">{g.subject.name}</CardTitle>
-                    <code className="text-xs text-muted-foreground font-mono">
-                      {g.subject.code}
-                    </code>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-foreground truncate leading-tight">
+                        {g.subject.name}
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground font-mono uppercase mt-0.5 tracking-wider">
+                        {g.subject.code} · Grupo {codigo}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 space-y-3">
-                <div className="grid grid-cols-1 gap-2 text-xs">
-                  {(g.horario || g.schedule) && (
+
+                  <div className="space-y-2 text-xs">
+                    {dia && horaInicio && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">
+                          {DIA_LABELS[dia] ?? dia} · {horaInicio}–{horaFin}
+                        </span>
+                      </div>
+                    )}
+                    {sala && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Layout className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{sala}</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      <CalendarDays className="h-3.5 w-3.5 shrink-0 text-blue-500" />
-                      <span>
-                        {g.horario?.diaSemana || g.schedule?.dayOfWeek
-                          ? DIA_LABELS[g.horario?.diaSemana || g.schedule?.dayOfWeek || '']
-                          : 'Día Pendiente'}{' '}
-                        · {g.horario?.horaInicio || g.schedule?.startTime} –{' '}
-                        {g.horario?.horaFin || g.schedule?.endTime}
-                      </span>
+                      <GraduationCap className="h-3.5 w-3.5 shrink-0" />
+                      <span>{studentsCount} estudiantes</span>
                     </div>
-                  )}
-                  {(g.sala || g.room) && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Layout className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                      <span>{g.sala?.name || g.room?.name}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <GraduationCap className="h-3.5 w-3.5 shrink-0 text-violet-500" />
-                    <span>{(g.estudianteIds || g.studentIds)?.length || 0} estudiantes</span>
                   </div>
-                </div>
-                <Link href={`/dashboard/docente/grupos/${g.id}`}>
-                  <Button className="w-full mt-1">
-                    Ver Detalles
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
+
+                  <div className="flex items-center justify-between pt-2 border-t border-border/30">
+                    <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground">
+                      {periodo}
+                    </span>
+                    <Link href={`/dashboard/docente/grupos/${g.id}`}>
+                      <Button size="sm" variant="ghost" className="h-7 px-3 text-xs gap-1 group-hover:bg-primary/10 group-hover:text-primary">
+                        Ver detalle
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

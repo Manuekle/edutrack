@@ -173,8 +173,8 @@ export default function DocenteDashboard() {
       : undefined;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
+    <div className="space-y-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
         <div>
           {loading ? (
             <div className="space-y-2">
@@ -242,7 +242,7 @@ export default function DocenteDashboard() {
         isLoading={loading || refreshing}
       />
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <TeacherSubjectsList subjects={subjects} isLoading={loading} />
         <UpcomingClassesCard classes={upcomingClasses} isLoading={loading} />
       </div>

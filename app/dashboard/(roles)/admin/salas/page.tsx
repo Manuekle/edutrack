@@ -422,9 +422,9 @@ export default function AdminSalasPage() {
                       <div className="space-y-2">
                         <p className="text-xs font-semibold">1. Descarga la plantilla</p>
                         <a href="/formatos/plantilla_salas.csv" download>
-                          <Button size="default" variant="default" className="w-full justify-start  text-xs">
-                            <Download className="mr-2 h-4 w-4 text-muted-foreground" />
-                            Descargar Plantilla CSV
+                          <Button size="default" variant="default" className="w-full justify-start text-xs">
+                            <Download className="mr-2 h-4 w-4" />
+                            Descargar plantilla CSV
                           </Button>
                         </a>
                       </div>
@@ -631,8 +631,8 @@ export default function AdminSalasPage() {
                         label: 'Salones',
                         count: rooms.filter(r => r.type === 'SALA_CLASE').length,
                         icon: Building2,
-                        bg: 'bg-blue-500/10',
-                        text: 'text-blue-600 dark:text-blue-400',
+                        bg: 'bg-primary/10',
+                        text: 'text-primary',
                       },
                       {
                         label: 'Cómputo',
@@ -702,7 +702,7 @@ export default function AdminSalasPage() {
                             className={cn(
                               'h-10 w-10 rounded-xl flex items-center justify-center shrink-0',
                               room.type === 'SALA_CLASE'
-                                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                ? 'bg-primary/10 text-primary'
                                 : room.type === 'LABORATORIO'
                                   ? 'bg-orange-500/10 text-orange-600 dark:text-orange-400'
                                   : 'bg-purple-500/10 text-purple-600 dark:text-purple-400'

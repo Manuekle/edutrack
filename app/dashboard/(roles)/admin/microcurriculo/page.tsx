@@ -361,7 +361,7 @@ export default function MicrocurriculoPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
                               <DropdownMenuItem
-                                className="cursor-pointer gap-2 py-2 text-blue-600 dark:text-blue-400 focus:bg-blue-500/10 focus:text-blue-600"
+                                className="cursor-pointer gap-2 py-2 text-primary focus:bg-primary/10 focus:text-primary"
                                 onClick={() => openEdit(subject)}
                               >
                                 <Pencil className="h-4 w-4" aria-hidden="true" />

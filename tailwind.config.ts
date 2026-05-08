@@ -94,6 +94,11 @@ const config: Config = {
           primary: '#638ECB',
           dark: '#395886',
         },
+        warm: {
+          DEFAULT: 'var(--accent-warm)',
+          foreground: 'var(--accent-warm-foreground)',
+          soft: 'var(--accent-warm-soft)',
+        },
       },
       borderRadius: {
         sm: 'calc(var(--radius) - 4px)',
@@ -101,6 +106,12 @@ const config: Config = {
         lg: 'var(--radius)',
         xl: 'calc(var(--radius) + 4px)',
         '2xl': 'calc(var(--radius) + 8px)',
+        '3xl': 'calc(var(--radius) + 14px)',
+      },
+      boxShadow: {
+        soft: 'var(--shadow)',
+        'soft-sm': 'var(--shadow-sm)',
+        'soft-xs': 'var(--shadow-xs)',
       },
       keyframes: {
         'accordion-down': {

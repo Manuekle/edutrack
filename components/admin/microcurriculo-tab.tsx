@@ -315,9 +315,9 @@ export function MicrocurriculoTab() {
                   <div className="space-y-2">
                     <p className="text-xs font-semibold">1. Descarga la plantilla</p>
                     <a href="/formatos/plantilla_microcurriculo.csv" download>
-                      <Button size="default" variant="default" className="w-full justify-start  text-xs">
-                        <Download className="mr-2 h-4 w-4 text-muted-foreground" />
-                        Descargar Plantilla CSV
+                      <Button size="default" variant="default" className="w-full justify-start text-xs">
+                        <Download className="mr-2 h-4 w-4" />
+                        Descargar plantilla CSV
                       </Button>
                     </a>
                   </div>

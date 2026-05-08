@@ -245,7 +245,7 @@ export default function AdminUsuariosPage() {
       case 'ADMIN':
         return 'bg-red-500/10 text-red-600 dark:text-red-400';
       case 'DOCENTE':
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400';
+        return 'bg-primary/10 text-primary';
       case 'ESTUDIANTE':
         return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400';
       default:
@@ -568,7 +568,7 @@ export default function AdminUsuariosPage() {
 
                               <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-xl border">
                                 <DropdownMenuItem
-                                  className="cursor-pointer gap-2 py-2.5 rounded-lg text-blue-500 focus:bg-blue-500/10"
+                                  className="cursor-pointer gap-2 py-2.5 rounded-lg text-primary focus:bg-primary/10"
                                   onClick={() => handleEditUser(user)}
                                 >
                                   <Edit2 className="h-3.5 w-3.5 text-primary" />

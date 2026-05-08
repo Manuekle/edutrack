@@ -1,5 +1,6 @@
 import { CardDescription } from '@/components/ui/card';
 import { authOptions } from '@/lib/auth';
+import { getBitacoraHeader } from '@/lib/bitacora-settings';
 import { db } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import Image from 'next/image';
@@ -153,6 +154,7 @@ export default async function PreviewPage({ params }: PageProps) {
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth() + 1;
   const currentPeriod = currentMonth <= 6 ? 1 : 2;
+  const bitacoraHeader = await getBitacoraHeader();
 
   return (
     <div className="space-y-6">
@@ -203,18 +205,18 @@ export default async function PreviewPage({ params }: PageProps) {
                 <span className="font-semibold text-slate-500 uppercase tracking-card">
                   Código:
                 </span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">FO-DO-005</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">{bitacoraHeader.codigo}</span>
               </div>
               <div className="flex justify-between items-center gap-4 border-b border-slate-100 dark:border-slate-800 py-1.5 px-3">
                 <span className="font-semibold text-slate-500 uppercase tracking-card">
                   Versión:
                 </span>
-                <span className="font-medium text-slate-900 dark:text-slate-100">08</span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">{bitacoraHeader.version}</span>
               </div>
               <div className="flex justify-between items-center gap-4 py-1.5 px-3">
                 <span className="font-semibold text-slate-500 uppercase tracking-card">Fecha:</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100 capitalize">
-                  {metaMonthYear}
+                  {bitacoraHeader.fecha}
                 </span>
               </div>
             </div>

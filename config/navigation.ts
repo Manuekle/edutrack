@@ -145,6 +145,24 @@ export const navLinkGroups: NavLinkGroup[] = [
   },
 
   // ─────────────────────────────────────────
+  // BITÁCORA (Admin)
+  // ─────────────────────────────────────────
+  {
+    title: 'Bitácora',
+    roles: ['ADMIN'],
+    icon: NotebookPen,
+    links: [
+      {
+        href: '/dashboard/admin/bitacora',
+        icon: NotebookPen,
+        label: 'Encabezado',
+        roles: ['ADMIN'],
+        description: 'Configurar código, versión y fecha del formato institucional',
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────
   // REPORTES (Admin)
   // ─────────────────────────────────────────
   {

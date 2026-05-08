@@ -700,133 +700,141 @@ export default function ProfilePage() {
 
         {session?.user?.role === 'DOCENTE' && (
           <TabsContent value="signature" className="space-y-4">
-            <Card className="p-0">
-              <CardHeader className="border-b px-5 py-4">
-                <CardTitle className="sm:text-sm text-xs font-semibold">Firma Digital</CardTitle>
-                <CardDescription className="text-xs text-muted-foreground">
-                  Gestiona tu firma oficial para certificados y documentos.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-5 py-5 space-y-6">
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Subir imagen de firma</Label>
-                    <div className="rounded-xl overflow-hidden border border-dashed border-border">
-                      <SignatureFileUpload onFileSelect={handleFileSelect} file={signatureFile} />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      PNG con fondo transparente o blanco. Máximo 2 MB.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">Dibujar firma a mano</Label>
-                    <div
-                      ref={canvasWrapperRef}
-                      className="signature-canvas-container w-full h-[180px] rounded-xl bg-white border border-border relative overflow-hidden touch-none select-none"
-                    >
-                      <SignatureCanvas
-                        ref={sigCanvas}
-                        penColor={signaturePenColor}
-                        canvasProps={{
-                          className: 'w-full h-full rounded-xl touch-none cursor-crosshair',
-                          style: { touchAction: 'none', display: 'block' },
-                        }}
-                        velocityFilterWeight={0.7}
-                        minWidth={2}
-                        maxWidth={4}
-                        throttle={16}
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="default"
-                        onClick={clearCanvas}
-                        className="flex-1 text-xs"
-                      >
-                        Limpiar
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="default"
-                        onClick={saveCanvas}
-                        className="flex-1 text-xs"
-                      >
-                        Capturar trazo
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t border-border/80 pt-6">
-                  <p className="sm:text-sm text-xs font-medium text-foreground mb-3">Vista previa</p>
-                  <div className="flex flex-col sm:flex-row gap-6 items-stretch sm:items-center">
-                    <div className="shrink-0 w-full sm:w-56 h-32 rounded-xl bg-muted/30 dark:bg-muted/10 border border-border/80 shadow-sm overflow-hidden flex items-center justify-center ring-1 ring-black/4 dark:ring-white/6">
-                      {signaturePreview ? (
-                        <div className="relative w-full h-full p-4">
-                          <Image
-                            src={signaturePreview}
-                            alt="Firma"
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            className="w-full object-contain dark:invert transition-all"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-                          <div className="rounded-full bg-muted/80 dark:bg-muted/40 p-2.5">
-                            <PenLine className="h-5 w-5 opacity-60" />
-                          </div>
-                          <span className="text-xs font-medium">Sin firma</span>
-                          <span className="text-[11px] text-muted-foreground/90">
-                            Aparecerá aquí
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col justify-center gap-2 min-w-0">
-                      {signatureFile ? (
-                        <p className="text-xs text-warning font-medium">Pendiente de guardar</p>
-                      ) : signaturePreview ? (
-                        <p className="text-xs text-success font-medium">Firma guardada</p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">
-                          Sube una imagen o dibuja y pulsa «Capturar trazo».
-                        </p>
-                      )}
-                      <div className="flex gap-2 flex-wrap">
-                        <Button
-                          onClick={handleUploadSignature}
-                          disabled={!signatureFile || isSignatureLoading}
-                          size="default"
-                          className="text-xs h-8"
-                        >
-                          {isSignatureLoading ? (
-                            <>
-                              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                              Guardando...
-                            </>
-                          ) : (
-                            'Guardar Firma'
-                          )}
-                        </Button>
-                        {signatureFile && (
-                          <Button
-                            onClick={handleCancelSignature}
-                            variant="ghost"
-                            size="default"
-                            className="text-xs h-8 text-muted-foreground"
-                          >
-                            Cancelar
-                          </Button>
-                        )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Preview principal */}
+              <Card className="lg:col-span-1 lg:row-span-2">
+                <CardHeader className="px-5 pt-5 pb-3">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <PenLine className="h-4 w-4 text-primary" />
+                    Tu firma
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Aparecerá en bitácoras firmadas y reportes oficiales.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-5 pb-5 space-y-3">
+                  <div className="aspect-[3/2] rounded-2xl bg-muted/30 dark:bg-muted/10 border border-dashed border-border/50 overflow-hidden flex items-center justify-center relative">
+                    {signaturePreview ? (
+                      <div className="relative w-full h-full p-6">
+                        <Image
+                          src={signaturePreview}
+                          alt="Firma"
+                          fill
+                          style={{ objectFit: 'contain' }}
+                          className="dark:invert transition-all"
+                        />
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                        <div className="h-12 w-12 rounded-2xl bg-muted/40 flex items-center justify-center">
+                          <PenLine className="h-5 w-5 opacity-50" />
+                        </div>
+                        <span className="text-xs font-medium">Sin firma registrada</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-2 w-2 rounded-full ${signatureFile ? 'bg-amber-500' : signaturePreview ? 'bg-emerald-500' : 'bg-muted-foreground/30'}`}
+                    />
+                    <span className="text-[11px] font-medium">
+                      {signatureFile
+                        ? 'Cambios sin guardar'
+                        : signaturePreview
+                          ? 'Firma guardada'
+                          : 'Aún no has registrado firma'}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={handleUploadSignature}
+                      disabled={!signatureFile || isSignatureLoading}
+                      className="flex-1 h-9"
+                    >
+                      {isSignatureLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                          Guardando...
+                        </>
+                      ) : (
+                        'Guardar firma'
+                      )}
+                    </Button>
+                    {signatureFile && (
+                      <Button
+                        onClick={handleCancelSignature}
+                        variant="ghost"
+                        className="h-9 text-muted-foreground"
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Subir imagen */}
+              <Card className="lg:col-span-2">
+                <CardHeader className="px-5 pt-5 pb-3">
+                  <CardTitle className="text-sm font-semibold">Subir imagen</CardTitle>
+                  <CardDescription className="text-xs">
+                    PNG con fondo transparente o blanco · máx. 2 MB.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-5 pb-5">
+                  <div className="rounded-2xl overflow-hidden border border-dashed border-border/50 bg-muted/10">
+                    <SignatureFileUpload onFileSelect={handleFileSelect} file={signatureFile} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Dibujar */}
+              <Card className="lg:col-span-2">
+                <CardHeader className="px-5 pt-5 pb-3">
+                  <CardTitle className="text-sm font-semibold">Dibujar a mano</CardTitle>
+                  <CardDescription className="text-xs">
+                    Usa el ratón o pantalla táctil. Pulsa <strong>Capturar trazo</strong> para registrar.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-5 pb-5 space-y-3">
+                  <div
+                    ref={canvasWrapperRef}
+                    className="signature-canvas-container w-full h-[200px] rounded-2xl bg-white border border-border/50 relative overflow-hidden touch-none select-none"
+                  >
+                    <SignatureCanvas
+                      ref={sigCanvas}
+                      penColor={signaturePenColor}
+                      canvasProps={{
+                        className: 'w-full h-full rounded-2xl touch-none cursor-crosshair',
+                        style: { touchAction: 'none', display: 'block' },
+                      }}
+                      velocityFilterWeight={0.7}
+                      minWidth={2}
+                      maxWidth={4}
+                      throttle={16}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={clearCanvas}
+                      className="flex-1 h-9"
+                    >
+                      Limpiar
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={saveCanvas}
+                      className="flex-1 h-9"
+                    >
+                      Capturar trazo
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         )}
       </Tabs>
